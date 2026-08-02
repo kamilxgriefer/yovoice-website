@@ -7,7 +7,8 @@ export const siteConfig = {
   navigation: [
     { label: "Experience", href: "#experience" },
     { label: "Community", href: "#community" },
-    { label: "Features", href: "#features" },
+    { label: "Clubs", href: "#clubs" },
+    { label: "Achievements", href: "#achievements" },
     { label: "Download", href: "#download" },
   ],
 } as const;

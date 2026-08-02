@@ -1,24 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Menu, Mic2, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#08040f]/75 backdrop-blur-2xl">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
+        isScrolled
+          ? "border-white/[0.08] bg-[#08040f]/88 shadow-[0_12px_50px_rgba(0,0,0,0.26)] backdrop-blur-2xl"
+          : "border-transparent bg-[#08040f]/45 backdrop-blur-xl"
+      }`}
+    >
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
         <Link
           href="/"
-          className="focus-ring flex items-center gap-3 rounded-xl"
+          className="focus-ring flex items-center gap-3 rounded-2xl"
           aria-label="YO Voice home"
         >
-          <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 shadow-[0_0_35px_rgba(192,38,255,0.32)]">
-            <Mic2 className="size-5 text-white" />
+          <span className="relative flex size-12 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black shadow-[0_0_35px_rgba(192,38,255,0.25)]">
+            <Image
+              src="/logos/yovoice-logo.png"
+              alt="YO Voice logo"
+              width={48}
+              height={48}
+              className="size-full object-cover"
+              priority
+            />
           </span>
 
           <span>
@@ -26,18 +50,18 @@ export function SiteHeader() {
               YO Voice
             </span>
 
-            <span className="block text-[9px] font-semibold uppercase tracking-[0.34em] text-fuchsia-300">
+            <span className="block text-[9px] font-bold uppercase tracking-[0.34em] text-fuchsia-300">
               Be You
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden items-center gap-7 lg:flex">
           {siteConfig.navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="focus-ring rounded-lg text-sm font-medium text-white/60 transition hover:text-white"
+              className="focus-ring rounded-lg text-sm font-medium text-white/55 transition hover:text-white"
             >
               {item.label}
             </Link>
@@ -53,8 +77,8 @@ export function SiteHeader() {
           </Link>
 
           <Link
-            href="/download"
-            className="focus-ring inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-bold text-black shadow-lg transition hover:-translate-y-0.5 hover:bg-fuchsia-50"
+            href="#download"
+            className="focus-ring inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-bold text-black shadow-[0_10px_30px_rgba(255,255,255,0.12)] transition hover:-translate-y-0.5 hover:bg-fuchsia-50"
           >
             Download
           </Link>
@@ -72,7 +96,7 @@ export function SiteHeader() {
       </div>
 
       {isOpen ? (
-        <div className="border-t border-white/[0.06] bg-[#0d0715]/95 px-5 py-5 backdrop-blur-2xl lg:hidden">
+        <div className="border-t border-white/[0.06] bg-[#0d0715]/96 px-5 py-5 backdrop-blur-2xl lg:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-2">
             {siteConfig.navigation.map((item) => (
               <Link
@@ -95,7 +119,7 @@ export function SiteHeader() {
               </Link>
 
               <Link
-                href="/download"
+                href="#download"
                 onClick={() => setIsOpen(false)}
                 className="flex min-h-12 items-center justify-center rounded-xl bg-white text-sm font-bold text-black"
               >

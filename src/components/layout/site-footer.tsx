@@ -1,13 +1,14 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Mic2 } from "lucide-react";
 
 const footerLinks = [
   {
     title: "Product",
     links: [
-      { label: "Features", href: "#features" },
+      { label: "Experience", href: "#experience" },
       { label: "Community", href: "#community" },
-      { label: "Download", href: "/download" },
+      { label: "Clubs", href: "#clubs" },
+      { label: "Download", href: "#download" },
     ],
   },
   {
@@ -34,15 +35,22 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-7xl gap-12 px-5 py-16 sm:px-8 md:grid-cols-[1.2fr_1fr] lg:px-10">
         <div className="max-w-sm">
           <Link href="/" className="inline-flex items-center gap-3">
-            <span className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500">
-              <Mic2 className="size-5 text-white" />
+            <span className="relative flex size-12 overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black">
+              <Image
+                src="/logos/yovoice-logo.png"
+                alt="YO Voice logo"
+                width={48}
+                height={48}
+                className="size-full object-cover"
+              />
             </span>
 
             <span>
               <span className="block font-[family-name:var(--font-display)] text-lg font-bold text-white">
                 YO Voice
               </span>
-              <span className="text-[9px] font-semibold uppercase tracking-[0.34em] text-fuchsia-300">
+
+              <span className="text-[9px] font-bold uppercase tracking-[0.34em] text-fuchsia-300">
                 Be You
               </span>
             </span>
@@ -51,6 +59,10 @@ export function SiteFooter() {
           <p className="mt-5 text-sm leading-7 text-white/45">
             A modern voice platform created for communities, creators and
             meaningful conversations.
+          </p>
+
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-white/25">
+            Your voice. Your community.
           </p>
         </div>
 

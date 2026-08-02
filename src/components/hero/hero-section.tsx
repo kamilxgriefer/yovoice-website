@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,26 +17,30 @@ const members = [
   {
     name: "Maya",
     initial: "M",
-    position: "left-[4%] top-[25%] sm:left-[8%]",
+    position: "left-[3%] top-[26%] sm:left-[7%]",
     delay: 0,
+    active: true,
   },
   {
     name: "Alex",
     initial: "A",
-    position: "right-[4%] top-[19%] sm:right-[8%]",
-    delay: 0.3,
+    position: "right-[3%] top-[18%] sm:right-[8%]",
+    delay: 0.25,
+    active: false,
   },
   {
     name: "Luna",
     initial: "L",
-    position: "bottom-[17%] left-[11%] sm:left-[16%]",
-    delay: 0.6,
+    position: "bottom-[16%] left-[10%] sm:left-[16%]",
+    delay: 0.55,
+    active: false,
   },
   {
     name: "Noah",
     initial: "N",
-    position: "bottom-[14%] right-[9%] sm:right-[15%]",
-    delay: 0.9,
+    position: "bottom-[13%] right-[8%] sm:right-[15%]",
+    delay: 0.85,
+    active: false,
   },
 ];
 
@@ -45,10 +50,11 @@ export function HeroSection() {
       <div className="grid-background absolute inset-0 opacity-60" />
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.045]" />
 
-      <div className="absolute left-[-15%] top-[24%] size-[460px] rounded-full bg-violet-700/20 blur-[120px]" />
-      <div className="absolute right-[-12%] top-[10%] size-[520px] rounded-full bg-fuchsia-600/15 blur-[140px]" />
+      <div className="absolute left-[-18%] top-[25%] size-[500px] rounded-full bg-violet-700/20 blur-[130px]" />
+      <div className="absolute right-[-14%] top-[8%] size-[580px] rounded-full bg-fuchsia-600/16 blur-[150px]" />
+      <div className="absolute bottom-[-25%] left-[35%] size-[500px] rounded-full bg-purple-900/20 blur-[150px]" />
 
-      <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl items-center gap-16 px-5 py-20 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-10 lg:py-24">
+      <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-7xl items-center gap-16 px-5 py-20 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10 lg:py-24">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
@@ -60,7 +66,7 @@ export function HeroSection() {
             A new way to connect
           </div>
 
-          <h1 className="font-[family-name:var(--font-display)] text-5xl font-bold leading-[0.96] tracking-[-0.055em] text-white sm:text-6xl lg:text-[74px]">
+          <h1 className="font-[family-name:var(--font-display)] text-5xl font-bold leading-[0.95] tracking-[-0.055em] text-white sm:text-6xl lg:text-[76px]">
             Your voice.
             <span className="text-gradient mt-2 block">Your community.</span>
           </h1>
@@ -73,7 +79,7 @@ export function HeroSection() {
 
           <div className="mt-9 flex flex-col gap-4 sm:flex-row">
             <Link
-              href="/download"
+              href="#download"
               className="focus-ring inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 px-7 font-bold text-white shadow-[0_18px_60px_rgba(138,43,226,0.38)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_70px_rgba(192,38,255,0.46)]"
             >
               Download YO Voice
@@ -104,7 +110,7 @@ export function HeroSection() {
 
             <span className="flex items-center gap-2">
               <Headphones className="size-4 text-pink-400" />
-              Made for real conversations
+              Real conversations
             </span>
           </div>
         </motion.div>
@@ -122,17 +128,31 @@ export function HeroSection() {
 
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
             className="absolute inset-[10%] rounded-full border border-dashed border-white/[0.07]"
           />
 
           <motion.div
-            animate={{ scale: [1, 1.06, 1] }}
-            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-[37%] flex items-center justify-center rounded-full border border-fuchsia-200/40 bg-gradient-to-br from-violet-700 via-purple-500 to-fuchsia-500 shadow-[0_0_110px_rgba(192,38,255,0.52)]"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 48, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-[22%] rounded-full border border-dashed border-fuchsia-300/[0.08]"
+          />
+
+          <motion.div
+            animate={{ scale: [1, 1.055, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-[36%] flex items-center justify-center rounded-full border border-fuchsia-200/35 bg-black shadow-[0_0_120px_rgba(192,38,255,0.5)]"
           >
-            <div className="absolute inset-[-70%] rounded-full bg-fuchsia-500/10 blur-3xl" />
-            <Mic2 className="relative size-14 text-white sm:size-16" />
+            <div className="absolute inset-[-60%] rounded-full bg-fuchsia-500/10 blur-3xl" />
+
+            <Image
+              src="/logos/yovoice-logo.png"
+              alt="YO Voice community heart"
+              width={180}
+              height={180}
+              className="relative size-full rounded-full object-cover"
+              priority
+            />
           </motion.div>
 
           {members.map((member, index) => (
@@ -150,10 +170,10 @@ export function HeroSection() {
               className={`absolute ${member.position}`}
             >
               <div className="relative">
-                {index === 0 ? (
+                {member.active ? (
                   <>
-                    <span className="absolute inset-[-14px] animate-ping rounded-full border border-fuchsia-400/20" />
-                    <span className="absolute inset-[-8px] rounded-full border border-fuchsia-300/40" />
+                    <span className="absolute inset-[-15px] animate-ping rounded-full border border-fuchsia-400/25" />
+                    <span className="absolute inset-[-8px] rounded-full border border-fuchsia-300/45 shadow-[0_0_30px_rgba(232,121,249,0.25)]" />
                   </>
                 ) : (
                   <span className="absolute inset-[-7px] rounded-full border border-white/10" />
@@ -170,10 +190,11 @@ export function HeroSection() {
             </motion.div>
           ))}
 
-          <div className="glass-panel absolute bottom-[1%] left-1/2 w-[230px] -translate-x-1/2 rounded-2xl px-5 py-4 text-center sm:bottom-[4%]">
+          <div className="glass-panel absolute bottom-[0%] left-1/2 w-[240px] -translate-x-1/2 rounded-2xl px-5 py-4 text-center sm:bottom-[3%]">
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-fuchsia-300">
               Heart of the Community
             </p>
+
             <p className="mt-1.5 text-sm font-semibold text-white">
               Maya is speaking
             </p>
