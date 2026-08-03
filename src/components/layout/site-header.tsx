@@ -17,10 +17,7 @@ export function SiteHeader() {
     };
 
     handleScroll();
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -49,17 +46,17 @@ export function SiteHeader() {
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
         isScrolled
-          ? "border-white/[0.08] bg-[#08040f]/90 shadow-[0_14px_50px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
-          : "border-transparent bg-[#08040f]/55 backdrop-blur-xl"
+          ? "border-white/[0.08] bg-[#08040f]/92 shadow-[0_16px_60px_rgba(0,0,0,0.36)] backdrop-blur-2xl"
+          : "border-transparent bg-[#08040f]/58 backdrop-blur-xl"
       }`}
     >
-      <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+      <div className="mx-auto flex h-20 w-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link
           href="/"
           className="focus-ring flex items-center gap-3 rounded-2xl"
           aria-label="YO Voice home"
         >
-          <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#0c0614] shadow-[0_0_35px_rgba(192,38,255,0.3)]">
+          <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#0c0614] shadow-[0_0_38px_rgba(192,38,255,0.32)]">
             <Image
               src="/logos/yovoice-logo.png"
               alt="YO Voice logo"
@@ -106,10 +103,11 @@ export function SiteHeader() {
 
           <Link
             href="#download"
-            className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 px-5 text-sm font-bold text-white shadow-[0_12px_36px_rgba(138,43,226,0.32)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(192,38,255,0.42)]"
+            className="focus-ring group relative inline-flex min-h-12 items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 px-5 text-sm font-bold text-white shadow-[0_14px_42px_rgba(138,43,226,0.34)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_52px_rgba(192,38,255,0.46)]"
           >
-            <ArrowDownToLine className="size-4" />
-            Download
+            <span className="absolute inset-0 translate-x-[-130%] bg-gradient-to-r from-transparent via-white/20 to-transparent transition duration-700 group-hover:translate-x-[130%]" />
+            <ArrowDownToLine className="relative size-4" />
+            <span className="relative">Download</span>
           </Link>
         </div>
 

@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 
-const stars = Array.from({ length: 90 }, (_, index) => ({
+const stars = Array.from({ length: 125 }, (_, index) => ({
   id: index,
   left: (index * 37 + 11) % 100,
   top: (index * 61 + 7) % 100,
   size: 1 + ((index * 13) % 3),
-  opacity: 0.18 + ((index * 17) % 60) / 100,
+  opacity: 0.14 + ((index * 17) % 56) / 100,
   duration: 3.5 + ((index * 7) % 8) * 0.45,
   delay: ((index * 11) % 10) * 0.2,
 }));
@@ -29,8 +29,12 @@ export function StarField() {
             height: star.size,
           }}
           animate={{
-            opacity: [star.opacity, Math.min(star.opacity + 0.45, 1), star.opacity],
-            scale: [1, 1.6, 1],
+            opacity: [
+              star.opacity,
+              Math.min(star.opacity + 0.42, 0.94),
+              star.opacity,
+            ],
+            scale: [1, 1.55, 1],
           }}
           transition={{
             duration: star.duration,
@@ -42,15 +46,15 @@ export function StarField() {
       ))}
 
       <motion.div
-        className="absolute left-[12%] top-[18%] h-px w-24 rotate-[-28deg] bg-gradient-to-r from-transparent via-fuchsia-200/70 to-transparent"
+        className="absolute left-[8%] top-[13%] h-px w-28 rotate-[-28deg] bg-gradient-to-r from-transparent via-fuchsia-200/75 to-transparent"
         animate={{
-          x: [0, 260],
-          y: [0, 130],
-          opacity: [0, 0.8, 0],
+          x: [0, 340],
+          y: [0, 170],
+          opacity: [0, 0.9, 0],
         }}
         transition={{
-          duration: 5.8,
-          delay: 2,
+          duration: 5.6,
+          delay: 1.5,
           repeat: Infinity,
           repeatDelay: 8,
           ease: "easeOut",
@@ -58,17 +62,33 @@ export function StarField() {
       />
 
       <motion.div
-        className="absolute right-[20%] top-[12%] h-px w-16 rotate-[-32deg] bg-gradient-to-r from-transparent via-violet-200/60 to-transparent"
+        className="absolute right-[24%] top-[9%] h-px w-20 rotate-[-32deg] bg-gradient-to-r from-transparent via-violet-200/70 to-transparent"
         animate={{
-          x: [0, 180],
-          y: [0, 95],
-          opacity: [0, 0.65, 0],
+          x: [0, 220],
+          y: [0, 115],
+          opacity: [0, 0.75, 0],
         }}
         transition={{
           duration: 4.8,
-          delay: 6,
+          delay: 5,
           repeat: Infinity,
-          repeatDelay: 11,
+          repeatDelay: 10,
+          ease: "easeOut",
+        }}
+      />
+
+      <motion.div
+        className="absolute bottom-[18%] left-[28%] h-px w-16 rotate-[-24deg] bg-gradient-to-r from-transparent via-pink-200/55 to-transparent"
+        animate={{
+          x: [0, 150],
+          y: [0, 80],
+          opacity: [0, 0.6, 0],
+        }}
+        transition={{
+          duration: 4,
+          delay: 10,
+          repeat: Infinity,
+          repeatDelay: 13,
           ease: "easeOut",
         }}
       />

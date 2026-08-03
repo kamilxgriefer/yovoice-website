@@ -134,9 +134,44 @@ img {
   outline-offset: 4px;
 }
 
+.cosmic-cloud {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(150px);
+}
+
+.cosmic-cloud-left {
+  left: -18%;
+  top: 22%;
+  width: 560px;
+  height: 560px;
+  background: rgba(109, 40, 217, 0.2);
+}
+
+.cosmic-cloud-right {
+  right: -14%;
+  top: 3%;
+  width: 680px;
+  height: 680px;
+  background: rgba(192, 38, 255, 0.15);
+}
+
+.cosmic-cloud-bottom {
+  bottom: -30%;
+  left: 27%;
+  width: 640px;
+  height: 640px;
+  background: rgba(88, 28, 135, 0.22);
+}
+
 @media (max-width: 1023px) {
   .grid-background {
     background-size: 40px 40px;
+  }
+
+  .cosmic-cloud {
+    filter: blur(120px);
   }
 }
 
