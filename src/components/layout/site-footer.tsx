@@ -1,109 +1,59 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BriefcaseBusiness, Camera, Code2, Mail } from "lucide-react";
 
-const footerLinks = [
-  {
-    title: "Product",
-    links: [
-      { label: "Experience", href: "#experience" },
-      { label: "Community", href: "#community" },
-      { label: "Clubs", href: "#clubs" },
-      { label: "Download", href: "#download" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About", href: "/about" },
-      { label: "Roadmap", href: "/roadmap" },
-      { label: "Contact", href: "/contact" },
-      { label: "Careers", href: "/careers" },
-    ],
-  },
-  {
-    title: "Support",
-    links: [
-      { label: "Help Center", href: "/help" },
-      { label: "Safety", href: "/safety" },
-      { label: "Status", href: "/status" },
-      { label: "FAQ", href: "/faq" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { label: "Privacy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
-      { label: "Cookies", href: "/cookies" },
-    ],
-  },
+const columns = [
+  { title: "Product", links: [["Experience","#experience"],["Community","#community"],["Clubs","#clubs"],["Download","#download"]] },
+  { title: "Company", links: [["About","mailto:hello@yovoice.app?subject=About YO Voice"],["Roadmap","#experience"],["Contact","mailto:hello@yovoice.app"],["Careers","mailto:careers@yovoice.app"]] },
+  { title: "Support", links: [["Help Center","mailto:support@yovoice.app"],["Safety","#community"],["Status","#stats"],["FAQ","#download"]] },
+  { title: "Legal", links: [["Privacy","#footer"],["Terms","#footer"],["Cookies","#footer"]] },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#07030d]">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_1.35fr] lg:px-12">
+    <footer id="footer" className="border-t border-white/[.06] bg-[#05040d]">
+      <div className="mx-auto grid max-w-[1400px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.4fr] lg:px-12">
         <div className="max-w-sm">
           <Link href="/" className="inline-flex items-center gap-3">
             <span className="relative flex size-12 overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black">
-              <Image
-                src="/logos/yovoice-logo.png"
-                alt="YO Voice logo"
-                width={48}
-                height={48}
-                className="size-full object-cover"
-              />
+              <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill className="object-cover"/>
             </span>
-
-            <span>
-              <span className="block font-[family-name:var(--font-display)] text-lg font-bold text-white">
-                YO Voice
-              </span>
-
-              <span className="text-[9px] font-bold uppercase tracking-[0.34em] text-fuchsia-300">
-                Be You
-              </span>
-            </span>
+            <span><span className="block text-lg font-bold">YO Voice</span><span className="text-[9px] font-bold uppercase tracking-[.34em] text-fuchsia-300">Be You</span></span>
           </Link>
-
-          <p className="mt-6 text-sm leading-7 text-white/45">
-            Where conversations become communities. Built for creators,
-            friends and people looking for something real.
-          </p>
-
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-white/25">
-            Voice first. Community always.
-          </p>
+          <p className="mt-6 text-sm leading-7 text-white/45">Where conversations become communities. Built for creators, friends and people looking for something real.</p>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/25">Voice first. Community always.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
-          {footerLinks.map((section) => (
-            <div key={section.title}>
-              <h2 className="text-sm font-bold text-white">
-                {section.title}
-              </h2>
-
+          {columns.map((column) => (
+            <div key={column.title}>
+              <h2 className="text-sm font-bold">{column.title}</h2>
               <ul className="mt-5 space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-white/40 transition hover:text-white"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="text-sm text-white/42 transition hover:text-white">{label}</Link></li>)}
               </ul>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="border-t border-white/[0.06]">
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-5 py-6 text-xs text-white/35 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
-          <p>© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
-          <p>Designed and built by Kamil Jaguszewski.</p>
+      <div className="border-t border-white/[.06]">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-5 px-5 py-6 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+          <p className="text-xs text-white/35">© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
+          <div className="flex items-center gap-3">
+            {[
+              [Code2,"https://github.com/kamilxgriefer","GitHub"],
+              [BriefcaseBusiness,"https://www.linkedin.com/","LinkedIn"],
+              [Camera,"https://www.instagram.com/","Instagram"],
+              [Mail,"mailto:hello@yovoice.app","Email"],
+            ].map(([Icon,href,label]) => {
+              const Comp = Icon as typeof Code2;
+              return (
+                <a key={String(label)} href={String(href)} target={String(href).startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[.04] text-white/60 transition hover:border-fuchsia-300/30 hover:bg-fuchsia-400/10 hover:text-white" aria-label={String(label)}>
+                  <Comp className="size-4"/>
+                </a>
+              )
+            })}
+          </div>
         </div>
       </div>
     </footer>
