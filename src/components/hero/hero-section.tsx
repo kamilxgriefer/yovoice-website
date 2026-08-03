@@ -17,78 +17,79 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { StarField } from "@/components/animations/star-field";
 
+type MemberId = "maya" | "alex" | "luna" | "noah";
+
 type Member = {
+  id: MemberId;
   name: string;
   avatar: string;
   position: string;
-  delay: number;
-  active?: boolean;
-  status: string;
   bubble: string;
+  status: string;
   messages: string[];
+  equalizer: number[];
 };
 
 const members: Member[] = [
   {
+    id: "maya",
     name: "Maya",
-    avatar: "/avatars/maya.jpg",
-    position: "left-[5%] top-[13%]",
-    delay: 0,
-    active: true,
+    avatar: "/avatars/maya.svg",
+    position: "left-[7%] top-[14%]",
+    bubble: "left-[6px]",
     status: "bg-emerald-400",
-    bubble: "left-1/2 -translate-x-1/2",
     messages: [
       "Hey everyone! 👋",
       "How's your day going?",
       "Love this community 💜",
       "Ready to start?",
-      "Let's build something great!",
     ],
+    equalizer: [8, 18, 12, 21, 15, 9, 17, 12, 19],
   },
   {
+    id: "alex",
     name: "Alex",
-    avatar: "/avatars/alex.jpg",
-    position: "right-[4%] top-[18%]",
-    delay: 0.65,
+    avatar: "/avatars/alex.svg",
+    position: "right-[6%] top-[17%]",
+    bubble: "right-[0px]",
     status: "bg-emerald-400",
-    bubble: "right-[-22px]",
     messages: [
       "Great to be here! 🚀",
       "This sounds amazing!",
       "Can I join the stage?",
-      "Nice to meet you all!",
       "Count me in 🙌",
     ],
+    equalizer: [13, 8, 20, 11, 18, 14, 7, 17, 12],
   },
   {
+    id: "luna",
     name: "Luna",
-    avatar: "/avatars/luna.jpg",
-    position: "bottom-[8%] left-[11%]",
-    delay: 1.3,
+    avatar: "/avatars/luna.svg",
+    position: "bottom-[9%] left-[13%]",
+    bubble: "left-[2px]",
     status: "bg-amber-300",
-    bubble: "left-1/2 -translate-x-1/2",
     messages: [
       "Let's go! 💜",
       "That was brilliant!",
       "I totally agree.",
-      "Who wants to join?",
       "This room feels alive ✨",
     ],
+    equalizer: [10, 16, 9, 19, 12, 20, 8, 14, 18],
   },
   {
+    id: "noah",
     name: "Noah",
-    avatar: "/avatars/noah.jpg",
-    position: "bottom-[6%] right-[8%]",
-    delay: 1.95,
+    avatar: "/avatars/noah.svg",
+    position: "bottom-[8%] right-[10%]",
+    bubble: "right-[0px]",
     status: "bg-emerald-400",
-    bubble: "right-[-18px]",
     messages: [
       "Awesome talk! 🔥",
       "Good point, Maya.",
       "I'm listening 👂",
-      "See you in the club!",
       "What happens next?",
     ],
+    equalizer: [18, 14, 9, 20, 12, 7, 16, 11, 19],
   },
 ];
 
@@ -99,61 +100,74 @@ const platforms = [
 ];
 
 function RotatingChatBubble({
-  messages,
+  member,
+  active,
   delay,
-  bubbleClass,
 }: {
-  messages: string[];
+  member: Member;
+  active: boolean;
   delay: number;
-  bubbleClass: string;
 }) {
   const [messageIndex, setMessageIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-
-  const cycleDuration = 6900;
-  const visibleDuration = 4100;
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let hideTimer: ReturnType<typeof setTimeout>;
-    let interval: ReturnType<typeof setInterval>;
+    let hideTimer: ReturnType<typeof setTimeout> | undefined;
+    let nextTimer: ReturnType<typeof setTimeout> | undefined;
+    let interval: ReturnType<typeof setInterval> | undefined;
 
     const showBubble = () => {
-      setIsVisible(true);
+      setVisible(true);
 
       hideTimer = setTimeout(() => {
-        setIsVisible(false);
+        setVisible(false);
 
-        setTimeout(() => {
-          setMessageIndex((current) => (current + 1) % messages.length);
-        }, 420);
-      }, visibleDuration);
+        nextTimer = setTimeout(() => {
+          setMessageIndex((current) => (current + 1) % member.messages.length);
+        }, 350);
+      }, 3200);
     };
 
     const startTimer = setTimeout(() => {
       showBubble();
-      interval = setInterval(showBubble, cycleDuration);
-    }, delay * 1000);
+      interval = setInterval(showBubble, 7600);
+    }, delay);
 
     return () => {
       clearTimeout(startTimer);
-      clearTimeout(hideTimer);
-      clearInterval(interval);
+      if (hideTimer) clearTimeout(hideTimer);
+      if (nextTimer) clearTimeout(nextTimer);
+      if (interval) clearInterval(interval);
     };
-  }, [delay, messages.length]);
+  }, [delay, member.messages.length]);
 
   return (
     <AnimatePresence mode="wait">
-      {isVisible ? (
+      {visible ? (
         <motion.div
-          key={`${messageIndex}-${messages[messageIndex]}`}
-          initial={{ opacity: 0, y: 8, scale: 0.94 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -7, scale: 0.96 }}
-          transition={{ duration: 0.34, ease: "easeOut" }}
-          className={`absolute bottom-[calc(100%+14px)] z-30 whitespace-nowrap rounded-2xl border border-fuchsia-200/15 bg-[#171022]/96 px-4 py-3 text-[11px] font-semibold text-white shadow-[0_16px_45px_rgba(0,0,0,.42),0_0_28px_rgba(192,38,255,.08)] backdrop-blur-2xl ${bubbleClass}`}
+          key={`${member.id}-${messageIndex}`}
+          initial={{ opacity: 0, y: 7, scale: 0.96 }}
+          animate={{
+            opacity: active ? 1 : 0.86,
+            y: 0,
+            scale: active ? 1 : 0.98,
+          }}
+          exit={{ opacity: 0, y: -6, scale: 0.97 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className={`absolute bottom-[calc(100%+12px)] z-40 max-w-[180px] whitespace-nowrap rounded-2xl border px-4 py-2.5 text-[11px] font-semibold text-white backdrop-blur-2xl ${
+            active
+              ? "border-fuchsia-200/25 bg-[#1b1027]/98 shadow-[0_16px_45px_rgba(0,0,0,.45),0_0_32px_rgba(192,38,255,.16)]"
+              : "border-white/10 bg-[#171022]/94 shadow-[0_16px_38px_rgba(0,0,0,.34)]"
+          } ${member.bubble}`}
         >
-          {messages[messageIndex]}
-          <span className="absolute -bottom-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45 border-b border-r border-fuchsia-200/15 bg-[#171022]" />
+          {member.messages[messageIndex]}
+          <span
+            className={`absolute -bottom-1.5 left-7 size-3 rotate-45 border-b border-r ${
+              active
+                ? "border-fuchsia-200/25 bg-[#1b1027]"
+                : "border-white/10 bg-[#171022]"
+            }`}
+          />
         </motion.div>
       ) : null}
     </AnimatePresence>
@@ -161,12 +175,23 @@ function RotatingChatBubble({
 }
 
 export function HeroSection() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeMember = members[activeIndex];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % members.length);
+    }, 6200);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const connectionPaths = useMemo(
     () => [
-      "M19 26 C30 30 39 39 48 48",
-      "M52 48 C63 39 73 30 83 27",
-      "M47 53 C38 64 30 72 24 79",
-      "M53 53 C63 64 72 71 82 77",
+      "M20 25 C31 30 40 39 48 48",
+      "M52 48 C63 39 73 31 81 27",
+      "M47 53 C39 63 31 71 25 78",
+      "M53 53 C63 63 72 70 80 76",
     ],
     [],
   );
@@ -174,6 +199,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden pt-20">
       <StarField />
+
       <div className="grid-background absolute inset-0 opacity-25" />
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.03]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_36%,rgba(192,38,255,.22),transparent_29%),radial-gradient(circle_at_18%_28%,rgba(88,28,135,.14),transparent_33%)]" />
@@ -201,10 +227,14 @@ export function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="#download" className="premium-button focus-ring min-h-12 px-6 text-sm">
+            <Link
+              href="#download"
+              className="premium-button focus-ring min-h-12 px-6 text-sm"
+            >
               <span className="relative">Download YO Voice</span>
               <ArrowDown className="relative size-4" />
             </Link>
+
             <Link
               href="#experience"
               className="focus-ring inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/[0.035] px-6 text-sm font-semibold text-white backdrop-blur-xl transition hover:border-white/25 hover:bg-white/[0.07]"
@@ -217,15 +247,25 @@ export function HeroSection() {
           </div>
 
           <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-[13px] text-white/50">
-            <span className="flex items-center gap-2"><Radio className="size-4 text-fuchsia-400" />Live voice rooms</span>
-            <span className="flex items-center gap-2"><Users className="size-4 text-violet-400" />Clubs and friends</span>
-            <span className="flex items-center gap-2"><Sparkles className="size-4 text-pink-400" />Built for creators</span>
+            <span className="flex items-center gap-2">
+              <Radio className="size-4 text-fuchsia-400" />
+              Live voice rooms
+            </span>
+            <span className="flex items-center gap-2">
+              <Users className="size-4 text-violet-400" />
+              Clubs and friends
+            </span>
+            <span className="flex items-center gap-2">
+              <Sparkles className="size-4 text-pink-400" />
+              Built for creators
+            </span>
           </div>
 
           <div className="mt-8">
             <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-white/30">
               Available across your devices
             </p>
+
             <div className="mt-3 flex flex-wrap gap-3">
               {platforms.map(({ label, icon: Icon }) => (
                 <div
@@ -277,112 +317,163 @@ export function HeroSection() {
               </linearGradient>
             </defs>
 
-            {connectionPaths.map((path, index) => (
-              <motion.path
-                key={path}
-                d={path}
-                stroke="url(#orbitLine)"
-                strokeWidth={index === 0 ? 0.42 : 0.3}
-                strokeLinecap="round"
-                strokeDasharray="2.2 2.7"
-                animate={{ strokeDashoffset: [9, 0], opacity: [0.2, 0.8, 0.2] }}
-                transition={{
-                  duration: 2.4 + index * 0.45,
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: index * 0.25,
-                }}
-              />
-            ))}
+            {connectionPaths.map((path, index) => {
+              const isActive = index === activeIndex;
+
+              return (
+                <motion.path
+                  key={path}
+                  d={path}
+                  stroke="url(#orbitLine)"
+                  strokeWidth={isActive ? 0.48 : 0.26}
+                  strokeLinecap="round"
+                  strokeDasharray="2.2 2.7"
+                  animate={{
+                    strokeDashoffset: [9, 0],
+                    opacity: isActive ? [0.45, 1, 0.45] : [0.1, 0.28, 0.1],
+                  }}
+                  transition={{
+                    duration: isActive ? 1.7 : 3,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              );
+            })}
           </svg>
 
-          <div className="absolute left-1/2 top-1/2 h-[2px] w-[54%] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-fuchsia-400/60 to-transparent shadow-[0_0_22px_rgba(232,121,249,.48)]" />
+          <div className="absolute left-1/2 top-1/2 h-[2px] w-[50%] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-fuchsia-400/55 to-transparent shadow-[0_0_22px_rgba(232,121,249,.42)]" />
 
           <motion.div
             animate={{
-              scale: [1, 1.045, 1],
-              filter: ["brightness(1)", "brightness(1.15)", "brightness(1)"],
+              scale: [1, 1.035, 1],
+              filter: ["brightness(1)", "brightness(1.13)", "brightness(1)"],
             }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-[39%] flex items-center justify-center rounded-full border border-fuchsia-200/35 bg-[#09030f] shadow-[0_0_115px_rgba(192,38,255,.6)]"
+            className="absolute inset-[40%] flex items-center justify-center rounded-full border border-fuchsia-200/35 bg-black shadow-[0_0_95px_rgba(192,38,255,.55)]"
           >
             <motion.span
-              className="absolute inset-[-22%] rounded-full border border-fuchsia-300/16"
-              animate={{ scale: [0.82, 1.28], opacity: [0.55, 0] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
+              className="absolute inset-[-24%] rounded-full border border-fuchsia-300/15"
+              animate={{ scale: [0.84, 1.24], opacity: [0.48, 0] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }}
             />
-            <motion.span
-              className="absolute inset-[-42%] rounded-full border border-violet-300/10"
-              animate={{ scale: [0.8, 1.2], opacity: [0.35, 0] }}
-              transition={{ duration: 3.2, delay: 0.75, repeat: Infinity, ease: "easeOut" }}
-            />
-            <Image
-              src="/logos/yovoice-logo.png"
-              alt="YO Voice community heart"
-              fill
-              className="rounded-full object-cover mix-blend-screen"
-              priority
-            />
+
+            <div className="relative size-[92%] overflow-hidden rounded-full bg-black">
+              <Image
+                src="/logos/yovoice-logo.png"
+                alt="YO Voice community heart"
+                fill
+                className="object-contain p-[4%] drop-shadow-[0_0_18px_rgba(232,121,249,.45)]"
+                priority
+              />
+            </div>
           </motion.div>
 
-          {members.map((member, index) => (
-            <motion.div
-              key={member.name}
-              animate={{
-                y: [0, index % 2 === 0 ? -7 : 7, 0],
-                x: [0, index % 2 === 0 ? 4 : -4, 0],
-              }}
-              transition={{
-                duration: 4 + index * 0.35,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: member.delay,
-              }}
-              className={`absolute ${member.position}`}
-            >
-              <div className="relative">
-                <RotatingChatBubble
-                  messages={member.messages}
-                  delay={member.delay}
-                  bubbleClass={member.bubble}
-                />
+          {members.map((member, index) => {
+            const isActive = index === activeIndex;
 
-                {member.active && (
-                  <>
-                    <motion.span
-                      className="absolute inset-[-18px] rounded-full border border-fuchsia-300/30"
-                      animate={{ scale: [0.82, 1.52], opacity: [0.8, 0] }}
-                      transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
-                    />
-                    <motion.span
-                      className="absolute inset-[-10px] rounded-full border border-fuchsia-300/35"
-                      animate={{ scale: [0.9, 1.8], opacity: [0.66, 0] }}
-                      transition={{ duration: 2.2, delay: 0.45, repeat: Infinity, ease: "easeOut" }}
-                    />
-                  </>
-                )}
-
-                <div className="relative size-[70px] overflow-hidden rounded-full border-2 border-fuchsia-300/60 bg-[#150c22] p-[3px] shadow-[0_0_30px_rgba(192,38,255,.48)] transition duration-300 hover:scale-105 hover:border-fuchsia-200/80">
-                  <Image
-                    src={member.avatar}
-                    alt={`${member.name} avatar`}
-                    fill
-                    className="rounded-full object-cover"
-                    sizes="70px"
+            return (
+              <motion.div
+                key={member.name}
+                animate={{
+                  y: [0, index % 2 === 0 ? -7 : 7, 0],
+                  x: [0, index % 2 === 0 ? 4 : -4, 0],
+                }}
+                transition={{
+                  duration: 4 + index * 0.35,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: index * 0.25,
+                }}
+                className={`absolute ${member.position}`}
+              >
+                <div className="relative">
+                  <RotatingChatBubble
+                    member={member}
+                    active={isActive}
+                    delay={index * 950}
                   />
-                  <span className={`absolute bottom-0 right-0 size-4 rounded-full border-[3px] border-[#12091e] ${member.status}`} />
+
+                  <AnimatePresence>
+                    {isActive ? (
+                      <>
+                        <motion.span
+                          className="absolute inset-[-15px] rounded-full border border-fuchsia-300/35"
+                          initial={{ opacity: 0 }}
+                          animate={{
+                            scale: [0.84, 1.46],
+                            opacity: [0.75, 0],
+                          }}
+                          exit={{ opacity: 0 }}
+                          transition={{
+                            duration: 1.9,
+                            repeat: Infinity,
+                            ease: "easeOut",
+                          }}
+                        />
+
+                        <motion.span
+                          className="absolute inset-[-8px] rounded-full border border-fuchsia-300/40"
+                          initial={{ opacity: 0 }}
+                          animate={{
+                            scale: [0.92, 1.72],
+                            opacity: [0.6, 0],
+                          }}
+                          exit={{ opacity: 0 }}
+                          transition={{
+                            duration: 2.3,
+                            delay: 0.45,
+                            repeat: Infinity,
+                            ease: "easeOut",
+                          }}
+                        />
+                      </>
+                    ) : null}
+                  </AnimatePresence>
+
+                  <motion.div
+                    animate={{
+                      scale: isActive ? 1.08 : 1,
+                      filter: isActive
+                        ? "brightness(1.12)"
+                        : "brightness(0.88)",
+                    }}
+                    transition={{ duration: 0.42, ease: "easeOut" }}
+                    className={`relative size-[66px] overflow-hidden rounded-full border-2 bg-[#150c22] p-[3px] ${
+                      isActive
+                        ? "border-fuchsia-200/85 shadow-[0_0_34px_rgba(192,38,255,.62)]"
+                        : "border-fuchsia-300/30 shadow-[0_0_18px_rgba(192,38,255,.2)]"
+                    }`}
+                  >
+                    <Image
+                      src={member.avatar}
+                      alt={`${member.name} avatar`}
+                      fill
+                      className="rounded-full object-cover"
+                      sizes="66px"
+                    />
+
+                    <span
+                      className={`absolute bottom-0 right-0 size-4 rounded-full border-[3px] border-[#12091e] ${member.status}`}
+                    />
+                  </motion.div>
+
+                  <span
+                    className={`absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium ${
+                      isActive ? "text-white" : "text-white/58"
+                    }`}
+                  >
+                    {member.name}
+                  </span>
                 </div>
-                <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-medium text-white/62">
-                  {member.name}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
 
           <motion.div
-            animate={{ y: [0, -3, 0] }}
+            animate={{ y: [0, -2, 0] }}
             transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-            className="glass-panel absolute bottom-[11%] left-1/2 w-[235px] -translate-x-1/2 rounded-2xl px-5 py-4 text-center shadow-[0_18px_50px_rgba(0,0,0,.35),0_0_40px_rgba(192,38,255,.08)]"
+            className="glass-panel absolute bottom-[12%] left-1/2 w-[222px] -translate-x-1/2 rounded-2xl px-5 py-4 text-center shadow-[0_18px_48px_rgba(0,0,0,.32)]"
           >
             <div className="mx-auto mb-2 flex w-fit items-center gap-2 rounded-full bg-fuchsia-400/10 px-2.5 py-1">
               <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
@@ -390,16 +481,35 @@ export function HeroSection() {
                 Live conversation
               </span>
             </div>
+
             <p className="text-[8px] font-bold uppercase tracking-[0.22em] text-fuchsia-300/80">
               Heart of the Community
             </p>
-            <p className="mt-1.5 text-sm font-semibold text-white">Maya is speaking</p>
+
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={activeMember.id}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.3 }}
+                className="mt-1.5 text-sm font-semibold text-white"
+              >
+                {activeMember.name} is speaking
+              </motion.p>
+            </AnimatePresence>
+
             <div className="mt-3 flex h-5 items-end justify-center gap-1">
-              {[10, 18, 13, 20, 15, 8, 17, 11, 14, 19].map((height, i) => (
+              {activeMember.equalizer.map((height, index) => (
                 <motion.span
-                  key={i}
+                  key={`${activeMember.id}-${index}`}
+                  initial={{ height: 5 }}
                   animate={{ height: [5, height, 5] }}
-                  transition={{ duration: 0.65 + i * 0.05, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 0.58 + index * 0.045,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                   className="w-1 rounded-full bg-gradient-to-t from-violet-500 to-fuchsia-300"
                 />
               ))}
