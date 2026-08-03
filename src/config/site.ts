@@ -2,13 +2,13 @@ export const siteConfig = {
   name: "YO Voice",
   tagline: "Be You.",
   description:
-    "A modern voice platform where communities connect, creators grow and conversations come alive.",
+    "The next generation of voice communities. Built for creators, friends and real conversations.",
   url: "https://yovoice.app",
+
   navigation: [
     { label: "Experience", href: "#experience" },
     { label: "Community", href: "#community" },
-    { label: "Clubs", href: "#clubs" },
-    { label: "Achievements", href: "#achievements" },
+    { label: "Features", href: "#features" },
     { label: "Download", href: "#download" },
   ],
 } as const;

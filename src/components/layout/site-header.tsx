@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ArrowDownToLine, Menu, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 
@@ -12,20 +12,45 @@ export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 24);
+    };
 
     handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen]);
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
         isScrolled
-          ? "border-white/[0.08] bg-[#08040f]/88 shadow-[0_12px_50px_rgba(0,0,0,0.26)] backdrop-blur-2xl"
-          : "border-transparent bg-[#08040f]/45 backdrop-blur-xl"
+          ? "border-white/[0.08] bg-[#08040f]/90 shadow-[0_14px_50px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
+          : "border-transparent bg-[#08040f]/55 backdrop-blur-xl"
       }`}
     >
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
@@ -34,13 +59,13 @@ export function SiteHeader() {
           className="focus-ring flex items-center gap-3 rounded-2xl"
           aria-label="YO Voice home"
         >
-          <span className="relative flex size-12 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black shadow-[0_0_35px_rgba(192,38,255,0.25)]">
+          <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#0c0614] shadow-[0_0_35px_rgba(192,38,255,0.3)]">
             <Image
               src="/logos/yovoice-logo.png"
               alt="YO Voice logo"
               width={48}
               height={48}
-              className="size-full object-cover"
+              className="size-full scale-[1.06] object-cover"
               priority
             />
           </span>
@@ -50,13 +75,16 @@ export function SiteHeader() {
               YO Voice
             </span>
 
-            <span className="block text-[9px] font-bold uppercase tracking-[0.34em] text-fuchsia-300">
+            <span className="block text-[9px] font-bold uppercase tracking-[0.36em] text-fuchsia-300">
               Be You
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex">
+        <nav
+          className="hidden items-center gap-8 lg:flex"
+          aria-label="Primary navigation"
+        >
           {siteConfig.navigation.map((item) => (
             <Link
               key={item.href}
@@ -71,15 +99,16 @@ export function SiteHeader() {
         <div className="hidden items-center gap-3 sm:flex">
           <Link
             href="/login"
-            className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/65 transition hover:text-white"
+            className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/65 transition hover:bg-white/[0.04] hover:text-white"
           >
             Log in
           </Link>
 
           <Link
             href="#download"
-            className="focus-ring inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-bold text-black shadow-[0_10px_30px_rgba(255,255,255,0.12)] transition hover:-translate-y-0.5 hover:bg-fuchsia-50"
+            className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-500 px-5 text-sm font-bold text-white shadow-[0_12px_36px_rgba(138,43,226,0.32)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(192,38,255,0.42)]"
           >
+            <ArrowDownToLine className="size-4" />
             Download
           </Link>
         </div>
@@ -88,16 +117,23 @@ export function SiteHeader() {
           type="button"
           className="focus-ring flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white lg:hidden"
           onClick={() => setIsOpen((current) => !current)}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
           aria-expanded={isOpen}
+          aria-controls="mobile-navigation"
+          aria-label={isOpen ? "Close menu" : "Open menu"}
         >
           {isOpen ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </div>
 
       {isOpen ? (
-        <div className="border-t border-white/[0.06] bg-[#0d0715]/96 px-5 py-5 backdrop-blur-2xl lg:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-2">
+        <div
+          id="mobile-navigation"
+          className="border-t border-white/[0.06] bg-[#0b0612]/97 px-5 py-5 backdrop-blur-2xl lg:hidden"
+        >
+          <nav
+            className="mx-auto flex max-w-7xl flex-col gap-2"
+            aria-label="Mobile navigation"
+          >
             {siteConfig.navigation.map((item) => (
               <Link
                 key={item.href}
@@ -121,8 +157,9 @@ export function SiteHeader() {
               <Link
                 href="#download"
                 onClick={() => setIsOpen(false)}
-                className="flex min-h-12 items-center justify-center rounded-xl bg-white text-sm font-bold text-black"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-sm font-bold text-white"
               >
+                <ArrowDownToLine className="size-4" />
                 Download
               </Link>
             </div>
