@@ -1,5 +1,10 @@
 import { type FirebaseApp, getApps, initializeApp } from "firebase/app";
-import { type Auth, getAuth } from "firebase/auth";
+import {
+  type Auth,
+  browserLocalPersistence,
+  getAuth,
+  setPersistence,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,11 +16,22 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+let authInstance: Auth | null = null;
+
 export function getFirebaseApp(): FirebaseApp {
   const existing = getApps();
   return existing.length ? existing[0] : initializeApp(firebaseConfig);
 }
 
 export function getFirebaseAuth(): Auth {
-  return getAuth(getFirebaseApp());
+  if (!authInstance) {
+    authInstance = getAuth(getFirebaseApp());
+    // Explicit even though browserLocalPersistence is already the web SDK
+    // default — keeps the session alive across tabs/restarts intentionally,
+    // not by accident.
+    if (typeof window !== "undefined") {
+      void setPersistence(authInstance, browserLocalPersistence);
+    }
+  }
+  return authInstance;
 }
