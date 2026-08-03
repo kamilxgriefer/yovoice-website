@@ -16,7 +16,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Link href="/" className="inline-flex items-center gap-3">
             <span className="relative flex size-12 overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black">
-              <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill className="object-cover"/>
+              <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill sizes="48px" className="object-cover"/>
             </span>
             <span><span className="block text-lg font-bold">YO Voice</span><span className="text-[9px] font-bold uppercase tracking-[.34em] text-fuchsia-300">Be You</span></span>
           </Link>

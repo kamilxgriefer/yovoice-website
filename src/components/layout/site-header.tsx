@@ -6,10 +6,15 @@ import Link from "next/link";
 import { ArrowDownToLine, Menu, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
+import { useAuth } from "@/hooks/use-auth";
+import { getAppUrl } from "@/lib/auth/auth-redirect";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user } = useAuth();
+  const accountHref = user ? getAppUrl() : "/login";
+  const accountLabel = user ? "Open App" : "Log in";
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 18);
@@ -27,7 +32,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link href="/" className="focus-ring flex items-center gap-3 rounded-2xl" aria-label="YO Voice home">
           <span className="relative flex size-12 overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black shadow-[0_0_38px_rgba(192,38,255,.32)]">
-            <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill className="object-cover" priority />
+            <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill sizes="48px" className="object-cover" priority />
           </span>
           <span>
             <span className="block font-[family-name:var(--font-display)] text-lg font-bold tracking-[-.03em] text-white">
@@ -48,8 +53,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 sm:flex">
-          <Link href="/login" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
-            Log in
+          <Link href={accountHref} className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
+            {accountLabel}
           </Link>
           <Link href="#download" className="premium-button focus-ring min-h-12 px-5">
             <ArrowDownToLine className="relative size-4" />
@@ -77,8 +82,8 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="mt-3 grid grid-cols-2 gap-3 sm:hidden">
-              <Link href="/login" onClick={() => setIsOpen(false)} className="flex min-h-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-white">
-                Log in
+              <Link href={accountHref} onClick={() => setIsOpen(false)} className="flex min-h-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-white">
+                {accountLabel}
               </Link>
               <Link href="#download" onClick={() => setIsOpen(false)} className="premium-button min-h-12">
                 Download

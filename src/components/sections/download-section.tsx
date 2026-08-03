@@ -1,14 +1,45 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
 
-const platforms = [
-  { icon: Smartphone, title: "Mobile", description: "Download through the Apple App Store or Google Play.", href: "#mobile-downloads", action: "View mobile options" },
-  { icon: Monitor, title: "Windows", description: "Continue every conversation with a dedicated desktop application.", href: "/login?redirect=/download", action: "Sign in to download" },
-  { icon: Laptop, title: "macOS", description: "Native desktop builds prepared for Apple Silicon and Intel Macs.", href: "/login?redirect=/download", action: "Sign in to download" },
-  { icon: Globe2, title: "Web", description: "Open YO Voice directly from a modern browser without installation.", href: "/login?redirect=/app", action: "Launch web app" },
-];
+import { useAuth } from "@/hooks/use-auth";
+import { getAppUrl } from "@/lib/auth/auth-redirect";
 
 export function DownloadSection() {
+  const { user } = useAuth();
+
+  const platforms = [
+    {
+      icon: Smartphone,
+      title: "Mobile",
+      description: "Download through the Apple App Store or Google Play.",
+      href: "#mobile-downloads",
+      action: "View mobile options",
+    },
+    {
+      icon: Monitor,
+      title: "Windows",
+      description: "Continue every conversation with a dedicated desktop application.",
+      href: user ? "/download" : "/login?redirect=/download",
+      action: user ? "Download" : "Sign in to download",
+    },
+    {
+      icon: Laptop,
+      title: "macOS",
+      description: "Native desktop builds prepared for Apple Silicon and Intel Macs.",
+      href: user ? "/download" : "/login?redirect=/download",
+      action: user ? "Download" : "Sign in to download",
+    },
+    {
+      icon: Globe2,
+      title: "Web",
+      description: "Open YO Voice directly from a modern browser without installation.",
+      href: user ? getAppUrl() : "/login?redirect=/app",
+      action: "Launch web app",
+    },
+  ];
+
   return (
     <section id="download" className="relative overflow-hidden border-t border-white/[.06] bg-[#060511] py-28">
       <div className="absolute left-1/2 top-1/2 size-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-600/[.1] blur-[170px]" />
@@ -44,8 +75,8 @@ export function DownloadSection() {
               <p className="mt-2 max-w-2xl text-sm leading-7 text-white/45">Desktop downloads are available after signing in. Your account will provide the correct installer, release notes and device management.</p>
             </div>
           </div>
-          <Link href="/login?redirect=/download" className="premium-button min-h-13 shrink-0 px-6">
-            Log in to download <ArrowRight className="size-4"/>
+          <Link href={user ? "/download" : "/login?redirect=/download"} className="premium-button min-h-13 shrink-0 px-6">
+            {user ? "Go to downloads" : "Log in to download"} <ArrowRight className="size-4"/>
           </Link>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Space_Grotesk } from "next/font/google";
 
+import { AuthProvider } from "@/providers/auth-provider";
+
 import "./globals.css";
 
 const geist = Geist({
@@ -37,6 +39,21 @@ export const metadata: Metadata = {
     url: "https://yovoice.app",
     siteName: "YO Voice",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "YO Voice — Be You",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "YO Voice — Be You",
+    description:
+      "Join communities, meet creators and experience conversations that feel alive.",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
@@ -52,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geist.variable} ${spaceGrotesk.variable}`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

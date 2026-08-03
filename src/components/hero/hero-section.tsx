@@ -281,7 +281,7 @@ export function HeroSection() {
         </motion.div>
 
         <motion.div
-          id="community"
+          id="hero-orbit"
           initial={{ opacity: 0, scale: 0.93 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.85, delay: 0.1, ease: "easeOut" }}
@@ -363,6 +363,7 @@ export function HeroSection() {
                 src="/logos/yovoice-logo.png"
                 alt="YO Voice community heart"
                 fill
+                sizes="(max-width: 1024px) 220px, 300px"
                 className="object-contain p-[4%] drop-shadow-[0_0_18px_rgba(232,121,249,.45)]"
                 priority
               />

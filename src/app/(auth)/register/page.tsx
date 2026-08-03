@@ -2,21 +2,21 @@ import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { LoginForm } from "@/components/auth/login-form";
+import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = {
-  title: "Log in",
+  title: "Create your account",
 };
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <>
-      <h1 className="mt-8 text-center text-3xl font-bold">Welcome back</h1>
+      <h1 className="mt-8 text-center text-3xl font-bold">Join YO Voice</h1>
       <p className="mt-2 text-center text-sm text-white/45">
-        Sign in to continue to your downloads and account.
+        Create an account to download, sign in and launch the app.
       </p>
       <Suspense>
-        <LoginForm />
+        <RegisterForm />
       </Suspense>
       <Link
         href="/"
