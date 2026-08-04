@@ -92,7 +92,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(nextUser);
       setLoading(false);
     });
-    return unsubscribe;
+    // onAuthStateChanged's first callback is normally near-instant (it's a
+    // local IndexedDB read, not a network round-trip) but every page that
+    // gates its UI on `loading` — the verify-email prompt, the whole
+    // /account section — would otherwise spin forever if it never fires
+    // for any reason (a slow/unavailable network, a wedged IndexedDB
+    // connection). Fail open to "signed out" after a timeout rather than
+    // hang indefinitely; this doesn't grant access to anything, it just
+    // stops the spinner and lets the normal unauthenticated flow (login
+    // redirect, "resend verification" prompt) take over.
+    const failSafeTimer = setTimeout(() => setLoading(false), 8000);
+    return () => {
+      unsubscribe();
+      clearTimeout(failSafeTimer);
+    };
   }, []);
 
   const value = useMemo<AuthContextValue>(

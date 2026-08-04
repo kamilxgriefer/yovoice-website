@@ -13,6 +13,11 @@ import { getAppUrl } from "@/lib/auth/auth-redirect";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 const AUTO_CHECK_INTERVAL_MS = 5000;
+// A courtesy auto-continue for anyone who doesn't click — the "Open App"
+// button is the real affordance (immediately visible, immediately
+// clickable), this is just a fallback for people who walk away from the
+// screen assuming it "just works."
+const AUTO_OPEN_APP_DELAY_MS = 6000;
 
 export default function VerifyEmailPage() {
   return (
@@ -41,8 +46,6 @@ function VerifyEmailPageContent() {
 }
 
 function ActionCodeHandler({ oobCode }: { oobCode: string }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [state, setState] = useState<"applying" | "success" | "error">(
     "applying",
   );
@@ -74,37 +77,22 @@ function ActionCodeHandler({ oobCode }: { oobCode: string }) {
     };
   }, [oobCode]);
 
-  useEffect(() => {
-    if (state !== "success") return;
-    const redirectParam = searchParams.get("redirect");
-    const destination =
-      redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
-        ? redirectParam
-        : getFirebaseAuth().currentUser
-          ? "/account/profile"
-          : "/login";
-    const timer = setTimeout(() => {
-      if (destination.startsWith("http")) {
-        window.location.href = destination;
-      } else {
-        router.push(destination);
-      }
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, [state, router, searchParams]);
-
   if (state === "applying") {
     return (
-      <p className="mt-8 text-center text-sm text-white/45">
-        Confirming your email…
-      </p>
+      <>
+        <LoadingSpinner />
+        <p className="mt-6 text-center text-sm text-white/45">
+          Confirming your email…
+        </p>
+      </>
     );
   }
 
   if (state === "error") {
     return (
       <>
-        <h1 className="mt-8 text-center text-3xl font-bold">
+        <ErrorGlyph />
+        <h1 className="mt-6 text-center text-3xl font-bold">
           Link no longer valid
         </h1>
         <p className="mt-2 text-center text-sm text-white/45">{error}</p>
@@ -118,21 +106,12 @@ function ActionCodeHandler({ oobCode }: { oobCode: string }) {
     );
   }
 
-  return (
-    <>
-      <h1 className="mt-8 text-center text-3xl font-bold">Email verified</h1>
-      <p className="mt-2 text-center text-sm text-white/45">
-        Taking you back now…
-      </p>
-    </>
-  );
+  return <VerifiedSuccess email={getFirebaseAuth().currentUser?.email ?? null} />;
 }
 
 function VerifyEmailPrompt() {
   const { user, loading } = useRequireAuth();
   const { resendVerificationEmail, reloadUser } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [verified, setVerified] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -146,7 +125,8 @@ function VerifyEmailPrompt() {
 
   // Reload once on arrival — `user` from context can be stale if the
   // account was verified in another tab (or on another device) before
-  // landing back here.
+  // landing back here. This is also what makes "already verified? skip
+  // straight to the success screen" work.
   useEffect(() => {
     if (!user) return;
     reloadUser().then(setVerified);
@@ -164,23 +144,6 @@ function VerifyEmailPrompt() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, verified]);
-
-  useEffect(() => {
-    if (!verified) return;
-    const redirectParam = searchParams.get("redirect");
-    const destination =
-      redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
-        ? redirectParam
-        : getAppUrl();
-    const timer = setTimeout(() => {
-      if (destination.startsWith("http")) {
-        window.location.href = destination;
-      } else {
-        router.push(destination);
-      }
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [verified, router, searchParams]);
 
   useEffect(() => {
     return () => {
@@ -229,18 +192,16 @@ function VerifyEmailPrompt() {
   }
 
   if (loading || !user) {
-    return <p className="mt-8 text-center text-sm text-white/45">Loading…</p>;
+    return (
+      <>
+        <LoadingSpinner />
+        <p className="mt-6 text-center text-sm text-white/45">Loading…</p>
+      </>
+    );
   }
 
   if (verified) {
-    return (
-      <>
-        <h1 className="mt-8 text-center text-3xl font-bold">You&apos;re verified</h1>
-        <p className="mt-2 text-center text-sm text-white/45">
-          {user.email} is confirmed. Taking you onward…
-        </p>
-      </>
-    );
+    return <VerifiedSuccess email={user.email} />;
   }
 
   return (
@@ -291,5 +252,143 @@ function VerifyEmailPrompt() {
         Return to homepage
       </Link>
     </>
+  );
+}
+
+/**
+ * Shared by both the direct-link (ActionCodeHandler) and prompt-page
+ * (VerifyEmailPrompt) success paths, so a verified account looks the same
+ * regardless of how it got there. `getAppUrl()` reads NEXT_PUBLIC_APP_URL,
+ * currently the production Flutter web build
+ * (https://yovoice-ec54a.web.app) — switching to https://app.yovoice.app
+ * once its DNS is live is a Vercel env var change, not a code change.
+ */
+function VerifiedSuccess({ email }: { email: string | null }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [autoOpened, setAutoOpened] = useState(false);
+
+  function openApp() {
+    if (autoOpened) return;
+    setAutoOpened(true);
+    const redirectParam = searchParams.get("redirect");
+    const destination =
+      redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+        ? redirectParam
+        : getAppUrl();
+    if (destination.startsWith("http")) {
+      window.location.href = destination;
+    } else {
+      router.push(destination);
+    }
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(openApp, AUTO_OPEN_APP_DELAY_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <SuccessCheckmark />
+      <h1 className="mt-6 text-center text-3xl font-bold">You&apos;re verified</h1>
+      <p className="mt-2 text-center text-sm text-white/45">
+        {email ? `${email} is confirmed.` : "Your email is confirmed."}{" "}
+        You&apos;re all set.
+      </p>
+
+      <button
+        type="button"
+        onClick={openApp}
+        className="premium-button min-h-13 mt-8 w-full"
+      >
+        Open YO Voice
+      </button>
+
+      <Link
+        href="/account/profile"
+        className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+      >
+        Go to your account instead
+      </Link>
+    </>
+  );
+}
+
+function SuccessCheckmark() {
+  return (
+    <div className="mx-auto flex size-20 items-center justify-center">
+      <svg
+        viewBox="0 0 80 80"
+        fill="none"
+        className="size-20"
+        role="img"
+        aria-label="Verified"
+      >
+        <circle
+          cx="40"
+          cy="40"
+          r="36"
+          className="origin-center animate-[verify-pop_0.4s_ease-out]"
+          stroke="url(#verify-ring)"
+          strokeWidth="3"
+        />
+        <path
+          d="M24 41 L35 52 L57 29"
+          fill="none"
+          stroke="url(#verify-ring)"
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          pathLength={1}
+          className="animate-[verify-draw_0.5s_0.25s_ease-out_both]"
+          style={{
+            strokeDasharray: 1,
+            strokeDashoffset: 1,
+          }}
+        />
+        <defs>
+          <linearGradient id="verify-ring" x1="0" y1="0" x2="80" y2="80">
+            <stop offset="0%" stopColor="#e879f9" />
+            <stop offset="100%" stopColor="#7c3aed" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <style>{`
+        @keyframes verify-pop {
+          0% { transform: scale(0.6); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes verify-draw {
+          to { stroke-dashoffset: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          svg circle, svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="mx-auto mt-4 size-10 animate-spin rounded-full border-2 border-white/10 border-t-fuchsia-400" />
+  );
+}
+
+function ErrorGlyph() {
+  return (
+    <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-rose-500/10">
+      <svg viewBox="0 0 24 24" fill="none" className="size-9" aria-hidden="true">
+        <path
+          d="M12 8v5m0 3.5h.01M10.29 3.86 1.82 18a1.5 1.5 0 0 0 1.29 2.25h17.78A1.5 1.5 0 0 0 22.18 18L13.71 3.86a1.5 1.5 0 0 0-2.6 0Z"
+          stroke="#fb7185"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
   );
 }

@@ -3,25 +3,26 @@ import type { ActionCodeSettings } from "firebase/auth";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yovoice.app";
 
 /**
- * Confirmed by testing a real emailed link (2026-08-04, not assumed):
+ * Confirmed by testing real emailed links (2026-08-04, not assumed):
  * for verifyEmail/resetPassword oob codes, Firebase ALWAYS routes through
  * its own hosted action-handler page first (at the project's authDomain).
  * `url` here becomes the `continueUrl` query param on that hosted page,
- * which is where its own "Continue" button sends the user afterward —
- * NOT a bypass of Firebase's page. VerifyEmailPage's own applyActionCode
- * branch still exists for defense in depth (e.g. a future mobile deep
- * link) but a real emailed link never actually reaches it; Firebase's
- * hosted page consumes the code first.
+ * which correctly sends the user to it afterward — confirmed with a
+ * from-scratch browser profile (no prior session on this origin at all)
+ * clicking a real link end to end. An EARLIER round of testing appeared
+ * to show verifyEmail's Continue button landing on yovoice-ec54a.web.app
+ * instead — that was this site's OWN "already verified, redirecting to
+ * the app" logic firing correctly, misattributed to Firebase, because the
+ * test browser tabs shared a previously-verified session on this origin
+ * (IndexedDB/localStorage are origin-scoped, not tab-scoped) left over
+ * from earlier steps in the same test sequence. Root-caused by repeating
+ * the test in a tab with zero prior interaction with this origin.
  *
- * handleCodeInApp is deliberately OMITTED (not just false) — it signals
- * "try to hand this off to a native app," and empirically, leaving it
- * `true` was the cause of verifyEmail's Continue button landing on
- * yovoice-ec54a.web.app (Firebase's default Hosting site, associated via
- * mobileLinksConfig.domain=HOSTING_DOMAIN) instead of the configured
- * continueUrl — resetPassword, which has no such "hand off to the app"
- * semantics, honored continueUrl correctly the whole time with the exact
- * same settings shape. No androidPackageName/iOSBundleId either — the
- * Flutter app has no deep-link handler for these at all.
+ * handleCodeInApp is omitted — it signals "try to hand this off to a
+ * native app" for the passwordless email-link *sign-in* feature
+ * specifically; it has no effect on verifyEmail/resetPassword, and there's
+ * no Flutter deep-link handler to hand off to regardless. No
+ * androidPackageName/iOSBundleId for the same reason.
  */
 function actionCodeSettings(
   path: string,
