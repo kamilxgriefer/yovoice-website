@@ -5,6 +5,7 @@ import {
   getAuth,
   setPersistence,
 } from "firebase/auth";
+import { type Firestore, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,10 +18,18 @@ const firebaseConfig = {
 };
 
 let authInstance: Auth | null = null;
+let firestoreInstance: Firestore | null = null;
 
 export function getFirebaseApp(): FirebaseApp {
   const existing = getApps();
   return existing.length ? existing[0] : initializeApp(firebaseConfig);
+}
+
+export function getFirebaseFirestore(): Firestore {
+  if (!firestoreInstance) {
+    firestoreInstance = getFirestore(getFirebaseApp());
+  }
+  return firestoreInstance;
 }
 
 export function getFirebaseAuth(): Auth {

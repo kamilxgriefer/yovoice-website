@@ -21,8 +21,30 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 import { getFirebaseAuth } from "@/lib/firebase/config";
+import { getFirebaseFirestore } from "@/lib/firebase/config";
+
+// Matches the shape FriendService.ensureUserDocument() / PresenceService
+// write from the Flutter app — accounts created here need the same
+// users/{uid} doc shape so the app doesn't see a partial profile the first
+// time someone who registered on the website opens it.
+async function ensureUserProfile(user: User, displayName: string) {
+  await setDoc(
+    doc(getFirebaseFirestore(), "users", user.uid),
+    {
+      uid: user.uid,
+      displayName: displayName.trim() || user.email?.split("@")[0] || "YoVoice user",
+      email: user.email?.trim().toLowerCase() ?? "",
+      photoUrl: user.photoURL,
+      isOnline: false,
+      lastSeen: serverTimestamp(),
+      createdAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+}
 
 type AuthContextValue = {
   user: User | null;
@@ -83,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             displayName: displayName.trim(),
           });
         }
+        await ensureUserProfile(credential.user, displayName);
         await sendEmailVerification(credential.user);
       },
       signOut: async () => {

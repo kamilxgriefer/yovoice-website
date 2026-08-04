@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 
 export const metadata: Metadata = {
   title: "Reset your password",
@@ -14,6 +16,9 @@ export default function ForgotPasswordPage() {
       <p className="mt-2 text-center text-sm text-white/45">
         Enter your email and we&apos;ll send you a reset link.
       </p>
+      <Suspense>
+        <RedirectIfAuthenticated />
+      </Suspense>
       <ForgotPasswordForm />
       <Link
         href="/"

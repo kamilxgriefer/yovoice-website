@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 import { LoginForm } from "@/components/auth/login-form";
+import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 
 export const metadata: Metadata = {
   title: "Log in",
@@ -16,6 +17,7 @@ export default function LoginPage() {
         Sign in to continue to your downloads and account.
       </p>
       <Suspense>
+        <RedirectIfAuthenticated />
         <LoginForm />
       </Suspense>
       <Link

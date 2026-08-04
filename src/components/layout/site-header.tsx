@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDownToLine, Menu, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowDownToLine, LogOut, Menu, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,9 +13,9 @@ import { getAppUrl } from "@/lib/auth/auth-redirect";
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user } = useAuth();
-  const accountHref = user ? getAppUrl() : "/login";
-  const accountLabel = user ? "Open App" : "Log in";
+  const [signingOut, setSigningOut] = useState(false);
+  const { user, signOut } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 18);
@@ -22,6 +23,18 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  async function handleSignOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOut();
+      setIsOpen(false);
+      router.push("/");
+    } finally {
+      setSigningOut(false);
+    }
+  }
 
   return (
     <header className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
@@ -54,17 +67,37 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 sm:flex">
           {user ? (
-            <Link href="/account/profile" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
-              Account
-            </Link>
-          ) : null}
-          <Link href={accountHref} className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
-            {accountLabel}
-          </Link>
-          <Link href="#download" className="premium-button focus-ring min-h-12 px-5">
-            <ArrowDownToLine className="relative size-4" />
-            <span className="relative">Download</span>
-          </Link>
+            <>
+              <Link href="/account/profile" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
+                My account
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="focus-ring flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white disabled:opacity-50"
+              >
+                <LogOut className="size-4" />
+                {signingOut ? "Signing out…" : "Log out"}
+              </button>
+              <Link href={getAppUrl()} className="premium-button focus-ring min-h-12 px-5">
+                <span className="relative">Open app</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
+                Log in
+              </Link>
+              <Link href="/register" className="focus-ring rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[.04]">
+                Create account
+              </Link>
+              <Link href="#download" className="premium-button focus-ring min-h-12 px-5">
+                <ArrowDownToLine className="relative size-4" />
+                <span className="relative">Download</span>
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -86,14 +119,40 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:hidden">
-              <Link href={accountHref} onClick={() => setIsOpen(false)} className="flex min-h-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-white">
-                {accountLabel}
-              </Link>
-              <Link href="#download" onClick={() => setIsOpen(false)} className="premium-button min-h-12">
-                Download
-              </Link>
-            </div>
+
+            {user ? (
+              <>
+                <Link href="/account/profile" onClick={() => setIsOpen(false)} className="rounded-xl px-4 py-3 text-sm font-medium text-white/75 hover:bg-white/5 hover:text-white">
+                  My account
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={signingOut}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 text-left text-sm font-medium text-white/75 hover:bg-white/5 hover:text-white disabled:opacity-50"
+                >
+                  <LogOut className="size-4" />
+                  {signingOut ? "Signing out…" : "Log out"}
+                </button>
+                <Link href={getAppUrl()} onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
+                  Open app
+                </Link>
+              </>
+            ) : (
+              <>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <Link href="/login" onClick={() => setIsOpen(false)} className="flex min-h-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-white">
+                    Log in
+                  </Link>
+                  <Link href="/register" onClick={() => setIsOpen(false)} className="flex min-h-12 items-center justify-center rounded-xl border border-white/20 text-sm font-semibold text-white">
+                    Create account
+                  </Link>
+                </div>
+                <Link href="#download" onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
+                  Download
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}

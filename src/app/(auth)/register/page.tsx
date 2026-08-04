@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 import { RegisterForm } from "@/components/auth/register-form";
+import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 
 export const metadata: Metadata = {
   title: "Create your account",
@@ -16,6 +17,7 @@ export default function RegisterPage() {
         Create an account to download, sign in and launch the app.
       </p>
       <Suspense>
+        <RedirectIfAuthenticated />
         <RegisterForm />
       </Suspense>
       <Link
