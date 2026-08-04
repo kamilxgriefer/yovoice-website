@@ -45,6 +45,8 @@ export function RegisterForm() {
         : "/verify-email";
       router.push(verifyUrl);
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[diag] signUp failed", err);
       setError(getAuthErrorMessage(err));
       setSubmitting(false);
     }
