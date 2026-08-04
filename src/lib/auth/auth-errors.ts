@@ -7,6 +7,9 @@ const MESSAGES: Record<string, string> = {
   "auth/weak-password": "Choose a password with at least 8 characters.",
   "auth/too-many-requests": "Too many attempts. Try again in a few minutes.",
   "auth/network-request-failed": "Network error. Check your connection and try again.",
+  "auth/invalid-action-code": "This link has already been used or is invalid. Request a new one.",
+  "auth/expired-action-code": "This link has expired. Request a new one.",
+  "auth/user-disabled": "This account has been disabled.",
 };
 
 export function getAuthErrorMessage(error: unknown): string {

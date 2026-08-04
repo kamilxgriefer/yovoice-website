@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
-import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 
 export function RegisterForm() {
   const { signUp } = useAuth();
@@ -36,12 +35,15 @@ export function RegisterForm() {
     setSubmitting(true);
     try {
       await signUp(email, password, displayName);
-      const destination = resolveAuthRedirect(searchParams.get("redirect"));
-      if (destination.startsWith("http")) {
-        window.location.href = destination;
-      } else {
-        router.push(destination);
-      }
+      // Straight to the app would skip past email verification entirely —
+      // land on the verify-email prompt instead, carrying the original
+      // destination forward so it can pick up where this would have gone
+      // once the account is actually verified.
+      const redirectParam = searchParams.get("redirect");
+      const verifyUrl = redirectParam
+        ? `/verify-email?redirect=${encodeURIComponent(redirectParam)}`
+        : "/verify-email";
+      router.push(verifyUrl);
     } catch (err) {
       setError(getAuthErrorMessage(err));
       setSubmitting(false);

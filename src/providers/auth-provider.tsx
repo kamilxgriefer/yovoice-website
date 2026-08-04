@@ -25,6 +25,7 @@ import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 import { getFirebaseAuth } from "@/lib/firebase/config";
 import { getFirebaseFirestore } from "@/lib/firebase/config";
+import { verifyEmailActionCodeSettings } from "@/lib/auth/action-code-settings";
 
 // Matches the shape FriendService.ensureUserDocument() / PresenceService
 // write from the Flutter app — accounts created here need the same
@@ -58,6 +59,10 @@ type AuthContextValue = {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
+  /** Forces a fresh emailVerified read from Firebase and syncs it into
+   * context `user` (onAuthStateChanged does NOT refire after reload()).
+   * Returns the up-to-date verified state. */
+  reloadUser: () => Promise<boolean>;
   updateDisplayName: (displayName: string) => Promise<void>;
   changePassword: (
     currentPassword: string,
@@ -106,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
         await ensureUserProfile(credential.user, displayName);
-        await sendEmailVerification(credential.user);
+        await sendEmailVerification(credential.user, verifyEmailActionCodeSettings());
       },
       signOut: async () => {
         await firebaseSignOut(getFirebaseAuth());
@@ -117,7 +122,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resendVerificationEmail: async () => {
         const current = getFirebaseAuth().currentUser;
         if (!current) throw new Error("Not signed in.");
-        await sendEmailVerification(current);
+        await sendEmailVerification(current, verifyEmailActionCodeSettings());
+      },
+      reloadUser: async () => {
+        const current = getFirebaseAuth().currentUser;
+        if (!current) return false;
+        await current.reload();
+        setUser({ ...current });
+        return current.emailVerified;
       },
       updateDisplayName: async (displayName) => {
         const current = getFirebaseAuth().currentUser;
@@ -137,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!current) throw new Error("Not signed in.");
         await reauthenticate(current, currentPassword);
         await updateEmail(current, newEmail);
-        await sendEmailVerification(current);
+        await sendEmailVerification(current, verifyEmailActionCodeSettings());
         setUser({ ...current });
       },
     }),
