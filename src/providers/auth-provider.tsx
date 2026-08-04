@@ -25,7 +25,10 @@ import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 import { getFirebaseAuth } from "@/lib/firebase/config";
 import { getFirebaseFirestore } from "@/lib/firebase/config";
-import { verifyEmailActionCodeSettings } from "@/lib/auth/action-code-settings";
+import {
+  resetPasswordActionCodeSettings,
+  verifyEmailActionCodeSettings,
+} from "@/lib/auth/action-code-settings";
 
 // Matches the shape FriendService.ensureUserDocument() / PresenceService
 // write from the Flutter app — accounts created here need the same
@@ -117,7 +120,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await firebaseSignOut(getFirebaseAuth());
       },
       resetPassword: async (email) => {
-        await sendPasswordResetEmail(getFirebaseAuth(), email);
+        await sendPasswordResetEmail(
+          getFirebaseAuth(),
+          email,
+          resetPasswordActionCodeSettings(),
+        );
       },
       resendVerificationEmail: async () => {
         const current = getFirebaseAuth().currentUser;
