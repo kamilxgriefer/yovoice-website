@@ -3,9 +3,12 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Lock, Mail, User } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function RegisterForm() {
   const { signUp } = useAuth();
@@ -65,7 +68,7 @@ export function RegisterForm() {
         <label htmlFor="register-name" className="sr-only">
           Display name
         </label>
-        <input
+        <Input
           id="register-name"
           type="text"
           autoComplete="name"
@@ -73,7 +76,7 @@ export function RegisterForm() {
           placeholder="Display name"
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<User className="size-[18px]" />}
         />
       </div>
 
@@ -81,7 +84,7 @@ export function RegisterForm() {
         <label htmlFor="register-email" className="sr-only">
           Email address
         </label>
-        <input
+        <Input
           id="register-email"
           type="email"
           autoComplete="email"
@@ -89,7 +92,7 @@ export function RegisterForm() {
           placeholder="Email address"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<Mail className="size-[18px]" />}
         />
       </div>
 
@@ -97,7 +100,7 @@ export function RegisterForm() {
         <label htmlFor="register-password" className="sr-only">
           Password
         </label>
-        <input
+        <Input
           id="register-password"
           type="password"
           autoComplete="new-password"
@@ -105,7 +108,7 @@ export function RegisterForm() {
           placeholder="Password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<Lock className="size-[18px]" />}
         />
       </div>
 
@@ -113,7 +116,7 @@ export function RegisterForm() {
         <label htmlFor="register-confirm-password" className="sr-only">
           Confirm password
         </label>
-        <input
+        <Input
           id="register-confirm-password"
           type="password"
           autoComplete="new-password"
@@ -121,17 +124,14 @@ export function RegisterForm() {
           placeholder="Confirm password"
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<Lock className="size-[18px]" />}
+          state={confirmPassword && password !== confirmPassword ? "error" : "default"}
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="premium-button min-h-13 w-full disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" isLoading={submitting} className="w-full">
         {submitting ? "Creating account…" : "Create account"}
-      </button>
+      </Button>
 
       <p className="text-center text-sm text-white/45">
         Already have an account?{" "}

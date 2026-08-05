@@ -2,9 +2,12 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { Mail } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function ForgotPasswordForm() {
   const { resetPassword } = useAuth();
@@ -56,7 +59,7 @@ export function ForgotPasswordForm() {
         <label htmlFor="forgot-email" className="sr-only">
           Email address
         </label>
-        <input
+        <Input
           id="forgot-email"
           type="email"
           autoComplete="email"
@@ -64,17 +67,13 @@ export function ForgotPasswordForm() {
           placeholder="Email address"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<Mail className="size-[18px]" />}
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="premium-button min-h-13 w-full disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" isLoading={submitting} className="w-full">
         {submitting ? "Sending…" : "Send reset link"}
-      </button>
+      </Button>
 
       <p className="text-center text-sm text-white/45">
         Remembered it?{" "}

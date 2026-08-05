@@ -7,6 +7,17 @@
   --primary: #8a2be2;
   --accent: #c026ff;
   --border: #3a3151;
+  --success: #00e676;
+  --error: #ff6d6d;
+
+  /* Design tokens — single source of truth for radius/spacing so pages stop
+     inventing their own one-off values. Pill for buttons/chips/badges,
+     lg for cards, per the UI asset pack. */
+  --radius-sm: 0.7rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-pill: 999px;
 }
 
 * { box-sizing: border-box; }
@@ -48,13 +59,24 @@ img { user-select: none; -webkit-user-drag: none; }
   color: transparent;
 }
 .glass-panel {
+  position: relative;
   border: 1px solid rgba(255,255,255,.1);
   background: linear-gradient(145deg,rgba(35,24,55,.76),rgba(17,9,29,.74));
-  box-shadow: 0 24px 80px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  box-shadow: 0 24px 80px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.25);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+  transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+/* Optional gradient-border variant for cards that should read as more
+   premium/prominent than a plain glass panel (e.g. featured cards). */
+.glass-panel-glow {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(145deg,rgba(35,24,55,.82),rgba(17,9,29,.8)) padding-box,
+    linear-gradient(135deg, rgba(240,171,252,.5), rgba(124,58,237,.15) 40%, rgba(56,189,248,.2)) border-box;
 }
 .focus-ring:focus-visible { outline: 2px solid #e879f9; outline-offset: 4px; }
+
 .premium-button {
   position: relative;
   display: inline-flex;
@@ -62,24 +84,112 @@ img { user-select: none; -webkit-user-drag: none; }
   justify-content: center;
   gap: .6rem;
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: var(--radius-pill);
   background: linear-gradient(90deg,#7c3aed,#a855f7,#d946ef);
   color: white;
   font-weight: 800;
-  box-shadow: 0 16px 48px rgba(138,43,226,.38);
-  transition: transform .3s ease, box-shadow .3s ease;
+  box-shadow: 0 16px 48px rgba(138,43,226,.38), inset 0 1px 0 rgba(255,255,255,.22);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
+}
+.premium-button::after {
+  /* Glass top highlight */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,.22), transparent 55%);
+  pointer-events: none;
 }
 .premium-button::before {
   content: "";
   position: absolute;
   inset: 0;
   transform: translateX(-135%);
-  background: linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
   transition: transform .7s ease;
 }
-.premium-button:hover { transform: translateY(-2px); box-shadow: 0 22px 62px rgba(192,38,255,.48); }
+.premium-button:hover { transform: translateY(-2px) scale(1.015); box-shadow: 0 22px 62px rgba(192,38,255,.48), inset 0 1px 0 rgba(255,255,255,.22); }
+.premium-button:active { transform: translateY(0) scale(.98); }
 .premium-button:hover::before { transform: translateX(135%); }
+
+/* Secondary — glass pill, no fill */
+.premium-button-secondary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: white;
+  font-weight: 700;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), border-color .3s ease, background-color .3s ease;
+}
+.premium-button-secondary:hover { transform: translateY(-2px) scale(1.015); border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.08); }
+.premium-button-secondary:active { transform: translateY(0) scale(.98); }
+
+/* Ghost — text only, fills in softly on hover */
+.premium-button-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border-radius: var(--radius-pill);
+  color: rgba(255,255,255,.7);
+  font-weight: 700;
+  transition: color .25s ease, background-color .25s ease;
+}
+.premium-button-ghost:hover { color: white; background: rgba(255,255,255,.06); }
+
 .eyebrow { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .24em; color: #e879f9; }
+
+/* Chips — filter/tab pills */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.03);
+  padding: .5rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.6);
+  transition: all .25s ease;
+}
+.chip:hover { border-color: rgba(255,255,255,.24); color: white; background: rgba(255,255,255,.06); }
+.chip-active {
+  border-color: transparent;
+  background: linear-gradient(90deg,#7c3aed,#d946ef);
+  color: white;
+  box-shadow: 0 8px 24px rgba(138,43,226,.4);
+}
+
+/* Badges — small status pills */
+.badge { display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius-pill); padding: .25rem .65rem; font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.badge-live { background: rgba(255,109,109,.15); color: #ff8a8a; border: 1px solid rgba(255,109,109,.3); }
+.badge-verified { background: rgba(139,92,246,.18); color: #c4b5fd; border: 1px solid rgba(139,92,246,.35); }
+.badge-creator { background: rgba(250,204,21,.15); color: #fde68a; border: 1px solid rgba(250,204,21,.3); }
+.badge-neutral { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.12); }
+
+/* Inputs — matches the asset pack's default/focus/error/success states */
+.glass-input {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.035);
+  padding: .9rem 1.1rem;
+  color: white;
+  transition: border-color .25s ease, box-shadow .25s ease, background-color .25s ease;
+}
+.glass-input::placeholder { color: rgba(255,255,255,.3); }
+.glass-input:hover { border-color: rgba(255,255,255,.18); }
+.glass-input:focus { outline: none; border-color: #c084fc; background: rgba(255,255,255,.05); box-shadow: 0 0 0 4px rgba(192,132,252,.15); }
+.glass-input[data-state="error"] { border-color: rgba(255,109,109,.6); box-shadow: 0 0 0 4px rgba(255,109,109,.1); }
+.glass-input[data-state="success"] { border-color: rgba(0,230,118,.5); }
 .prose-legal ul { list-style: disc; padding-left: 1.25rem; }
 .prose-legal ol { list-style: decimal; padding-left: 1.25rem; }
 .prose-legal li { margin-top: .4rem; }

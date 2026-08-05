@@ -3,10 +3,13 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Lock, Mail } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
 import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function LoginForm() {
   const { signIn } = useAuth();
@@ -51,7 +54,7 @@ export function LoginForm() {
         <label htmlFor="login-email" className="sr-only">
           Email address
         </label>
-        <input
+        <Input
           id="login-email"
           type="email"
           autoComplete="email"
@@ -59,7 +62,7 @@ export function LoginForm() {
           placeholder="Email address"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<Mail className="size-[18px]" />}
         />
       </div>
 
@@ -67,7 +70,7 @@ export function LoginForm() {
         <label htmlFor="login-password" className="sr-only">
           Password
         </label>
-        <input
+        <Input
           id="login-password"
           type="password"
           autoComplete="current-password"
@@ -75,7 +78,7 @@ export function LoginForm() {
           placeholder="Password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          icon={<Lock className="size-[18px]" />}
         />
       </div>
 
@@ -88,13 +91,9 @@ export function LoginForm() {
         </Link>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="premium-button min-h-13 w-full disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" isLoading={submitting} className="w-full">
         {submitting ? "Signing in…" : "Log in"}
-      </button>
+      </Button>
 
       <p className="text-center text-sm text-white/45">
         Don&apos;t have an account?{" "}
