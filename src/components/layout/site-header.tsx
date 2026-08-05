@@ -59,8 +59,13 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary navigation">
           {siteConfig.navigation.map((item) => (
-            <Link key={item.href} href={item.href} className="focus-ring rounded-lg text-sm font-medium text-white/68 transition hover:text-white">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="focus-ring group relative rounded-lg py-1 text-sm font-medium text-white/68 transition hover:text-white"
+            >
               {item.label}
+              <span className="absolute inset-x-0 -bottom-1 h-px scale-x-0 bg-gradient-to-r from-violet-400 to-fuchsia-300 transition-transform duration-300 ease-out group-hover:scale-x-100" />
             </Link>
           ))}
         </nav>
