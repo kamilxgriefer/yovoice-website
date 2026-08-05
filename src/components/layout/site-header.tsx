@@ -44,15 +44,15 @@ export function SiteHeader() {
     }`}>
       <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link href="/" className="focus-ring flex items-center gap-3 rounded-2xl" aria-label="YO Voice home">
-          <span className="relative flex size-12 overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-black shadow-[0_0_38px_rgba(192,38,255,.32)]">
-            <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill sizes="48px" className="object-cover" priority />
+          <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/25 bg-black shadow-[0_0_38px_rgba(192,38,255,.35)]">
+            <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill sizes="48px" className="object-contain p-1.5" priority />
           </span>
-          <span>
-            <span className="block font-[family-name:var(--font-display)] text-lg font-bold tracking-[-.03em] text-white">
+          <span className="leading-none">
+            <span className="block font-[family-name:var(--font-display)] text-lg font-extrabold uppercase tracking-[.02em] text-white">
               YO Voice
             </span>
-            <span className="block text-[9px] font-bold uppercase tracking-[.36em] text-fuchsia-300">
-              Be You
+            <span className="text-gradient block font-[family-name:var(--font-script)] text-xl leading-tight">
+              be you
             </span>
           </span>
         </Link>

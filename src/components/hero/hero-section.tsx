@@ -16,6 +16,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 
 import { StarField } from "@/components/animations/star-field";
+import { RadarRing } from "@/components/hero/radar-ring";
+import { SpacePlanets } from "@/components/hero/space-planets";
 
 type MemberId = "maya" | "alex" | "luna" | "noah";
 
@@ -198,6 +200,7 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden pt-20">
+      <SpacePlanets />
       <StarField />
 
       <div className="grid-background absolute inset-0 opacity-25" />
@@ -288,7 +291,9 @@ export function HeroSection() {
           className="relative mx-auto aspect-[1.16/1] w-full max-w-[690px]"
         >
           <div className="absolute inset-[7%] rounded-full border border-fuchsia-300/[0.13]" />
+          <RadarRing inset="7%" opacity={0.22} />
           <div className="absolute inset-[18%] rounded-full border border-fuchsia-300/[0.16]" />
+          <RadarRing inset="18%" opacity={0.16} />
           <div className="absolute inset-[31%] rounded-full border border-fuchsia-300/[0.2]" />
 
           <motion.div
