@@ -34,15 +34,21 @@ export function LiveConversationCard({
     <motion.div
       animate={{ y: [0, -4, 0] }}
       transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
-      className="absolute bottom-[9%] left-1/2 w-[86%] max-w-[252px] -translate-x-1/2"
+      className="absolute bottom-[2%] left-1/2 w-[78%] max-w-[252px] -translate-x-1/2 sm:bottom-[9%] sm:w-[86%]"
     >
-      <div className="relative overflow-hidden rounded-[28px] border border-white/[0.09] bg-gradient-to-b from-white/[0.055] to-white/[0.012] p-5 backdrop-blur-2xl shadow-[0_28px_80px_rgba(0,0,0,.55),0_0_56px_rgba(192,38,255,.16)]">
+      <div
+        className="relative overflow-hidden rounded-2xl border border-white/[0.1] bg-gradient-to-b from-white/[0.06] to-white/[0.014] p-3.5 backdrop-blur-2xl sm:rounded-[28px] sm:p-5"
+        style={{
+          boxShadow:
+            "0 28px 80px rgba(0,0,0,.55), 0 0 56px rgba(192,38,255,.16), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.35)",
+        }}
+      >
         {/* Top reflection sheen */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.07] to-transparent" />
-        <div className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-inset ring-fuchsia-300/[0.08]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.08] to-transparent" />
+        <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-fuchsia-300/[0.08] sm:rounded-[28px]" />
 
-        <div className="relative flex items-center gap-3">
-          <div className="relative size-12 shrink-0">
+        <div className="relative flex items-center gap-2.5 sm:gap-3">
+          <div className="relative size-9 shrink-0 sm:size-12">
             <motion.div
               className="absolute inset-[-6px] rounded-full border border-fuchsia-300/30"
               animate={{ scale: [0.9, 1.22], opacity: [0.55, 0] }}
@@ -60,7 +66,7 @@ export function LiveConversationCard({
                 animate={{ opacity: [1, 0.35, 1] }}
                 transition={{ duration: 1.4, repeat: Infinity }}
               />
-              <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-fuchsia-200">
+              <span className="text-[7px] font-bold uppercase tracking-[0.22em] text-fuchsia-200/90 sm:text-[8px]">
                 Live
               </span>
             </div>
@@ -71,15 +77,17 @@ export function LiveConversationCard({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.3 }}
-                className="truncate text-[13.5px] font-semibold text-white"
+                className="truncate text-[12px] font-semibold text-white sm:text-[13.5px]"
               >
                 {speakerName} is speaking
               </motion.p>
             </AnimatePresence>
           </div>
 
-          {/* Equalizer — scaleY only, never height, for GPU-only animation */}
-          <div className="flex h-6 shrink-0 items-end justify-center gap-[3px]">
+          {/* Equalizer — scaleY only, never height, for GPU-only animation.
+              Hidden below sm: at the smaller mobile card width it crowds
+              out the name/status text before adding much visual value. */}
+          <div className="hidden h-6 shrink-0 items-end justify-center gap-[3px] sm:flex">
             {equalizer.slice(0, 5).map((height, index) => (
               <motion.span
                 key={`${speakerName}-${index}`}
@@ -97,7 +105,7 @@ export function LiveConversationCard({
         </div>
 
         {/* Progress — scaleX with left transform-origin, not width */}
-        <div className="relative mt-4 h-1 overflow-hidden rounded-full bg-white/[0.07]">
+        <div className="relative mt-2.5 h-1 overflow-hidden rounded-full bg-white/[0.07] sm:mt-4">
           <motion.div
             className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-300"
             animate={{ scaleX: [0.06, 0.4, 0.68, 0.92] }}

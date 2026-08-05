@@ -43,49 +43,100 @@ function OrbitMarker({
   );
 }
 
-/** Premium multi-layer orbit rings: varied thickness/opacity/style,
- * independent rotation speeds and directions, glowing traveling markers,
- * and a background/foreground split so avatars read as sitting "within"
- * the system rather than on top of a flat circle. */
+/** A ring whose brightness sweeps around its circumference (conic-gradient)
+ * rather than a single flat border color — the difference between a "CSS
+ * circle" and a light-catching motion-graphics ring. `thickness` is in px;
+ * the radial-gradient mask cuts the fill down to just that stroke width. */
+function GradientRing({
+  inset,
+  thickness = 1,
+  colorStops,
+  duration,
+  reverse,
+  blur,
+}: {
+  inset: string;
+  thickness?: number;
+  colorStops: string;
+  duration: number;
+  reverse?: boolean;
+  blur?: number;
+}) {
+  return (
+    <motion.div
+      className="absolute rounded-full"
+      style={{
+        inset,
+        filter: blur ? `blur(${blur}px)` : undefined,
+        background: `conic-gradient(from 0deg, ${colorStops})`,
+        WebkitMaskImage: `radial-gradient(farthest-side, transparent calc(100% - ${thickness}px), #000 calc(100% - ${thickness}px))`,
+        maskImage: `radial-gradient(farthest-side, transparent calc(100% - ${thickness}px), #000 calc(100% - ${thickness}px))`,
+      }}
+      animate={{ rotate: reverse ? -360 : 360 }}
+      transition={{ duration, repeat: Infinity, ease: "linear" }}
+    />
+  );
+}
+
+/** Premium multi-layer orbit rings: gradient-sweep strokes (not flat CSS
+ * borders), varied thickness/blur for depth, independent rotation speeds
+ * and directions, glowing traveling markers, and a background/foreground
+ * split so avatars read as sitting "within" the system. */
 export function OrbitSystem() {
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
       {/* Furthest, softest ring — depth via blur, breathes in sync with the
           center logo's pulse (same 3.4s cadence) so the whole system reads
-          as "illuminated" by it rather than as separate static shapes.
-          Hidden on mobile: decorative-only, and mobile should feel focused
-          rather than scaled-down-and-cluttered. */}
+          as illuminated by it rather than as separate static shapes.
+          Hidden on mobile — decorative-only, mobile stays focused. */}
       <motion.div
-        className="absolute inset-0 hidden rounded-full border border-fuchsia-300/10 blur-[1.5px] sm:block"
+        className="absolute inset-0 hidden sm:block"
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-      />
+      >
+        <GradientRing
+          inset="0"
+          thickness={1.5}
+          blur={2}
+          duration={130}
+          colorStops="rgba(240,171,252,.22) 0deg, transparent 40deg, transparent 140deg, rgba(139,92,246,.18) 180deg, transparent 220deg, transparent 320deg, rgba(240,171,252,.22) 360deg"
+        />
+      </motion.div>
 
       {/* Background layer — behind avatars/logo */}
-      <div className="absolute inset-[4%] rounded-full border border-fuchsia-300/[0.08]" />
-      <motion.div
-        className="absolute inset-[15%] hidden rounded-full sm:block"
-        style={{ border: "1px dashed rgba(240,171,252,0.13)" }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
+      <GradientRing
+        inset="4%"
+        thickness={1}
+        duration={110}
+        colorStops="rgba(240,171,252,.16) 0deg, rgba(139,92,246,.05) 90deg, rgba(240,171,252,.16) 180deg, rgba(139,92,246,.05) 270deg, rgba(240,171,252,.16) 360deg"
       />
+      <div className="absolute inset-[15%] hidden rounded-full sm:block" style={{ border: "1px dashed rgba(240,171,252,0.13)" }} />
       <motion.div
-        className="absolute inset-[26%] rounded-full border-2 border-violet-300/[0.09]"
         animate={{ opacity: [0.6, 1, 0.6] }}
         transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-      />
+      >
+        <GradientRing
+          inset="26%"
+          thickness={2.5}
+          blur={0.5}
+          duration={55}
+          reverse
+          colorStops="rgba(216,180,254,.32) 0deg, rgba(139,92,246,.06) 100deg, rgba(216,180,254,.32) 180deg, rgba(139,92,246,.06) 280deg, rgba(216,180,254,.32) 360deg"
+        />
+      </motion.div>
 
-      {/* Segmented ring — built from four arcs with gaps, via conic-gradient
-          mask, so it reads as "broken" rather than a full circle */}
+      {/* Segmented ring — broken arcs with gaps, so it reads as a premium
+          "instrument dial" rather than a full circle */}
       <motion.div
         className="absolute inset-[9%] rounded-full"
         style={{
           background:
-            "conic-gradient(from 0deg, rgba(240,171,252,.42) 0deg 70deg, transparent 70deg 90deg, rgba(240,171,252,.42) 90deg 160deg, transparent 160deg 180deg, rgba(240,171,252,.42) 180deg 250deg, transparent 250deg 270deg, rgba(240,171,252,.42) 270deg 340deg, transparent 340deg 360deg)",
+            "conic-gradient(from 0deg, rgba(240,171,252,.5) 0deg 70deg, transparent 70deg 90deg, rgba(56,189,248,.35) 90deg 160deg, transparent 160deg 180deg, rgba(240,171,252,.5) 180deg 250deg, transparent 250deg 270deg, rgba(139,92,246,.4) 270deg 340deg, transparent 340deg 360deg)",
+          filter: "blur(0.3px)",
           WebkitMaskImage:
-            "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+            "radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))",
           maskImage:
-            "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+            "radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))",
         }}
         animate={{ rotate: -360 }}
         transition={{ duration: 70, repeat: Infinity, ease: "linear" }}

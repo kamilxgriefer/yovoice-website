@@ -29,15 +29,18 @@ export function PremiumChatBubble({
           <div
             className={`relative overflow-hidden whitespace-nowrap rounded-2xl border px-4 py-2.5 backdrop-blur-2xl ${
               size === "sm" ? "text-[10.5px]" : "text-[11.5px]"
-            } font-medium ${
+            } font-medium tracking-[-0.01em] ${
               active
-                ? "border-fuchsia-200/30 text-white shadow-[0_18px_48px_rgba(0,0,0,.5),0_0_28px_rgba(192,38,255,.22)]"
-                : "border-white/[0.09] text-white/85 shadow-[0_14px_36px_rgba(0,0,0,.4)]"
+                ? "border-fuchsia-200/30 text-white"
+                : "border-white/[0.1] text-white/85"
             }`}
             style={{
               background: active
                 ? "linear-gradient(155deg, rgba(56,20,74,.92), rgba(24,12,38,.94))"
                 : "linear-gradient(155deg, rgba(28,20,42,.9), rgba(18,11,30,.92))",
+              boxShadow: active
+                ? "0 18px 48px rgba(0,0,0,.5), 0 0 28px rgba(192,38,255,.22), inset 0 1px 0 rgba(255,255,255,.14)"
+                : "0 14px 36px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08)",
             }}
           >
             {/* Gradient border glow (only when active) */}

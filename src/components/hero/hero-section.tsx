@@ -116,6 +116,11 @@ export function HeroSection() {
     <section className="relative overflow-hidden pt-24 sm:pt-28">
       <DeepSpaceBackground />
       <div className="grid-background absolute inset-0 opacity-[0.06]" />
+      {/* Cinematic key light + color grade — a soft directional wash from
+          upper-right (as if lit by the orb) plus a faint teal/magenta
+          split-tone, tying every layer beneath it into one consistent
+          lighting scene rather than independently-lit components. */}
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(232,121,249,.05)_0%,transparent_35%),linear-gradient(-65deg,rgba(56,189,248,.04)_0%,transparent_40%)]" />
 
       <div className="relative mx-auto grid w-full max-w-[1400px] items-center gap-16 px-5 pb-16 pt-8 sm:px-8 sm:pb-20 lg:min-h-[760px] lg:grid-cols-[0.84fr_1.16fr] lg:gap-10 lg:px-12 lg:pb-10 lg:pt-10">
         <motion.div
