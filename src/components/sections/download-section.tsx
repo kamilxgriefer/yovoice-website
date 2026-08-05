@@ -13,9 +13,9 @@ export function DownloadSection() {
     {
       icon: Smartphone,
       title: "Mobile",
-      description: "Download through the Apple App Store or Google Play.",
-      href: "#mobile-downloads",
-      action: "View mobile options",
+      description: "Coming soon to the Apple App Store and Google Play.",
+      href: user ? "/download" : "/login?redirect=/download",
+      action: "Track progress",
     },
     {
       icon: Monitor,

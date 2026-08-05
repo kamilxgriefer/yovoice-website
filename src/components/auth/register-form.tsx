@@ -135,7 +135,14 @@ export function RegisterForm() {
 
       <p className="text-center text-sm text-white/45">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-fuchsia-300 hover:text-white">
+        <Link
+          href={
+            searchParams.get("redirect")
+              ? `/login?redirect=${encodeURIComponent(searchParams.get("redirect")!)}`
+              : "/login"
+          }
+          className="font-semibold text-fuchsia-300 hover:text-white"
+        >
           Log in
         </Link>
       </p>

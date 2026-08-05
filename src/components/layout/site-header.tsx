@@ -92,7 +92,7 @@ export function SiteHeader() {
               <Link href="/register" className="focus-ring rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[.04]">
                 Create account
               </Link>
-              <Link href="#download" className="premium-button focus-ring min-h-12 px-5">
+              <Link href="/download" className="premium-button focus-ring min-h-12 px-5">
                 <ArrowDownToLine className="relative size-4" />
                 <span className="relative">Download</span>
               </Link>
@@ -148,7 +148,7 @@ export function SiteHeader() {
                     Create account
                   </Link>
                 </div>
-                <Link href="#download" onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
+                <Link href="/download" onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
                   Download
                 </Link>
               </>

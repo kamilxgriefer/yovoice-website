@@ -2,13 +2,31 @@
 
 import Link from "next/link";
 
+import { MobileDownload } from "@/components/download/mobile-download";
 import { PlatformSelector } from "@/components/download/platform-selector";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-is-mobile";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 
 export default function DownloadPage() {
-  const { user, loading } = useRequireAuth();
+  const isMobile = useIsMobile();
+  // Desktop installers are gated behind an account; mobile never is — a
+  // phone visitor should see App Store / Google Play status immediately,
+  // never a login wall for something they'd get from a store anyway.
+  const { user, loading } = useRequireAuth({ skip: isMobile !== false });
   const { reloadUser } = useAuth();
+
+  if (isMobile === null) {
+    return (
+      <section className="flex min-h-[70vh] items-center justify-center px-5 pt-20">
+        <p className="text-sm text-white/45">Loading…</p>
+      </section>
+    );
+  }
+
+  if (isMobile) {
+    return <MobileDownload />;
+  }
 
   if (loading || !user) {
     return (
