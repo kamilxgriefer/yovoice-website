@@ -98,6 +98,30 @@ export function DeepSpaceBackground() {
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(192,38,255,.10),transparent_55%)]" />
 
+      {/* Large blurred planets — soft, distant, part of the depth rather than
+          a distinct foreground object. Radial-gradient spheres, heavily
+          blurred so they read as atmosphere, not shapes. */}
+      <motion.div
+        className="absolute -right-[8%] top-[4%] size-[380px] rounded-full opacity-70 blur-2xl sm:size-[460px]"
+        style={{
+          background:
+            "radial-gradient(circle at 35% 30%, rgba(139,92,246,.5), rgba(88,28,135,.25) 45%, transparent 72%)",
+          x: useTransform(springX, (v) => v * 6),
+          y: useTransform(springY, (v) => v * 6),
+        }}
+        animate={reduced ? undefined : { y: [0, 14, 0] }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-[2%] left-[2%] size-[260px] rounded-full opacity-50 blur-2xl sm:size-[320px]"
+        style={{
+          background:
+            "radial-gradient(circle at 40% 35%, rgba(244,114,182,.4), rgba(124,58,237,.2) 50%, transparent 74%)",
+        }}
+        animate={reduced ? undefined : { y: [0, -12, 0] }}
+        transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      />
+
       {/* Space dust — soft, larger, slower than stars */}
       <motion.div style={{ x: useTransform(springX, (v) => v * -8), y: useTransform(springY, (v) => v * -8) }}>
         {dust.map((d) => (

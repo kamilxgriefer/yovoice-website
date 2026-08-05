@@ -38,6 +38,8 @@ export function HeroPrimaryCta({
         href={href}
         className="focus-ring relative flex min-h-12 items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-fuchsia-400 px-6 text-sm font-bold text-white shadow-[0_18px_50px_rgba(192,38,255,.4)]"
       >
+        {/* Glass top highlight */}
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.22] to-transparent" />
         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
         <span className="relative">{children}</span>
       </Link>
@@ -58,7 +60,9 @@ export function HeroSecondaryCta({
         href={href}
         className="focus-ring group relative flex min-h-12 items-center justify-center gap-3 overflow-hidden rounded-2xl border border-white/[0.14] bg-white/[0.04] px-6 text-sm font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.08]"
       >
-        {children}
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.08] to-transparent" />
+        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
+        <span className="relative flex items-center gap-3">{children}</span>
       </Link>
     </motion.div>
   );

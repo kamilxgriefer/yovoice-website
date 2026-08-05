@@ -92,7 +92,7 @@ function OrbitingMember({ member, activeId, cycleOffset }: { member: Member; act
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, delay: 0.3 + cycleOffset * 0.1, ease: "easeOut" }}
-      className={`absolute z-20 ${member.position}`}
+      className={`absolute z-20 origin-center scale-[0.72] sm:scale-90 lg:scale-100 ${member.position}`}
     >
       <div className="relative">
         <PremiumChatBubble
@@ -113,39 +113,39 @@ export function HeroSection() {
   const activeMember = members[activeIndex];
 
   return (
-    <section className="relative overflow-hidden pt-20">
+    <section className="relative overflow-hidden pt-24 sm:pt-28">
       <DeepSpaceBackground />
-      <div className="grid-background absolute inset-0 opacity-[0.08]" />
+      <div className="grid-background absolute inset-0 opacity-[0.06]" />
 
-      <div className="relative mx-auto grid min-h-[720px] w-full max-w-[1360px] items-center gap-10 px-5 pb-10 pt-10 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:px-10">
+      <div className="relative mx-auto grid w-full max-w-[1400px] items-center gap-16 px-5 pb-16 pt-8 sm:px-8 sm:pb-20 lg:min-h-[760px] lg:grid-cols-[0.84fr_1.16fr] lg:gap-10 lg:px-12 lg:pb-10 lg:pt-10">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 max-w-[560px]"
+          className="relative z-10 max-w-[560px] text-center lg:text-left"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
-            className="mb-7 inline-flex items-center gap-2 rounded-full border border-fuchsia-400/25 bg-fuchsia-400/[0.08] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-fuchsia-100 backdrop-blur-xl"
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-fuchsia-400/25 bg-fuchsia-400/[0.08] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-fuchsia-100 backdrop-blur-xl"
           >
             <Sparkles className="size-4" />
             The future of voice communities
           </motion.div>
 
-          <h1 className="font-[family-name:var(--font-display)] text-[3.4rem] font-bold leading-[0.92] tracking-[-0.055em] text-white sm:text-7xl xl:text-[80px]">
+          <h1 className="font-[family-name:var(--font-display)] text-[3.1rem] font-bold leading-[1.02] tracking-[-0.045em] text-white sm:text-7xl sm:leading-[0.95] xl:text-[82px]">
             <span className="block">Your voice.</span>
-            <span className="text-gradient mt-1 block">Your community.</span>
+            <span className="text-gradient mt-1.5 block">Your community.</span>
           </h1>
 
-          <p className="mt-7 max-w-[480px] text-base leading-8 text-white/60">
+          <p className="mx-auto mt-8 max-w-[460px] text-base leading-[1.85] text-white/55 lg:mx-0">
             Where conversations become communities. Meet people who
             understand your world, speak freely and build something
             meaningful together.
           </p>
 
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+          <div className="mt-11 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
             <HeroPrimaryCta href="#download">
               Download YO Voice
               <ArrowDown className="size-4" />
@@ -158,7 +158,7 @@ export function HeroSection() {
             </HeroSecondaryCta>
           </div>
 
-          <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-[13px] text-white/50">
+          <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[13px] text-white/45 lg:justify-start">
             <span className="flex items-center gap-2">
               <Radio className="size-4 text-fuchsia-400" />
               Live voice rooms
@@ -173,15 +173,15 @@ export function HeroSection() {
             </span>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-12">
             <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-white/30">
               Available across your devices
             </p>
-            <div className="mt-3 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap justify-center gap-3 lg:justify-start">
               {platforms.map(({ label, icon: Icon }) => (
                 <div
                   key={label}
-                  className="flex items-center gap-2 rounded-xl border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-[11px] text-white/55 backdrop-blur-xl"
+                  className="flex items-center gap-2 rounded-xl border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-[11px] text-white/50 backdrop-blur-xl"
                 >
                   <Icon className="size-3.5 text-fuchsia-300" />
                   {label}
@@ -195,7 +195,7 @@ export function HeroSection() {
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto aspect-[1.1/1] w-full max-w-[660px]"
+          className="relative mx-auto aspect-[1.1/1] w-full max-w-[340px] sm:max-w-[460px] lg:max-w-[660px]"
         >
           <OrbitSystem />
 
@@ -215,7 +215,7 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      <div className="relative mx-auto max-w-[1360px] px-5 pb-6 sm:px-8 lg:px-10">
+      <div className="relative mx-auto max-w-[1400px] px-5 pb-8 sm:px-8 lg:px-12">
         <motion.a
           href="#stats"
           whileHover={{ y: 2 }}
