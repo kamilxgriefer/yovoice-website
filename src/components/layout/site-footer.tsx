@@ -3,10 +3,10 @@ import Link from "next/link";
 import { BriefcaseBusiness, Camera, Code2, Mail } from "lucide-react";
 
 const columns = [
-  { title: "Product", links: [["Experience","#experience"],["Community","#community"],["Clubs","#clubs"],["Download","#download"]] },
-  { title: "Company", links: [["About","mailto:hello@yovoice.app?subject=About YO Voice"],["Roadmap","#experience"],["Contact","mailto:hello@yovoice.app"],["Careers","mailto:careers@yovoice.app"]] },
-  { title: "Support", links: [["Help Center","mailto:support@yovoice.app"],["Safety","#community"],["Status","#stats"],["FAQ","#download"]] },
-  { title: "Legal", links: [["Privacy","#footer"],["Terms","#footer"],["Cookies","#footer"]] },
+  { title: "Product", links: [["Features","/features"],["Community","/community"],["Clubs","/clubs"],["Achievements","/achievements"]] },
+  { title: "Company", links: [["About","/about"],["Roadmap","/roadmap"],["Careers","/careers"],["Contact","/contact"]] },
+  { title: "Support", links: [["Help Center","/help-center"],["Safety","/safety"],["Status","/status"],["FAQ","/faq"]] },
+  { title: "Legal", links: [["Privacy","/privacy"],["Terms","/terms"],["Cookies","/cookies"]] },
 ];
 
 export function SiteFooter() {
