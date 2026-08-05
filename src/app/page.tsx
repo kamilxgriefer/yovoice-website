@@ -8,14 +8,16 @@ import { StatsSection } from "@/components/sections/stats-section";
 
 export default function HomePage() {
   return (
-    <main>
+    <div>
       <SiteHeader />
-      <HeroSection />
-      <StatsSection />
-      <FeatureGridSection />
-      <ProductDetailsSection />
-      <DownloadSection />
+      <main>
+        <HeroSection />
+        <StatsSection />
+        <FeatureGridSection />
+        <ProductDetailsSection />
+        <DownloadSection />
+      </main>
       <SiteFooter />
-    </main>
+    </div>
   );
 }

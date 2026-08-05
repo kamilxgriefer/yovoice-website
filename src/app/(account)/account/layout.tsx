@@ -36,9 +36,9 @@ export default function AccountLayout({
   }
 
   return (
-    <main>
+    <div>
       <SiteHeader />
-      <section className="min-h-screen bg-[#060511] px-5 pb-24 pt-32 sm:px-8 lg:px-12">
+      <main className="min-h-screen bg-[#060511] px-5 pb-24 pt-32 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <VerifyEmailBanner />
 
@@ -74,8 +74,8 @@ export default function AccountLayout({
             <div>{children}</div>
           </div>
         </div>
-      </section>
+      </main>
       <SiteFooter />
-    </main>
+    </div>
   );
 }
