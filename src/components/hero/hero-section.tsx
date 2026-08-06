@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Play, Sparkles } from "lucide-react";
+import { ArrowDown, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { CenterLogo } from "@/components/hero/center-logo";
@@ -95,21 +95,31 @@ export function HeroSection() {
           that single vertical line, on purpose — one scene, not a stack
           of independent components. */}
       <div className="relative mx-auto flex w-full max-w-[860px] flex-col items-center px-5 text-center sm:px-8">
+        {/* Not a category label — a sign of life. The first thing anyone
+            reads should already feel like a room full of people, not a
+            product description. */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/20 bg-fuchsia-400/[0.06] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-fuchsia-100/90 backdrop-blur-xl"
+          className="inline-flex items-center gap-2 text-[13px] text-white/40"
         >
-          <Sparkles className="size-3.5" />
-          The future of voice communities
+          <span className="relative flex size-1.5">
+            <motion.span
+              className="absolute inset-0 rounded-full bg-emerald-400"
+              animate={{ scale: [1, 2.2], opacity: [0.6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+            />
+            <span className="relative size-1.5 rounded-full bg-emerald-400" />
+          </span>
+          2,481 people talking right now
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-8 font-[family-name:var(--font-display)] text-[2.4rem] font-bold leading-[1.03] tracking-[-0.035em] text-white sm:text-7xl xl:text-[6.4rem]"
+          className="mt-6 font-[family-name:var(--font-display)] text-[2.4rem] font-bold leading-[1.03] tracking-[-0.035em] text-white sm:text-7xl xl:text-[6.4rem]"
         >
           <span className="block">Your voice.</span>
           <span className="text-gradient mt-1 block">Your community.</span>
@@ -119,10 +129,10 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="mx-auto mt-7 max-w-[420px] text-[15px] leading-[1.85] text-white/50"
+          className="mx-auto mt-7 max-w-[400px] text-[15px] leading-[1.85] text-white/50"
         >
-          Where conversations become communities. Meet people who understand
-          your world, speak freely and build something meaningful together.
+          Somewhere right now, someone is telling a story, making a friend,
+          or hosting a room full of people who get it. Come listen in.
         </motion.p>
 
         <motion.div
@@ -182,20 +192,14 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.95 }}
-        className="relative z-30 mx-auto mt-14 max-w-[420px] px-5 text-center text-[11px] text-white/25"
-      >
-        Available on iOS, Android, Windows, macOS and Web
-      </motion.p>
-
-      <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-16 sm:px-8 lg:px-12">
+      {/* No device/logistics line here on purpose — that's what the
+          download section further down is for. The hero's job is the
+          feeling, not the spec sheet. */}
+      <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-20 sm:px-8 lg:px-12">
         <motion.a
           href="#stats"
           whileHover={{ y: 2 }}
-          className="focus-ring mx-auto flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-white/55 backdrop-blur-xl transition hover:bg-white/[0.06] hover:text-white"
+          className="focus-ring mx-auto flex size-10 items-center justify-center text-white/30 transition hover:text-white/60"
           aria-label="Scroll to statistics"
         >
           <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>

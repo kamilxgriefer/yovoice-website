@@ -11,19 +11,20 @@ const depthStyle: Record<Depth, { opacity: number; blur: string }> = {
   far: { opacity: 0.72, blur: "blur-[0.5px]" },
 };
 
-/** A clean circle — nothing more. One shared, neutral rim light sits behind
- * every avatar (the scene's single consistent light source); each
- * person's accent color is only a faint hint at rest, and only becomes a
- * real colored glow while they're actually speaking — fewer independent
- * light sources, not more. `depth` (near/mid/far) drives opacity and a
- * touch of blur so the eye reads distance from the center, not a flat
- * ring of equal objects. `tiltBias` is a small constant rotation biasing
- * the avatar's idle motion toward the logo, so it reads as connected
- * rather than independently floating. */
+/** A clean circle — nothing more. No role tag underneath (HOST/SPEAKER/
+ * LISTENER reads as admin-panel classification, not a person) — just a
+ * first name, the way you'd recognize someone in a room. One shared,
+ * neutral rim light sits behind every avatar (the scene's single
+ * consistent light source); each person's accent color is only a faint
+ * hint at rest, and only becomes a real colored glow while they're
+ * actually speaking — fewer independent light sources, not more. `depth`
+ * (near/mid/far) drives opacity and a touch of blur so the eye reads
+ * distance from the center, not a flat ring of equal objects. `tiltBias`
+ * is a small constant rotation biasing the avatar's idle motion toward
+ * the logo, so it reads as connected rather than independently floating. */
 export function PremiumAvatar({
   src,
   name,
-  role,
   ringColor,
   active,
   depth = "mid",
@@ -33,7 +34,6 @@ export function PremiumAvatar({
 }: {
   src: string;
   name: string;
-  role: string;
   ringColor: string;
   active: boolean;
   depth?: Depth;
@@ -86,8 +86,7 @@ export function PremiumAvatar({
         </motion.div>
       </div>
 
-      <p className="mt-2.5 text-[11px] font-semibold text-white/80">{name}</p>
-      <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-white/35">{role}</p>
+      <p className="mt-2.5 text-[11px] font-semibold text-white/75">{name}</p>
     </motion.div>
   );
 }

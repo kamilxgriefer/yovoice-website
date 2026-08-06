@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { SignalHigh, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
 function useElapsed() {
   const [seconds, setSeconds] = useState(102);
@@ -16,10 +16,12 @@ function useElapsed() {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** A premium media-player widget, sized like one — not a giant card. Avatar,
- * speaker name, a real waveform, listener count, connection quality, an
- * elapsed timer and a progress bar, in a thin glass shell. GPU-only
- * animation (scaleY/scaleX/opacity, never width/height) throughout. */
+/** Not a UI widget — proof. This card exists to say "this is happening
+ * right now," so it opens on the human sentence, not a section label.
+ * No app-chrome (connection quality, category eyebrows) — only what
+ * actually proves a real conversation is live: who's talking, the sound
+ * of it, how many people are there, and one live indicator, once.
+ * GPU-only animation (scaleY/scaleX/opacity, never width/height). */
 export function LiveConversationCard({
   speakerName,
   speakerAvatar,
@@ -47,27 +49,7 @@ export function LiveConversationCard({
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.06] to-transparent" />
 
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <motion.span
-              className="size-1.5 rounded-full bg-emerald-400"
-              animate={{ opacity: [1, 0.35, 1] }}
-              transition={{ duration: 1.4, repeat: Infinity }}
-            />
-            <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-fuchsia-200/80">
-              Live Conversation
-            </span>
-          </div>
-          <div className="flex items-center gap-2.5 text-white/35">
-            <span className="flex items-center gap-1 text-[10px] font-semibold tabular-nums">
-              <Users className="size-3" />
-              {listeners.toLocaleString("en-US")}
-            </span>
-            <SignalHigh className="size-3.5 text-emerald-400" aria-label="Connection quality: excellent" />
-          </div>
-        </div>
-
-        <div className="relative mt-3.5 flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
           <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-white/10">
             <Image src={speakerAvatar} alt={speakerName} fill className="object-cover" sizes="40px" />
           </div>
@@ -80,15 +62,20 @@ export function LiveConversationCard({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.3 }}
-                className="truncate text-[13.5px] font-semibold text-white"
+                className="truncate text-[14.5px] font-semibold text-white"
               >
                 {speakerName} is speaking
               </motion.p>
             </AnimatePresence>
           </div>
+
+          <span className="flex shrink-0 items-center gap-1 text-[10px] font-semibold tabular-nums text-white/35">
+            <Users className="size-3" />
+            {listeners.toLocaleString("en-US")}
+          </span>
         </div>
 
-        <div className="relative mt-3.5 flex h-7 items-end justify-center gap-[2.5px]">
+        <div className="relative mt-4 flex h-7 items-end justify-center gap-[2.5px]">
           {equalizer.map((height, index) => (
             <motion.span
               key={`${speakerName}-${index}`}
@@ -116,7 +103,11 @@ export function LiveConversationCard({
         <div className="relative mt-1.5 flex items-center justify-between text-[10px] font-medium tabular-nums text-white/35">
           <span>{elapsed}</span>
           <span className="flex items-center gap-1 font-bold text-rose-300">
-            <span className="size-1.5 rounded-full bg-rose-400" />
+            <motion.span
+              className="size-1.5 rounded-full bg-rose-400"
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1.6, repeat: Infinity }}
+            />
             LIVE
           </span>
         </div>

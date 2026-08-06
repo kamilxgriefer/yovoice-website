@@ -54,7 +54,6 @@ export function OrbitingMembers({ members, activeId }: { members: OrbitMember[];
                 <PremiumAvatar
                   src={member.avatar}
                   name={member.name}
-                  role={member.role}
                   ringColor={member.ringColor}
                   active={member.id === activeId}
                   depth={member.depth}
