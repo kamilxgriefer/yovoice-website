@@ -2,27 +2,25 @@
 
 import { motion } from "framer-motion";
 
-import { IdentityCard } from "@/components/hero/identity-card";
+import { PremiumAvatar } from "@/components/hero/premium-avatar";
 
 export type OrbitMember = {
   id: string;
   name: string;
   role: string;
   avatar: string;
+  ringColor: string;
 };
 
-/** Evenly distributes members around a full circle (true trig placement,
- * not scattered corner positions) at a shared radius. Each card's position
- * is static — the orbit *feeling* comes from the rotating ring layers
- * behind/around them (OrbitSystem) plus each card's own independent float/
- * tilt (IdentityCard) — literally spinning avatar photos around the circle
- * reads as chaotic and distracting at this scale, so motion is layered
- * instead of applied to position. `startAngleDeg` rotates the whole
- * formation without touching any card's own orientation. */
+/** Evenly distributes members around a full circle (real trigonometric
+ * placement, not scattered corner positions) at a shared radius. Position
+ * is static per member — motion lives in each PremiumAvatar's own float/
+ * breathing pulse instead of the position itself, which reads as engineered
+ * rather than chaotic at this scale. */
 export function OrbitingMembers({
   members,
   activeId,
-  radiusPercent = 38,
+  radiusPercent = 40,
   startAngleDeg = -90,
 }: {
   members: OrbitMember[];
@@ -42,16 +40,17 @@ export function OrbitingMembers({
         return (
           <motion.div
             key={member.id}
-            initial={{ opacity: 0, scale: 0.6 }}
+            initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.4 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute z-20 origin-center -translate-x-1/2 -translate-y-1/2 scale-[0.46] sm:scale-90 lg:scale-100"
+            transition={{ duration: 0.6, delay: 0.35 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 scale-[0.68] sm:scale-90 lg:scale-100"
             style={{ left: `${x}%`, top: `${y}%` }}
           >
-            <IdentityCard
+            <PremiumAvatar
               src={member.avatar}
               name={member.name}
               role={member.role}
+              ringColor={member.ringColor}
               active={member.id === activeId}
               floatDelay={i}
             />
