@@ -86,13 +86,13 @@ export function OrbitSystem() {
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
       {/* Furthest, softest ring — depth via blur, breathes in sync with the
-          center logo's pulse (same 3.4s cadence) so the whole system reads
-          as illuminated by it rather than as separate static shapes.
+          center logo's pulse (same 4.6s cadence — see CenterLogo's PULSE)
+          so the whole system reads as powered by it, not independently lit.
           Hidden on mobile — decorative-only, mobile stays focused. */}
       <motion.div
         className="absolute inset-0 hidden sm:block"
         animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
       >
         <GradientRing
           inset="0"
@@ -113,7 +113,7 @@ export function OrbitSystem() {
       <div className="absolute inset-[15%] hidden rounded-full sm:block" style={{ border: "1px dashed rgba(240,171,252,0.13)" }} />
       <motion.div
         animate={{ opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+        transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
       >
         <GradientRing
           inset="26%"

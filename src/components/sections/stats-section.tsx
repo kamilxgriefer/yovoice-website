@@ -53,7 +53,7 @@ function AnimatedNumber({
 
 export function StatsSection() {
   return (
-    <section id="stats" className="relative px-5 pb-8 sm:px-8 lg:px-10">
+    <section id="stats" className="relative px-5 pb-20 pt-6 sm:px-8 lg:px-10">
       <div className="mx-auto grid max-w-[1320px] gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map(({ icon: Icon, prefix, value, decimals, suffix, label }, index) => (
           <motion.div
@@ -63,7 +63,7 @@ export function StatsSection() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{ y: -4 }}
-            className="group relative overflow-hidden rounded-[22px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.015] p-6 backdrop-blur-xl transition-colors duration-300 hover:border-fuchsia-300/25"
+            className="glass-panel group relative overflow-hidden rounded-[22px] p-6 hover:border-fuchsia-300/25"
           >
             <div className="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-fuchsia-500/10 blur-2xl transition-opacity duration-300 group-hover:opacity-80" />
             <motion.div

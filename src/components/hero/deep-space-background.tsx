@@ -47,6 +47,21 @@ const dust = Array.from({ length: 26 }, (_, i) => ({
   parallax: 14 + (i % 3) * 10,
 }));
 
+/** Warm embers — a distinct particle family from `dust`: smaller, faster,
+ * amber/fuchsia-tinted rather than neutral, drifting upward like sparks
+ * off the center logo rather than floating in place. Concentrated toward
+ * the lower two-thirds of the frame so they read as rising past the
+ * avatars/logo, not scattered uniformly. */
+const embers = Array.from({ length: 34 }, (_, i) => ({
+  id: i,
+  left: (i * 17.3 + 2) % 100,
+  top: 35 + ((i * 23.6) % 60),
+  size: 1 + (i % 3),
+  hue: i % 3 === 0 ? "rgba(253,186,116,.55)" : i % 3 === 1 ? "rgba(232,121,249,.5)" : "rgba(216,180,254,.5)",
+  duration: 6 + (i % 7) * 1.4,
+  delay: (i % 11) * 0.6,
+}));
+
 /** Full-bleed layered space backdrop: nebula fog, ambient light, a starfield
  * with size variance, drifting dust motes, and a subtle cursor-parallax tilt
  * across the whole stack. Every layer is pure CSS/SVG — no image assets. */
@@ -77,6 +92,23 @@ export function DeepSpaceBackground() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       {/* Base void */}
       <div className="absolute inset-0 bg-[#040210]" />
+
+      {/* Cursor glow — a soft light that follows the pointer, as if the
+          scene itself were reacting to it. Additive-feeling radial wash,
+          low opacity so it reads as ambient rather than a spotlight. */}
+      <motion.div
+        className="absolute size-[600px] rounded-full blur-[90px]"
+        style={{
+          background: "radial-gradient(circle, rgba(232,121,249,.16), transparent 68%)",
+          left: useTransform(springX, (v) => `calc(50% + ${v * 340}px - 300px)`),
+          top: useTransform(springY, (v) => `calc(50% + ${v * 340}px - 300px)`),
+        }}
+      />
+
+      {/* Light leaks — diagonal cinematic color streaks, like stray lens
+          flare across the frame rather than a symmetric glow. */}
+      <div className="absolute -left-[10%] top-[-6%] h-[140%] w-[45%] rotate-[9deg] bg-[linear-gradient(100deg,transparent_40%,rgba(232,121,249,.05)_48%,rgba(139,92,246,.07)_52%,transparent_60%)]" />
+      <div className="absolute -right-[15%] bottom-[-10%] h-[120%] w-[40%] rotate-[-11deg] bg-[linear-gradient(100deg,transparent_42%,rgba(56,189,248,.04)_50%,transparent_58%)]" />
 
       {/* Nebula fog — slow-drifting layered color fields */}
       <motion.div
@@ -135,6 +167,24 @@ export function DeepSpaceBackground() {
                 : { y: [0, -18, 0], x: [0, 8, 0], opacity: [0.2, 0.5, 0.2] }
             }
             transition={{ duration: d.duration, delay: d.delay, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ))}
+      </motion.div>
+
+      {/* Embers — warm/fuchsia sparks drifting upward, distinct from the
+          neutral `dust` layer below */}
+      <motion.div style={{ x: useTransform(springX, (v) => v * -6), y: useTransform(springY, (v) => v * -6) }}>
+        {embers.map((e) => (
+          <motion.span
+            key={e.id}
+            className="absolute rounded-full"
+            style={{ left: `${e.left}%`, top: `${e.top}%`, width: e.size, height: e.size, background: e.hue, boxShadow: `0 0 ${e.size * 3}px ${e.hue}` }}
+            animate={
+              reduced
+                ? undefined
+                : { y: [0, -60, -120], opacity: [0, 0.85, 0], x: [0, e.id % 2 === 0 ? 10 : -10, 0] }
+            }
+            transition={{ duration: e.duration, delay: e.delay, repeat: Infinity, ease: "easeOut" }}
           />
         ))}
       </motion.div>
