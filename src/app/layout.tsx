@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Space_Grotesk, Dancing_Script } from "next/font/google";
+import { Geist, Space_Grotesk } from "next/font/google";
 
 import { AuthProvider } from "@/providers/auth-provider";
 
@@ -13,11 +13,6 @@ const geist = Geist({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
-});
-
-const dancingScript = Dancing_Script({
-  subsets: ["latin"],
-  variable: "--font-script",
 });
 
 export const metadata: Metadata = {
@@ -73,7 +68,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} ${spaceGrotesk.variable} ${dancingScript.variable}`}>
+      <body className={`${geist.variable} ${spaceGrotesk.variable}`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

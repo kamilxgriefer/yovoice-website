@@ -43,7 +43,7 @@ export function SiteHeader() {
         : "border-transparent bg-[#060511]/76 backdrop-blur-xl"
     }`}>
       <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="/" className="focus-ring flex items-center gap-3 rounded-2xl" aria-label="YO Voice home">
+        <Link href="/" className="focus-ring flex items-center gap-2.5 rounded-2xl" aria-label="YO Voice home">
           <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/25 bg-black shadow-[0_0_38px_rgba(192,38,255,.35)]">
             <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill sizes="48px" className="object-contain p-1.5" priority />
           </span>
@@ -51,8 +51,8 @@ export function SiteHeader() {
             <span className="block font-[family-name:var(--font-display)] text-lg font-extrabold uppercase tracking-[.02em] text-white">
               YO Voice
             </span>
-            <span className="text-gradient block font-[family-name:var(--font-script)] text-xl leading-tight">
-              be you
+            <span className="text-gradient -mt-0.5 block font-[family-name:var(--font-display)] text-[17px] font-medium leading-tight tracking-[-0.01em]">
+              Sound like you
             </span>
           </span>
         </Link>
