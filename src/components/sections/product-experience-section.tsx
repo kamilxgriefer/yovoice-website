@@ -55,26 +55,26 @@ export function ProductExperienceSection() {
   return (
     <section
       id="experience"
-      className="relative overflow-hidden border-t border-white/[0.06] bg-[#0b0712] py-28 sm:py-36"
+      className="relative overflow-hidden border-t border-white/[0.06] bg-[#0b0712] py-16 sm:py-36"
     >
       <div className="grid-background absolute inset-0 opacity-20" />
       <div className="absolute left-[-10%] top-[5%] size-[500px] rounded-full bg-violet-700/12 blur-[150px]" />
       <div className="absolute right-[-12%] top-[42%] size-[520px] rounded-full bg-fuchsia-700/10 blur-[160px]" />
 
       <div className="relative mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12">
-        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+        <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:gap-10">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-fuchsia-400">
               Product experience
             </p>
 
-            <h2 className="mt-6 max-w-3xl font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.05em] text-white sm:text-6xl">
+            <h2 className="mt-4 max-w-3xl font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.05em] text-white sm:mt-6 sm:text-6xl">
               Voice first.
               <span className="text-gradient block">Community always.</span>
             </h2>
           </div>
 
-          <p className="max-w-2xl text-base leading-8 text-white/50 lg:justify-self-end">
+          <p className="max-w-2xl text-[15px] leading-7 text-white/50 sm:text-base sm:leading-8 lg:justify-self-end">
             YO Voice brings live conversations, friendships and communities
             into one connected world. Each part of the product is designed to
             make online interaction feel personal rather than mechanical.
@@ -83,7 +83,7 @@ export function ProductExperienceSection() {
 
         <div
           id="features"
-          className="mt-16 grid gap-5 md:grid-cols-2"
+          className="mt-10 grid gap-4 sm:gap-5 md:grid-cols-2 sm:mt-16"
         >
           {featureCards.map((feature, index) => {
             const Icon = feature.icon;
@@ -98,7 +98,7 @@ export function ProductExperienceSection() {
                   duration: 0.55,
                   delay: index * 0.07,
                 }}
-                className="glass-panel group relative min-h-[310px] overflow-hidden rounded-[32px] p-7 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-300/25 sm:p-9"
+                className="glass-panel group relative overflow-hidden rounded-[26px] p-6 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-300/25 sm:min-h-[310px] sm:rounded-[32px] sm:p-9"
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-75 transition duration-500 group-hover:opacity-100`}
@@ -115,16 +115,20 @@ export function ProductExperienceSection() {
                     </span>
                   </div>
 
-                  <div className="mt-auto pt-16">
+                  {/* pt is the icon-to-text air gap. The desktop value is
+                      generous because min-h stretches these cards into
+                      squares; on mobile there's no min-h, so the same pt
+                      would just be dead space. */}
+                  <div className="mt-auto pt-8 sm:pt-16">
                     <p className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-300">
                       {feature.label}
                     </p>
 
-                    <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-bold text-white sm:text-3xl">
+                    <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-white sm:mt-3 sm:text-3xl">
                       {feature.title}
                     </h3>
 
-                    <p className="mt-4 max-w-xl text-sm leading-7 text-white/48">
+                    <p className="mt-3 max-w-xl text-sm leading-6 text-white/48 sm:mt-4 sm:leading-7">
                       {feature.description}
                     </p>
                   </div>
@@ -136,14 +140,17 @@ export function ProductExperienceSection() {
 
         <div
           id="clubs"
-          className="mt-20 grid gap-6 lg:grid-cols-[1.08fr_0.92fr]"
+          className="mt-12 grid gap-4 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr] sm:mt-20"
         >
+          {/* min-h only at lg, where the two panels sit side by side and
+              must match heights. Stacked (mobile/tablet) it only
+              manufactured empty vertical space below the content. */}
           <motion.div
             initial={{ opacity: 0, x: -28 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65 }}
-            className="glass-panel relative min-h-[650px] overflow-hidden rounded-[38px] p-7 sm:p-10"
+            className="glass-panel relative overflow-hidden rounded-[28px] p-6 sm:rounded-[38px] sm:p-10 lg:min-h-[650px]"
           >
             <div className="absolute right-[-15%] top-[-20%] size-[420px] rounded-full bg-violet-600/20 blur-[110px]" />
             <div className="absolute bottom-[-25%] left-[-15%] size-[420px] rounded-full bg-fuchsia-600/14 blur-[120px]" />
@@ -153,47 +160,51 @@ export function ProductExperienceSection() {
                 Community Room
               </p>
 
-              <h3 className="mt-5 max-w-2xl font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-0.04em] text-white sm:text-5xl">
+              <h3 className="mt-3 max-w-2xl font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.12] tracking-[-0.04em] text-white sm:mt-5 sm:text-5xl">
                 Feel the room, not the interface.
               </h3>
 
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/50">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
                 The Heart of the Community reacts to every voice. Speakers,
                 listeners and shared energy become part of one living scene.
               </p>
 
-              <div className="relative mx-auto mt-12 aspect-[1.25/1] w-full max-w-[700px] overflow-hidden rounded-[34px] border border-white/10 bg-[#100819]/80">
+              <div className="relative mx-auto mt-7 aspect-[1.25/1] w-full max-w-[700px] overflow-hidden rounded-[22px] border border-white/10 bg-[#100819]/80 sm:mt-12 sm:rounded-[34px]">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,rgba(192,38,255,0.26),transparent_32%)]" />
                 <div className="grid-background absolute inset-0 opacity-25" />
 
-                <div className="absolute left-[8%] top-[18%] flex items-center gap-3 rounded-2xl border border-fuchsia-300/20 bg-[#1a0d28]/85 px-4 py-3 backdrop-blur-xl">
-                  <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-violet-700 text-xs font-bold text-white">
+                {/* Every fixed-size element inside the scene steps down on
+                    mobile — the aspect box shrinks with the viewport but
+                    these didn't, which is what made the illustration read
+                    as a desktop scene crammed into a phone. */}
+                <div className="absolute left-[8%] top-[18%] flex items-center gap-2 rounded-xl border border-fuchsia-300/20 bg-[#1a0d28]/85 px-2.5 py-2 backdrop-blur-xl sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3">
+                  <div className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-violet-700 text-[10px] font-bold text-white sm:size-10 sm:text-xs">
                     MA
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">Maya</p>
-                    <p className="text-[10px] text-fuchsia-300">
+                    <p className="text-[11px] font-bold text-white sm:text-xs">Maya</p>
+                    <p className="text-[9px] text-fuchsia-300 sm:text-[10px]">
                       Speaking now
                     </p>
                   </div>
                 </div>
 
-                <div className="absolute right-[8%] top-[20%] rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-white/60 backdrop-blur-xl">
-                  <Users className="size-5" />
+                <div className="absolute right-[8%] top-[20%] rounded-xl border border-white/10 bg-white/[0.04] p-2 text-white/60 backdrop-blur-xl sm:rounded-2xl sm:p-3">
+                  <Users className="size-4 sm:size-5" />
                 </div>
 
-                <div className="absolute left-1/2 top-1/2 flex size-36 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-fuchsia-300/30 bg-gradient-to-br from-violet-700 via-purple-500 to-fuchsia-500 shadow-[0_0_100px_rgba(192,38,255,0.55)]">
-                  <Mic2 className="size-14 text-white" />
+                <div className="absolute left-1/2 top-1/2 flex size-22 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-fuchsia-300/30 bg-gradient-to-br from-violet-700 via-purple-500 to-fuchsia-500 shadow-[0_0_60px_rgba(192,38,255,0.5)] sm:size-36 sm:shadow-[0_0_100px_rgba(192,38,255,0.55)]">
+                  <Mic2 className="size-9 text-white sm:size-14" />
                 </div>
 
-                <div className="absolute bottom-[12%] left-1/2 flex -translate-x-1/2 gap-3">
+                <div className="absolute bottom-[12%] left-1/2 flex -translate-x-1/2 gap-2 sm:gap-3">
                   {[Mic2, Headphones, MessageCircle, ShieldCheck].map(
                     (ControlIcon, index) => (
                       <div
                         key={index}
-                        className="flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-[#170c23]/90 text-white/60 backdrop-blur-xl"
+                        className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-[#170c23]/90 text-white/60 backdrop-blur-xl sm:size-11 sm:rounded-2xl"
                       >
-                        <ControlIcon className="size-4" />
+                        <ControlIcon className="size-3.5 sm:size-4" />
                       </div>
                     ),
                   )}
@@ -220,7 +231,7 @@ export function ProductExperienceSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65 }}
-            className="glass-panel relative min-h-[650px] overflow-hidden rounded-[38px] p-7 sm:p-10"
+            className="glass-panel relative overflow-hidden rounded-[28px] p-6 sm:rounded-[38px] sm:p-10 lg:min-h-[650px]"
           >
             <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-red-500/10 to-transparent" />
 
@@ -229,16 +240,16 @@ export function ProductExperienceSection() {
                 Broadcast Room
               </p>
 
-              <h3 className="mt-5 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-0.04em] text-white sm:text-5xl">
+              <h3 className="mt-3 font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.12] tracking-[-0.04em] text-white sm:mt-5 sm:text-5xl">
                 Lead. Listen. Join.
               </h3>
 
-              <p className="mt-5 text-sm leading-7 text-white/50">
+              <p className="mt-3 text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
                 Broadcast rooms give hosts structure without losing the
                 humanity of a real conversation.
               </p>
 
-              <div className="mt-10 space-y-4">
+              <div className="mt-7 space-y-3 sm:mt-10 sm:space-y-4">
                 <BroadcastRow
                   icon={<Radio className="size-5" />}
                   title="Live broadcast"
@@ -268,13 +279,13 @@ export function ProductExperienceSection() {
                 />
               </div>
 
-              <div className="mt-8 rounded-[30px] border border-rose-400/15 bg-gradient-to-br from-rose-500/12 to-transparent p-6">
+              <div className="mt-6 rounded-[22px] border border-rose-400/15 bg-gradient-to-br from-rose-500/12 to-transparent p-5 sm:mt-8 sm:rounded-[30px] sm:p-6">
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-300">
                       Next speaker
                     </p>
-                    <p className="mt-2 text-lg font-bold text-white">
+                    <p className="mt-2 text-base font-bold text-white sm:text-lg">
                       Alex requested the stage
                     </p>
                   </div>
@@ -293,23 +304,23 @@ export function ProductExperienceSection() {
 
         <div
           id="achievements"
-          className="mt-20 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]"
+          className="mt-12 grid gap-4 sm:gap-6 lg:grid-cols-[0.95fr_1.05fr] sm:mt-20"
         >
-          <div className="glass-panel rounded-[38px] p-7 sm:p-10">
+          <div className="glass-panel rounded-[28px] p-6 sm:rounded-[38px] sm:p-10">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-fuchsia-400">
               Clubs and friends
             </p>
 
-            <h3 className="mt-5 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-0.04em] text-white sm:text-5xl">
+            <h3 className="mt-3 font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.12] tracking-[-0.04em] text-white sm:mt-5 sm:text-5xl">
               Find your people.
             </h3>
 
-            <p className="mt-5 max-w-xl text-sm leading-7 text-white/50">
+            <p className="mt-3 max-w-xl text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
               Build private clubs, meet new friends and stay close to the
               creators and communities that matter to you.
             </p>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <div className="mt-7 grid gap-3 sm:mt-10 sm:gap-4 sm:grid-cols-2">
               <SocialCard
                 icon={<Crown className="size-5" />}
                 title="Cybersecurity Hub"
@@ -340,7 +351,7 @@ export function ProductExperienceSection() {
             </div>
           </div>
 
-          <div className="glass-panel relative overflow-hidden rounded-[38px] p-7 sm:p-10">
+          <div className="glass-panel relative overflow-hidden rounded-[28px] p-6 sm:rounded-[38px] sm:p-10">
             <div className="absolute right-[-16%] top-[-20%] size-[380px] rounded-full bg-fuchsia-600/15 blur-[110px]" />
 
             <div className="relative">
@@ -348,16 +359,16 @@ export function ProductExperienceSection() {
                 Achievements
               </p>
 
-              <h3 className="mt-5 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-0.04em] text-white sm:text-5xl">
+              <h3 className="mt-3 font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.12] tracking-[-0.04em] text-white sm:mt-5 sm:text-5xl">
                 Every voice leaves a mark.
               </h3>
 
-              <p className="mt-5 max-w-xl text-sm leading-7 text-white/50">
+              <p className="mt-3 max-w-xl text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
                 Unlock titles, collect achievements and show how you contribute
                 to the communities around you.
               </p>
 
-              <div className="mt-10 space-y-4">
+              <div className="mt-7 space-y-3 sm:mt-10 sm:space-y-4">
                 <AchievementCard
                   icon={<Trophy className="size-6" />}
                   title="First Speaker"

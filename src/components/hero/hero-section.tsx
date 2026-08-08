@@ -87,7 +87,7 @@ export function HeroSection() {
   const activeMember = members[activeIndex];
 
   return (
-    <section className="relative overflow-hidden pt-32 sm:pt-40">
+    <section className="relative overflow-hidden pt-28 sm:pt-40">
       <DeepSpaceBackground />
 
       {/* The eye moves: headline -> CTAs -> hero center -> avatars ->
@@ -129,7 +129,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="mx-auto mt-7 max-w-[400px] text-[15px] leading-[1.85] text-white/50"
+          className="mx-auto mt-5 max-w-[400px] text-[15px] leading-[1.65] text-white/50 sm:mt-7 sm:leading-[1.85]"
         >
           Somewhere right now, someone is telling a story, making a friend,
           or hosting a room full of people who get it. Come listen in.
@@ -157,7 +157,7 @@ export function HeroSection() {
       {/* The scene: logo, orbit and the people around it, with the live
           widget pulled up to overlap its base — physically attached to
           the center rather than a separate card stacked below it. */}
-      <div className="relative mx-auto mt-16 w-full max-w-[300px] sm:mt-20 sm:max-w-[520px] md:max-w-[600px] lg:max-w-[680px]">
+      <div className="relative mx-auto mt-12 w-full max-w-[300px] sm:mt-20 sm:max-w-[520px] md:max-w-[600px] lg:max-w-[680px]">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -195,7 +195,7 @@ export function HeroSection() {
       {/* No device/logistics line here on purpose — that's what the
           download section further down is for. The hero's job is the
           feeling, not the spec sheet. */}
-      <div className="relative mx-auto max-w-[1400px] px-5 pb-10 pt-20 sm:px-8 lg:px-12">
+      <div className="relative mx-auto max-w-[1400px] px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-20 lg:px-12">
         <motion.a
           href="#stats"
           whileHover={{ y: 2 }}
