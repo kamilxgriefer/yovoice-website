@@ -39,7 +39,7 @@ async function ensureUserProfile(user: User, displayName: string) {
     doc(getFirebaseFirestore(), "users", user.uid),
     {
       uid: user.uid,
-      displayName: displayName.trim() || user.email?.split("@")[0] || "YoVoice user",
+      displayName: displayName.trim() || user.email?.split("@")[0] || "YO Voice user",
       email: user.email?.trim().toLowerCase() ?? "",
       photoUrl: user.photoURL,
       isOnline: false,

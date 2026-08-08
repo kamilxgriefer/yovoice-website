@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 
@@ -9,6 +9,8 @@ import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const RESEND_COOLDOWN_SECONDS = 60;
+
 export function ForgotPasswordForm() {
   const { resetPassword } = useAuth();
 
@@ -16,14 +18,35 @@ export function ForgotPasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, []);
+
+  function startCooldown() {
+    setCooldown(RESEND_COOLDOWN_SECONDS);
+    cooldownRef.current = setInterval(() => {
+      setCooldown((current) => {
+        if (current <= 1) {
+          if (cooldownRef.current) clearInterval(cooldownRef.current);
+          return 0;
+        }
+        return current - 1;
+      });
+    }, 1000);
+  }
+
+  async function send() {
     setError(null);
     setSubmitting(true);
     try {
       await resetPassword(email);
       setSent(true);
+      startCooldown();
     } catch (err) {
       setError(getAuthErrorMessage(err));
     } finally {
@@ -31,14 +54,52 @@ export function ForgotPasswordForm() {
     }
   }
 
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (submitting) return;
+    await send();
+  }
+
   if (sent) {
     return (
       <div className="mt-8 space-y-4 text-center">
-        <p className="rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-          If an account exists for {email}, a reset link is on its way.
+        <div
+          aria-hidden="true"
+          className="mx-auto flex size-16 items-center justify-center rounded-full border border-fuchsia-300/25 bg-fuchsia-500/10 text-2xl"
+        >
+          ✉
+        </div>
+        <h2 className="text-xl font-bold">Check your inbox</h2>
+        <p className="text-sm text-white/45">
+          If an account exists for {email}, we&apos;ve sent instructions to
+          reset your password.
         </p>
-        <Link href="/login" className="premium-button min-h-13 inline-flex w-full items-center justify-center">
-          Return to log in
+        {error ? (
+          <p
+            role="alert"
+            className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+          >
+            {error}
+          </p>
+        ) : null}
+        <p className="pt-2 text-sm text-white/45">Didn&apos;t receive it?</p>
+        <button
+          type="button"
+          onClick={send}
+          disabled={submitting || cooldown > 0}
+          className="min-h-13 w-full rounded-2xl border border-white/10 bg-white/[.04] text-sm font-semibold text-white/80 transition hover:bg-white/[.08] disabled:opacity-60"
+        >
+          {submitting
+            ? "Sending…"
+            : cooldown > 0
+              ? `Resend email (${cooldown}s)`
+              : "Resend email"}
+        </button>
+        <Link
+          href="/login"
+          className="premium-button min-h-13 inline-flex w-full items-center justify-center"
+        >
+          Back to log in
         </Link>
       </div>
     );
