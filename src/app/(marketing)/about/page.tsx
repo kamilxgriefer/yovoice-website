@@ -56,7 +56,7 @@ export default function AboutPage() {
             Most social platforms optimize for content you consume alone.
             We&apos;re building the opposite: a place where you show up, speak,
             and leave with people you actually know. A community room where
-            everyone can jump in. A broadcast room when someone needs the
+            everyone can jump in. A podcast room when someone needs the
             stage. A club that keeps your people together between
             conversations.
           </p>

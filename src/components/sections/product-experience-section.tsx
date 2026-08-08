@@ -27,7 +27,7 @@ const featureCards = [
   },
   {
     icon: Radio,
-    title: "Broadcast Rooms",
+    title: "Podcast Rooms",
     label: "Lead the conversation",
     description:
       "Host live events, manage speakers, accept raised hands and connect with listeners at scale.",
@@ -237,7 +237,7 @@ export function ProductExperienceSection() {
 
             <div className="relative">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-rose-400">
-                Broadcast Room
+                Podcast Room
               </p>
 
               <h3 className="mt-3 font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.12] tracking-[-0.04em] text-white sm:mt-5 sm:text-5xl">
@@ -245,14 +245,14 @@ export function ProductExperienceSection() {
               </h3>
 
               <p className="mt-3 text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
-                Broadcast rooms give hosts structure without losing the
+                Podcast rooms give hosts structure without losing the
                 humanity of a real conversation.
               </p>
 
               <div className="mt-7 space-y-3 sm:mt-10 sm:space-y-4">
                 <BroadcastRow
                   icon={<Radio className="size-5" />}
-                  title="Live broadcast"
+                  title="Live podcast"
                   subtitle="1,248 listeners"
                   badge="LIVE"
                 />

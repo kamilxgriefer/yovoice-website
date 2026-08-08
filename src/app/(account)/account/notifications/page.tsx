@@ -47,7 +47,7 @@ const GROUPS: {
     title: "Rooms",
     types: [
       { id: "roomInvite", label: "Room invitations" },
-      { id: "broadcastInvite", label: "Broadcast invitations" },
+      { id: "broadcastInvite", label: "Podcast invitations" },
     ],
   },
   {

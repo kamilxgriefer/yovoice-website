@@ -29,7 +29,7 @@ const features = [
   },
   {
     icon: Radio,
-    title: "Broadcast rooms",
+    title: "Podcast rooms",
     description:
       "Host events with structure: a stage, raised hands, and moderator controls for managing speakers and larger audiences.",
   },

@@ -33,9 +33,9 @@ const groups: FaqGroup[] = [
     title: "Rooms and voice",
     items: [
       {
-        question: "What's the difference between a community room and a broadcast room?",
+        question: "What's the difference between a community room and a podcast room?",
         answer:
-          "Community rooms are open conversations where everyone can speak. Broadcast rooms give a host structure — a stage, raised hands and speaker management — for events and larger audiences.",
+          "Community rooms are open conversations where everyone can speak. Podcast rooms give a host structure — a stage, raised hands and speaker management — for events and larger audiences.",
       },
       {
         question: "Can I record a room?",

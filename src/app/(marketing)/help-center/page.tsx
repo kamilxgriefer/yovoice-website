@@ -30,7 +30,7 @@ const topics = [
     icon: Mic2,
     title: "Rooms & voice",
     description:
-      "Community rooms, broadcast rooms, raising your hand, and hosting your own conversation.",
+      "Community rooms, podcast rooms, raising your hand, and hosting your own conversation.",
     href: "/features",
     linkLabel: "How rooms work",
   },
