@@ -8,6 +8,7 @@ export const siteConfig = {
     { label: "Features", href: "/features" },
     { label: "Community", href: "/community" },
     { label: "Clubs", href: "/clubs" },
+    { label: "Premium", href: "/premium" },
     { label: "About", href: "/about" },
     { label: "Download", href: "/download" },
   ],
