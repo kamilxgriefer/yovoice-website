@@ -4,12 +4,21 @@ import { Suspense, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Check } from "lucide-react";
+import {
+  ArrowRight,
+  AudioLines,
+  Check,
+  Crown,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 
+import { PremiumBadge } from "@/components/premium/premium-badge";
 import { PremiumRing } from "@/components/premium/premium-ring";
 import {
   isPremiumPlanId,
   premiumIncludedFeatures,
+  premiumPlanChecklist,
   premiumPlans,
   type PremiumPlanId,
 } from "@/config/premium";
@@ -77,20 +86,17 @@ function PremiumPlansContent() {
   return (
     <div className="relative mx-auto w-full max-w-[900px] px-5 pb-24 pt-14 sm:px-8 sm:pt-20">
       <div className="mx-auto max-w-xl text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.28em] text-fuchsia-400">
-          YO Voice Premium
-        </p>
-        <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.05em] text-white sm:text-5xl">
-          Choose how you want{" "}
-          <span className="text-gradient">to go Premium</span>
+        <PremiumBadge />
+        <h1 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.05em] text-white sm:text-5xl">
+          Choose <span className="text-gradient">your plan</span>
         </h1>
         <p className="mt-4 text-[15px] leading-7 text-white/50">
-          One subscription, every Premium capability. Plans differ only in
-          billing period — cancel any time.
+          Unlock the full YO Voice experience. Plans differ only in billing
+          period — cancel any time.
         </p>
       </div>
 
-      <div className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2">
+      <div className="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2">
         {premiumPlans.map((plan) => (
           <button
             key={plan.id}
@@ -99,12 +105,13 @@ function PremiumPlansContent() {
             aria-pressed={selectedPlan === plan.id}
             className={`focus-ring glass-panel group relative rounded-[28px] p-7 text-left transition duration-300 hover:-translate-y-1 ${
               plan.highlight
-                ? "border border-fuchsia-400/40"
+                ? "border border-fuchsia-400/50 shadow-[0_0_44px_rgba(192,38,255,0.22)]"
                 : "hover:border-white/20"
             } ${selectedPlan === plan.id ? "ring-2 ring-fuchsia-400" : ""}`}
           >
             {plan.highlight ? (
-              <span className="absolute right-5 top-5 rounded-full bg-fuchsia-500/20 px-3 py-1 text-[11px] font-bold text-fuchsia-200">
+              <span className="absolute -top-3.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-gradient-to-r from-[#7b2ff7] to-[#c026ff] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-[0_0_14px_rgba(192,38,255,0.45)]">
+                <Crown className="size-3" aria-hidden />
                 Best value
               </span>
             ) : null}
@@ -118,11 +125,27 @@ function PremiumPlansContent() {
                 {plan.period}
               </span>
             </p>
-            {(plan.equivalent || plan.savings) && (
-              <p className="mt-2 text-sm text-white/50">
-                {[plan.equivalent, plan.savings].filter(Boolean).join(" · ")}
-              </p>
-            )}
+            {plan.equivalent ? (
+              <p className="mt-2 text-sm text-white/50">{plan.equivalent}</p>
+            ) : null}
+            {plan.savings ? (
+              <span className="mt-3 inline-flex rounded-full bg-gradient-to-r from-[#7b2ff7] to-[#c026ff] px-3 py-1 text-[11px] font-bold text-white">
+                {plan.savings}
+              </span>
+            ) : null}
+            <ul className="mt-5 space-y-2 border-t border-white/[0.07] pt-5">
+              {premiumPlanChecklist.map((item) => (
+                <li key={item} className="flex items-center gap-2.5">
+                  <Check
+                    className={`size-3.5 shrink-0 ${
+                      plan.highlight ? "text-[#e879f9]" : "text-[#5ce1e6]"
+                    }`}
+                    aria-hidden
+                  />
+                  <span className="text-[13px] text-white/65">{item}</span>
+                </li>
+              ))}
+            </ul>
             <span className="premium-button mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2">
               {plan.cta}
               <ArrowRight className="size-4 transition group-hover:translate-x-1" />
@@ -133,28 +156,33 @@ function PremiumPlansContent() {
 
       {selectedPlan ? <CheckoutBoundary plan={selectedPlan} /> : null}
 
-      <div id="included" className="mx-auto mt-14 max-w-xl scroll-mt-24">
-        <h2 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-white/40">
-          Both plans include
+      <div id="included" className="mx-auto mt-16 max-w-xl scroll-mt-24">
+        <h2 className="text-[15px] font-bold text-white">
+          Everything Premium includes:
         </h2>
-        <ul className="mt-6 space-y-3">
-          {premiumIncludedFeatures.map((feature) => (
-            <li key={feature} className="flex items-start gap-3">
-              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-fuchsia-500/15">
-                <Check className="size-3 text-fuchsia-300" />
-              </span>
-              <span className="text-sm leading-6 text-white/60">{feature}</span>
-            </li>
-          ))}
+        <ul className="mt-4 space-y-1 rounded-3xl border border-white/[0.07] bg-white/[0.02] px-5 py-3">
+          {premiumIncludedFeatures.map((feature, index) => {
+            const Icon = includedIcons[index] ?? Sparkles;
+            return (
+              <li key={feature} className="flex items-center gap-3.5 py-2.5">
+                <Icon className="size-[18px] shrink-0 text-[#d3a5ff]" aria-hidden />
+                <span className="text-sm font-medium leading-6 text-[#efeaf7]">
+                  {feature}
+                </span>
+              </li>
+            );
+          })}
         </ul>
         <p className="mt-8 text-center text-xs leading-5 text-white/35">
-          Everything essential on YO Voice stays free — rooms, chats, friends
-          and joining Clubs. Store pricing may vary by region.
+          Cancel anytime. Everything essential on YO Voice stays free — rooms,
+          chats, friends and joining Clubs. Store pricing may vary by region.
         </p>
       </div>
     </div>
   );
 }
+
+const includedIcons = [UserRound, Crown, Sparkles, AudioLines, Sparkles];
 
 /**
  * The honest end of the web flow until a billing provider is configured.

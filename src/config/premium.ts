@@ -21,6 +21,14 @@ export type PremiumPlan = {
 
 export const premiumPlans: PremiumPlan[] = [
   {
+    id: "monthly",
+    name: "Monthly",
+    price: "€9.99",
+    period: "/ month",
+    highlight: false,
+    cta: "Choose monthly",
+  },
+  {
     id: "yearly",
     name: "Yearly",
     price: "€89.99",
@@ -30,14 +38,18 @@ export const premiumPlans: PremiumPlan[] = [
     highlight: true,
     cta: "Choose yearly",
   },
-  {
-    id: "monthly",
-    name: "Monthly",
-    price: "€9.99",
-    period: "/ month",
-    highlight: false,
-    cta: "Choose monthly",
-  },
+];
+
+/**
+ * The short per-plan checklist on the plan cards. Identical for both
+ * plans on purpose — the plans differ in billing, not capabilities.
+ * Mirrors the app's PremiumPlans.planChecklist.
+ */
+export const premiumPlanChecklist = [
+  "Creator access",
+  "Create Clubs",
+  "Premium identity",
+  "Exclusive features",
 ];
 
 export function isPremiumPlanId(value: string | null): value is PremiumPlanId {
@@ -54,8 +66,8 @@ export const premiumShowcaseBenefits = [
   },
   {
     kicker: "Clubs",
-    title: "Build your own Clubs",
-    description: "Create spaces for your community. Joining stays free for everyone.",
+    title: "Create your own Clubs",
+    description: "Build spaces for your people. Joining stays free for everyone.",
   },
   {
     kicker: "Premium identity",
