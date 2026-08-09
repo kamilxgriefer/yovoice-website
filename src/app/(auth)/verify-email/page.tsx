@@ -14,7 +14,7 @@ import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
 import { getFirebaseAuth } from "@/lib/firebase/config";
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 const AUTO_CHECK_INTERVAL_MS = 5000;
@@ -263,9 +263,10 @@ function VerifyEmailPrompt() {
 /**
  * Shared by both the direct-link (ActionCodeHandler) and prompt-page
  * (VerifyEmailPrompt) success paths, so a verified account looks the same
- * regardless of how it got there. `getAppUrl()` reads NEXT_PUBLIC_APP_URL,
- * currently the production Flutter web build
- * (https://yovoice-ec54a.web.app) — switching to https://app.yovoice.app
+ * regardless of how it got there. With no ?redirect, this lands on the /app
+ * launch route, which plays the entry transition and then hands off to
+ * NEXT_PUBLIC_APP_URL — currently the production Flutter web build
+ * (https://yovoice-ec54a.web.app); switching to https://app.yovoice.app
  * once its DNS is live is a Vercel env var change, not a code change.
  */
 function VerifiedSuccess({ email }: { email: string | null }) {
@@ -276,16 +277,9 @@ function VerifiedSuccess({ email }: { email: string | null }) {
   function openApp() {
     if (autoOpened) return;
     setAutoOpened(true);
-    const redirectParam = searchParams.get("redirect");
-    const destination =
-      redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
-        ? redirectParam
-        : getAppUrl();
-    if (destination.startsWith("http")) {
-      window.location.href = destination;
-    } else {
-      router.push(destination);
-    }
+    // replace: the verification link has been consumed, so Back should skip
+    // this screen rather than re-running a code that no longer works.
+    router.replace(resolveAuthRedirect(searchParams.get("redirect")));
   }
 
   useEffect(() => {

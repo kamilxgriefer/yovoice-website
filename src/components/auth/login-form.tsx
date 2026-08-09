@@ -27,12 +27,10 @@ export function LoginForm() {
     setSubmitting(true);
     try {
       await signIn(email, password);
-      const destination = resolveAuthRedirect(searchParams.get("redirect"));
-      if (destination.startsWith("http")) {
-        window.location.href = destination;
-      } else {
-        router.push(destination);
-      }
+      // replace, not push: a completed login shouldn't sit in history behind
+      // the destination, or Back lands on this form and RedirectIfAuthenticated
+      // immediately throws the user forward again.
+      router.replace(resolveAuthRedirect(searchParams.get("redirect")));
     } catch (err) {
       setError(getAuthErrorMessage(err));
       setSubmitting(false);

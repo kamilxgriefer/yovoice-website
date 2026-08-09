@@ -16,12 +16,7 @@ export function RedirectIfAuthenticated() {
 
   useEffect(() => {
     if (loading || !user) return;
-    const destination = resolveAuthRedirect(searchParams.get("redirect"));
-    if (destination.startsWith("http")) {
-      window.location.href = destination;
-    } else {
-      router.replace(destination);
-    }
+    router.replace(resolveAuthRedirect(searchParams.get("redirect")));
   }, [loading, user, router, searchParams]);
 
   return null;

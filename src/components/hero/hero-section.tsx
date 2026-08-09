@@ -8,7 +8,7 @@ import { CenterLogo } from "@/components/hero/center-logo";
 import { DeepSpaceBackground } from "@/components/hero/deep-space-background";
 import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
 import { useAuth } from "@/hooks/use-auth";
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 import { LiveConversationCard } from "@/components/hero/live-conversation-card";
 import { OrbitingMembers, type OrbitMember } from "@/components/hero/orbit-members";
 import { OrbitSystem } from "@/components/hero/orbit-system";
@@ -151,7 +151,11 @@ export function HeroSection() {
               (resolveAuthRedirect handles ?redirect=/app). Native
               downloads stay a SECONDARY choice until they exist. */}
           <HeroPrimaryCta
-            href={authLoading || user ? getAppUrl() : "/login?redirect=/app"}
+            href={
+              authLoading || user
+                ? APP_ENTRY_PATH
+                : `/login?redirect=${APP_ENTRY_PATH}`
+            }
           >
             Open YO Voice
             <ArrowRight className="size-4" />

@@ -24,7 +24,7 @@ import {
 } from "@/config/premium";
 import { useAuth } from "@/hooks/use-auth";
 import { useEntitlements } from "@/hooks/use-entitlements";
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 /**
  * The /premium plans experience. One page, four states:
@@ -206,12 +206,12 @@ function CheckoutBoundary({ plan }: { plan: PremiumPlanId }) {
         inside YO Voice first — your selection is ready and waiting.
       </p>
       <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
-        <a
-          href={getAppUrl()}
+        <Link
+          href={APP_ENTRY_PATH}
           className="premium-button focus-ring min-h-12 inline-flex items-center justify-center px-6"
         >
           Open YO Voice
-        </a>
+        </Link>
         <Link
           href="/download"
           className="focus-ring inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"
@@ -264,12 +264,12 @@ function PremiumActiveState() {
       </div>
 
       <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-        <a
-          href={getAppUrl()}
+        <Link
+          href={APP_ENTRY_PATH}
           className="premium-button focus-ring min-h-13 inline-flex items-center justify-center px-7"
         >
           Open YO Voice
-        </a>
+        </Link>
         <Link
           href="/account/profile"
           className="focus-ring inline-flex min-h-13 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"

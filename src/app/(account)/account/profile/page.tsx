@@ -6,7 +6,7 @@ import { CheckCircle2, ExternalLink, TriangleAlert } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 export default function ProfilePage() {
   const { user, updateDisplayName, signOut } = useAuth();
@@ -42,7 +42,7 @@ export default function ProfilePage() {
           </p>
         </div>
         <Link
-          href={getAppUrl()}
+          href={APP_ENTRY_PATH}
           className="premium-button min-h-11 shrink-0 px-5 text-sm"
         >
           Open YO Voice <ExternalLink className="size-4" />

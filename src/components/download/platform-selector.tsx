@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Code2, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
 
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_URL = "https://github.com/kamilxgriefer/yovoice";
 
@@ -35,7 +35,7 @@ const cards = [
     title: "Web",
     description: "No install required.",
     status: "Available right now.",
-    href: getAppUrl(),
+    href: APP_ENTRY_PATH,
     action: "Launch web app",
   },
 ] as const;

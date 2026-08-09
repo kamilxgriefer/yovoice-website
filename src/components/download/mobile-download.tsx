@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Code2, Globe2, Smartphone, Store } from "lucide-react";
 
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_URL = "https://github.com/kamilxgriefer/yovoice";
 
@@ -45,12 +45,12 @@ export function MobileDownload() {
           ))}
         </div>
 
-        <a
-          href={getAppUrl()}
+        <Link
+          href={APP_ENTRY_PATH}
           className="premium-button focus-ring mt-8 inline-flex min-h-12 w-full px-6 text-sm"
         >
           <Globe2 className="size-4" /> Open the web app
-        </a>
+        </Link>
 
         <Link
           href={REPO_URL}

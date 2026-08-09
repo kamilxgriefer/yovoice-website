@@ -8,7 +8,7 @@ import { LogOut, Menu, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/hooks/use-auth";
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -85,7 +85,7 @@ export function SiteHeader() {
                 <LogOut className="size-4" />
                 {signingOut ? "Signing out…" : "Log out"}
               </button>
-              <Link href={getAppUrl()} className="premium-button focus-ring min-h-12 px-5">
+              <Link href={APP_ENTRY_PATH} className="premium-button focus-ring min-h-12 px-5">
                 <span className="relative">Open YO Voice</span>
               </Link>
             </>
@@ -145,7 +145,7 @@ export function SiteHeader() {
                   <LogOut className="size-4" />
                   {signingOut ? "Signing out…" : "Log out"}
                 </button>
-                <Link href={getAppUrl()} onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
+                <Link href={APP_ENTRY_PATH} onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
                   Open YO Voice
                 </Link>
               </>
