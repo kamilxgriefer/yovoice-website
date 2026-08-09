@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Play } from "lucide-react";
+import { ArrowDown, ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { CenterLogo } from "@/components/hero/center-logo";
 import { DeepSpaceBackground } from "@/components/hero/deep-space-background";
 import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
+import { useAuth } from "@/hooks/use-auth";
+import { getAppUrl } from "@/lib/auth/auth-redirect";
 import { LiveConversationCard } from "@/components/hero/live-conversation-card";
 import { OrbitingMembers, type OrbitMember } from "@/components/hero/orbit-members";
 import { OrbitSystem } from "@/components/hero/orbit-system";
@@ -85,6 +87,7 @@ function useRotatingIndex(length: number, intervalMs: number) {
 export function HeroSection() {
   const activeIndex = useRotatingIndex(members.length, 6200);
   const activeMember = members[activeIndex];
+  const { user, loading: authLoading } = useAuth();
 
   return (
     <section className="relative overflow-hidden pt-28 sm:pt-40">
@@ -141,9 +144,17 @@ export function HeroSection() {
           transition={{ duration: 0.7, delay: 0.55 }}
           className="mt-9 flex flex-col items-center gap-3.5 sm:flex-row"
         >
-          <HeroPrimaryCta href="#download">
-            Download YO Voice
-            <ArrowDown className="size-4" />
+          {/* Using YO Voice means opening the web app — one click, no
+              detour through a downloads section. A visitor with a live
+              session goes straight there; everyone else goes through the
+              existing sign-in and is returned to the app afterwards
+              (resolveAuthRedirect handles ?redirect=/app). Native
+              downloads stay a SECONDARY choice until they exist. */}
+          <HeroPrimaryCta
+            href={authLoading || user ? getAppUrl() : "/login?redirect=/app"}
+          >
+            Open YO Voice
+            <ArrowRight className="size-4" />
           </HeroPrimaryCta>
           <HeroSecondaryCta href="#experience">
             <span className="flex size-7 items-center justify-center rounded-full bg-white text-[#0d0618]">

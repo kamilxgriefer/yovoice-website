@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowDownToLine, LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/hooks/use-auth";
@@ -86,7 +86,7 @@ export function SiteHeader() {
                 {signingOut ? "Signing out…" : "Log out"}
               </button>
               <Link href={getAppUrl()} className="premium-button focus-ring min-h-12 px-5">
-                <span className="relative">Open app</span>
+                <span className="relative">Open YO Voice</span>
               </Link>
             </>
           ) : (
@@ -97,9 +97,15 @@ export function SiteHeader() {
               <Link href="/register" className="focus-ring rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[.04]">
                 Create account
               </Link>
-              <Link href="/download" className="premium-button focus-ring min-h-12 px-5">
-                <ArrowDownToLine className="relative size-4" />
-                <span className="relative">Download</span>
+              {/* The web app is the product today — the header's primary
+                  action opens it (through sign-in, which returns here's
+                  visitor to the app). Downloads stay in the nav/footer as
+                  a secondary path until native builds actually ship. */}
+              <Link
+                href="/login?redirect=/app"
+                className="premium-button focus-ring min-h-12 px-5"
+              >
+                <span className="relative">Open YO Voice</span>
               </Link>
             </>
           )}
@@ -140,7 +146,7 @@ export function SiteHeader() {
                   {signingOut ? "Signing out…" : "Log out"}
                 </button>
                 <Link href={getAppUrl()} onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
-                  Open app
+                  Open YO Voice
                 </Link>
               </>
             ) : (
@@ -153,8 +159,8 @@ export function SiteHeader() {
                     Create account
                   </Link>
                 </div>
-                <Link href="/download" onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
-                  Download
+                <Link href="/login?redirect=/app" onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
+                  Open YO Voice
                 </Link>
               </>
             )}
