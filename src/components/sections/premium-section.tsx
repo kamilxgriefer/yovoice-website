@@ -31,7 +31,7 @@ export function PremiumSection() {
       <div className="absolute bottom-[-40%] right-[-10%] size-[480px] rounded-full bg-fuchsia-700/10 blur-[160px]" />
 
       <div className="relative mx-auto w-full max-w-[1100px] px-5 sm:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+        <div className="grid min-w-0 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <div>
             <PremiumBadge />
             <h2 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.05em] text-white sm:mt-6 sm:text-6xl">
@@ -66,8 +66,11 @@ export function PremiumSection() {
           {/* Identity hero: the actual premium ring — the same treatment a
               member's avatar gets in the app — with the capability pills
               from the presentation design. */}
-          <div className="flex justify-center">
-            <div className="relative h-[300px] w-[340px]">
+          {/* w-full + max-w so a 320px viewport can't be forced wider than
+              itself — a fixed 340px hero made the grid column overflow and
+              the section's overflow-hidden clipped the headline. */}
+          <div className="flex w-full justify-center">
+            <div className="relative h-[300px] w-full max-w-[340px]">
               {/* Presentation-strength bloom behind the ring. */}
               <div className="absolute left-1/2 top-1/2 size-[240px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-600/30 blur-[70px]" />
               <div className="absolute left-1/2 top-1/2 size-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-700/25 blur-[100px]" />
