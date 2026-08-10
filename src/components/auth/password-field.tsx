@@ -71,14 +71,18 @@ export function PasswordField({
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
-      <div className="relative">
-        <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35">
+      {/* Same slotted structure as Input: leading lock slot, flexible
+          text, trailing reveal slot — so the icon can never sit under the
+          placeholder or caret, and the geometry is identical whether the
+          password is hidden, visible, autofilled or invalid. */}
+      <div className="glass-field" data-state={invalid ? "error" : undefined}>
+        <span className="glass-field__icon" aria-hidden>
           <Lock className="size-[18px]" />
         </span>
         <input
           id={id}
           type={visible ? "text" : "password"}
-          className={cn("glass-input pl-11 pr-12")}
+          className={cn("glass-field__input")}
           placeholder={placeholder}
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -97,7 +101,7 @@ export function PasswordField({
           aria-label={visible ? "Hide password" : "Show password"}
           aria-pressed={visible}
           disabled={disabled}
-          className="absolute right-2 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-xl text-white/45 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400"
+          className="glass-field__action rounded-xl text-white/45 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400"
         >
           {visible ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
         </button>

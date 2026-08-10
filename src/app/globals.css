@@ -176,20 +176,75 @@ img { user-select: none; -webkit-user-drag: none; }
 .badge-neutral { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.12); }
 
 /* Inputs — matches the asset pack's default/focus/error/success states */
-.glass-input {
+/* The field is the WRAPPER, not the <input>: a flex row of fixed-width
+   slots. Previously the input carried the border/padding and the icon was
+   absolutely positioned over it, with its clearance supplied by a `pl-11`
+   utility — but Tailwind v4 puts utilities in a cascade layer and this
+   file is unlayered, so `padding: .9rem 1.1rem` here always won and the
+   icon sat on top of the placeholder and the caret. Slots make the
+   geometry structural, so it cannot be overridden by cascade order and
+   is identical in every state. */
+.glass-field {
+  display: flex;
+  align-items: center;
   width: 100%;
+  /* Comfortably above the 44px minimum touch target. */
+  min-height: 3.25rem;
   border-radius: var(--radius-md);
   border: 1px solid rgba(255,255,255,.1);
   background: rgba(255,255,255,.035);
-  padding: .9rem 1.1rem;
-  color: white;
   transition: border-color .25s ease, box-shadow .25s ease, background-color .25s ease;
 }
-.glass-input::placeholder { color: rgba(255,255,255,.3); }
-.glass-input:hover { border-color: rgba(255,255,255,.18); }
-.glass-input:focus { outline: none; border-color: #c084fc; background: rgba(255,255,255,.05); box-shadow: 0 0 0 4px rgba(192,132,252,.15); }
-.glass-input[data-state="error"] { border-color: rgba(255,109,109,.6); box-shadow: 0 0 0 4px rgba(255,109,109,.1); }
-.glass-input[data-state="success"] { border-color: rgba(0,230,118,.5); }
+.glass-field:hover { border-color: rgba(255,255,255,.18); }
+/* focus-within, so the ring appears no matter which slot has focus. */
+.glass-field:focus-within {
+  border-color: #c084fc;
+  background: rgba(255,255,255,.05);
+  box-shadow: 0 0 0 4px rgba(192,132,252,.15);
+}
+.glass-field[data-state="error"] { border-color: rgba(255,109,109,.6); box-shadow: 0 0 0 4px rgba(255,109,109,.1); }
+.glass-field[data-state="success"] { border-color: rgba(0,230,118,.5); }
+
+/* Fixed, predictable leading slot — the input can never start inside it. */
+.glass-field__icon,
+.glass-field__action {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 2.75rem;
+  color: rgba(255,255,255,.35);
+}
+.glass-field__action { width: 3rem; }
+
+.glass-field__input {
+  flex: 1 1 auto;
+  /* Long email addresses shrink the text, never the slots. */
+  min-width: 0;
+  align-self: stretch;
+  border: 0;
+  background: transparent;
+  padding: .9rem 1.1rem;
+  color: white;
+  font: inherit;
+  line-height: 1.25;
+}
+/* Padding belongs to whichever side has no slot. */
+.glass-field__icon + .glass-field__input { padding-left: 0; }
+.glass-field__input:has(+ .glass-field__action) { padding-right: 0; }
+.glass-field__input:focus { outline: none; }
+.glass-field__input::placeholder { color: rgba(255,255,255,.3); }
+/* Autofill repaints the input's own background; keep the field's surface
+   and text metrics identical so an autofilled row matches an empty one. */
+.glass-field__input:-webkit-autofill,
+.glass-field__input:-webkit-autofill:hover,
+.glass-field__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  transition: background-color 100000s ease-in-out 0s;
+}
 .prose-legal ul { list-style: disc; padding-left: 1.25rem; }
 .prose-legal ol { list-style: decimal; padding-left: 1.25rem; }
 .prose-legal li { margin-top: .4rem; }

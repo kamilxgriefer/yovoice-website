@@ -7,6 +7,16 @@ import { cn } from "@/lib/utils/cn";
 
 type State = "default" | "error" | "success";
 
+/**
+ * A slotted input: the WRAPPER carries the border, surface and focus
+ * ring, and the icon lives in a fixed-width slot beside the text rather
+ * than floating over it. The previous version absolutely positioned the
+ * icon and relied on a `pl-11` utility for clearance, which the unlayered
+ * `.glass-input` padding always beat (Tailwind v4 utilities are layered)
+ * — so the icon overlapped the placeholder, the typed value and the
+ * caret. With slots the geometry is structural and identical whether the
+ * field is empty, focused, autofilled, invalid or showing a password.
+ */
 export function Input({
   icon,
   state = "default",
@@ -19,25 +29,33 @@ export function Input({
   errorMessage?: string;
   className?: string;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "className">) {
+  const statusIcon =
+    state === "error" ? (
+      <XCircle className="size-5 text-rose-400" />
+    ) : state === "success" ? (
+      <CheckCircle2 className="size-5 text-emerald-400" />
+    ) : null;
+
   return (
     <div>
-      <div className="relative">
+      <div
+        className="glass-field"
+        data-state={state === "default" ? undefined : state}
+      >
         {icon ? (
-          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-white/35">
+          <span className="glass-field__icon" aria-hidden>
             {icon}
           </span>
         ) : null}
         <input
-          className={cn("glass-input", icon && "pl-11", (state === "error" || state === "success") && "pr-11", className)}
-          data-state={state === "default" ? undefined : state}
+          className={cn("glass-field__input", className)}
           aria-invalid={state === "error"}
           {...rest}
         />
-        {state === "error" ? (
-          <XCircle className="pointer-events-none absolute right-3.5 top-1/2 size-5 -translate-y-1/2 text-rose-400" />
-        ) : null}
-        {state === "success" ? (
-          <CheckCircle2 className="pointer-events-none absolute right-3.5 top-1/2 size-5 -translate-y-1/2 text-emerald-400" />
+        {statusIcon ? (
+          <span className="glass-field__action" aria-hidden>
+            {statusIcon}
+          </span>
         ) : null}
       </div>
       {state === "error" && errorMessage ? (
