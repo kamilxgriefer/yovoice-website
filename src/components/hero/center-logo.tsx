@@ -56,12 +56,17 @@ export function CenterLogo() {
           animate={{ scale: [0.99, 1.015, 0.99] }}
           transition={{ duration: PULSE, repeat: Infinity, ease: "easeInOut" }}
         >
+          {/* The supplied symbol is a tight crop — the mark it replaced
+              carried its own soft glow as transparent padding, so it only
+              filled about four fifths of this box. Scaling down keeps the
+              mark the same optical size as before, and leaves the halo
+              layers (sized against this container) exactly where they were. */}
           <Image
-            src="/logos/yovoice-mark-glow.png"
+            src="/logos/yo-voice-symbol.png"
             alt="YO Voice"
             fill
             sizes="(max-width: 640px) 210px, (max-width: 1024px) 280px, 350px"
-            className="object-contain drop-shadow-[0_0_32px_rgba(232,121,249,.4)]"
+            className="scale-[0.82] object-contain drop-shadow-[0_0_32px_rgba(232,121,249,.4)]"
             priority
             quality={100}
           />

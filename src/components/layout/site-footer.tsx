@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { BriefcaseBusiness, Camera, Code2, Mail } from "lucide-react";
+
+import { BrandLockup } from "@/components/layout/brand-lockup";
 
 const columns = [
   { title: "Product", links: [["Features","/features"],["Community","/community"],["Clubs","/clubs"],["Achievements","/achievements"]] },
@@ -14,15 +15,7 @@ export function SiteFooter() {
     <footer id="footer" className="border-t border-white/[.06] bg-[#05040d]">
       <div className="mx-auto grid max-w-[1400px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.4fr] lg:px-12">
         <div className="max-w-sm">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-fuchsia-300/25 bg-black shadow-[0_0_28px_rgba(192,38,255,.25)]">
-              <Image src="/logos/yovoice-logo.png" alt="YO Voice logo" fill sizes="48px" className="object-contain p-1.5"/>
-            </span>
-            <span className="leading-none">
-              <span className="block text-lg font-extrabold uppercase tracking-[.02em]">YO Voice</span>
-              <span className="text-gradient -mt-0.5 block font-[family-name:var(--font-display)] text-[17px] font-medium leading-tight tracking-[-0.01em]">Sound like you</span>
-            </span>
-          </Link>
+          <BrandLockup className="w-fit" />
           <p className="mt-6 text-sm leading-7 text-white/45">Where conversations become communities. Built for creators, friends and people looking for something real.</p>
           <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/25">Voice first. Community always.</p>
         </div>

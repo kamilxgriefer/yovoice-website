@@ -7,7 +7,7 @@ export const contentType = "image/png";
 
 export default function OpengraphImage() {
   const logoData = readFileSync(
-    join(process.cwd(), "public/logos/yovoice-logo.png"),
+    join(process.cwd(), "public/logos/yo-voice-symbol.png"),
   ).toString("base64");
   const logoSrc = `data:image/png;base64,${logoData}`;
 
@@ -26,13 +26,11 @@ export default function OpengraphImage() {
             "radial-gradient(circle at 76% 36%, rgba(192,38,255,0.35) 0%, transparent 45%), radial-gradient(circle at 18% 28%, rgba(88,28,135,0.28) 0%, transparent 50%)",
         }}
       >
-        <img
-          src={logoSrc}
-          alt=""
-          width={140}
-          height={140}
-          style={{ borderRadius: 32 }}
-        />
+        {/* No borderRadius any more: that existed to round off the black
+            square baked into the previous asset. The supplied symbol is
+            transparent, so it sits straight on the card gradient. Height is
+            the mark's true 362:375 ratio so it isn't squashed. */}
+        <img src={logoSrc} alt="" width={140} height={145} />
         <div
           style={{
             marginTop: 40,

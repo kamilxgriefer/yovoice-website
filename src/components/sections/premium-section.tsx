@@ -77,12 +77,16 @@ export function PremiumSection() {
 
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                 <PremiumRing size={190}>
+                  {/* object-contain, not cover: the old asset was a black
+                      square that filled the ring edge to edge, so cropping
+                      it was harmless. The supplied symbol is transparent and
+                      slightly taller than wide — cover would crop the mark. */}
                   <Image
-                    src="/logos/yovoice-logo.png"
+                    src="/logos/yo-voice-symbol.png"
                     alt=""
                     width={184}
-                    height={184}
-                    className="size-full object-cover"
+                    height={190}
+                    className="size-full scale-[0.8] object-contain"
                   />
                 </PremiumRing>
               </div>

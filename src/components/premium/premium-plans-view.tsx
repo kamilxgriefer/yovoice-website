@@ -232,10 +232,10 @@ function PremiumActiveState() {
     <div className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 pb-24 pt-16 text-center sm:pt-24">
       <PremiumRing size={104}>
         <Image
-          src="/logos/yovoice-logo.png"
+          src="/logos/yo-voice-symbol.png"
           alt=""
           width={62}
-          height={62}
+          height={64}
           className="object-contain"
         />
       </PremiumRing>

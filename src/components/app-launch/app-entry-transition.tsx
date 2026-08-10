@@ -218,19 +218,21 @@ function EntrySequence({
             }}
           />
           {/* Explicit width/height rather than `fill`: this renders at ~104px,
-              and `fill` made Next fall back to the 3840px variant of a 1.5MB
-              source — the one asset gating the hand-off would have been the
-              slowest thing on the page. Same file as the hero's mark, just
-              asked for at the size it's actually drawn. */}
+              and `fill` had Next reaching for the largest generated variant —
+              the one asset gating the hand-off would have been the slowest
+              thing on the page. Asked for at the size it's actually drawn.
+              scale matches the hero: the supplied symbol is a tight crop, so
+              it needs to sit slightly inside its box to read the same weight
+              as the mark it replaced. */}
           <Image
-            src="/logos/yovoice-mark-glow.png"
+            src="/logos/yo-voice-symbol.png"
             alt=""
             width={208}
-            height={208}
+            height={215}
             quality={100}
             priority
             onLoad={handleLogoLoad}
-            className="relative size-full object-contain"
+            className="relative size-full scale-[0.86] object-contain"
           />
         </motion.div>
 
