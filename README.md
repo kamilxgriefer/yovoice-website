@@ -211,6 +211,14 @@ Download
 Google Play / App Store
 ```
 
+App launch hand-off:
+
+- `/app` redirects immediately to the configured Flutter app origin with
+  `location.replace()`.
+- The marketing site intentionally owns no loading animation or minimum
+  timeline. Direct entry and landing-page entry use the app's single real
+  startup surface while the Flutter engine initializes.
+
 ---
 
 # 📅 Roadmap
