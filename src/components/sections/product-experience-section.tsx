@@ -250,10 +250,15 @@ export function ProductExperienceSection() {
               </p>
 
               <div className="mt-7 space-y-3 sm:mt-10 sm:space-y-4">
+                {/* Was "1,248 listeners" — an invented audience presented as
+                    a real one. Every other row in this list describes what
+                    the feature does; this one now does the same, so the
+                    illustration explains the product without claiming
+                    traction the product has not earned yet. */}
                 <BroadcastRow
                   icon={<Radio className="size-5" />}
                   title="Live podcast"
-                  subtitle="1,248 listeners"
+                  subtitle="Broadcast to everyone who joins"
                   badge="LIVE"
                 />
 

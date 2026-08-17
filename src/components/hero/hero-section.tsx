@@ -10,6 +10,7 @@ import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
 import { useAuth } from "@/hooks/use-auth";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 import { LiveConversationCard } from "@/components/hero/live-conversation-card";
+import { LiveStats } from "@/components/hero/live-stats";
 import { OrbitingMembers, type OrbitMember } from "@/components/hero/orbit-members";
 import { OrbitSystem } from "@/components/hero/orbit-system";
 
@@ -100,23 +101,14 @@ export function HeroSection() {
       <div className="relative mx-auto flex w-full max-w-[860px] flex-col items-center px-5 text-center sm:px-8">
         {/* Not a category label — a sign of life. The first thing anyone
             reads should already feel like a room full of people, not a
-            product description. */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.6 }}
-          className="inline-flex items-center gap-2 text-[13px] text-white/40"
-        >
-          <span className="relative flex size-1.5">
-            <motion.span
-              className="absolute inset-0 rounded-full bg-emerald-400"
-              animate={{ scale: [1, 2.2], opacity: [0.6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-            />
-            <span className="relative size-1.5 rounded-full bg-emerald-400" />
-          </span>
-          2,481 people talking right now
-        </motion.div>
+            product description.
+
+            This was "2,481 people talking right now", hardcoded. It read as
+            a sign of life and was a string literal. LiveStats replaces it
+            with real figures from publicStats/live, and renders nothing at
+            all when there is nothing true to say — which on a pre-launch
+            product is most of the time, and is the honest outcome. */}
+        <LiveStats />
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
