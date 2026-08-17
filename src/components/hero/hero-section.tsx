@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { CenterLogo } from "@/components/hero/center-logo";
 import { DeepSpaceBackground } from "@/components/hero/deep-space-background";
 import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
+import { HeroPromptRotator } from "@/components/hero/hero-prompt-rotator";
 import { useAuth } from "@/hooks/use-auth";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 import { LiveConversationCard } from "@/components/hero/live-conversation-card";
@@ -129,16 +130,13 @@ export function HeroSection() {
             <span className="text-gradient mt-1 block">Start talking.</span>
           </motion.h1>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.24 }}
-            className="mt-5 max-w-[560px] text-[15px] leading-[1.7] text-white/55 sm:mt-7 sm:text-[17px] sm:leading-7"
           >
-            YO Voice brings people together in live rooms that feel less like
-            another feed and more like being there. Listen first, join the
-            conversation, or create a place for your people.
-          </motion.p>
+            <HeroPromptRotator />
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}
