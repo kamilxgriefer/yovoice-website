@@ -66,7 +66,6 @@ type AuthContextValue = {
    * context `user` (onAuthStateChanged does NOT refire after reload()).
    * Returns the up-to-date verified state. */
   reloadUser: () => Promise<boolean>;
-  updateDisplayName: (displayName: string) => Promise<void>;
   changePassword: (
     currentPassword: string,
     newPassword: string,
@@ -150,13 +149,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await current.reload();
         setUser({ ...current });
         return current.emailVerified;
-      },
-      updateDisplayName: async (displayName) => {
-        const current = getFirebaseAuth().currentUser;
-        if (!current) throw new Error("Not signed in.");
-        await updateProfile(current, { displayName: displayName.trim() });
-        // updateProfile doesn't trigger onAuthStateChanged; force a local refresh.
-        setUser({ ...current });
       },
       changePassword: async (currentPassword, newPassword) => {
         const current = getFirebaseAuth().currentUser;
