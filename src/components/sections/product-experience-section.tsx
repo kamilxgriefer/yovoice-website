@@ -5,17 +5,16 @@ import {
   Hand,
   HouseHeart,
   LockKeyhole,
-  MessageCircle,
   Mic2,
   Radio,
   ShieldCheck,
   Sparkles,
   Trophy,
   UserPlus,
-  Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { CommunityRoomPreview } from "@/components/sections/community-room-preview";
+import { PublicShowcaseGrid } from "@/components/sections/public-showcase-grid";
 
 const featureCards = [
   {
@@ -326,35 +325,7 @@ export function ProductExperienceSection() {
               creators and communities that matter to you.
             </p>
 
-            <div className="mt-7 grid gap-3 sm:mt-10 sm:gap-4 sm:grid-cols-2">
-              <SocialCard
-                icon={<Crown className="size-5" />}
-                title="Cybersecurity Hub"
-                subtitle="312 members"
-                action="Join club"
-              />
-
-              <SocialCard
-                icon={<Users className="size-5" />}
-                title="Gaming Nights"
-                subtitle="1.2K members"
-                action="View club"
-              />
-
-              <SocialCard
-                icon={<MessageCircle className="size-5" />}
-                title="Alex"
-                subtitle="Online now"
-                action="Message"
-              />
-
-              <SocialCard
-                icon={<UserPlus className="size-5" />}
-                title="Maya"
-                subtitle="Creator"
-                action="Follow"
-              />
-            </div>
+            <PublicShowcaseGrid />
           </div>
 
           <div className="glass-panel relative overflow-hidden rounded-[28px] p-6 sm:rounded-[38px] sm:p-10">
@@ -442,41 +413,6 @@ function BroadcastRow({
       <span className="rounded-full border border-rose-400/15 bg-rose-400/10 px-3 py-1 text-[10px] font-bold text-rose-300">
         {badge}
       </span>
-    </div>
-  );
-}
-
-type SocialCardProps = {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  action: string;
-};
-
-function SocialCard({
-  icon,
-  title,
-  subtitle,
-  action,
-}: SocialCardProps) {
-  return (
-    <div className="rounded-3xl border border-white/10 bg-[#130b1e]/72 p-5">
-      <div className="flex size-11 items-center justify-center rounded-2xl bg-fuchsia-500/10 text-fuchsia-300">
-        {icon}
-      </div>
-
-      <h4 className="mt-5 font-[family-name:var(--font-display)] text-lg font-bold text-white">
-        {title}
-      </h4>
-
-      <p className="mt-1 text-xs text-white/40">{subtitle}</p>
-
-      <button
-        type="button"
-        className="mt-5 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
-      >
-        {action}
-      </button>
     </div>
   );
 }

@@ -47,6 +47,15 @@ const sections: LegalSection[] = [
           (online / in a room).
         </p>
         <p>
+          <strong>Optional public website showcase.</strong> If you explicitly
+          opt in from YO Voice settings, we may publish your display name,
+          profile type and a short &quot;Active recently&quot; label on yovoice.app.
+          We do not publish your user ID, username, last-seen time, email,
+          avatar URL, staff role or social graph. Club owners can separately
+          opt a public Club into showing its name and current member count.
+          Private, invite-only and Family spaces are never included.
+        </p>
+        <p>
           <strong>Voice and room data.</strong> When you join a voice room,
           your device streams audio through our real-time voice
           infrastructure (LiveKit) to other participants. We do not record or
@@ -115,6 +124,11 @@ const sections: LegalSection[] = [
           presence status. We may also disclose information if required by
           law or to protect the safety of our community.
         </p>
+        <p>
+          The optional website showcase is visible to the public internet,
+          including signed-out visitors and people whose accounts you have
+          blocked. It is off by default and can be disabled from settings.
+        </p>
       </>
     ),
   },
@@ -125,10 +139,10 @@ const sections: LegalSection[] = [
       <p>
         Data is encrypted in transit (TLS). Access to your data in our
         database is governed by server-enforced security rules scoped to
-        your account, and sensitive actions are additionally protected by
-        Firebase App Check to block unauthorized clients. No system is
-        perfectly secure, but we design defaults conservatively and review
-        access rules as the product changes.
+        your account. We also use bounded server endpoints, validation and
+        abuse monitoring for sensitive operations. No system is perfectly
+        secure, but we design defaults conservatively and review access rules
+        as the product changes.
       </p>
     ),
   },
@@ -141,6 +155,7 @@ const sections: LegalSection[] = [
         <ul>
           <li>Update your profile information from your account settings.</li>
           <li>Change or disable individual notification types.</li>
+          <li>Enable or disable the optional public website showcase.</li>
           <li>Request a copy of the personal data we hold about you.</li>
           <li>Request deletion of your account and associated data.</li>
         </ul>
@@ -214,7 +229,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="August 5, 2026"
+        updatedOn="August 17, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />
