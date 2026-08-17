@@ -19,11 +19,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "shared-room-experience",
     updatedOn: "2026-08-17",
-    status: "ready",
+    status: "live",
     eyebrow: "Rooms",
-    title: "A clearer stage is ready for every kind of conversation",
+    title: "A clearer stage is live for every kind of conversation",
     summary:
-      "The next rollout will give Community, Podcast, Club and Family rooms one compact structure while preserving each room’s visual identity.",
+      "Community, Podcast, Club and Family rooms now share one compact structure while preserving each room’s visual identity.",
     highlights: [
       "Purple Community, coral Podcast, gold Club and emerald Family identities",
       "Responsive stage, listener strip and controls from phone to desktop",
@@ -33,11 +33,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "private-chat-media",
     updatedOn: "2026-08-17",
-    status: "ready",
+    status: "live",
     eyebrow: "Messages",
-    title: "Private chat media is ready for rollout",
+    title: "Private chat media is live",
     summary:
-      "The next rollout will replace the old placeholder actions with participant-only photo and voice-message flows.",
+      "The old placeholder actions have been replaced with participant-only photo and voice-message flows.",
     highlights: [
       "Private Storage paths instead of public download links",
       "Safe retry after interrupted uploads or finalization",
@@ -47,11 +47,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "family-room-reliability",
     updatedOn: "2026-08-17",
-    status: "ready",
+    status: "live",
     eyebrow: "Family Rooms",
-    title: "Safer Family Room creation is ready for rollout",
+    title: "Safer Family Room creation is live",
     summary:
-      "The next rollout will create the complete Family graph atomically, recover one canonical room after concurrent attempts, and keep private artwork disabled until its media boundary is safe.",
+      "Family Room creation now commits the complete Family graph atomically, recovers one canonical room after concurrent attempts, and keeps private artwork disabled until its media boundary is safe.",
     highlights: [
       "Family chat, announcements, Lounge and organizer membership created together",
       "No duplicate room after concurrent creation or a lost response",
