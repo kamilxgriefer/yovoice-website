@@ -16,10 +16,22 @@ import { getFirebaseFirestore } from "@/lib/firebase/config";
 // number is not available, or not yet true enough to mean anything, the line
 // simply is not rendered — an absent claim beats a comfortable one.
 
+// Field names match what the publisher actually writes, and the names are
+// deliberate. Neither says "created": neither is a lifetime counter and both
+// can go down. `activeAccounts` counts publicProfiles rather than users,
+// because users retains banned, disabled and Auth-orphaned rows and overstates
+// the product roughly two to one; the projection has Firebase Auth as its
+// existence authority, so it can lag low but never high.
+//
+// There is deliberately no live "people talking now" field yet. Deriving it
+// from voice-token expiry produced an error that grew with the thing being
+// measured — a room of twelve an hour into a conversation would have published
+// zero. It arrives once the LiveKit webhook is delivering, and it arrives once,
+// correctly, rather than being redefined under the same name later.
 type PublicStats = {
-  peopleTalkingNow?: number;
-  accountsCreated?: number;
-  roomsCreated?: number;
+  schemaVersion?: number;
+  activeAccounts?: number;
+  existingRooms?: number;
   updatedAt?: { seconds: number } | null;
 };
 
@@ -29,13 +41,6 @@ type PublicStats = {
 // longer than the publish interval and short enough that nobody reads a
 // number from a job that stopped an hour ago.
 const MAX_STALENESS_SECONDS = 15 * 60;
-
-// A live count is only worth showing when someone is actually there. Below
-// this it is hidden entirely rather than rendered as "0 people talking right
-// now" — the truth, but a self-defeating way to state it. The cumulative
-// numbers have no such floor: they only ever grow, and a real small number is
-// a fair thing to show.
-const MIN_TALKING_TO_SHOW = 1;
 
 function isFresh(stats: PublicStats): boolean {
   const seconds = stats.updatedAt?.seconds;
@@ -79,16 +84,13 @@ export function LiveStats() {
 
   if (!stats || !isFresh(stats)) return null;
 
-  const talking = stats.peopleTalkingNow;
-  const accounts = stats.accountsCreated;
-  const rooms = stats.roomsCreated;
+  const accounts = stats.activeAccounts;
+  const rooms = stats.existingRooms;
 
-  const showTalking =
-    typeof talking === "number" && talking >= MIN_TALKING_TO_SHOW;
   const showAccounts = typeof accounts === "number" && accounts > 0;
   const showRooms = typeof rooms === "number" && rooms > 0;
 
-  if (!showTalking && !showAccounts && !showRooms) return null;
+  if (!showAccounts && !showRooms) return null;
 
   return (
     <motion.div
@@ -97,31 +99,10 @@ export function LiveStats() {
       transition={{ delay: 0.1, duration: 0.6 }}
       className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-white/40"
     >
-      {showTalking && (
-        <span className="inline-flex items-center gap-2">
-          <span className="relative flex size-1.5" aria-hidden="true">
-            <motion.span
-              className="absolute inset-0 rounded-full bg-emerald-400"
-              animate={{ scale: [1, 2.2], opacity: [0.6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-            />
-            <span className="relative size-1.5 rounded-full bg-emerald-400" />
-          </span>
-          {format(talking as number)}{" "}
-          {talking === 1 ? "person talking right now" : "people talking right now"}
-        </span>
-      )}
-
-      {showTalking && (showAccounts || showRooms) && (
-        <span aria-hidden="true" className="text-white/20">
-          ·
-        </span>
-      )}
-
       {showAccounts && (
         <span>
           {format(accounts as number)}{" "}
-          {accounts === 1 ? "person has joined" : "people have joined"}
+          {accounts === 1 ? "person is here" : "people are here"}
         </span>
       )}
 
