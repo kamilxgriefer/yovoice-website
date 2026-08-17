@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
 import { motion } from "framer-motion";
 
-import { getFirebaseFirestore } from "@/lib/firebase/config";
+import { usePublicStats } from "@/hooks/use-public-stats";
 
 // The hero used to say "2,481 people talking right now". That number was a
 // string literal — nobody was talking, and on a pre-launch product the real
@@ -28,67 +26,18 @@ import { getFirebaseFirestore } from "@/lib/firebase/config";
 // measured — a room of twelve an hour into a conversation would have published
 // zero. It arrives once the LiveKit webhook is delivering, and it arrives once,
 // correctly, rather than being redefined under the same name later.
-type PublicStats = {
-  schemaVersion?: number;
-  activeAccounts?: number;
-  existingRooms?: number;
-  updatedAt?: { seconds: number } | null;
-};
-
-// A scheduled writer can die quietly. If the document stops being refreshed
-// we would otherwise keep presenting its last values as "right now" forever,
-// which is the same lie in slower motion. Fifteen minutes is comfortably
-// longer than the publish interval and short enough that nobody reads a
-// number from a job that stopped an hour ago.
-const MAX_STALENESS_SECONDS = 15 * 60;
-
-function isFresh(stats: PublicStats): boolean {
-  const seconds = stats.updatedAt?.seconds;
-  if (typeof seconds !== "number") return false;
-  return Date.now() / 1000 - seconds <= MAX_STALENESS_SECONDS;
-}
-
 function format(value: number): string {
   return value.toLocaleString("en-US");
 }
 
 export function LiveStats() {
-  const [stats, setStats] = useState<PublicStats | null>(null);
+  const state = usePublicStats();
+  if (state.status !== "fresh") return null;
 
-  useEffect(() => {
-    let cancelled = false;
-    // Failing to read this must never break the hero. The document is world
-    // readable, but a network error, a blocked request or an offline visitor
-    // should all land in exactly the same place: no line at all.
-    try {
-      const unsubscribe = onSnapshot(
-        doc(getFirebaseFirestore(), "publicStats", "live"),
-        (snapshot) => {
-          if (cancelled) return;
-          setStats(snapshot.exists() ? (snapshot.data() as PublicStats) : null);
-        },
-        () => {
-          if (!cancelled) setStats(null);
-        },
-      );
-      return () => {
-        cancelled = true;
-        unsubscribe();
-      };
-    } catch {
-      return () => {
-        cancelled = true;
-      };
-    }
-  }, []);
+  const { activeAccounts: accounts, existingRooms: rooms } = state.stats;
 
-  if (!stats || !isFresh(stats)) return null;
-
-  const accounts = stats.activeAccounts;
-  const rooms = stats.existingRooms;
-
-  const showAccounts = typeof accounts === "number" && accounts > 0;
-  const showRooms = typeof rooms === "number" && rooms > 0;
+  const showAccounts = accounts > 0;
+  const showRooms = rooms > 0;
 
   if (!showAccounts && !showRooms) return null;
 
@@ -101,7 +50,7 @@ export function LiveStats() {
     >
       {showAccounts && (
         <span>
-          {format(accounts as number)}{" "}
+          {format(accounts)}{" "}
           {accounts === 1 ? "person is here" : "people are here"}
         </span>
       )}
@@ -114,7 +63,7 @@ export function LiveStats() {
 
       {showRooms && (
         <span>
-          {format(rooms as number)} {rooms === 1 ? "room" : "rooms"} on YO Voice
+          {format(rooms)} {rooms === 1 ? "room" : "rooms"} on YO Voice
         </span>
       )}
     </motion.div>
