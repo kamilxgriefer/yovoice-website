@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Compass, Hand, Mic2, ShieldCheck, UserPlus, Users } from "lucide-react";
+import { ArrowRight, Compass, Headphones, Mic2, ShieldCheck, UserPlus, Users } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
 
@@ -12,15 +12,15 @@ export const metadata: Metadata = {
 const highlights = [
   {
     icon: Mic2,
-    title: "Open by design",
+    title: "A focused stage",
     description:
-      "Community rooms have no stage and no gatekeeping — everyone in the room can speak, and everyone is visible.",
+      "Hosts and active speakers stay visible on a calm, bounded stage. Listeners remain one tap away in People, even as the room grows.",
   },
   {
-    icon: Hand,
-    title: "Raise your hand",
+    icon: Headphones,
+    title: "Listen first",
     description:
-      "In structured rooms, raising your hand signals you want to speak without interrupting — hosts bring you up when it's your turn.",
+      "Join as a listener, follow the conversation and let the host bring you onto the stage when it's time to take part.",
   },
   {
     icon: UserPlus,
@@ -44,7 +44,7 @@ const highlights = [
     icon: ShieldCheck,
     title: "Moderated, not chaotic",
     description:
-      "Hosts can mute, remove or manage access at any time, so open rooms stay open without becoming unmanageable.",
+      "Hosts can mute or remove participants from People, helping every conversation stay focused and welcoming.",
   },
 ];
 

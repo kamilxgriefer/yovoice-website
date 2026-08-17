@@ -3,7 +3,6 @@
 import {
   Crown,
   Hand,
-  Headphones,
   HouseHeart,
   LockKeyhole,
   MessageCircle,
@@ -16,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { CommunityRoomPreview } from "@/components/sections/community-room-preview";
 
 const featureCards = [
   {
@@ -218,64 +218,12 @@ export function ProductExperienceSection() {
               </h3>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
-                The Heart of the Community reacts to every voice. Speakers,
-                listeners and shared energy become part of one living scene.
+                The room identity and active speakers stay in focus. Listeners
+                remain one tap away in People, while the stage stays calm as
+                the audience grows.
               </p>
 
-              <div className="relative mx-auto mt-7 aspect-[1.25/1] w-full max-w-[700px] overflow-hidden rounded-[22px] border border-white/10 bg-[#100819]/80 sm:mt-12 sm:rounded-[34px]">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,rgba(192,38,255,0.26),transparent_32%)]" />
-                <div className="grid-background absolute inset-0 opacity-25" />
-
-                {/* Every fixed-size element inside the scene steps down on
-                    mobile — the aspect box shrinks with the viewport but
-                    these didn't, which is what made the illustration read
-                    as a desktop scene crammed into a phone. */}
-                <div className="absolute left-[8%] top-[18%] flex items-center gap-2 rounded-xl border border-fuchsia-300/20 bg-[#1a0d28]/85 px-2.5 py-2 backdrop-blur-xl sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3">
-                  <div className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-violet-700 text-[10px] font-bold text-white sm:size-10 sm:text-xs">
-                    MA
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-bold text-white sm:text-xs">Maya</p>
-                    <p className="text-[9px] text-fuchsia-300 sm:text-[10px]">
-                      Speaking now
-                    </p>
-                  </div>
-                </div>
-
-                <div className="absolute right-[8%] top-[20%] rounded-xl border border-white/10 bg-white/[0.04] p-2 text-white/60 backdrop-blur-xl sm:rounded-2xl sm:p-3">
-                  <Users className="size-4 sm:size-5" />
-                </div>
-
-                <div className="absolute left-1/2 top-1/2 flex size-22 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-fuchsia-300/30 bg-gradient-to-br from-violet-700 via-purple-500 to-fuchsia-500 shadow-[0_0_60px_rgba(192,38,255,0.5)] sm:size-36 sm:shadow-[0_0_100px_rgba(192,38,255,0.55)]">
-                  <Mic2 className="size-9 text-white sm:size-14" />
-                </div>
-
-                <div className="absolute bottom-[12%] left-1/2 flex -translate-x-1/2 gap-2 sm:gap-3">
-                  {[Mic2, Headphones, MessageCircle, ShieldCheck].map(
-                    (ControlIcon, index) => (
-                      <div
-                        key={index}
-                        className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-[#170c23]/90 text-white/60 backdrop-blur-xl sm:size-11 sm:rounded-2xl"
-                      >
-                        <ControlIcon className="size-3.5 sm:size-4" />
-                      </div>
-                    ),
-                  )}
-                </div>
-
-                <motion.div
-                  className="absolute left-[27%] top-[38%] h-px w-[22%] origin-left bg-gradient-to-r from-fuchsia-300/70 to-transparent"
-                  animate={{
-                    opacity: [0.25, 0.9, 0.25],
-                    scaleX: [0.6, 1, 0.6],
-                  }}
-                  transition={{
-                    duration: 1.8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              </div>
+              <CommunityRoomPreview />
             </div>
           </motion.div>
 
