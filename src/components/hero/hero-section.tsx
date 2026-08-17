@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowRight, Play } from "lucide-react";
+import { ArrowDown, ArrowRight, HouseHeart, Mic2, Play, UsersRound } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { CenterLogo } from "@/components/hero/center-logo";
@@ -91,118 +91,140 @@ export function HeroSection() {
   const { user, loading: authLoading } = useAuth();
 
   return (
-    <section className="relative overflow-hidden pt-28 sm:pt-40">
+    <section className="relative overflow-hidden pt-28 sm:pt-36 lg:min-h-[calc(100svh-80px)] lg:pt-0">
       <DeepSpaceBackground />
 
-      {/* The eye moves: headline -> CTAs -> hero center -> avatars ->
-          live widget -> stats (below). Every block here is centered on
-          that single vertical line, on purpose — one scene, not a stack
-          of independent components. */}
-      <div className="relative mx-auto flex w-full max-w-[860px] flex-col items-center px-5 text-center sm:px-8">
-        {/* Not a category label — a sign of life. The first thing anyone
-            reads should already feel like a room full of people, not a
-            product description.
-
-            This was "2,481 people talking right now", hardcoded. It read as
-            a sign of life and was a string literal. LiveStats replaces it
-            with real figures from publicStats/live, and renders nothing at
-            all when there is nothing true to say — which on a pre-launch
-            product is most of the time, and is the honest outcome. */}
-        <LiveStats />
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 font-[family-name:var(--font-display)] text-[2.4rem] font-bold leading-[1.03] tracking-[-0.035em] text-white sm:text-7xl xl:text-[6.4rem]"
-        >
-          <span className="block">Your voice.</span>
-          <span className="text-gradient mt-1 block">Your community.</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="mx-auto mt-5 max-w-[400px] text-[15px] leading-[1.65] text-white/50 sm:mt-7 sm:leading-[1.85]"
-        >
-          Somewhere right now, someone is telling a story, making a friend,
-          or hosting a room full of people who get it. Come listen in.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.55 }}
-          className="mt-9 flex flex-col items-center gap-3.5 sm:flex-row"
-        >
-          {/* Using YO Voice means opening the web app — one click, no
-              detour through a downloads section. A visitor with a live
-              session goes straight there; everyone else goes through the
-              existing sign-in and is returned to the app afterwards
-              (resolveAuthRedirect handles ?redirect=/app). Native
-              downloads stay a SECONDARY choice until they exist. */}
-          <HeroPrimaryCta
-            href={
-              authLoading || user
-                ? APP_ENTRY_PATH
-                : `/login?redirect=${APP_ENTRY_PATH}`
-            }
+      {/* Desktop is one above-fold stage: promise on the left, the human
+          conversation scene on the right. Below lg the same pieces return
+          to the centered stack that already works well on phones. */}
+      <div className="relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:grid lg:min-h-[calc(100svh-80px)] lg:grid-cols-[minmax(0,.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-16 xl:gap-16">
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.08 }}
+            className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/15 bg-fuchsia-300/[0.06] px-3.5 py-2 text-[10.5px] font-bold tracking-[0.16em] text-fuchsia-100/80 sm:text-[11px]"
           >
-            Open YO Voice
-            <ArrowRight className="size-4" />
-          </HeroPrimaryCta>
-          <HeroSecondaryCta href="#experience">
-            <span className="flex size-7 items-center justify-center rounded-full bg-white text-[#0d0618]">
-              <Play className="ml-0.5 size-3.5 fill-current" />
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-fuchsia-300 opacity-50" />
+              <span className="relative inline-flex size-2 rounded-full bg-fuchsia-300" />
             </span>
-            Watch experience
-          </HeroSecondaryCta>
-        </motion.div>
-      </div>
+            REAL PEOPLE. LIVE CONVERSATIONS.
+          </motion.div>
 
-      {/* The scene: logo, orbit and the people around it, with the live
-          widget pulled up to overlap its base — physically attached to
-          the center rather than a separate card stacked below it. */}
-      <div className="relative mx-auto mt-12 w-full max-w-[300px] sm:mt-20 sm:max-w-[520px] md:max-w-[600px] lg:max-w-[680px]">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="relative aspect-square w-full"
-        >
-          <OrbitSystem />
-
-          <div className="absolute inset-0 flex items-center justify-center">
-            <CenterLogo />
+          {/* Real server-published figures appear only when fresh. The fixed
+              eyebrow above still explains the product when honest numbers are
+              unavailable — it never substitutes an invented count. */}
+          <div className="mt-3 w-full">
+            <LiveStats />
           </div>
 
-          <OrbitingMembers members={members} activeId={activeMember.id} />
-        </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.58, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-5 font-[family-name:var(--font-display)] text-[2.65rem] font-bold leading-[1.01] tracking-[-0.04em] text-white sm:text-7xl lg:text-[3.55rem] xl:text-[4.5rem]"
+          >
+            <span className="block">Stop scrolling.</span>
+            <span className="text-gradient mt-1 block">Start talking.</span>
+          </motion.h1>
 
-        {/* The light bridging logo and widget — one glow, not a new
-            element, so the two read as parts of the same object. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[radial-gradient(ellipse_at_50%_100%,rgba(139,92,246,.12),transparent_65%)]" />
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.24 }}
+            className="mt-5 max-w-[560px] text-[15px] leading-[1.7] text-white/55 sm:mt-7 sm:text-[17px] sm:leading-7"
+          >
+            YO Voice brings people together in live rooms that feel less like
+            another feed and more like being there. Listen first, join the
+            conversation, or create a place for your people.
+          </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.75, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-30 mx-auto -mt-16 flex justify-center px-5 sm:-mt-24"
-        >
-          <LiveConversationCard
-            speakerName={activeMember.name}
-            speakerAvatar={activeMember.avatar}
-            equalizer={activeMember.equalizer}
-            listeners={activeMember.listeners}
-          />
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.32 }}
+            className="mt-8 flex flex-col items-center gap-3.5 sm:flex-row lg:items-start"
+          >
+            <HeroPrimaryCta
+              href={
+                authLoading || user
+                  ? APP_ENTRY_PATH
+                  : `/login?redirect=${APP_ENTRY_PATH}`
+              }
+            >
+              Start talking
+              <ArrowRight className="size-4" />
+            </HeroPrimaryCta>
+            <HeroSecondaryCta href="#experience">
+              <span className="flex size-7 items-center justify-center rounded-full bg-white text-[#0d0618]">
+                <Play className="ml-0.5 size-3.5 fill-current" />
+              </span>
+              Explore YO Voice
+            </HeroSecondaryCta>
+          </motion.div>
+
+          <motion.ul
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.4 }}
+            className="mt-6 flex max-w-[620px] flex-wrap justify-center gap-2 text-[11px] font-semibold text-white/55 lg:justify-start"
+            aria-label="YO Voice highlights"
+          >
+            {[
+              { icon: Mic2, label: "Live voice rooms" },
+              { icon: HouseHeart, label: "Private Family Rooms" },
+              { icon: UsersRound, label: "Clubs & community chats" },
+            ].map(({ icon: Icon, label }) => (
+              <li
+                key={label}
+                className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.035] px-3.5"
+              >
+                <Icon className="size-3.5 text-fuchsia-200/75" aria-hidden="true" />
+                {label}
+              </li>
+            ))}
+          </motion.ul>
+        </div>
+
+        {/* The scene: logo, orbit and people around it, with the preview
+            attached to the base. It sits beside the promise on desktop so
+            visitors see both the meaning and the product in one viewport. */}
+        <div className="relative mx-auto mt-12 w-full max-w-[300px] sm:mt-16 sm:max-w-[520px] md:max-w-[600px] lg:mt-0 lg:max-w-[560px] xl:max-w-[600px]">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="relative aspect-square w-full"
+          >
+            <OrbitSystem />
+
+            <div className="absolute inset-0 flex items-center justify-center">
+              <CenterLogo />
+            </div>
+
+            <OrbitingMembers members={members} activeId={activeMember.id} />
+          </motion.div>
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[radial-gradient(ellipse_at_50%_100%,rgba(139,92,246,.12),transparent_65%)]" />
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.48, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-30 mx-auto -mt-16 flex justify-center px-3 sm:-mt-24"
+          >
+            <LiveConversationCard
+              speakerName={activeMember.name}
+              speakerAvatar={activeMember.avatar}
+              equalizer={activeMember.equalizer}
+              listeners={activeMember.listeners}
+            />
+          </motion.div>
+        </div>
       </div>
 
-      {/* No device/logistics line here on purpose — that's what the
-          download section further down is for. The hero's job is the
-          feeling, not the spec sheet. */}
-      <div className="relative mx-auto max-w-[1400px] px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-20 lg:px-12">
+      <div className="relative mx-auto max-w-[1400px] px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-16 lg:absolute lg:inset-x-0 lg:bottom-3 lg:p-0">
         <motion.a
           href="#stats"
           whileHover={{ y: 2 }}

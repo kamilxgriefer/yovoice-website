@@ -51,7 +51,7 @@ export function HeroPrimaryCta({ href, children }: { href: string; children: Rea
       <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-violet-400/40 via-fuchsia-300/50 to-violet-400/40 opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
       <Link
         href={href}
-        className="focus-ring relative flex min-h-13 items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-fuchsia-400 px-7 text-[14.5px] font-bold text-white shadow-[0_14px_40px_rgba(192,38,255,.32)]"
+        className="focus-ring relative flex min-h-13 items-center justify-center gap-2.5 overflow-hidden whitespace-nowrap rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-fuchsia-400 px-7 text-[14.5px] font-bold text-white shadow-[0_14px_40px_rgba(192,38,255,.32)]"
       >
         {/* Glass top highlight */}
         <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.22] to-transparent" />
@@ -76,7 +76,7 @@ export function HeroSecondaryCta({ href, children }: { href: string; children: R
     >
       <Link
         href={href}
-        className="focus-ring group relative flex min-h-13 items-center justify-center gap-3 overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] px-7 text-[14.5px] font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-white/22 hover:bg-white/[0.07]"
+        className="focus-ring group relative flex min-h-13 items-center justify-center gap-3 overflow-hidden whitespace-nowrap rounded-2xl border border-white/[0.12] bg-white/[0.04] px-7 text-[14.5px] font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-white/22 hover:bg-white/[0.07]"
       >
         <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.1] to-transparent" />
         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />

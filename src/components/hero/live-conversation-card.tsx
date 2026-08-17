@@ -16,11 +16,9 @@ function useElapsed() {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** Not a UI widget — proof. This card exists to say "this is happening
- * right now," so it opens on the human sentence, not a section label.
- * No app-chrome (connection quality, category eyebrows) — only what
- * actually proves a real conversation is live: who's talking, the sound
- * of it, how many people are there, and one live indicator, once.
+/** An illustrative slice of the room experience. The names, listener count
+ * and equalizer are composed demo data, so the card identifies itself as a
+ * product preview rather than presenting them as live platform statistics.
  * GPU-only animation (scaleY/scaleX/opacity, never width/height). */
 export function LiveConversationCard({
   speakerName,
@@ -48,6 +46,11 @@ export function LiveConversationCard({
         }}
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.06] to-transparent" />
+
+        <div className="relative mb-3 flex items-center justify-between text-[9px] font-bold tracking-[0.14em] text-white/30">
+          <span>PRODUCT PREVIEW</span>
+          <span className="text-fuchsia-200/55">VOICE ROOM</span>
+        </div>
 
         <div className="relative flex items-center gap-3">
           <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-white/10">

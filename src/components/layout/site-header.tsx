@@ -45,7 +45,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <BrandLockup priority />
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary navigation">
           {siteConfig.navigation.map((item) => (
             <Link
               key={item.href}
@@ -58,7 +58,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 sm:flex">
+        <div className="hidden items-center gap-3 xl:flex">
           {user ? (
             <>
               <Link href="/account/profile" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
@@ -101,7 +101,7 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="focus-ring flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white lg:hidden"
+          className="focus-ring flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white xl:hidden"
           onClick={() => setIsOpen((v) => !v)}
           aria-expanded={isOpen}
           aria-label={isOpen ? "Close menu" : "Open menu"}
@@ -111,7 +111,7 @@ export function SiteHeader() {
       </div>
 
       {isOpen && (
-        <div className="border-t border-white/[.06] bg-[#090616]/98 px-5 py-5 backdrop-blur-2xl lg:hidden">
+        <div className="border-t border-white/[.06] bg-[#090616]/98 px-5 py-5 backdrop-blur-2xl xl:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-2">
             {siteConfig.navigation.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)} className="rounded-xl px-4 py-3 text-sm font-medium text-white/75 hover:bg-white/5 hover:text-white">
