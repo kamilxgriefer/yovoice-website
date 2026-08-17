@@ -265,9 +265,8 @@ function VerifyEmailPrompt() {
  * (VerifyEmailPrompt) success paths, so a verified account looks the same
  * regardless of how it got there. With no ?redirect, this lands on the /app
  * launch route, which plays the entry transition and then hands off to
- * NEXT_PUBLIC_APP_URL — currently the production Flutter web build
- * (https://yovoice-ec54a.web.app); switching to https://app.yovoice.app
- * once its DNS is live is a Vercel env var change, not a code change.
+ * the canonical Flutter web origin at https://app.yovoice.app. The launch
+ * route also normalizes legacy Firebase Hosting origins to that domain.
  */
 function VerifiedSuccess({ email }: { email: string | null }) {
   const router = useRouter();

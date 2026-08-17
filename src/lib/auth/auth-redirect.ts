@@ -1,4 +1,25 @@
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://yovoice-ec54a.web.app";
+export const CANONICAL_APP_URL = "https://app.yovoice.app";
+
+const LEGACY_FIREBASE_APP_URLS = new Set([
+  "https://yovoice-ec54a.web.app",
+  "https://yovoice-ec54a.firebaseapp.com",
+]);
+
+/**
+ * Keeps preview/custom deployments configurable while permanently migrating
+ * the old Firebase Hosting origins to the public YO Voice app domain. This
+ * also protects production if a stale Vercel environment variable is still
+ * present during the rollout.
+ */
+export function resolveConfiguredAppUrl(configuredUrl?: string): string {
+  const normalized = configuredUrl?.trim().replace(/\/+$/, "");
+  if (!normalized || LEGACY_FIREBASE_APP_URLS.has(normalized)) {
+    return CANONICAL_APP_URL;
+  }
+  return normalized;
+}
+
+const APP_URL = resolveConfiguredAppUrl(process.env.NEXT_PUBLIC_APP_URL);
 
 /**
  * The on-site launch route. It plays the entry transition, waits on real

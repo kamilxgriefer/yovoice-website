@@ -16,8 +16,8 @@ const ALLOWED_HOSTS = new Set([
   "yovoice.app",
   "www.yovoice.app",
   "app.yovoice.app",
-  // The Flutter web app's current production origin (app.yovoice.app is
-  // planned but its DNS isn't live yet — see the app repo's Roadmap).
+  // Legacy Firebase Hosting origins remain allowlisted so links issued before
+  // the custom-domain rollout can still complete safely.
   "yovoice-ec54a.web.app",
   "yovoice-ec54a.firebaseapp.com",
 ]);

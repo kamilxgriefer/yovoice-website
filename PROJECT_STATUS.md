@@ -75,9 +75,8 @@ below).
 - **Social links**: LinkedIn and Instagram footer icons still point to
   generic placeholder URLs (`linkedin.com/`, `instagram.com/`), not real
   company profiles — explicitly deferred by request, not forgotten.
-- **`app.yovoice.app` DNS**: not live yet; `getAppUrl()` falls back to
-  `https://yovoice-ec54a.web.app`. Switching later is an env var change
-  (`NEXT_PUBLIC_APP_URL`), not a code change.
+- **`app.yovoice.app` DNS**: live and canonical. The website launch route
+  normalizes legacy Firebase Hosting origins to `https://app.yovoice.app`.
 - **Blog**: `src/app/(marketing)/blog/` is still an empty directory. Not
   linked from anywhere, so it isn't a broken link — just genuinely out of
   scope for this pass (wasn't in the requested page list).

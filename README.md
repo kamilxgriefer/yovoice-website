@@ -129,7 +129,7 @@ account pages, and the actual app.
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase Web SDK config |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase Web SDK config |
 | `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID` | Firebase Analytics |
-| `NEXT_PUBLIC_APP_URL` | Where "Launch Web App" / post-login redirects send signed-in users. `https://yovoice-ec54a.web.app` until `app.yovoice.app` DNS exists, then switch to `https://app.yovoice.app` |
+| `NEXT_PUBLIC_APP_URL` | Where "Launch Web App" / post-login redirects send signed-in users. Canonical production URL: `https://app.yovoice.app` |
 
 Set these locally in `.env.local` (gitignored) and in Vercel via
 `vercel env add <NAME> <environment>` for `production`, `preview`, and
@@ -145,12 +145,8 @@ the run context.
 - **Local ↔ Vercel link:** `vercel link` (already linked to
   `yo-voice/yovoice-website`); `vercel env pull .env.local` to sync env
   vars locally.
-- **DNS:** `yovoice.app` is on Cloudflare. `app.yovoice.app` is **not
-  configured yet** — it needs a `CNAME app.yovoice.app → yovoice-ec54a.web.app`
-  record added in Cloudflare (this was added as a custom domain in
-  Firebase Hosting; that's the exact record Firebase's own setup flow
-  asked for). Nobody but whoever controls the Cloudflare DNS zone can add
-  this — it's not something achievable from code.
+- **DNS:** `yovoice.app` is on Cloudflare. `app.yovoice.app` is the live,
+  canonical Flutter web application domain and points to Firebase Hosting.
 
 ---
 
