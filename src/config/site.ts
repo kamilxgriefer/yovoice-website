@@ -9,7 +9,7 @@ export const siteConfig = {
     { label: "Community", href: "/community" },
     { label: "Clubs", href: "/clubs" },
     { label: "Premium", href: "/premium" },
-    { label: "About", href: "/about" },
+    { label: "Updates", href: "/updates" },
     { label: "Download", href: "/download" },
   ],
 } as const;

@@ -14,6 +14,7 @@ const routes = [
   "/clubs",
   "/achievements",
   "/about",
+  "/updates",
   "/roadmap",
   "/careers",
   "/contact",
@@ -32,7 +33,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return routes.map((route) => ({
     url: `${siteConfig.url}${route}`,
     lastModified,
-    changeFrequency: route === "/" ? "weekly" : "monthly",
-    priority: route === "/" ? 1 : highPriorityRoutes.includes(route) ? 0.8 : 0.5,
+    changeFrequency: route === "/" || route === "/updates" ? "weekly" : "monthly",
+    priority:
+      route === "/"
+        ? 1
+        : route === "/updates"
+          ? 0.75
+          : highPriorityRoutes.includes(route)
+            ? 0.8
+            : 0.5,
   }));
 }

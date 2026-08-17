@@ -5,7 +5,7 @@ import { BrandLockup } from "@/components/layout/brand-lockup";
 
 const columns = [
   { title: "Product", links: [["Features","/features"],["Community","/community"],["Clubs","/clubs"],["Achievements","/achievements"]] },
-  { title: "Company", links: [["About","/about"],["Roadmap","/roadmap"],["Careers","/careers"],["Contact","/contact"]] },
+  { title: "Company", links: [["About","/about"],["Updates","/updates"],["Roadmap","/roadmap"],["Careers","/careers"],["Contact","/contact"]] },
   { title: "Support", links: [["Help Center","/help-center"],["Safety","/safety"],["Status","/status"],["FAQ","/faq"]] },
   { title: "Legal", links: [["Privacy","/privacy"],["Terms","/terms"],["Cookies","/cookies"]] },
 ];
