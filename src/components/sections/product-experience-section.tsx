@@ -4,6 +4,7 @@ import {
   Crown,
   Hand,
   Headphones,
+  HouseHeart,
   LockKeyhole,
   MessageCircle,
   Mic2,
@@ -24,6 +25,8 @@ const featureCards = [
     description:
       "Open voice spaces built around shared presence instead of rigid stages and cold meeting layouts.",
     gradient: "from-violet-500/25 via-purple-500/8 to-transparent",
+    featured: false,
+    highlights: [],
   },
   {
     icon: Radio,
@@ -32,6 +35,22 @@ const featureCards = [
     description:
       "Host live events, manage speakers, accept raised hands and connect with listeners at scale.",
     gradient: "from-rose-500/22 via-red-500/7 to-transparent",
+    featured: false,
+    highlights: [],
+  },
+  {
+    icon: HouseHeart,
+    title: "Family Rooms",
+    label: "Close, even from far away",
+    description:
+      "Create a private room for your family, invite the people you choose, and stay close through family chat, quick check-ins and an always-open Family Lounge.",
+    gradient: "from-sky-500/20 via-violet-500/10 to-fuchsia-500/8",
+    featured: true,
+    highlights: [
+      "Private family space",
+      "Personal invitations",
+      "Quick check-ins",
+    ],
   },
   {
     icon: Crown,
@@ -40,6 +59,8 @@ const featureCards = [
     description:
       "Create lasting communities with member roles, dedicated chats, events and private voice spaces.",
     gradient: "from-amber-500/18 via-fuchsia-500/7 to-transparent",
+    featured: false,
+    highlights: [],
   },
   {
     icon: UserPlus,
@@ -48,6 +69,8 @@ const featureCards = [
     description:
       "Make friends, follow creators and discover the people behind the conversations you enjoy.",
     gradient: "from-cyan-500/20 via-violet-500/7 to-transparent",
+    featured: false,
+    highlights: [],
   },
 ];
 
@@ -75,9 +98,10 @@ export function ProductExperienceSection() {
           </div>
 
           <p className="max-w-2xl text-[15px] leading-7 text-white/50 sm:text-base sm:leading-8 lg:justify-self-end">
-            YO Voice brings live conversations, friendships and communities
-            into one connected world. Each part of the product is designed to
-            make online interaction feel personal rather than mechanical.
+            YO Voice brings live conversations, families, friendships and
+            communities into one connected world. Each part of the product is
+            designed to make online interaction feel personal rather than
+            mechanical.
           </p>
         </div>
 
@@ -90,6 +114,7 @@ export function ProductExperienceSection() {
 
             return (
               <motion.article
+                id={feature.featured ? "family-rooms" : undefined}
                 key={feature.title}
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -98,7 +123,11 @@ export function ProductExperienceSection() {
                   duration: 0.55,
                   delay: index * 0.07,
                 }}
-                className="glass-panel group relative overflow-hidden rounded-[26px] p-6 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-300/25 sm:min-h-[310px] sm:rounded-[32px] sm:p-9"
+                className={`glass-panel group relative overflow-hidden rounded-[26px] p-6 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-300/25 sm:rounded-[32px] sm:p-9 ${
+                  feature.featured
+                    ? "md:col-span-2 sm:min-h-[280px]"
+                    : "sm:min-h-[310px]"
+                }`}
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-75 transition duration-500 group-hover:opacity-100`}
@@ -119,18 +148,42 @@ export function ProductExperienceSection() {
                       generous because min-h stretches these cards into
                       squares; on mobile there's no min-h, so the same pt
                       would just be dead space. */}
-                  <div className="mt-auto pt-8 sm:pt-16">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-300">
-                      {feature.label}
-                    </p>
+                  <div
+                    className={`mt-auto pt-8 sm:pt-16 ${
+                      feature.featured
+                        ? "sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-10"
+                        : ""
+                    }`}
+                  >
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-300">
+                        {feature.label}
+                      </p>
 
-                    <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-white sm:mt-3 sm:text-3xl">
-                      {feature.title}
-                    </h3>
+                      <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-white sm:mt-3 sm:text-3xl">
+                        {feature.title}
+                      </h3>
 
-                    <p className="mt-3 max-w-xl text-sm leading-6 text-white/48 sm:mt-4 sm:leading-7">
-                      {feature.description}
-                    </p>
+                      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/48 sm:mt-4 sm:leading-7">
+                        {feature.description}
+                      </p>
+                    </div>
+
+                    {feature.highlights.length > 0 ? (
+                      <ul
+                        aria-label="Family Rooms features"
+                        className="mt-5 flex flex-wrap gap-2 sm:mt-0 sm:max-w-xs sm:justify-end"
+                      >
+                        {feature.highlights.map((highlight) => (
+                          <li
+                            key={highlight}
+                            className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-2 text-xs font-semibold text-white/65"
+                          >
+                            {highlight}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </div>
                 </div>
               </motion.article>
