@@ -131,7 +131,7 @@ export default function UpdatesPage() {
             </div>
             <Link
               href="/roadmap"
-              className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-5 py-2 text-sm font-black text-[#080711] transition hover:bg-fuchsia-100"
+              className="roadmap-cta focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl px-5 py-2 text-sm font-black transition"
             >
               View roadmap
               <ArrowRight className="size-4" aria-hidden="true" />

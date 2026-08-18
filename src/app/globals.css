@@ -77,6 +77,15 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 .focus-ring:focus-visible { outline: 2px solid #e879f9; outline-offset: 4px; }
 
+/* Light CTA links need an explicit class because the global anchor rule keeps
+   inherited white text. A named class also survives production CSS pruning,
+   unlike the one-off arbitrary color that previously rendered white-on-white. */
+.roadmap-cta {
+  background: #fff;
+  color: #080711;
+}
+.roadmap-cta:hover { background: #fae8ff; color: #080711; }
+
 .premium-button {
   position: relative;
   display: inline-flex;
