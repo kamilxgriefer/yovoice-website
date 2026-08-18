@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import {
+  ACCOUNT_ENTRY_PATH,
+  APP_ENTRY_PATH,
+  buildAppHandoffUrl,
   CANONICAL_APP_URL,
+  isAppLaunchRedirect,
+  resolveAuthRedirect,
   resolveConfiguredAppUrl,
 } from "../src/lib/auth/auth-redirect.ts";
 
@@ -28,5 +33,52 @@ describe("application URL", () => {
       resolveConfiguredAppUrl(" https://preview.example.test/app/ "),
       "https://preview.example.test/app",
     );
+  });
+
+  test("preserves campaign attribution through the app hand-off", () => {
+    assert.equal(
+      buildAppHandoffUrl(
+        CANONICAL_APP_URL,
+        "?utm_source=instagram&utm_medium=paid_social&utm_campaign=voice_moments&fbclid=abc123",
+      ),
+      "https://app.yovoice.app/?utm_source=instagram&utm_medium=paid_social&utm_campaign=voice_moments&fbclid=abc123",
+    );
+  });
+
+  test("drops unrelated query parameters from the app hand-off", () => {
+    assert.equal(
+      buildAppHandoffUrl(
+        CANONICAL_APP_URL,
+        "?utm_content=single_4x5&email=private%40example.com&redirect=https%3A%2F%2Fevil.example",
+      ),
+      "https://app.yovoice.app/?utm_content=single_4x5",
+    );
+  });
+
+  test("keeps ordinary website sign-in inside the account portal", () => {
+    assert.equal(resolveAuthRedirect(null), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("https://evil.example"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("/premium/manage"), "/premium/manage");
+  });
+
+  test("rejects same-origin-looking paths that browsers resolve off-site", () => {
+    // "/\evil.com" — backslash is normalized to "/" by http(s) URL parsing,
+    // so the client router would hard-navigate to https://evil.com.
+    assert.equal(resolveAuthRedirect("/\\evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("/\\t/evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("//evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("/%5Cevil.com"), "/%5Cevil.com");
+    // Deep same-site paths with queries stay honoured.
+    assert.equal(
+      resolveAuthRedirect("/download?utm_source=mail"),
+      "/download?utm_source=mail",
+    );
+  });
+
+  test("recognizes a legacy app redirect so website auth can be skipped", () => {
+    assert.equal(isAppLaunchRedirect(APP_ENTRY_PATH), true);
+    assert.equal(isAppLaunchRedirect([APP_ENTRY_PATH]), false);
+    assert.equal(isAppLaunchRedirect("/download"), false);
+    assert.equal(isAppLaunchRedirect(null), false);
   });
 });

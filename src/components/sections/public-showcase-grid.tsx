@@ -6,6 +6,7 @@ import { Crown, Radio, Sparkles, UserPlus } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { usePublicShowcase } from "@/hooks/use-public-showcase";
+import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 import type {
   PublicShowcaseClub,
   PublicShowcasePerson,
@@ -144,7 +145,7 @@ function ShowcaseCard({ card }: { card: Card }) {
         </div>
       </div>
       <Link
-        href="/login?redirect=/app"
+        href={APP_ENTRY_PATH}
         className="focus-ring mt-5 inline-flex min-h-10 items-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
       >
         Open YO Voice
@@ -161,7 +162,7 @@ function ShowcaseInvitation() {
         Public profiles appear here only after a member chooses to be featured. Open YO Voice to discover people and public Clubs right now.
       </p>
       <Link
-        href="/login?redirect=/app"
+        href={APP_ENTRY_PATH}
         className="focus-ring mt-5 inline-flex min-h-11 items-center rounded-xl bg-white px-4 py-2 text-xs font-black text-black transition hover:bg-fuchsia-100"
         style={{ color: "#080711" }}
       >

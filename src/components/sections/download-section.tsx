@@ -35,7 +35,7 @@ export function DownloadSection() {
       icon: Globe2,
       title: "Web",
       description: "Open YO Voice directly from a modern browser without installation.",
-      href: user ? APP_ENTRY_PATH : `/login?redirect=${APP_ENTRY_PATH}`,
+      href: APP_ENTRY_PATH,
       action: "Launch web app",
     },
   ];
