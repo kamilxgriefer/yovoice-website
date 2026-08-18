@@ -21,6 +21,36 @@ export function resolveConfiguredAppUrl(configuredUrl?: string): string {
 
 const APP_URL = resolveConfiguredAppUrl(process.env.NEXT_PUBLIC_APP_URL);
 
+const CAMPAIGN_QUERY_KEYS = new Set([
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "fbclid",
+]);
+
+/**
+ * Carries only campaign attribution through the marketing-site hand-off.
+ * The allowlist prevents unrelated or sensitive query parameters from being
+ * forwarded to the application origin.
+ */
+export function buildAppHandoffUrl(
+  appUrl: string,
+  sourceSearch: string,
+): string {
+  const destination = new URL(appUrl);
+  const source = new URLSearchParams(sourceSearch);
+
+  for (const [key, value] of source) {
+    if (CAMPAIGN_QUERY_KEYS.has(key) && value) {
+      destination.searchParams.set(key, value);
+    }
+  }
+
+  return destination.toString();
+}
+
 /**
  * The on-site launch route. It plays the entry transition, waits on real
  * initialization, then hands off to {@link getAppUrl}. Every "open YO Voice"
@@ -28,22 +58,35 @@ const APP_URL = resolveConfiguredAppUrl(process.env.NEXT_PUBLIC_APP_URL);
  * exactly one place, so the hand-off is consistent and never flashes white.
  */
 export const APP_ENTRY_PATH = "/app";
+export const ACCOUNT_ENTRY_PATH = "/account/profile";
+
+/**
+ * A launch intent must never be satisfied by authenticating on the marketing
+ * origin first. Firebase Auth persistence is origin-scoped, so a website
+ * session cannot authenticate the separate app.yovoice.app origin. Sending
+ * this intent straight to /app makes the application own the only login.
+ */
+export function isAppLaunchRedirect(
+  redirectParam: string | string[] | null | undefined,
+): boolean {
+  return typeof redirectParam === "string" && redirectParam === APP_ENTRY_PATH;
+}
 
 /**
  * `redirect` query param on /login, /register etc. Any same-site relative
  * path is honoured ("/download", "/app"); anything that isn't one
  * (protocol-relative "//host", absolute URLs) is rejected to avoid an open
- * redirect and falls back to the launch route, as does a missing param.
+ * redirect and falls back to the account portal, as does a missing param.
  *
  * Always returns a same-site path — callers can route it with the Next
  * router and never need a `location.href` branch.
  */
 export function resolveAuthRedirect(redirectParam: string | null): string {
-  if (!redirectParam) return APP_ENTRY_PATH;
+  if (!redirectParam) return ACCOUNT_ENTRY_PATH;
   if (redirectParam.startsWith("/") && !redirectParam.startsWith("//")) {
     return redirectParam;
   }
-  return APP_ENTRY_PATH;
+  return ACCOUNT_ENTRY_PATH;
 }
 
 /**

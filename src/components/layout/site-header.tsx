@@ -85,12 +85,8 @@ export function SiteHeader() {
               <Link href="/register" className="focus-ring rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[.04]">
                 Create account
               </Link>
-              {/* The web app is the product today — the header's primary
-                  action opens it (through sign-in, which returns here's
-                  visitor to the app). Downloads stay in the nav/footer as
-                  a secondary path until native builds actually ship. */}
               <Link
-                href="/login?redirect=/app"
+                href={APP_ENTRY_PATH}
                 className="premium-button focus-ring min-h-12 px-5"
               >
                 <span className="relative">Open YO Voice</span>
@@ -147,7 +143,7 @@ export function SiteHeader() {
                     Create account
                   </Link>
                 </div>
-                <Link href="/login?redirect=/app" onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
+                <Link href={APP_ENTRY_PATH} onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">
                   Open YO Voice
                 </Link>
               </>

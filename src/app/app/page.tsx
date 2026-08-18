@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { getAppUrl } from "@/lib/auth/auth-redirect";
+import { buildAppHandoffUrl, getAppUrl } from "@/lib/auth/auth-redirect";
 
 const APP_URL = getAppUrl();
 
@@ -13,7 +13,7 @@ const APP_URL = getAppUrl();
  */
 export default function AppEntryPage() {
   useEffect(() => {
-    window.location.replace(APP_URL);
+    window.location.replace(buildAppHandoffUrl(APP_URL, window.location.search));
   }, []);
 
   return (

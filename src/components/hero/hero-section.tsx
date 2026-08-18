@@ -8,7 +8,6 @@ import { CenterLogo } from "@/components/hero/center-logo";
 import { DeepSpaceBackground } from "@/components/hero/deep-space-background";
 import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
 import { HeroPromptRotator } from "@/components/hero/hero-prompt-rotator";
-import { useAuth } from "@/hooks/use-auth";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 import { LiveConversationCard } from "@/components/hero/live-conversation-card";
 import { LiveStats } from "@/components/hero/live-stats";
@@ -89,7 +88,6 @@ function useRotatingIndex(length: number, intervalMs: number) {
 export function HeroSection() {
   const activeIndex = useRotatingIndex(members.length, 6200);
   const activeMember = members[activeIndex];
-  const { user, loading: authLoading } = useAuth();
 
   return (
     <section className="relative overflow-hidden pt-28 sm:pt-36 lg:min-h-[calc(100svh-80px)] lg:pt-0">
@@ -144,13 +142,7 @@ export function HeroSection() {
             transition={{ duration: 0.55, delay: 0.32 }}
             className="mt-8 flex flex-col items-center gap-3.5 sm:flex-row lg:items-start"
           >
-            <HeroPrimaryCta
-              href={
-                authLoading || user
-                  ? APP_ENTRY_PATH
-                  : `/login?redirect=${APP_ENTRY_PATH}`
-              }
-            >
+            <HeroPrimaryCta href={APP_ENTRY_PATH}>
               Start talking
               <ArrowRight className="size-4" />
             </HeroPrimaryCta>

@@ -1,15 +1,26 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import { RegisterForm } from "@/components/auth/register-form";
 import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
+import { APP_ENTRY_PATH, isAppLaunchRedirect } from "@/lib/auth/auth-redirect";
 
 export const metadata: Metadata = {
   title: "Create your account",
 };
 
-export default function RegisterPage() {
+type RegisterPageProps = {
+  searchParams: Promise<{ redirect?: string | string[] }>;
+};
+
+export default async function RegisterPage({ searchParams }: RegisterPageProps) {
+  const params = await searchParams;
+  if (isAppLaunchRedirect(params.redirect)) {
+    redirect(APP_ENTRY_PATH);
+  }
+
   return (
     <>
       <h1 className="mt-8 text-center text-3xl font-bold">Join YO Voice</h1>
