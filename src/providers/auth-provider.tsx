@@ -29,6 +29,11 @@ import {
   resetPasswordActionCodeSettings,
   verifyEmailActionCodeSettings,
 } from "@/lib/auth/action-code-settings";
+import {
+  createFirebaseTotpSignInChallenge,
+  isMultiFactorRequiredError,
+  type EmailPasswordSignInResult,
+} from "@/lib/auth/totp-sign-in";
 
 // Matches the shape FriendService.ensureUserDocument() / PresenceService
 // write from the Flutter app — accounts created here need the same
@@ -53,7 +58,10 @@ async function ensureUserProfile(user: User, displayName: string) {
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<EmailPasswordSignInResult>;
   signUp: (
     email: string,
     password: string,
@@ -112,7 +120,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       signIn: async (email, password) => {
-        await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+        const auth = getFirebaseAuth();
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          return { status: "signed-in" };
+        } catch (error) {
+          if (!isMultiFactorRequiredError(error)) throw error;
+          return {
+            status: "totp-required",
+            challenge: createFirebaseTotpSignInChallenge(auth, error),
+          };
+        }
       },
       signUp: async (email, password, displayName) => {
         const credential = await createUserWithEmailAndPassword(

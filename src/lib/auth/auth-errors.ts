@@ -10,6 +10,12 @@ const MESSAGES: Record<string, string> = {
   "auth/invalid-action-code": "This link has already been used or is invalid. Request a new one.",
   "auth/expired-action-code": "This link has expired. Request a new one.",
   "auth/user-disabled": "This account has been disabled.",
+  "auth/invalid-verification-code": "That authenticator code is not valid. Try the current code.",
+  "auth/code-expired": "That authenticator code expired. Enter the new code from your app.",
+  "auth/session-expired": "This sign-in attempt expired. Return to password and sign in again.",
+  "auth/multi-factor-info-not-found": "That authenticator is no longer enrolled. Sign in again.",
+  "auth/unsupported-second-factor": "This account uses a second-factor method that is not supported on the website.",
+  "auth/invalid-totp-challenge": "Enter a valid 6-digit code for an authenticator enrolled on this account.",
 };
 
 export function getAuthErrorMessage(error: unknown): string {

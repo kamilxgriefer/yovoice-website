@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -19,12 +19,19 @@ import {
   isPremiumPlanId,
   premiumIncludedFeatures,
   premiumPlanChecklist,
-  premiumPlans,
+  premiumPlans as premiumPlanCopy,
+  type PremiumPlan,
   type PremiumPlanId,
 } from "@/config/premium";
 import { useAuth } from "@/hooks/use-auth";
 import { useEntitlements } from "@/hooks/use-entitlements";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
+import {
+  countryCodeFromLocale,
+  createPremiumCheckoutSession,
+  getPremiumBillingContext,
+  type PremiumBillingContext,
+} from "@/lib/premium/billing";
 
 /**
  * The /premium plans experience. One page, four states:
@@ -55,6 +62,8 @@ function PremiumPlansContent() {
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { entitlements, loading: entitlementsLoading } = useEntitlements();
+  const [billing, setBilling] = useState<PremiumBillingContext | null>(null);
+  const [billingError, setBillingError] = useState(false);
 
   // A plan carried through the login round-trip (?plan=...) selects
   // itself on arrival — the visitor never has to choose twice. Lazy
@@ -65,6 +74,21 @@ function PremiumPlansContent() {
       return isPremiumPlanId(fromUrl) ? fromUrl : null;
     },
   );
+
+  useEffect(() => {
+    let active = true;
+    getPremiumBillingContext(countryCodeFromLocale(navigator.language)).then(
+      (context) => {
+        if (active) setBilling(context);
+      },
+      () => {
+        if (active) setBillingError(true);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function choosePlan(plan: PremiumPlanId) {
     if (!user && !authLoading) {
@@ -83,6 +107,37 @@ function PremiumPlansContent() {
     return <PremiumActiveState />;
   }
 
+  if (!billing) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-5 text-center">
+        {billingError ? (
+          <>
+            <h1 className="text-2xl font-bold text-white">Local pricing is temporarily unavailable</h1>
+            <p className="mt-3 text-sm leading-6 text-white/65">Please check your connection and try again.</p>
+          </>
+        ) : (
+          <div className="size-9 animate-spin rounded-full border-2 border-white/15 border-t-fuchsia-400" aria-label="Loading local prices" />
+        )}
+      </div>
+    );
+  }
+
+  const displayPlans = billing.plans.map((localized) => {
+    const copy = premiumPlanCopy.find((plan) => plan.id === localized.id)!;
+    return {
+      ...copy,
+      price: localized.formattedPrice,
+      period: `/ ${localized.interval}`,
+      equivalent: localized.formattedEquivalent
+        ? `${localized.formattedEquivalent} / month`
+        : undefined,
+      savings:
+        localized.savingsPercent > 0
+          ? `Save ${localized.savingsPercent}%`
+          : undefined,
+    };
+  });
+
   return (
     <div className="relative mx-auto w-full max-w-[900px] px-5 pb-24 pt-14 sm:px-8 sm:pt-20">
       <div className="mx-auto max-w-xl text-center">
@@ -97,7 +152,7 @@ function PremiumPlansContent() {
       </div>
 
       <div className="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2">
-        {premiumPlans.map((plan) => (
+        {displayPlans.map((plan) => (
           <button
             key={plan.id}
             type="button"
@@ -125,6 +180,11 @@ function PremiumPlansContent() {
                 {plan.period}
               </span>
             </p>
+            {billing.localizedAtCheckout ? (
+              <p className="mt-2 text-xs leading-5 text-white/55">
+                Base price · final local currency at checkout
+              </p>
+            ) : null}
             {plan.equivalent ? (
               <p className="mt-2 text-sm text-white/50">{plan.equivalent}</p>
             ) : null}
@@ -154,7 +214,13 @@ function PremiumPlansContent() {
         ))}
       </div>
 
-      {selectedPlan ? <CheckoutBoundary plan={selectedPlan} /> : null}
+      {selectedPlan ? (
+        <CheckoutBoundary
+          plan={selectedPlan}
+          billing={billing}
+          displayPlans={displayPlans}
+        />
+      ) : null}
 
       <div id="included" className="mx-auto mt-16 max-w-xl scroll-mt-24">
         <h2 className="text-[15px] font-bold text-white">
@@ -184,13 +250,37 @@ function PremiumPlansContent() {
 
 const includedIcons = [UserRound, Crown, Sparkles, AudioLines, Sparkles];
 
-/**
- * The honest end of the web flow until a billing provider is configured.
- * No fake card form; the chosen plan is acknowledged and the visitor is
- * pointed at the real place Premium activates first.
- */
-function CheckoutBoundary({ plan }: { plan: PremiumPlanId }) {
-  const planConfig = premiumPlans.find((candidate) => candidate.id === plan);
+/** Stripe-hosted Checkout keeps payment details and final local pricing off-site. */
+function CheckoutBoundary({
+  plan,
+  billing,
+  displayPlans,
+}: {
+  plan: PremiumPlanId;
+  billing: PremiumBillingContext;
+  displayPlans: Array<
+    PremiumPlan & {
+      price: string;
+      period: string;
+      equivalent?: string;
+      savings?: string;
+    }
+  >;
+}) {
+  const planConfig = displayPlans.find((candidate) => candidate.id === plan);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function checkout() {
+    setBusy(true);
+    setError(null);
+    try {
+      window.location.assign(await createPremiumCheckoutSession(plan));
+    } catch {
+      setError("We couldn’t open checkout. Please try again.");
+      setBusy(false);
+    }
+  }
 
   return (
     <div
@@ -201,17 +291,17 @@ function CheckoutBoundary({ plan }: { plan: PremiumPlanId }) {
         {planConfig?.name} plan selected — {planConfig?.price}
         {planConfig?.period}
       </p>
-      <p className="mt-2 text-sm leading-6 text-white/50">
-        Web checkout isn&apos;t open yet. Premium purchases are launching
-        inside YO Voice first — your selection is ready and waiting.
-      </p>
+      <p className="mt-2 text-sm leading-6 text-white/60">{billing.taxNotice}</p>
+      {error ? <p role="alert" className="mt-3 text-sm text-rose-200">{error}</p> : null}
       <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
-        <Link
-          href={APP_ENTRY_PATH}
-          className="premium-button focus-ring min-h-12 inline-flex items-center justify-center px-6"
+        <button
+          type="button"
+          disabled={!billing.checkoutAvailable || busy}
+          onClick={() => void checkout()}
+          className="premium-button focus-ring min-h-12 inline-flex items-center justify-center px-6 disabled:opacity-50"
         >
-          Open YO Voice
-        </Link>
+          {busy ? "Opening secure checkout…" : "Continue to checkout"}
+        </button>
         <Link
           href="/download"
           className="focus-ring inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"
@@ -271,7 +361,7 @@ function PremiumActiveState() {
           Open YO Voice
         </Link>
         <Link
-          href="/account/profile"
+          href="/premium/manage"
           className="focus-ring inline-flex min-h-13 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"
         >
           Manage subscription

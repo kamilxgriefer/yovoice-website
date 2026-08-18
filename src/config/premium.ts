@@ -11,10 +11,6 @@ export type PremiumPlanId = "monthly" | "yearly";
 export type PremiumPlan = {
   id: PremiumPlanId;
   name: string;
-  price: string;
-  period: string;
-  equivalent?: string;
-  savings?: string;
   highlight: boolean;
   cta: string;
 };
@@ -23,18 +19,12 @@ export const premiumPlans: PremiumPlan[] = [
   {
     id: "monthly",
     name: "Monthly",
-    price: "€9.99",
-    period: "/ month",
     highlight: false,
     cta: "Choose monthly",
   },
   {
     id: "yearly",
     name: "Yearly",
-    price: "€89.99",
-    period: "/ year",
-    equivalent: "≈ €7.50 / month",
-    savings: "Save about 25%",
     highlight: true,
     cta: "Choose yearly",
   },

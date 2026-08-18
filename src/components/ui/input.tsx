@@ -1,6 +1,6 @@
 "use client";
 
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode, Ref } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils/cn";
@@ -21,12 +21,14 @@ export function Input({
   icon,
   state = "default",
   errorMessage,
+  inputRef,
   className,
   ...rest
 }: {
   icon?: ReactNode;
   state?: State;
   errorMessage?: string;
+  inputRef?: Ref<HTMLInputElement>;
   className?: string;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "className">) {
   const statusIcon =
@@ -48,6 +50,7 @@ export function Input({
           </span>
         ) : null}
         <input
+          ref={inputRef}
           className={cn("glass-field__input", className)}
           aria-invalid={state === "error"}
           {...rest}

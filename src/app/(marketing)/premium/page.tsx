@@ -5,7 +5,7 @@ import { PremiumPlansView } from "@/components/premium/premium-plans-view";
 export const metadata: Metadata = {
   title: "YO Voice Premium — Creator, Clubs and more",
   description:
-    "Go Premium on YO Voice: become a Creator, build your own Clubs and stand out with a premium identity. €9.99 monthly or €89.99 yearly.",
+    "Go Premium on YO Voice: become a Creator, build your own Clubs and see your final local currency securely at checkout.",
 };
 
 export default function PremiumPage() {

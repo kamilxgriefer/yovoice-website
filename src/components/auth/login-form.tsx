@@ -10,6 +10,8 @@ import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
 import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TotpChallengeForm } from "@/components/auth/totp-challenge-form";
+import type { TotpSignInChallenge } from "@/lib/auth/totp-sign-in";
 
 export function LoginForm() {
   const { signIn } = useAuth();
@@ -20,21 +22,46 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [totpChallenge, setTotpChallenge] =
+    useState<TotpSignInChallenge | null>(null);
+
+  function finishSignIn() {
+    router.replace(resolveAuthRedirect(searchParams.get("redirect")));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      await signIn(email, password);
+      const result = await signIn(email, password);
+      if (result.status === "totp-required") {
+        setTotpChallenge(result.challenge);
+        setPassword("");
+        setSubmitting(false);
+        return;
+      }
       // replace, not push: a completed login shouldn't sit in history behind
       // the destination, or Back lands on this form and RedirectIfAuthenticated
       // immediately throws the user forward again.
-      router.replace(resolveAuthRedirect(searchParams.get("redirect")));
+      finishSignIn();
     } catch (err) {
       setError(getAuthErrorMessage(err));
       setSubmitting(false);
     }
+  }
+
+  if (totpChallenge) {
+    return (
+      <TotpChallengeForm
+        challenge={totpChallenge}
+        onCancel={() => {
+          setTotpChallenge(null);
+          setError(null);
+        }}
+        onComplete={finishSignIn}
+      />
+    );
   }
 
   return (
