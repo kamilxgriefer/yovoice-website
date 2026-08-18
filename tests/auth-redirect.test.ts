@@ -61,6 +61,20 @@ describe("application URL", () => {
     assert.equal(resolveAuthRedirect("/premium/manage"), "/premium/manage");
   });
 
+  test("rejects same-origin-looking paths that browsers resolve off-site", () => {
+    // "/\evil.com" — backslash is normalized to "/" by http(s) URL parsing,
+    // so the client router would hard-navigate to https://evil.com.
+    assert.equal(resolveAuthRedirect("/\\evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("/\\t/evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("//evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("/%5Cevil.com"), "/%5Cevil.com");
+    // Deep same-site paths with queries stay honoured.
+    assert.equal(
+      resolveAuthRedirect("/download?utm_source=mail"),
+      "/download?utm_source=mail",
+    );
+  });
+
   test("recognizes a legacy app redirect so website auth can be skipped", () => {
     assert.equal(isAppLaunchRedirect(APP_ENTRY_PATH), true);
     assert.equal(isAppLaunchRedirect([APP_ENTRY_PATH]), false);

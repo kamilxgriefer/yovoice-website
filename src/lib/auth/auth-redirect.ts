@@ -83,8 +83,24 @@ export function isAppLaunchRedirect(
  */
 export function resolveAuthRedirect(redirectParam: string | null): string {
   if (!redirectParam) return ACCOUNT_ENTRY_PATH;
+  // A prefix check alone is not enough: browsers normalize backslashes in
+  // http(s) URLs, so "/\evil.com" resolves off-site even though it starts
+  // with a single "/". Parse against a fixed base and require that the
+  // candidate stays on that origin and still reads back as a plain path.
   if (redirectParam.startsWith("/") && !redirectParam.startsWith("//")) {
-    return redirectParam;
+    let resolved: URL;
+    try {
+      resolved = new URL(redirectParam, "https://relative.invalid");
+    } catch {
+      return ACCOUNT_ENTRY_PATH;
+    }
+    if (
+      resolved.origin === "https://relative.invalid" &&
+      !redirectParam.includes("\\") &&
+      resolved.pathname.startsWith("/")
+    ) {
+      return redirectParam;
+    }
   }
   return ACCOUNT_ENTRY_PATH;
 }
