@@ -39,7 +39,7 @@ export function SiteFooter() {
             {[
               [Code2,"https://github.com/kamilxgriefer","GitHub"],
               [BriefcaseBusiness,"https://www.linkedin.com/","LinkedIn"],
-              [Camera,"https://www.instagram.com/","Instagram"],
+              [Camera,"https://www.instagram.com/yovoice.app/","Instagram"],
               [Mail,"mailto:hello@yovoice.app","Email"],
             ].map(([Icon,href,label]) => {
               const Comp = Icon as typeof Code2;
