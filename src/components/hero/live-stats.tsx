@@ -8,11 +8,20 @@ import { usePublicStats } from "@/hooks/use-public-stats";
 // string literal — nobody was talking, and on a pre-launch product the real
 // figure was usually zero. This reads the only publicly readable document in
 // the project, `publicStats/live`, which a scheduled Cloud Function writes
-// through the Admin SDK from real count() aggregates and real voice sessions.
+// through the Admin SDK from real count() aggregates. It reads no voice
+// sessions: there is no honest live-presence figure yet, so none is published.
 //
 // Nothing here invents, rounds up, or holds a stale value forward. When a
 // number is not available, or not yet true enough to mean anything, the line
 // simply is not rendered — an absent claim beats a comfortable one.
+//
+// THE WORDING IS PART OF THE HONESTY, NOT DECORATION. This line first shipped
+// as "18 people are here", which states PRESENCE — and `activeAccounts` does
+// not measure presence, it measures how many usable accounts exist. On a
+// pre-launch product with nobody signed in, "people are here" was a softer
+// version of the same lie as "2,481 people talking right now". It says
+// "accounts" now, matching the verified-totals section lower down the page,
+// which already described the same figure as "accounts that currently exist".
 
 // Field names match what the publisher actually writes, and the names are
 // deliberate. Neither says "created": neither is a lifetime counter and both
@@ -50,8 +59,7 @@ export function LiveStats() {
     >
       {showAccounts && (
         <span>
-          {format(accounts)}{" "}
-          {accounts === 1 ? "person is here" : "people are here"}
+          {format(accounts)} {accounts === 1 ? "account" : "accounts"}
         </span>
       )}
 
