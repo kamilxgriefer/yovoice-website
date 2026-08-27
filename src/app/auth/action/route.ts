@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { resolveAuthActionDestination } from "@/lib/auth/auth-action-routing";
 import { safeContinueUrl } from "@/lib/auth/safe-continue-url";
 
 /**
@@ -23,54 +24,13 @@ import { safeContinueUrl } from "@/lib/auth/safe-continue-url";
  */
 export function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
-  const mode = params.get("mode");
-  const oobCode = params.get("oobCode");
-  const continueUrl = safeContinueUrl(params.get("continueUrl"));
-  const lang = params.get("lang");
+  const destination = resolveAuthActionDestination({
+    origin: request.nextUrl.origin,
+    mode: params.get("mode"),
+    oobCode: params.get("oobCode"),
+    safeContinueUrl: safeContinueUrl(params.get("continueUrl")),
+    lang: params.get("lang"),
+  });
 
-  const destination = (path: string) => {
-    const url = new URL(path, request.nextUrl.origin);
-    if (oobCode) url.searchParams.set("oobCode", oobCode);
-    if (continueUrl) url.searchParams.set("continueUrl", continueUrl);
-    if (lang && /^[a-zA-Z-]{2,10}$/.test(lang)) {
-      url.searchParams.set("lang", lang);
-    }
-    return url;
-  };
-
-  // Without a code there is nothing to act on — send the visitor somewhere
-  // useful instead of a dead end (people do open these links twice, strip
-  // query strings when copy-pasting, etc.).
-  if (!oobCode) {
-    return NextResponse.redirect(
-      new URL("/login", request.nextUrl.origin),
-      307,
-    );
-  }
-
-  switch (mode) {
-    case "resetPassword":
-      return NextResponse.redirect(destination("/reset-password"), 307);
-    case "verifyEmail": {
-      const url = destination("/verify-email");
-      // The verify-email page's direct-link branch keys on mode+oobCode.
-      url.searchParams.set("mode", "verifyEmail");
-      return NextResponse.redirect(url, 307);
-    }
-    // recoverEmail: sent to the OLD address when an account email is
-    // changed, so the owner can revert a hijack. verifyAndChangeEmail:
-    // sent to the NEW address to confirm an email change. Same handler —
-    // both are applyActionCode flows with different copy.
-    case "recoverEmail":
-    case "verifyAndChangeEmail": {
-      const url = destination("/recover-email");
-      url.searchParams.set("mode", mode);
-      return NextResponse.redirect(url, 307);
-    }
-    default:
-      return NextResponse.redirect(
-        new URL("/login", request.nextUrl.origin),
-        307,
-      );
-  }
+  return NextResponse.redirect(destination, 307);
 }

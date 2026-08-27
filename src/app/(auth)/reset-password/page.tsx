@@ -17,6 +17,10 @@ import {
 } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import {
+  passwordResetPhaseForError,
+  type PasswordResetPhase,
+} from "@/lib/auth/password-reset-flow";
 import { safeContinueUrl } from "@/lib/auth/safe-continue-url";
 import { getFirebaseAuth } from "@/lib/firebase/config";
 
@@ -39,13 +43,6 @@ export default function ResetPasswordPage() {
     </Suspense>
   );
 }
-
-type Phase =
-  | { name: "verifying" }
-  | { name: "ready"; email: string }
-  | { name: "success" }
-  | { name: "link-invalid"; title: string; body: string }
-  | { name: "network-error" };
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
@@ -90,7 +87,9 @@ function ResetPasswordFlow({
   oobCode: string;
   continueUrl: string | null;
 }) {
-  const [phase, setPhase] = useState<Phase>({ name: "verifying" });
+  const [phase, setPhase] = useState<PasswordResetPhase>({
+    name: "verifying",
+  });
   const [verifyAttempt, setVerifyAttempt] = useState(0);
 
   useEffect(() => {
@@ -101,7 +100,7 @@ function ResetPasswordFlow({
         if (!cancelled) setPhase({ name: "ready", email });
       } catch (error) {
         if (cancelled) return;
-        setPhase(phaseForVerifyError(error));
+        setPhase(passwordResetPhaseForError(error));
       }
     })();
     return () => {
@@ -182,52 +181,6 @@ function ResetPasswordFlow({
   }
 }
 
-/**
- * Maps a verifyPasswordResetCode failure onto a user-facing phase.
- * Expired, already-used/invalid, and disabled-account codes each get their
- * own copy; raw Firebase error text never reaches the page.
- */
-function phaseForVerifyError(error: unknown): Phase {
-  const code = (error as { code?: string } | null)?.code;
-  switch (code) {
-    case "auth/expired-action-code":
-      return {
-        name: "link-invalid",
-        title: "This link has expired",
-        body:
-          "Password reset links are temporary for your security. Request a new one and we'll send it to your email.",
-      };
-    case "auth/invalid-action-code":
-      return {
-        name: "link-invalid",
-        title: "This link is no longer valid",
-        body:
-          "It may have already been used, or it was copied incompletely. Request a fresh link and try again.",
-      };
-    case "auth/user-disabled":
-      return {
-        name: "link-invalid",
-        title: "Account unavailable",
-        body:
-          "This account has been disabled. Contact support if you think that's a mistake.",
-      };
-    case "auth/user-not-found":
-      return {
-        name: "link-invalid",
-        title: "This link is no longer valid",
-        body: "Request a fresh reset link and try again.",
-      };
-    case "auth/network-request-failed":
-      return { name: "network-error" };
-    default:
-      return {
-        name: "link-invalid",
-        title: "Something went wrong",
-        body: "We couldn't check this link. Request a new one and try again.",
-      };
-  }
-}
-
 function NewPasswordForm({
   oobCode,
   email,
@@ -237,7 +190,7 @@ function NewPasswordForm({
   oobCode: string;
   email: string;
   onSuccess: () => void;
-  onLinkInvalid: (phase: Phase) => void;
+  onLinkInvalid: (phase: PasswordResetPhase) => void;
 }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -268,7 +221,7 @@ function NewPasswordForm({
         code === "auth/user-disabled" ||
         code === "auth/user-not-found"
       ) {
-        onLinkInvalid(phaseForVerifyError(error));
+        onLinkInvalid(passwordResetPhaseForError(error));
         return;
       }
       setSubmitError(getAuthErrorMessage(error));
