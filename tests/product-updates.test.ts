@@ -53,30 +53,37 @@ describe("product update ledger", () => {
     assert.match(premium.highlights.join(" "), /PLN 260 for 365 days/);
   });
 
-  test("keeps mobile build 7 rollout truthful for each store", () => {
-    const ios = productUpdates.find(
-      (update) => update.slug === "ios-build-7-processing",
+  test("keeps mobile build 8 rollout truthful for each store", () => {
+    const mobile = productUpdates.find(
+      (update) => update.slug === "mobile-build-8-testing",
     );
     const android = productUpdates.find(
       (update) => update.slug === "android-adaptive-icon",
     );
 
-    assert.ok(ios);
-    assert.equal(ios.status, "verification");
-    assert.equal(ios.updatedOn, "2026-08-28");
-    assert.match(ios.summary, /1\.0\.0 build 7/);
-    assert.match(ios.summary, /source commit 9a92072/);
-    assert.match(ios.summary, /August 28 at 13:34 CEST/);
-    assert.match(ios.summary, /processing/i);
-    assert.match(ios.summary, /not yet confirmed as available to testers/i);
-    assert.match(ios.highlights.join(" "), /availability has not yet been confirmed/i);
+    assert.ok(mobile);
+    assert.equal(mobile.status, "testing");
+    assert.equal(mobile.updatedOn, "2026-08-28");
+    assert.match(mobile.summary, /1\.0\.0 build 8/);
+    assert.match(mobile.summary, /source commit 5f61c71/);
+    assert.match(mobile.summary, /Google Play Internal Testing/);
+    assert.match(mobile.summary, /TestFlight/);
+    assert.match(mobile.highlights.join(" "), /passed export compliance/i);
+    assert.match(mobile.highlights.join(" "), /persistent tester groups/i);
 
     assert.ok(android);
     assert.equal(android.status, "testing");
-    assert.match(android.summary, /remains active and available on Google Play Internal Testing/i);
-    assert.match(android.summary, /No newer mobile client code has landed since this build/i);
+    assert.match(android.summary, /Build 8 is active on Google Play Internal Testing/i);
     assert.match(android.highlights.join(" "), /existing opt-in/i);
     assert.match(android.highlights.join(" "), /correct Google Account/i);
+
+    const moderatorPreview = productUpdates.find(
+      (update) => update.slug === "moderator-premium-preview",
+    );
+    assert.ok(moderatorPreview);
+    assert.equal(moderatorPreview.status, "testing");
+    assert.match(moderatorPreview.summary, /without creating a subscription/i);
+    assert.match(moderatorPreview.highlights.join(" "), /No plan, renewal, payment provider or paid entitlement/i);
 
     assert.doesNotMatch(JSON.stringify(productUpdates), /\b[^\s@]+@[^\s@]+\b/);
   });

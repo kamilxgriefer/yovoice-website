@@ -23,17 +23,31 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
-    slug: "ios-build-7-processing",
+    slug: "mobile-build-8-testing",
     updatedOn: "2026-08-28",
-    status: "verification",
-    eyebrow: "iOS",
-    title: "iOS build 7 has reached App Store Connect",
+    status: "testing",
+    eyebrow: "Mobile",
+    title: "Build 8 is available to Android and iOS testers",
     summary:
-      "YO Voice 1.0.0 build 7, built from source commit 9a92072, was accepted by App Store Connect on August 28 at 13:34 CEST and is processing. It is not yet confirmed as available to testers.",
+      "YO Voice 1.0.0 build 8, built from source commit 5f61c71, is available on Google Play Internal Testing and TestFlight. It replaces the iOS builds that stopped at export-compliance verification.",
     highlights: [
-      "App Store Connect accepted iOS build 7 (1.0.0)",
-      "Source commit: 9a92072",
-      "Tester-group availability has not yet been confirmed",
+      "Android build 8 is published to the persistent internal-testing list",
+      "iOS build 8 passed export compliance and is attached to persistent tester groups",
+      "Source commit: 5f61c71; existing testers update through Google Play or TestFlight",
+    ],
+  },
+  {
+    slug: "moderator-premium-preview",
+    updatedOn: "2026-08-28",
+    status: "testing",
+    eyebrow: "Premium",
+    title: "Moderators can test the complete Premium experience",
+    summary:
+      "Active moderators and super moderators now receive a revocable Premium product preview for Creator and Clubs without creating a subscription or changing billing records.",
+    highlights: [
+      "Premium identity, Creator and the three-Club limit are available to both moderator tiers",
+      "Claim and server-role checks fail closed during promotion or demotion",
+      "No plan, renewal, payment provider or paid entitlement is fabricated",
     ],
   },
   {
@@ -61,7 +75,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     highlights: [
       "Google and Apple are available from both Login and Registration",
       "A delayed profile shows clear Retry or Sign out actions",
-      "Live on web; Android build 7 is internal; iOS build 7 is processing",
+      "Live on web and included in Android and iOS build 8 testing",
     ],
   },
   {
@@ -71,7 +85,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Android",
     title: "The Android launcher icon has more breathing room",
     summary:
-      "Build 7 remains active and available on Google Play Internal Testing and keeps the complete YO mark inside Android's adaptive safe area. No newer mobile client code has landed since this build.",
+      "Build 8 is active on Google Play Internal Testing and keeps the complete YO mark inside Android's adaptive safe area.",
     highlights: [
       "Safer spacing for circle, squircle and rounded-square launcher masks",
       "Join through the existing opt-in using the correct Google Account",
@@ -89,7 +103,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     highlights: [
       "Answer, decline, cancel and end states with private short-lived voice access",
       "Fast local mute and a useful missed-call notification after timeout",
-      "Web and backend are live; Android is internal; iOS is processing",
+      "Web and backend are live; Android and iOS build 8 are in tester distribution",
     ],
   },
   {
@@ -159,7 +173,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     highlights: [
       "One restrained cue family across the app's everyday events",
       "Incoming calls remain distinct from ordinary notifications",
-      "Web and Android internal delivery are complete; listening checks continue",
+      "Web plus Android and iOS build 8 delivery are complete; listening checks continue",
     ],
   },
   {
