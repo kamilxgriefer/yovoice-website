@@ -125,7 +125,9 @@ export function HeroSection() {
             className="mt-5 font-[family-name:var(--font-display)] text-[2.65rem] font-bold leading-[1.01] tracking-[-0.04em] text-white sm:text-7xl lg:text-[3.55rem] xl:text-[4.5rem]"
           >
             <span className="block">Stop scrolling.</span>
-            <span className="text-gradient mt-1 block">Start talking.</span>
+            <span className="text-gradient text-gradient-descender-safe mt-1 block">
+              Start talking.
+            </span>
           </motion.h1>
 
           <motion.div

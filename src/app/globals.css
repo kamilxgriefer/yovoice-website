@@ -58,6 +58,13 @@ img { user-select: none; -webkit-user-drag: none; }
   -webkit-background-clip: text;
   color: transparent;
 }
+/* A tight display line can let glyph descenders extend beyond the element's
+   background-painting box. Reserve paint space for letters such as g/y/p,
+   then cancel that space in layout so the hero rhythm does not move. */
+.text-gradient-descender-safe {
+  margin-bottom: -.12em;
+  padding-bottom: .12em;
+}
 .glass-panel {
   position: relative;
   border: 1px solid rgba(255,255,255,.1);
