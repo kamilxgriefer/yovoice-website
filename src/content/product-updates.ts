@@ -23,6 +23,20 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "ios-build-7-processing",
+    updatedOn: "2026-08-28",
+    status: "verification",
+    eyebrow: "iOS",
+    title: "iOS build 7 has reached App Store Connect",
+    summary:
+      "YO Voice 1.0.0 build 7, built from source commit 9a92072, was accepted by App Store Connect on August 28 at 13:34 CEST and is processing. It is not yet confirmed as available to testers.",
+    highlights: [
+      "App Store Connect accepted iOS build 7 (1.0.0)",
+      "Source commit: 9a92072",
+      "Tester-group availability has not yet been confirmed",
+    ],
+  },
+  {
     slug: "premium-plan-chooser",
     updatedOn: "2026-08-28",
     status: "verification",
@@ -47,7 +61,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     highlights: [
       "Google and Apple are available from both Login and Registration",
       "A delayed profile shows clear Retry or Sign out actions",
-      "Live on web; Android build 7 is internal; iOS build 6 is processing",
+      "Live on web; Android build 7 is internal; iOS build 7 is processing",
     ],
   },
   {
@@ -57,10 +71,10 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Android",
     title: "The Android launcher icon has more breathing room",
     summary:
-      "Build 7 keeps the complete YO mark inside Android's adaptive safe area without changing the artwork used by iOS and the App Store.",
+      "Build 7 remains active and available on Google Play Internal Testing and keeps the complete YO mark inside Android's adaptive safe area. No newer mobile client code has landed since this build.",
     highlights: [
       "Safer spacing for circle, squircle and rounded-square launcher masks",
-      "Available through Google Play Internal Testing",
+      "Join through the existing opt-in using the correct Google Account",
       "Update and fresh-install device checks remain in tester acceptance",
     ],
   },

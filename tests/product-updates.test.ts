@@ -52,4 +52,32 @@ describe("product update ledger", () => {
     assert.match(premium.highlights.join(" "), /PLN 26 for 30 days/);
     assert.match(premium.highlights.join(" "), /PLN 260 for 365 days/);
   });
+
+  test("keeps mobile build 7 rollout truthful for each store", () => {
+    const ios = productUpdates.find(
+      (update) => update.slug === "ios-build-7-processing",
+    );
+    const android = productUpdates.find(
+      (update) => update.slug === "android-adaptive-icon",
+    );
+
+    assert.ok(ios);
+    assert.equal(ios.status, "verification");
+    assert.equal(ios.updatedOn, "2026-08-28");
+    assert.match(ios.summary, /1\.0\.0 build 7/);
+    assert.match(ios.summary, /source commit 9a92072/);
+    assert.match(ios.summary, /August 28 at 13:34 CEST/);
+    assert.match(ios.summary, /processing/i);
+    assert.match(ios.summary, /not yet confirmed as available to testers/i);
+    assert.match(ios.highlights.join(" "), /availability has not yet been confirmed/i);
+
+    assert.ok(android);
+    assert.equal(android.status, "testing");
+    assert.match(android.summary, /remains active and available on Google Play Internal Testing/i);
+    assert.match(android.summary, /No newer mobile client code has landed since this build/i);
+    assert.match(android.highlights.join(" "), /existing opt-in/i);
+    assert.match(android.highlights.join(" "), /correct Google Account/i);
+
+    assert.doesNotMatch(JSON.stringify(productUpdates), /\b[^\s@]+@[^\s@]+\b/);
+  });
 });
