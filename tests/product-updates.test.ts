@@ -36,4 +36,20 @@ describe("product update ledger", () => {
       assert.ok(update.highlights.every((highlight) => highlight.trim()), update.slug);
     }
   });
+
+  test("keeps Premium sandbox verification behind the live checkout boundary", () => {
+    const premium = productUpdates.find(
+      (update) => update.slug === "premium-plan-chooser",
+    );
+
+    assert.ok(premium);
+    assert.equal(premium.status, "verification");
+    assert.match(premium.summary, /sandbox/i);
+    assert.match(premium.summary, /without completing a payment/i);
+    assert.match(premium.summary, /live checkout remains disabled/i);
+    assert.match(premium.highlights.join(" "), /€6 monthly/);
+    assert.match(premium.highlights.join(" "), /€60 yearly/);
+    assert.match(premium.highlights.join(" "), /PLN 26 for 30 days/);
+    assert.match(premium.highlights.join(" "), /PLN 260 for 365 days/);
+  });
 });

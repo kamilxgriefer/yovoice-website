@@ -25,15 +25,15 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "premium-plan-chooser",
     updatedOn: "2026-08-28",
-    status: "live",
+    status: "verification",
     eyebrow: "Premium",
-    title: "Premium plans are visible again",
+    title: "Premium checkout has passed sandbox verification",
     summary:
-      "The live Premium page now shows the restored monthly and annual offers plus their supported payment choices, while checkout stays safely locked until Stripe production activation is complete.",
+      "Stripe's sandbox now has the YO Voice Premium product and all four intended prices. Card, PayPal and BLIK Checkout paths were verified without completing a payment; live checkout remains disabled while seller activation and production configuration are completed.",
     highlights: [
-      "€6 monthly or €60 yearly — €5 per month and two months free annually",
-      "Recurring card or PayPal, plus non-renewing BLIK prepaid choices",
-      "Catalog is live; payment submission remains disabled until every live provider gate passes",
+      "Recurring: €6 monthly or €60 yearly, payable by card or PayPal",
+      "Prepaid BLIK: PLN 26 for 30 days or PLN 260 for 365 days, with no renewal",
+      "Sandbox paths are verified without a payment; live checkout remains disabled",
     ],
   },
   {
