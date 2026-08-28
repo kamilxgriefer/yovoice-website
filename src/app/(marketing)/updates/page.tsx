@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Clock3, FlaskConical } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  FlaskConical,
+  TestTube2,
+} from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
 import {
@@ -24,15 +30,21 @@ const statusPresentation: Record<
     className: "border-emerald-300/25 bg-emerald-400/10 text-emerald-200",
     icon: CheckCircle2,
   },
+  testing: {
+    label: "In testing",
+    description: "Available; final acceptance continues",
+    className: "border-sky-300/25 bg-sky-400/10 text-sky-100",
+    icon: TestTube2,
+  },
   ready: {
     label: "Ready for rollout",
-    description: "Built and release-tested, not represented as live yet",
+    description: "Built and release-tested",
     className: "border-amber-300/25 bg-amber-400/10 text-amber-100",
     icon: Clock3,
   },
   verification: {
     label: "In verification",
-    description: "Still behind the production release boundary",
+    description: "Still behind the release boundary",
     className: "border-fuchsia-300/25 bg-fuchsia-400/10 text-fuchsia-100",
     icon: FlaskConical,
   },
@@ -44,7 +56,7 @@ export default function UpdatesPage() {
       <PageHero
         eyebrow="Updates"
         title="Release progress, without the guesswork"
-        description="See what is being verified, what is ready for rollout, and what has been independently confirmed live."
+        description="See what is being verified, what has reached testing, what is ready for rollout, and what has been independently confirmed live."
       />
 
       <section className="px-5 pb-28 sm:px-8" aria-labelledby="updates-heading">
@@ -53,21 +65,24 @@ export default function UpdatesPage() {
             YO Voice product updates
           </h2>
 
-          <div className="grid gap-3 sm:grid-cols-3" aria-label="Release status legend">
+          <ul
+            className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 xl:grid-cols-4"
+            aria-label="Release status legend"
+          >
             {(Object.keys(statusPresentation) as ProductUpdateStatus[]).map((status) => {
               const item = statusPresentation[status];
               const Icon = item.icon;
               return (
-                <div key={status} className="rounded-2xl border border-white/8 bg-white/[.025] p-4">
+                <li key={status} className="rounded-2xl border border-white/8 bg-white/[.025] p-4">
                   <div className="flex items-center gap-2 text-sm font-bold text-white">
                     <Icon className="size-4 text-fuchsia-200" aria-hidden="true" />
                     {item.label}
                   </div>
                   <p className="mt-1 text-xs leading-5 text-white/60">{item.description}</p>
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ul>
 
           <ol className="mt-8 space-y-5">
             {productUpdates.map((update) => {
