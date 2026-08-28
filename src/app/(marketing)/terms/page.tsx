@@ -110,8 +110,41 @@ const sections: LegalSection[] = [
     ),
   },
   {
+    id: "premium-payments",
+    title: "7. Premium and payments",
+    body: (
+      <>
+        <p>
+          Where Premium checkout is available, Stripe provides the hosted
+          checkout and shows the payment method and amount before you confirm.
+          Payment-method availability can depend on your location and the
+          payment provider.
+        </p>
+        <p>
+          <strong>Recurring card or PayPal plans.</strong> The monthly plan is
+          EUR 6 per month and the annual plan is EUR 60 per year. These plans
+          renew automatically using the selected card or PayPal account until
+          you cancel. You can cancel through the Premium billing-management
+          link. Cancellation stops the next renewal; Premium remains available
+          until the end of the period you already paid for.
+        </p>
+        <p>
+          <strong>Prepaid BLIK plans.</strong> A PLN 26 BLIK payment provides
+          30 days of Premium and a PLN 260 BLIK payment provides 365 days.
+          Each is a one-time payment: it does not renew automatically and does
+          not authorize a future charge. To continue after the displayed end
+          date, you must choose and pay for a new term.
+        </p>
+        <p>
+          Your Premium screen shows the current plan, renewal behavior and paid
+          access end date.
+        </p>
+      </>
+    ),
+  },
+  {
     id: "termination",
-    title: "7. Termination",
+    title: "8. Termination",
     body: (
       <p>
         You can delete your account at any time from your account settings.
@@ -124,7 +157,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "disclaimer",
-    title: "8. Disclaimers and limitation of liability",
+    title: "9. Disclaimers and limitation of liability",
     body: (
       <p>
         YO Voice is provided &quot;as is&quot; without warranties of any
@@ -137,7 +170,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "changes",
-    title: "9. Changes to these terms",
+    title: "10. Changes to these terms",
     body: (
       <p>
         We may update these Terms as the product evolves. We&apos;ll update
@@ -149,7 +182,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "contact",
-    title: "10. Contact us",
+    title: "11. Contact us",
     body: (
       <p>
         Questions about these Terms? Email{" "}
@@ -168,7 +201,7 @@ export default function TermsPage() {
         description="The rules that keep YO Voice fair, safe and usable for everyone."
       />
       <LegalDocument
-        updatedOn="August 5, 2026"
+        updatedOn="August 28, 2026"
         intro="These Terms apply to yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

@@ -1,80 +1,73 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, CreditCard, RefreshCw, ShieldCheck } from "lucide-react";
 
 import { PremiumBadge } from "@/components/premium/premium-badge";
-import { useEntitlements } from "@/hooks/use-entitlements";
+import { useAccountCapabilityGuard } from "@/hooks/use-account-capability-guard";
 import { useAuth } from "@/hooks/use-auth";
+import { friendlyBillingError } from "@/lib/premium/billing-errors";
 import {
   countryCodeFromLocale,
-  createPremiumCheckoutSession,
   createPremiumPortalSession,
   getPremiumBillingContext,
-  type BillingPlanId,
-  type PremiumBillingContext,
 } from "@/lib/premium/billing";
-
-function friendlyBillingError(error: unknown, action: "checkout" | "portal") {
-  const reason =
-    typeof error === "object" && error !== null && "details" in error
-      ? (error as { details?: { reason?: unknown } }).details?.reason
-      : null;
-  if (reason === "billing-managed-elsewhere") {
-    return "This subscription is managed by your app store. Open its subscription settings to make changes.";
-  }
-  if (reason === "stripe-customer-missing") {
-    return "We couldn’t find a billing profile for this subscription. Contact support if this keeps happening.";
-  }
-  if (reason === "billing-not-configured") {
-    return "Billing is temporarily unavailable. Please try again later.";
-  }
-  if (reason === "stripe-subscription-exists") {
-    return "You already have a web subscription. Open subscription management to change it.";
-  }
-  if (reason === "checkout-in-progress") {
-    return "A checkout is already in progress. Finish it or try again in a moment.";
-  }
-  return action === "portal"
-    ? "We couldn’t open subscription management. Please try again."
-    : "We couldn’t open checkout. Please try again.";
-}
+import {
+  billingContextForAccount,
+  billingContextResolvedForAccount,
+  type AccountScopedBillingContext,
+} from "@/lib/premium/billing-contract";
 
 export function PremiumManageView() {
   const { user, loading: authLoading } = useAuth();
-  const { entitlements, loading: entitlementsLoading } = useEntitlements();
-  const [billing, setBilling] = useState<PremiumBillingContext | null>(null);
+  const [billingSnapshot, setBillingSnapshot] =
+    useState<AccountScopedBillingContext | null>(null);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState<BillingPlanId | "portal" | null>(null);
+  const [busy, setBusy] = useState<"portal" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const load = useCallback(async () => {
+  const accountIdentity = authLoading ? undefined : (user?.uid ?? null);
+  const billing =
+    accountIdentity === undefined
+      ? null
+      : billingContextForAccount(billingSnapshot, accountIdentity);
+  const billingResolved =
+    accountIdentity !== undefined &&
+    billingContextResolvedForAccount(billingSnapshot, accountIdentity);
+  const capabilityGuard = useAccountCapabilityGuard(accountIdentity);
+  const portalInFlightRef = useRef(false);
+
+  const load = useCallback(() => {
     setLoading(true);
+    setBillingSnapshot(null);
     setError(null);
-    try {
-      const countryCode = countryCodeFromLocale(navigator.language);
-      setBilling(await getPremiumBillingContext(countryCode));
-    } catch {
-      setBilling(null);
-      setError("We couldn’t load plan pricing. Check your connection and try again.");
-    } finally {
-      setLoading(false);
-    }
+    setReloadKey((value) => value + 1);
   }, []);
 
   useEffect(() => {
+    if (authLoading) return;
     let active = true;
+    const requestedIdentity = user?.uid ?? null;
     getPremiumBillingContext(countryCodeFromLocale(navigator.language)).then(
       (context) => {
         if (active) {
-          setBilling(context);
+          setBillingSnapshot({
+            accountIdentity: requestedIdentity,
+            context,
+          });
+          setError(null);
           setLoading(false);
         }
       },
-      () => {
+      (caught) => {
         if (active) {
-          setError("We couldn’t load plan pricing. Check your connection and try again.");
+          setBillingSnapshot({
+            accountIdentity: requestedIdentity,
+            context: null,
+          });
+          setError(friendlyBillingError(caught, "pricing"));
           setLoading(false);
         }
       },
@@ -82,65 +75,71 @@ export function PremiumManageView() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [authLoading, reloadKey, user?.uid]);
 
   async function openPortal() {
-    if (busy) return;
+    if (portalInFlightRef.current) return;
+    const attempt = capabilityGuard.begin();
+    if (!attempt) return;
+    portalInFlightRef.current = true;
     setBusy("portal");
     setError(null);
     try {
-      window.location.assign(await createPremiumPortalSession());
+      const url = await createPremiumPortalSession();
+      if (!capabilityGuard.isCurrent(attempt)) {
+        if (capabilityGuard.isMounted()) {
+          setBusy(null);
+          setError("Your account changed. Open billing again for the current account.");
+        }
+        return;
+      }
+      window.location.assign(url);
     } catch (caught) {
-      setError(friendlyBillingError(caught, "portal"));
-      setBusy(null);
+      if (capabilityGuard.isMounted()) {
+        setError(friendlyBillingError(caught, "portal"));
+        setBusy(null);
+      }
+    } finally {
+      portalInFlightRef.current = false;
     }
   }
 
-  async function choosePlan(plan: BillingPlanId) {
-    if (busy) return;
-    setBusy(plan);
-    setError(null);
-    try {
-      window.location.assign(await createPremiumCheckoutSession(plan));
-    } catch (caught) {
-      setError(friendlyBillingError(caught, "checkout"));
-      setBusy(null);
-    }
-  }
-
-  if (loading || entitlementsLoading || authLoading) {
+  if (loading || !billingResolved || authLoading) {
     return (
-      <main className="mx-auto flex min-h-[62vh] max-w-[800px] items-center justify-center px-5">
-        <div className="size-9 animate-spin rounded-full border-2 border-white/15 border-t-fuchsia-400" aria-label="Loading subscription" />
-      </main>
+      <div className="mx-auto flex min-h-[62vh] max-w-[800px] items-center justify-center px-5">
+        <div role="status" aria-live="polite">
+          <div className="size-9 animate-spin rounded-full border-2 border-white/15 border-t-fuchsia-400" aria-hidden />
+          <span className="sr-only">Loading Premium subscription</span>
+        </div>
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <main className="mx-auto flex min-h-[62vh] max-w-[520px] flex-col items-center justify-center px-5 text-center">
+      <div className="mx-auto flex min-h-[62vh] max-w-[520px] flex-col items-center justify-center px-5 text-center">
         <CreditCard className="size-10 text-[#d3a5ff]" aria-hidden />
         <h1 className="mt-5 text-2xl font-bold text-white">Sign in to manage Premium</h1>
         <p className="mt-3 text-sm leading-6 text-white/65">Your subscription and billing portal are private to your account.</p>
         <Link href={`/login?redirect=${encodeURIComponent("/premium/manage")}`} className="premium-button focus-ring mt-6 inline-flex min-h-12 items-center justify-center px-6">Sign in</Link>
-      </main>
+      </div>
     );
   }
 
   if (!billing) {
     return (
-      <main className="mx-auto flex min-h-[62vh] max-w-[520px] flex-col items-center justify-center px-5 text-center">
+      <div className="mx-auto flex min-h-[62vh] max-w-[520px] flex-col items-center justify-center px-5 text-center">
         <CreditCard className="size-10 text-[#d3a5ff]" aria-hidden />
         <h1 className="mt-5 text-2xl font-bold text-white">Plans are temporarily unavailable</h1>
         <p className="mt-3 text-sm leading-6 text-white/65">{error}</p>
         <button type="button" onClick={() => void load()} className="premium-button focus-ring mt-6 inline-flex min-h-12 items-center gap-2 px-6">
           <RefreshCw className="size-4" aria-hidden /> Try again
         </button>
-      </main>
+      </div>
     );
   }
 
-  const currentPlan = billing.currentPlan !== "none" ? billing.currentPlan : entitlements.plan;
+  const currentPlan = billing.currentPlan;
   const managerLabel = {
     stripe: "Managed securely by Stripe",
     apple: "Managed in the App Store",
@@ -154,19 +153,18 @@ export function PremiumManageView() {
       : billing.billingManagedBy === "google"
         ? "https://play.google.com/store/account/subscriptions"
         : null;
-  const checkoutAvailable =
-    billing.checkoutAvailable && billing.billingManagedBy !== "admin";
   const billingPeriodEnd = billing.currentPeriodEndMs
     ? new Date(billing.currentPeriodEndMs)
     : null;
 
   return (
-    <main className="mx-auto w-full max-w-[800px] px-5 pb-24 pt-12 sm:px-8 sm:pt-16">
+    <div className="mx-auto w-full max-w-[800px] px-5 pb-24 pt-12 sm:px-8 sm:pt-16">
       <header className="text-center">
         <PremiumBadge />
         <h1 className="mt-5 text-4xl font-bold tracking-[-0.045em] text-white sm:text-5xl">Manage Premium</h1>
         <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-white/65">
-          See your current plan, compare plans, or open secure billing to change or cancel.
+          See your current plan, compare options, or open secure billing when
+          subscription management is available.
         </p>
       </header>
 
@@ -178,13 +176,19 @@ export function PremiumManageView() {
               {currentPlan === "yearly" ? "YO Voice Premium · Yearly" : currentPlan === "monthly" ? "YO Voice Premium · Monthly" : "YO Voice Free"}
             </h2>
             <p className="mt-2 text-sm leading-6 text-white/60">
-              {billing.billingManagedBy === "admin"
+              {billing.billingManagedBy === "admin" && currentPlan !== "none"
                 ? "Complimentary Premium access"
                 : billing.renewalBehavior === "ends" && billingPeriodEnd
                   ? `Ends ${billingPeriodEnd.toLocaleDateString()}`
                   : billing.renewalBehavior === "renews" && billingPeriodEnd
                     ? `Renews ${billingPeriodEnd.toLocaleDateString()}`
-                : currentPlan === "none" ? "No active paid subscription" : "Premium active"}
+                    : billing.renewalBehavior === "none" && billingPeriodEnd
+                      ? billing.billingManagedBy === "stripe"
+                        ? `Prepaid access ends ${billingPeriodEnd.toLocaleDateString()}`
+                        : `Access through ${billingPeriodEnd.toLocaleDateString()}`
+                      : currentPlan === "none"
+                        ? "No active paid subscription"
+                        : "Premium active"}
               {currentPlan !== "none" ? ` · ${managerLabel}` : ""}
             </p>
           </div>
@@ -222,16 +226,25 @@ export function PremiumManageView() {
                 {plan.formattedEquivalent ? <p className="mt-2 text-sm text-white/60">{plan.formattedEquivalent} / month</p> : null}
                 {plan.savingsPercent > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-300">Save {plan.savingsPercent}%</p> : null}
                 <p className="mt-5 flex items-center gap-2 text-sm text-white/65"><Check className="size-4 text-fuchsia-300" aria-hidden />All Premium features</p>
-                <button type="button" disabled={active || !checkoutAvailable || busy !== null} onClick={() => void choosePlan(plan.id)} className="focus-ring mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-white/15 px-5 text-sm font-bold text-white transition hover:border-fuchsia-400/50 disabled:cursor-not-allowed disabled:opacity-50">
-                  {active ? "Your current plan" : busy === plan.id ? "Opening…" : "Choose plan"}
-                  {!active ? <ArrowRight className="size-4" aria-hidden /> : null}
-                </button>
+                {active ? (
+                  <button type="button" disabled className="focus-ring mt-5 inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center gap-2 rounded-2xl border border-white/15 px-5 text-sm font-bold text-white opacity-50">
+                    Your current plan
+                  </button>
+                ) : (
+                  <Link
+                    href={`/premium?plan=${plan.id}`}
+                    className="focus-ring mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-white/15 px-5 text-sm font-bold text-white transition hover:border-fuchsia-400/50"
+                  >
+                    Choose plan and payment method
+                    <ArrowRight className="size-4" aria-hidden />
+                  </Link>
+                )}
               </article>
             );
           })}
         </div>
         <p className="mt-5 text-center text-xs leading-5 text-white/55">{billing.taxNotice}</p>
       </section>
-    </main>
+    </div>
   );
 }

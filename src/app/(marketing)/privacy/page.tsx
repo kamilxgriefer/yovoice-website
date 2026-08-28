@@ -69,6 +69,21 @@ const sections: LegalSection[] = [
           types at any time in your notification preferences.
         </p>
         <p>
+          <strong>Premium and payment data.</strong> When you start a Premium
+          checkout, Stripe processes the payment details on its hosted pages.
+          YO Voice receives and stores the provider identifiers and status
+          needed to match the payment to your account, apply paid access,
+          prevent duplicate checkout, show the plan and end date, and process
+          renewal or cancellation events. This can include a Stripe customer,
+          checkout, payment, subscription or invoice reference; the selected
+          plan and payment-method category; payment status; and the paid access
+          period. Stripe also receives the billing name and address you enter
+          during checkout, plus an internal YO Voice account reference so a
+          signed payment result can be applied to the correct account. YO Voice
+          does not receive or store your full card number, BLIK code or PayPal
+          password.
+        </p>
+        <p>
           <strong>Technical data.</strong> Basic request metadata
           (timestamps, error logs, approximate service performance) collected
           by our hosting and backend providers to keep the service reliable
@@ -86,6 +101,8 @@ const sections: LegalSection[] = [
         <li>To connect you with friends, clubs and rooms you choose to join.</li>
         <li>To send transactional email — verification, password reset, security alerts.</li>
         <li>To send push notifications you&apos;ve opted into.</li>
+        <li>To process Premium purchases and keep paid access in sync with Stripe.</li>
+        <li>To manage recurring renewals or cancellation and fixed-term prepaid access.</li>
         <li>To detect, investigate and prevent abuse, spam and violations of our Terms.</li>
         <li>To keep the service secure, debug issues and improve reliability.</li>
       </ul>
@@ -116,6 +133,16 @@ const sections: LegalSection[] = [
           </li>
           <li>
             <strong>Vercel</strong> — hosting for yovoice.app.
+          </li>
+          <li>
+            <strong>Stripe</strong> — hosted Premium checkout, card and BLIK
+            payment processing, recurring billing, and signed payment-status
+            updates.
+          </li>
+          <li>
+            <strong>PayPal</strong> — processing when you choose PayPal inside
+            Stripe Checkout. PayPal receives the information needed to
+            authorize and manage that payment under its own privacy terms.
           </li>
         </ul>
         <p>
@@ -172,13 +199,23 @@ const sections: LegalSection[] = [
     id: "retention",
     title: "7. Data retention",
     body: (
-      <p>
-        We keep account and content data for as long as your account is
-        active. If you delete your account, we remove or anonymize your
-        personal data within a reasonable period, except where we&apos;re
-        required to retain it for legal, security or fraud-prevention
-        reasons.
-      </p>
+      <>
+        <p>
+          We keep account and content data for as long as your account is
+          active. If you delete your account, we remove or anonymize your
+          personal data within a reasonable period, except where we&apos;re
+          required to retain it for legal, security or fraud-prevention
+          reasons.
+        </p>
+        <p>
+          We keep private billing bindings and signed provider-event references
+          where they are needed to reconcile paid access, cancellations,
+          disputes and late or replayed payment events. Deleting your YO Voice
+          account does not itself delete records held independently by Stripe
+          or PayPal; each provider controls those records under its own privacy
+          and retention terms.
+        </p>
+      </>
     ),
   },
   {
@@ -229,7 +266,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="August 17, 2026"
+        updatedOn="August 28, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

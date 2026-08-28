@@ -1,5 +1,11 @@
 export type BillingPlanId = "monthly" | "yearly";
 export type BillingManager = "stripe" | "apple" | "google" | "admin" | "none";
+export type PremiumPaymentMethod = "recurring" | "blik";
+
+export type PremiumCheckoutRequest = {
+  plan: BillingPlanId;
+  paymentMethod: PremiumPaymentMethod;
+};
 
 export type LocalizedBillingPlan = {
   id: BillingPlanId;
@@ -26,6 +32,70 @@ export type PremiumBillingContext = {
   currentPeriodEndMs: number | null;
   plans: LocalizedBillingPlan[];
 };
+
+export type BillingAccountIdentity = string | null;
+
+export type AccountScopedBillingContext = {
+  accountIdentity: BillingAccountIdentity;
+  context: PremiumBillingContext | null;
+};
+
+export type AccountCapabilityAttempt = {
+  accountIdentity: string;
+  generation: number;
+};
+
+/**
+ * Billing state is private account data. A response started for account A must
+ * never be rendered after Auth has switched the page to account B (or signed
+ * out). Keeping the initiating identity beside the parsed response makes that
+ * boundary explicit in both Premium screens.
+ */
+export function billingContextForAccount(
+  snapshot: AccountScopedBillingContext | null,
+  accountIdentity: BillingAccountIdentity,
+): PremiumBillingContext | null {
+  return snapshot?.accountIdentity === accountIdentity
+    ? snapshot.context
+    : null;
+}
+
+export function billingContextResolvedForAccount(
+  snapshot: AccountScopedBillingContext | null,
+  accountIdentity: BillingAccountIdentity,
+): boolean {
+  return snapshot?.accountIdentity === accountIdentity;
+}
+
+export function accountCapabilityAttemptIsCurrent(
+  attempt: AccountCapabilityAttempt,
+  accountIdentity: BillingAccountIdentity | undefined,
+  generation: number,
+  firebaseUid: string | null,
+  mounted: boolean,
+): boolean {
+  return (
+    mounted &&
+    attempt.generation === generation &&
+    attempt.accountIdentity === accountIdentity &&
+    attempt.accountIdentity === firebaseUid
+  );
+}
+
+/**
+ * The amount, currency and provider Price remain server-owned. The website
+ * supplies only a bounded plan and payment mode. Card and PayPal remain one
+ * recurring mode; the backend enforces that exact provider allowlist.
+ */
+export function buildPremiumCheckoutRequest(
+  plan: BillingPlanId,
+  paymentMethod: PremiumPaymentMethod = "recurring",
+): PremiumCheckoutRequest {
+  return {
+    plan,
+    paymentMethod,
+  };
+}
 
 const contextKeys = ["billingManagedBy", "checkoutAvailable", "countryCode", "currency", "currentPeriodEndMs", "currentPlan", "localizedAtCheckout", "plans", "portalAvailable", "priceDisplaySource", "renewalBehavior", "taxDisplay", "taxNotice"].sort();
 const planKeys = ["currency", "formattedEquivalent", "formattedPrice", "id", "interval", "savingsPercent", "unitAmount"].sort();
@@ -106,7 +176,13 @@ export function parsePremiumBillingContext(value: unknown): PremiumBillingContex
 export function parseBillingUrl(value: unknown): string {
   if (!isRecord(value) || !hasExactKeys(value, ["url"]) || typeof value.url !== "string") throw new Error("Invalid billing link contract.");
   const url = new URL(value.url);
-  if (url.protocol !== "https:") throw new Error("Invalid billing link.");
+  if (
+    url.username !== "" ||
+    url.password !== "" ||
+    !["https://checkout.stripe.com", "https://billing.stripe.com"].includes(
+      url.origin,
+    )
+  ) throw new Error("Invalid billing link.");
   return url.toString();
 }
 
