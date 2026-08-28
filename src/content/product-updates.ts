@@ -23,6 +23,20 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "direct-chat-reliability-build-11",
+    updatedOn: "2026-08-28",
+    status: "testing",
+    eyebrow: "Chats",
+    title: "Build 11 makes private conversations fast and dependable",
+    summary:
+      "YO Voice 1.0.0 build 11, built from source commit a67036b, is available to both permanent TestFlight groups and Google Play Internal Testing with a hardened message, media, notification and direct-call path.",
+    highlights: [
+      "Text appears immediately and resumes safely after a lost response or brief network outage",
+      "Private photo and voice-message uploads survive restart and retry without duplicate messages",
+      "Foreground alerts and one-to-one calls are deduplicated across active chat, background and cold start",
+    ],
+  },
+  {
     slug: "mobile-build-8-testing",
     updatedOn: "2026-08-28",
     status: "testing",

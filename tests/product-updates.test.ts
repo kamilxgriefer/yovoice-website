@@ -53,6 +53,24 @@ describe("product update ledger", () => {
     assert.match(premium.highlights.join(" "), /PLN 260 for 365 days/);
   });
 
+  test("records build 11 on both permanent tester channels", () => {
+    const chat = productUpdates.find(
+      (update) => update.slug === "direct-chat-reliability-build-11",
+    );
+
+    assert.ok(chat);
+    assert.equal(chat.status, "testing");
+    assert.equal(chat.updatedOn, "2026-08-28");
+    assert.match(chat.summary, /1\.0\.0 build 11/);
+    assert.match(chat.summary, /source commit a67036b/);
+    assert.match(chat.summary, /both permanent TestFlight groups/i);
+    assert.match(chat.summary, /Google Play Internal Testing/);
+    assert.match(chat.highlights.join(" "), /Text appears immediately/i);
+    assert.match(chat.highlights.join(" "), /photo and voice-message/i);
+    assert.match(chat.highlights.join(" "), /Foreground alerts/i);
+    assert.match(chat.highlights.join(" "), /one-to-one calls/i);
+  });
+
   test("keeps mobile build 8 rollout truthful for each store", () => {
     const mobile = productUpdates.find(
       (update) => update.slug === "mobile-build-8-testing",
