@@ -133,7 +133,7 @@ export function RegisterForm() {
         {submitting ? "Creating account…" : "Create account"}
       </Button>
 
-      <p className="text-center text-sm text-white/45">
+      <p className="text-center text-sm text-white/65">
         Already have an account?{" "}
         <Link
           href={

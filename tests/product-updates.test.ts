@@ -37,6 +37,19 @@ describe("product update ledger", () => {
     }
   });
 
+  test("keeps build 15 truthful while iOS tester assignment is pending", () => {
+    const mobile = productUpdates.find(
+      (update) => update.slug === "mobile-build-15",
+    );
+
+    assert.ok(mobile);
+    assert.equal(mobile.updatedOn, "2026-08-31");
+    assert.equal(mobile.status, "testing");
+    assert.match(mobile.summary, /Android is published to Internal Testing/i);
+    assert.match(mobile.summary, /iOS assignment remains the final rollout boundary/i);
+    assert.doesNotMatch(mobile.summary, /available to all testers/i);
+  });
+
   test("keeps Premium sandbox verification behind the live checkout boundary", () => {
     const premium = productUpdates.find(
       (update) => update.slug === "premium-plan-chooser",

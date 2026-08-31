@@ -5,14 +5,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
 
 export const heroPrompts = [
-  "Drop into a Community Room. Listen first, then speak when you are ready.",
+  "Drop into a Community Room and join one shared conversation when you are ready.",
   "Find people who are into what you are into — or start the room they have been looking for.",
   "Host a Podcast Room with a stage, raised hands, and room for real questions.",
   "Create a Club where the conversation continues after the room ends.",
   "Bring your favorite people closer in a private Family Room.",
   "Follow voices you enjoy, make friends, and know where to meet again.",
   "No polished post required — just a topic, a microphone, and people worth meeting.",
-  "Listen live, raise your hand, or start a room of your own.",
+  "Join live, take part naturally, or start a room of your own.",
 ] as const;
 
 const ROTATION_INTERVAL_MS = 6200;

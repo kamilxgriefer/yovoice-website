@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  AudioLines,
   ArrowRight,
   Bell,
   Crown,
-  Mic,
   Mic2,
   Radio,
   ShieldCheck,
@@ -13,12 +12,14 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Features",
   description:
     "Voice rooms, clubs, friends, achievements and notifications — everything inside YO Voice.",
-};
+  path: "/features",
+});
 
 const features = [
   {
@@ -34,10 +35,10 @@ const features = [
       "Host events with structure: a stage, raised hands, and moderator controls for managing speakers and larger audiences.",
   },
   {
-    icon: Mic,
-    title: "Podcast rooms",
+    icon: AudioLines,
+    title: "Voice Moments",
     description:
-      "A focused format for hosts and guests to run a show-style conversation, built on the same real-time voice infrastructure.",
+      "Record, review and share a short voice update with the circle you choose, then decide exactly how long it stays available.",
   },
   {
     icon: Crown,
@@ -95,7 +96,7 @@ export default function FeaturesPage() {
                   <Icon className="size-6" />
                 </div>
                 <h2 className="mt-6 text-lg font-bold">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-white/50">{description}</p>
+                <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
               </article>
             ))}
           </div>
@@ -118,7 +119,7 @@ export default function FeaturesPage() {
                 className="glass-panel group rounded-[28px] p-7 transition hover:-translate-y-1 hover:border-fuchsia-300/25"
               >
                 <h3 className="text-xl font-bold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/45">{description}</p>
+                <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
                 <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-300 transition group-hover:text-white">
                   Learn more
                   <ArrowRight className="size-4 transition group-hover:translate-x-1" />

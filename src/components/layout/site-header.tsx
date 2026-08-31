@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, Menu, X } from "lucide-react";
@@ -14,6 +14,7 @@ export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const mobileToggleRef = useRef<HTMLButtonElement>(null);
   const { user, signOut } = useAuth();
   const router = useRouter();
 
@@ -23,6 +24,20 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        mobileToggleRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   async function handleSignOut() {
     if (signingOut) return;
@@ -39,18 +54,18 @@ export function SiteHeader() {
   return (
     <header className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
       isScrolled
-        ? "border-white/[0.08] bg-[#060511]/92 shadow-[0_16px_60px_rgba(0,0,0,.38)] backdrop-blur-2xl"
-        : "border-transparent bg-[#060511]/76 backdrop-blur-xl"
+        ? "border-white/[0.08] bg-[#080711]/92 shadow-[0_16px_60px_rgba(0,0,0,.38)] backdrop-blur-2xl"
+        : "border-transparent bg-[#080711]/76 backdrop-blur-xl"
     }`}>
       <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <BrandLockup priority />
 
-        <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-0.5 min-[1200px]:flex" aria-label="Primary navigation">
           {siteConfig.navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="focus-ring group relative rounded-full px-4 py-2 text-sm font-medium text-white/68 transition hover:bg-white/[.06] hover:text-white"
+              className="focus-ring group relative rounded-full px-3.5 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[.06] hover:text-white"
             >
               {item.label}
               <span className="absolute inset-x-4 -bottom-0.5 h-px scale-x-0 bg-gradient-to-r from-violet-400 to-fuchsia-300 transition-transform duration-300 ease-out group-hover:scale-x-100" />
@@ -58,7 +73,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 xl:flex">
+        <div className="hidden items-center gap-2 min-[1200px]:flex">
           {user ? (
             <>
               <Link href="/account/profile" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
@@ -96,10 +111,12 @@ export function SiteHeader() {
         </div>
 
         <button
+          ref={mobileToggleRef}
           type="button"
-          className="focus-ring flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white xl:hidden"
+          className="focus-ring flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white min-[1200px]:hidden"
           onClick={() => setIsOpen((v) => !v)}
           aria-expanded={isOpen}
+          aria-controls="mobile-navigation"
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
           {isOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -107,8 +124,11 @@ export function SiteHeader() {
       </div>
 
       {isOpen && (
-        <div className="border-t border-white/[.06] bg-[#090616]/98 px-5 py-5 backdrop-blur-2xl xl:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-2">
+        <div
+          id="mobile-navigation"
+          className="max-h-[calc(100svh-80px)] overflow-y-auto border-t border-white/[.06] bg-[#100d18]/98 px-5 py-5 backdrop-blur-2xl min-[1200px]:hidden"
+        >
+          <nav className="mx-auto flex max-w-7xl flex-col gap-2" aria-label="Mobile navigation">
             {siteConfig.navigation.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)} className="rounded-xl px-4 py-3 text-sm font-medium text-white/75 hover:bg-white/5 hover:text-white">
                 {item.label}

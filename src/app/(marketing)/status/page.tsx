@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-
 import { LiveStatus } from "@/components/marketing/live-status";
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "System Status",
   description: "Live status for YO Voice's website, accounts and voice infrastructure.",
-};
+  path: "/status",
+});
 
 export default function StatusPage() {
   return (

@@ -18,10 +18,26 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+const requiredFirebaseConfig = [
+  firebaseConfig.apiKey,
+  firebaseConfig.authDomain,
+  firebaseConfig.projectId,
+  firebaseConfig.storageBucket,
+  firebaseConfig.messagingSenderId,
+  firebaseConfig.appId,
+];
+
+export const isFirebaseConfigured = requiredFirebaseConfig.every(
+  (value) => typeof value === "string" && value.trim().length > 0,
+);
+
 let authInstance: Auth | null = null;
 let firestoreInstance: Firestore | null = null;
 
 export function getFirebaseApp(): FirebaseApp {
+  if (!isFirebaseConfigured) {
+    throw new Error("YO Voice account services are unavailable in this environment.");
+  }
   const existing = getApps();
   return existing.length ? existing[0] : initializeApp(firebaseConfig);
 }

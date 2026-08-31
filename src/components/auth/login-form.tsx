@@ -120,7 +120,7 @@ export function LoginForm() {
         {submitting ? "Signing in…" : "Log in"}
       </Button>
 
-      <p className="text-center text-sm text-white/45">
+      <p className="text-center text-sm text-white/65">
         Don&apos;t have an account?{" "}
         <Link
           href={

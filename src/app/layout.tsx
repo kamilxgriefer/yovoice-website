@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { AuthProvider } from "@/providers/auth-provider";
+import { MotionProvider } from "@/providers/motion-provider";
 
 import "./globals.css";
 
-const geist = Geist({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-geist",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -68,8 +65,32 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} ${spaceGrotesk.variable}`}>
-        <AuthProvider>{children}</AuthProvider>
+      <body className={inter.variable}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "YO Voice",
+              url: "https://yovoice.app",
+              logo: "https://yovoice.app/logos/yo-voice-symbol.png",
+              sameAs: [
+                "https://github.com/kamilxgriefer",
+                "https://www.instagram.com/yovoice.app/",
+              ],
+            }).replace(/</g, "\\u003c"),
+          }}
+        />
+        <a
+          href="#main-content"
+          className="focus-ring fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-white px-5 py-3 text-sm font-black text-[#211629] shadow-xl transition focus:translate-y-0"
+        >
+          Skip to content
+        </a>
+        <MotionProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </MotionProvider>
       </body>
     </html>
   );

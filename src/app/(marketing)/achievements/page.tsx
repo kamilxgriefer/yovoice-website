@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import {
   Activity,
   CalendarDays,
@@ -13,11 +12,13 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Achievements",
   description: "How the YO Voice achievement system works, tier by tier.",
-};
+  path: "/achievements",
+});
 
 const tracks = [
   { icon: MessageSquare, title: "Messages", description: "Sent in chats and clubs." },
@@ -78,7 +79,7 @@ export default function AchievementsPage() {
             <h2 className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-.04em] text-white sm:text-4xl">
               What actually earns you achievements
             </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm text-white/48">
+            <p className="mx-auto mt-3 max-w-2xl text-sm text-white/65">
               Each track has ten milestones, from your first step to a
               10,000-strong feat. Progress is tracked automatically as you
               use YO Voice.
@@ -91,7 +92,7 @@ export default function AchievementsPage() {
                   <Icon className="size-5" />
                 </div>
                 <h3 className="mt-5 font-bold text-white">{title}</h3>
-                <p className="mt-1 text-xs leading-5 text-white/45">{description}</p>
+                <p className="mt-1 text-xs leading-5 text-white/65">{description}</p>
               </article>
             ))}
           </div>

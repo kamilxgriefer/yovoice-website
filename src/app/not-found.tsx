@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/layout/site-header";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#060511]">
+    <div className="min-h-screen bg-[#080711]">
       <SiteHeader />
-      <main className="flex min-h-[80vh] flex-col items-center justify-center px-5 pt-20 text-center">
+      <main id="main-content" className="flex min-h-[80vh] flex-col items-center justify-center px-5 pt-20 text-center">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white shadow-[0_0_40px_rgba(192,38,255,.35)]">
           <Compass className="size-8" />
         </div>

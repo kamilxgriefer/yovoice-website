@@ -23,6 +23,160 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "mobile-build-15",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Mobile",
+    title: "Build 15 brings the newest YO Voice experience together",
+    summary:
+      "YO Voice 1.0.0 build 15 brings the latest navigation, account, profile, room and visual refinements into one coordinated tester release. Android is published to Internal Testing; iOS assignment remains the final rollout boundary.",
+    highlights: [
+      "A complete Dark and Pearl pass across primary journeys and shared controls",
+      "The sculpted navigation dock, compact live-room capsule and safer room-session transitions",
+      "Guided onboarding, responsive authentication and stronger profile and chat identity consistency",
+    ],
+  },
+  {
+    slug: "website-product-sync",
+    updatedOn: "2026-08-31",
+    status: "ready",
+    eyebrow: "Website",
+    title: "The website now speaks the same visual language as the app",
+    summary:
+      "The marketing experience has been rebuilt around the current YO Voice product instead of older room models, invented activity and outdated release copy. Production verification remains the final boundary.",
+    highlights: [
+      "Exact Dark and Pearl semantic colours, Inter typography and the sculpted YO dock appear in the product preview",
+      "Community Room, mobile tester access and the release ledger now match the real product state",
+      "Stronger contrast, skip navigation, compact Updates history and responsive menu behaviour improve accessibility",
+    ],
+  },
+  {
+    slug: "podcast-studio-rebuild",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Podcast Rooms",
+    title: "Podcast Studio gives hosts a calmer place to run a show",
+    summary:
+      "Podcast Rooms now emphasise the episode identity, current speakers, request queue and host decisions without turning the live conversation into a dashboard.",
+    highlights: [
+      "A clearer host-and-guest lineup keeps the active conversation readable",
+      "Raised-hand requests and moderator actions stay structured without fake audience metrics",
+      "Compact chat, cover artwork and responsive controls preserve the show identity across screen sizes",
+    ],
+  },
+  {
+    slug: "dark-pearl-visual-system",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Design system",
+    title: "Dark and Pearl now share one premium visual language",
+    summary:
+      "Primary journeys adapt cleanly between YO Voice's cosmic Dark theme and warm Pearl theme, with clearer hierarchy, stronger contrast and consistent interaction states.",
+    highlights: [
+      "Home, Chats, Profile, Moments, Settings, Notifications and Premium follow the active theme",
+      "Controls, focus rings, badges and status messages remain readable in both appearances",
+      "Narrow screens and enlarged text reflow instead of clipping or overlapping",
+    ],
+  },
+  {
+    slug: "sculpted-navigation-live-room",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Navigation",
+    title: "The YO dock now flows naturally into your live room",
+    summary:
+      "The mobile dock uses one continuous sculpted rise around the transparent YO mark, while a minimized room becomes a compact live capsule instead of an oversized control panel.",
+    highlights: [
+      "Clear icon-first navigation with responsive active states, keyboard focus and reduced motion",
+      "Mic, Chat, More and Return remain available without covering the current screen",
+      "Late actions from a previous room cannot unmute, navigate or disconnect a newer session",
+    ],
+  },
+  {
+    slug: "guided-quick-app-tour",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Getting started",
+    title: "A skippable Quick app tour welcomes new members",
+    summary:
+      "New members can learn YO Voice directly inside the real application shell, without adding another required account-creation step.",
+    highlights: [
+      "Five focused steps introduce YO creation, Moments, Chats and More",
+      "Skip, Back, Next and Done keep the walkthrough fully optional",
+      "Completion is stored per account and the tour can be replayed from Settings",
+    ],
+  },
+  {
+    slug: "responsive-authentication-stage",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Account access",
+    title: "Login and Registration now share one responsive stage",
+    summary:
+      "Authentication has been rebuilt around a consistent Voice Relay transition on compact screens and a matching two-panel curtain on wider layouts.",
+    highlights: [
+      "Form state, validation, keyboard and focus survive responsive layout changes",
+      "Signing out clears private session state and returns directly to account access",
+      "New password accounts wait for the chosen pseudonym instead of guessing identity from an email address",
+    ],
+  },
+  {
+    slug: "profile-chat-identity-refresh",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Profile",
+    title: "Profile identity stays compact and current everywhere",
+    summary:
+      "Names, avatars, roles and product identity now use a clearer profile hierarchy and converge across Profile, Home and Chats.",
+    highlights: [
+      "Role, VIP, Creator, Premium and achievement labels fit into a compact two-level passport",
+      "Avatar changes propagate across chat headers, conversation lists and Home with an offline fallback",
+      "Vibe opens safe links from YouTube, Spotify, Apple Music and other recognised music services",
+    ],
+  },
+  {
+    slug: "room-cover-studio",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Rooms",
+    title: "Room covers can finally be framed your way",
+    summary:
+      "Community and Podcast hosts can choose, crop, zoom and reposition artwork before it becomes the room's final landscape cover.",
+    highlights: [
+      "The editor preview matches the banner shape used inside the room",
+      "Replace, reset and remove controls keep the image workflow reversible",
+      "Browser-safe processing restores cover selection and export on web while preserving native support",
+    ],
+  },
+  {
+    slug: "moments-circle-focus",
+    updatedOn: "2026-08-31",
+    status: "testing",
+    eyebrow: "Home",
+    title: "Moments from your circle stays focused on voices",
+    summary:
+      "The Home rail now keeps the compact avatar-led format intended for your own Moment and followed accounts with an active Voice Moment.",
+    highlights: [
+      "No oversized empty-state panel is mixed into the Moments avatar rail",
+      "Followed voices appear only when they have an available Voice Moment",
+      "Discover categories keep distinctive, readable accents in both Dark and Pearl",
+    ],
+  },
+  {
+    slug: "totp-voice-constellation",
+    updatedOn: "2026-08-31",
+    status: "verification",
+    eyebrow: "Security",
+    title: "A clearer two-factor challenge is in verification",
+    summary:
+      "The six-digit TOTP challenge uses a branded Voice Constellation interaction while Firebase remains the sole verification authority. Rollout still depends on provider activation.",
+    highlights: [
+      "An incorrect code shows a red X, clears all six digits and refocuses the input",
+      "Network and rate-limit errors preserve the code for one deliberate retry",
+      "Autofill, keyboard, screen-reader and reduced-motion states are included",
+    ],
+  },
+  {
     slug: "direct-chat-reliability-build-11",
     updatedOn: "2026-08-28",
     status: "testing",

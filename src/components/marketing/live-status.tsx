@@ -44,7 +44,7 @@ export function LiveStatus() {
             <div key={system.name} className="flex items-center justify-between gap-4 p-6">
               <div>
                 <p className="font-semibold text-white">{system.name}</p>
-                <p className="mt-1 text-xs text-white/40">{system.description}</p>
+                <p className="mt-1 text-xs text-white/65">{system.description}</p>
               </div>
               <StatusBadge state={state} live={isWebsite} />
             </div>
@@ -52,13 +52,13 @@ export function LiveStatus() {
         })}
       </div>
 
-      <p className="mt-5 text-center text-xs text-white/35">
+      <p className="mt-5 text-center text-xs text-white/60">
         {checkedAt ? `Website status checked live at ${checkedAt}.` : "Checking live status…"} Other
         rows reflect our current operating status.
       </p>
 
       <div className="mt-8 flex flex-col items-center gap-3 text-center">
-        <p className="text-sm text-white/45">
+        <p className="text-sm text-white/65">
           YO Voice runs on Firebase, LiveKit and Vercel. For incidents on
           those platforms, see their status pages directly:
         </p>

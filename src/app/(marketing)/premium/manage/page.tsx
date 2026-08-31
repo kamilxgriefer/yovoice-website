@@ -5,6 +5,7 @@ import { PremiumManageView } from "@/components/premium/premium-manage-view";
 export const metadata: Metadata = {
   title: "Manage Premium",
   description: "View, change or cancel your YO Voice Premium subscription.",
+  robots: { index: false, follow: false },
 };
 
 export default function ManagePremiumPage() {

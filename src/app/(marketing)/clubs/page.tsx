@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -12,11 +11,13 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Clubs",
   description: "Build a lasting community around your rooms with YO Voice clubs.",
-};
+  path: "/clubs",
+});
 
 const highlights = [
   {

@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { Briefcase, HelpCircle, Mail, ShieldAlert } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Contact",
   description: "Get in touch with the YO Voice team.",
-};
+  path: "/contact",
+});
 
 const channels = [
   {

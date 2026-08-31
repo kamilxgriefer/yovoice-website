@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "A modern voice platform where communities connect, creators grow and conversations come alive.",
     start_url: "/",
     display: "standalone",
-    background_color: "#060511",
-    theme_color: "#060511",
+    background_color: "#080711",
+    theme_color: "#080711",
     icons: [
       {
         src: "/icons/icon-192.png",

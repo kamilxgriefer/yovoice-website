@@ -77,7 +77,7 @@ export function ProductExperienceSection() {
   return (
     <section
       id="experience"
-      className="relative overflow-hidden border-t border-white/[0.06] bg-[#0b0712] py-16 sm:py-36"
+      className="relative overflow-hidden border-t border-white/[0.06] bg-[#080711] py-16 sm:py-36"
     >
       <div className="grid-background absolute inset-0 opacity-20" />
       <div className="absolute left-[-10%] top-[5%] size-[500px] rounded-full bg-violet-700/12 blur-[150px]" />
@@ -115,7 +115,7 @@ export function ProductExperienceSection() {
               <motion.article
                 id={feature.featured ? "family-rooms" : undefined}
                 key={feature.title}
-                initial={{ opacity: 0, y: 28 }}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{
@@ -163,7 +163,7 @@ export function ProductExperienceSection() {
                         {feature.title}
                       </h3>
 
-                      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/48 sm:mt-4 sm:leading-7">
+                      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65 sm:mt-4 sm:leading-7">
                         {feature.description}
                       </p>
                     </div>
@@ -198,7 +198,7 @@ export function ProductExperienceSection() {
               must match heights. Stacked (mobile/tablet) it only
               manufactured empty vertical space below the content. */}
           <motion.div
-            initial={{ opacity: 0, x: -28 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65 }}
@@ -217,9 +217,9 @@ export function ProductExperienceSection() {
               </h3>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
-                The room identity and active speakers stay in focus. Listeners
-                remain one tap away in People, while the stage stays calm as
-                the audience grows.
+                Everyone enters one shared room. People keeps the full roster
+                clear, while fast mute, chat and room controls stay close
+                without turning the conversation into a rigid stage.
               </p>
 
               <CommunityRoomPreview />
@@ -227,7 +227,7 @@ export function ProductExperienceSection() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 28 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65 }}
@@ -265,15 +265,15 @@ export function ProductExperienceSection() {
                 <BroadcastRow
                   icon={<Mic2 className="size-5" />}
                   title="Current speakers"
-                  subtitle="Host and 3 guests"
-                  badge="4"
+                  subtitle="A clear host and guest lineup"
+                  badge="READY"
                 />
 
                 <BroadcastRow
                   icon={<Hand className="size-5" />}
                   title="Raised hands"
-                  subtitle="Listeners waiting to speak"
-                  badge="12"
+                  subtitle="An ordered request queue for the host"
+                  badge="QUEUE"
                 />
 
                 <BroadcastRow
@@ -291,16 +291,13 @@ export function ProductExperienceSection() {
                       Next speaker
                     </p>
                     <p className="mt-2 text-base font-bold text-white sm:text-lg">
-                      Alex requested the stage
+                      A participant requested to speak
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="rounded-xl bg-white px-4 py-2 text-xs font-bold text-black"
-                  >
-                    Accept
-                  </button>
+                  <span className="rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white">
+                    Host action
+                  </span>
                 </div>
               </div>
             </div>
@@ -407,7 +404,7 @@ function BroadcastRow({
 
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-white">{title}</p>
-        <p className="mt-1 text-xs text-white/40">{subtitle}</p>
+        <p className="mt-1 text-xs text-white/65">{subtitle}</p>
       </div>
 
       <span className="rounded-full border border-rose-400/15 bg-rose-400/10 px-3 py-1 text-[10px] font-bold text-rose-300">
@@ -450,7 +447,7 @@ function AchievementCard({
             </span>
           </div>
 
-          <p className="mt-1 text-xs leading-5 text-white/40">
+          <p className="mt-1 text-xs leading-5 text-white/65">
             {description}
           </p>
 

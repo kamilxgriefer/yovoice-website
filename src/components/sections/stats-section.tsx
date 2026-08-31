@@ -110,7 +110,7 @@ export function StatsSection() {
 
         <p
           role="status"
-          className="mx-auto mt-5 max-w-[720px] text-center text-xs leading-5 text-white/45"
+          className="mx-auto mt-5 max-w-[720px] text-center text-xs leading-5 text-white/60"
         >
           {hasFreshStats
             ? `Last verified at ${formatVerifiedTime(publicStats.stats.updatedAt)}. Counts are exact — never rounded up or replaced with estimates.`

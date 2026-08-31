@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Heart, Mic2, ShieldCheck, Sparkles } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "About",
   description: "Why we're building YO Voice, and what we believe about voice-first community.",
-};
+  path: "/about",
+});
 
 const principles = [
   {
@@ -32,7 +33,7 @@ const principles = [
     icon: Heart,
     title: "Be you",
     description:
-      "YO Voice exists so people can show up as themselves — in a club about a niche interest, a late-night conversation, or a stage in front of strangers who become friends.",
+      "YO Voice exists so people can show up as themselves — in a Club about a niche interest, a late-night Community Room, or a Podcast Room where strangers become friends.",
   },
 ];
 
@@ -63,7 +64,8 @@ export default function AboutPage() {
           <p className="mt-5">
             YO Voice is developed by a small, focused team shipping in the
             open — the web app is live today, with native apps for iOS,
-            Android, Windows and macOS actively in development.
+            iOS and Android builds available to invited testers while the
+            public store and desktop releases continue toward launch.
           </p>
         </div>
       </section>

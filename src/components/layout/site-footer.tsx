@@ -12,12 +12,12 @@ const columns = [
 
 export function SiteFooter() {
   return (
-    <footer id="footer" className="border-t border-white/[.06] bg-[#05040d]">
+    <footer id="footer" className="border-t border-white/[.06] bg-[#080711]">
       <div className="mx-auto grid max-w-[1400px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.4fr] lg:px-12">
         <div className="max-w-sm">
           <BrandLockup className="w-fit" />
-          <p className="mt-6 text-sm leading-7 text-white/45">Where conversations become communities. Built for creators, friends and people looking for something real.</p>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/25">Voice first. Community always.</p>
+          <p className="mt-6 text-sm leading-7 text-white/65">Where conversations become communities. Built for creators, friends and people looking for something real.</p>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/55">Voice first. Community always.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
@@ -25,7 +25,7 @@ export function SiteFooter() {
             <div key={column.title}>
               <h2 className="text-sm font-bold">{column.title}</h2>
               <ul className="mt-5 space-y-3">
-                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="text-sm text-white/42 transition hover:text-white">{label}</Link></li>)}
+                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="text-sm text-white/65 transition hover:text-white">{label}</Link></li>)}
               </ul>
             </div>
           ))}
@@ -34,7 +34,7 @@ export function SiteFooter() {
 
       <div className="border-t border-white/[.06]">
         <div className="mx-auto flex max-w-[1400px] flex-col gap-5 px-5 py-6 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
-          <p className="text-xs text-white/35">© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
+          <p className="text-xs text-white/55">© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
           <div className="flex items-center gap-3">
             {[
               [Code2,"https://github.com/kamilxgriefer","GitHub"],

@@ -17,7 +17,7 @@ export default function AppEntryPage() {
   }, []);
 
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--background)]">
+    <main id="main-content" className="flex min-h-[100dvh] items-center justify-center bg-[var(--background)]">
       <noscript>
         <a href={APP_URL} className="text-sm text-fuchsia-300 underline">
           Continue to YO Voice

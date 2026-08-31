@@ -52,9 +52,7 @@ export function LiveStats() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1, duration: 0.6 }}
+      initial={false}
       className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-white/40"
     >
       {showAccounts && (

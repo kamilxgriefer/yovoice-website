@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { CheckCircle2, CircleDashed, Loader2 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Roadmap",
   description: "What's live on YO Voice today, what's in progress, and what's next.",
-};
+  path: "/roadmap",
+});
 
 const columns = [
   {
@@ -21,6 +22,8 @@ const columns = [
       "Achievements across messages, followers and more",
       "Push and in-app notifications",
       "Email verification and secure password reset",
+      "In-app reporting, blocking and room moderation flows",
+      "Google Play Internal Testing channel",
       "Web app at yovoice.app",
     ],
   },
@@ -31,8 +34,8 @@ const columns = [
     accent: "text-fuchsia-300",
     items: [
       "Native desktop apps for Windows and macOS",
-      "iOS and Android App Store / Google Play submissions",
-      "In-app abuse reporting flow",
+      "Public iOS App Store and Google Play release",
+      "iOS build 15 assignment to permanent TestFlight groups",
       "Expanded club discovery",
     ],
   },

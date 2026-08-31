@@ -10,9 +10,9 @@ const cards = [
     icon: Smartphone,
     title: "Mobile",
     description: "iOS and Android apps.",
-    status: "Coming soon to the App Store and Google Play.",
-    href: REPO_URL,
-    action: "Follow progress on GitHub",
+    status: "Android build 15 is in Internal Testing. iOS build 15 is uploaded; TestFlight group assignment is pending.",
+    href: "/updates#mobile-build-15",
+    action: "See build 15 status",
   },
   {
     icon: Monitor,
@@ -51,7 +51,7 @@ export function PlatformSelector() {
               <Icon className="size-6" />
             </div>
             <h2 className="mt-6 text-xl font-bold">{title}</h2>
-            <p className="mt-2 text-sm text-white/45">{description}</p>
+            <p className="mt-2 text-sm text-white/65">{description}</p>
             <p className="mt-3 text-xs font-semibold text-fuchsia-300">{status}</p>
             <a
               href={href}
@@ -70,7 +70,7 @@ export function PlatformSelector() {
           href={REPO_URL}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-white/45 hover:text-white"
+          className="inline-flex items-center gap-2 text-sm text-white/65 hover:text-white"
         >
           <Code2 className="size-4" /> Source on GitHub
         </Link>

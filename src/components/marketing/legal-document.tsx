@@ -23,7 +23,7 @@ export function LegalDocument({
           className="hidden lg:block"
         >
           <div className="sticky top-28">
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-white/30">
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-white/60">
               On this page
             </p>
             <ul className="mt-5 space-y-3 border-l border-white/10 pl-4">
@@ -31,7 +31,7 @@ export function LegalDocument({
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
-                    className="focus-ring block rounded text-sm text-white/45 transition hover:text-white"
+                    className="focus-ring block rounded text-sm text-white/65 transition hover:text-white"
                   >
                     {section.title}
                   </a>
@@ -42,7 +42,7 @@ export function LegalDocument({
         </nav>
 
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[.2em] text-white/35">
+          <p className="text-xs font-semibold uppercase tracking-[.2em] text-white/60">
             Last updated {updatedOn}
           </p>
           <div className="mt-6 text-sm leading-7 text-white/55">{intro}</div>

@@ -23,8 +23,11 @@ import {
 } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
-import { getFirebaseAuth } from "@/lib/firebase/config";
-import { getFirebaseFirestore } from "@/lib/firebase/config";
+import {
+  getFirebaseAuth,
+  getFirebaseFirestore,
+  isFirebaseConfigured,
+} from "@/lib/firebase/config";
 import {
   resetPasswordActionCodeSettings,
   verifyEmailActionCodeSettings,
@@ -91,9 +94,11 @@ async function reauthenticate(user: User, currentPassword: string) {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isFirebaseConfigured);
 
   useEffect(() => {
+    if (!isFirebaseConfigured) return;
+
     const auth = getFirebaseAuth();
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser);

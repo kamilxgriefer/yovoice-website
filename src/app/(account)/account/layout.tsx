@@ -29,7 +29,7 @@ export default function AccountLayout({
 
   if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#060511]">
+      <main id="main-content" className="flex min-h-screen items-center justify-center bg-[#080711]">
         <p className="text-sm text-white/45">Loading…</p>
       </main>
     );
@@ -38,7 +38,7 @@ export default function AccountLayout({
   return (
     <div>
       <SiteHeader />
-      <main className="min-h-screen bg-[#060511] px-5 pb-24 pt-32 sm:px-8 lg:px-12">
+      <main id="main-content" className="min-h-screen bg-[#080711] px-5 pb-24 pt-32 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <VerifyEmailBanner />
 

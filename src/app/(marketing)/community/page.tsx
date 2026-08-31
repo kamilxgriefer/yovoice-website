@@ -1,26 +1,27 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Compass, Headphones, Mic2, ShieldCheck, UserPlus, Users } from "lucide-react";
+import { ArrowRight, Compass, DoorOpen, Mic2, ShieldCheck, UserPlus, Users } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Community",
   description: "Community rooms, friends and discovery on YO Voice.",
-};
+  path: "/community",
+});
 
 const highlights = [
   {
-    icon: Mic2,
-    title: "A focused stage",
+    icon: Users,
+    title: "One room, everyone present",
     description:
-      "Hosts and active speakers stay visible on a calm, bounded stage. Listeners remain one tap away in People, even as the room grows.",
+      "Community Rooms use one shared presence model. People here shows the room clearly without separating members into an audience lane.",
   },
   {
-    icon: Headphones,
-    title: "Listen first",
+    icon: DoorOpen,
+    title: "A lifecycle you choose",
     description:
-      "Join as a listener, follow the conversation and let the host bring you onto the stage when it's time to take part.",
+      "When creating a room, choose whether it stays open or ends when its host leaves. The rule is clear before anyone joins.",
   },
   {
     icon: UserPlus,
@@ -35,10 +36,10 @@ const highlights = [
       "Find active rooms and clubs around topics you care about instead of starting from an empty feed.",
   },
   {
-    icon: Users,
-    title: "Presence that feels real",
+    icon: Mic2,
+    title: "Fast, local controls",
     description:
-      "See who's online, who's speaking, and who just joined — community should feel alive, not like a static directory.",
+      "Mute responds locally first, and compact Chat and People actions remain within reach without covering the conversation.",
   },
   {
     icon: ShieldCheck,
@@ -54,7 +55,7 @@ export default function CommunityPage() {
       <PageHero
         eyebrow="Community"
         title="Feel the room, not the interface."
-        description="Community on YO Voice starts with a real, live conversation — then grows into the friends, clubs and creators you keep coming back to."
+        description="Community on YO Voice starts with one shared, live conversation — then grows into the friends, Clubs and creators you keep coming back to."
       />
 
       <section className="px-5 pb-8 sm:px-8">
@@ -66,7 +67,7 @@ export default function CommunityPage() {
                   <Icon className="size-6" />
                 </div>
                 <h2 className="mt-6 text-lg font-bold">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-white/50">{description}</p>
+                <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
               </article>
             ))}
           </div>

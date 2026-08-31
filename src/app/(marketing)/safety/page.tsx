@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Ban, Flag, Mail, ShieldCheck, UserCog } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Community Safety",
   description: "How YO Voice keeps rooms, clubs and conversations safe.",
-};
+  path: "/safety",
+});
 
 const tools = [
   {
@@ -80,7 +81,7 @@ export default function SafetyPage() {
                 <li key={rule}>{rule}</li>
               ))}
             </ul>
-            <p className="mt-8 text-sm leading-7 text-white/45">
+            <p className="mt-8 text-sm leading-7 text-white/65">
               Breaking these rules can lead to content removal, room or club
               restrictions, or account suspension — see our{" "}
               <Link href="/terms" className="text-fuchsia-300 hover:text-white">

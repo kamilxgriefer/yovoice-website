@@ -79,7 +79,7 @@ export function TotpChallengeForm({
         Back to password
       </button>
 
-      <div className="mt-5 rounded-[28px] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
+      <div className="mt-5 rounded-[28px] border border-white/10 bg-white/[0.035] p-3 sm:p-7">
         <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-fuchsia-400/25 bg-fuchsia-500/10 text-fuchsia-200">
           <ShieldCheck className="size-7" aria-hidden />
         </div>

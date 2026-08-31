@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-
 import { FaqAccordion, type FaqGroup } from "@/components/marketing/faq-accordion";
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "FAQ",
   description: "Answers to common questions about accounts, rooms, clubs and downloads.",
-};
+  path: "/faq",
+});
 
 const groups: FaqGroup[] = [
   {
@@ -20,7 +20,7 @@ const groups: FaqGroup[] = [
       {
         question: "What platforms is YO Voice available on?",
         answer:
-          "The web app is live today at any browser. Native iOS, Android, Windows and macOS apps are in development — see our Download page for current status.",
+          "The web app is live in modern browsers and Android build 15 is available through Google Play Internal Testing. iOS build 15 has been uploaded but is still awaiting TestFlight group assignment. Public store and desktop releases are not available yet — see Download for the current status.",
       },
       {
         question: "Do I need to verify my email?",
@@ -45,7 +45,7 @@ const groups: FaqGroup[] = [
       {
         question: "Who can moderate a room?",
         answer:
-          "The host and anyone they grant moderator access to can mute, remove or manage who's on stage.",
+          "The host and anyone they grant moderator access to can mute or remove participants and manage who can speak. Community Rooms keep everyone in one People here roster; Podcast Rooms keep the structured host and speaker workflow.",
       },
     ],
   },

@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { Mail } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Careers",
   description: "There are no open roles at YO Voice right now — but we'd still like to hear from you.",
-};
+  path: "/careers",
+});
 
 export default function CareersPage() {
   return (

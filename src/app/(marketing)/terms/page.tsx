@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-
 import { LegalDocument, type LegalSection } from "@/components/marketing/legal-document";
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Terms of Service",
   description: "The terms that govern your use of YO Voice.",
-};
+  path: "/terms",
+});
 
 const sections: LegalSection[] = [
   {

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -11,11 +10,13 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Help Center",
   description: "Guides and answers for getting the most out of YO Voice.",
-};
+  path: "/help-center",
+});
 
 const topics = [
   {

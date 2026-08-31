@@ -23,7 +23,7 @@ export function PremiumSection() {
   return (
     <section
       id="premium"
-      className="relative overflow-hidden border-t border-white/[0.06] bg-[#0b0712] py-16 sm:py-32"
+      className="relative overflow-hidden border-t border-white/[0.06] bg-[#080711] py-16 sm:py-32"
     >
       {/* Elevated lighting: a touch more deliberate than the standard
           sections, still restrained. */}
@@ -130,7 +130,7 @@ export function PremiumSection() {
                 <p className="mt-4 text-[15px] font-bold text-white">
                   {benefit.title}
                 </p>
-                <p className="mt-2 text-[13px] leading-6 text-white/45">
+                <p className="mt-2 text-[13px] leading-6 text-white/65">
                   {benefit.description}
                 </p>
               </div>

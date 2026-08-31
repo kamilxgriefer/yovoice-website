@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-
 import { PremiumPlansView } from "@/components/premium/premium-plans-view";
+import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "YO Voice Premium — Creator, Clubs and more",
   description:
     "Go Premium on YO Voice: become a Creator, build your own Clubs and see your final local currency securely at checkout.",
-};
+  path: "/premium",
+});
 
 export default function PremiumPage() {
   return (
