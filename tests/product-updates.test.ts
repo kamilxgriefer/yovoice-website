@@ -50,6 +50,16 @@ describe("product update ledger", () => {
     assert.doesNotMatch(mobile.summary, /available to all testers/i);
   });
 
+  test("marks the rebuilt website live only after production verification", () => {
+    const website = productUpdates.find(
+      (update) => update.slug === "website-product-sync",
+    );
+
+    assert.ok(website);
+    assert.equal(website.status, "live");
+    assert.match(website.summary, /verified in production/i);
+  });
+
   test("keeps Premium sandbox verification behind the live checkout boundary", () => {
     const premium = productUpdates.find(
       (update) => update.slug === "premium-plan-chooser",

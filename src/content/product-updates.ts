@@ -39,11 +39,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "website-product-sync",
     updatedOn: "2026-08-31",
-    status: "ready",
+    status: "live",
     eyebrow: "Website",
     title: "The website now speaks the same visual language as the app",
     summary:
-      "The marketing experience has been rebuilt around the current YO Voice product instead of older room models, invented activity and outdated release copy. Production verification remains the final boundary.",
+      "The marketing experience has been rebuilt around the current YO Voice product instead of older room models, invented activity and outdated release copy, and is now verified in production.",
     highlights: [
       "Exact Dark and Pearl semantic colours, Inter typography and the sculpted YO dock appear in the product preview",
       "Community Room, mobile tester access and the release ledger now match the real product state",
