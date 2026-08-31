@@ -90,6 +90,10 @@ describe("auth action continuation allowlist", () => {
     for (const candidate of [
       "//evil.example",
       "/\\evil.example",
+      "/\n/evil.example",
+      "/\r/evil.example",
+      "/\t/evil.example",
+      " /\n/evil.example ",
       "javascript:alert(1)",
       "http://yovoice.app/login",
       "https://user:password@yovoice.app/login",

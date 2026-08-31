@@ -22,6 +22,9 @@ const ALLOWED_HOSTS = new Set([
   "yovoice-ec54a.firebaseapp.com",
 ]);
 
+const RELATIVE_BASE_ORIGIN = "https://yovoice.app";
+const ASCII_CONTROL_OR_WHITESPACE = /[\u0000-\u0020\u007f]/;
+
 /**
  * Returns a destination that is safe to navigate to after an auth action:
  * either a same-site relative path, or an absolute https URL whose host is
@@ -31,14 +34,31 @@ const ALLOWED_HOSTS = new Set([
  */
 export function safeContinueUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;
-  const value = raw.trim();
-  if (value.length === 0 || value.length > 2048) return null;
+  if (
+    raw.length === 0 ||
+    raw.length > 2048 ||
+    ASCII_CONTROL_OR_WHITESPACE.test(raw)
+  ) {
+    return null;
+  }
+  const value = raw;
 
-  // Same-site relative path. Reject protocol-relative ("//host") and
-  // backslash tricks ("/\host"), which browsers treat as authority-form.
+  // Same-site relative path. Parse it against a fixed origin rather than
+  // trusting string prefixes: URL parsers discard ASCII tabs/newlines and
+  // normalize backslashes, either of which can turn an apparent path into an
+  // authority-form redirect. Return only the parsed relative components.
   if (value.startsWith("/")) {
-    if (value.startsWith("//") || value.startsWith("/\\")) return null;
-    return value;
+    if (value.includes("\\")) return null;
+
+    let parsed: URL;
+    try {
+      parsed = new URL(value, RELATIVE_BASE_ORIGIN);
+    } catch {
+      return null;
+    }
+
+    if (parsed.origin !== RELATIVE_BASE_ORIGIN) return null;
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
   }
 
   let parsed: URL;
