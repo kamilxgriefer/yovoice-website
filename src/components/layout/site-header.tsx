@@ -65,7 +65,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="focus-ring group relative rounded-full px-3.5 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[.06] hover:text-white"
+              className="focus-ring group relative inline-flex min-h-11 items-center rounded-full px-3.5 py-2 text-sm font-medium text-white/70 transition hover:bg-white/[.06] hover:text-white"
             >
               {item.label}
               <span className="absolute inset-x-4 -bottom-0.5 h-px scale-x-0 bg-gradient-to-r from-violet-400 to-fuchsia-300 transition-transform duration-300 ease-out group-hover:scale-x-100" />
@@ -76,16 +76,16 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 min-[1200px]:flex">
           {user ? (
             <>
-              <Link href="/account/profile" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
+              <Link href="/account/profile" className="focus-ring inline-flex min-h-11 items-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
                 My account
               </Link>
               <button
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className="focus-ring flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white disabled:opacity-50"
+                className="focus-ring flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white disabled:opacity-50"
               >
-                <LogOut className="size-4" />
+                <LogOut className="size-4" aria-hidden="true" />
                 {signingOut ? "Signing out…" : "Log out"}
               </button>
               <Link href={APP_ENTRY_PATH} className="premium-button focus-ring min-h-12 px-5">
@@ -94,10 +94,10 @@ export function SiteHeader() {
             </>
           ) : (
             <>
-              <Link href="/login" className="focus-ring rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
+              <Link href="/login" className="focus-ring inline-flex min-h-11 items-center rounded-xl px-4 py-2.5 text-sm font-semibold text-white/75 transition hover:bg-white/[.04] hover:text-white">
                 Log in
               </Link>
-              <Link href="/register" className="focus-ring rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[.04]">
+              <Link href="/register" className="focus-ring inline-flex min-h-11 items-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[.04]">
                 Create account
               </Link>
               <Link
@@ -119,7 +119,11 @@ export function SiteHeader() {
           aria-controls="mobile-navigation"
           aria-label={isOpen ? "Close menu" : "Open menu"}
         >
-          {isOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          {isOpen ? (
+            <X className="size-5" aria-hidden="true" />
+          ) : (
+            <Menu className="size-5" aria-hidden="true" />
+          )}
         </button>
       </div>
 
@@ -146,7 +150,7 @@ export function SiteHeader() {
                   disabled={signingOut}
                   className="flex items-center gap-2 rounded-xl px-4 py-3 text-left text-sm font-medium text-white/75 hover:bg-white/5 hover:text-white disabled:opacity-50"
                 >
-                  <LogOut className="size-4" />
+                  <LogOut className="size-4" aria-hidden="true" />
                   {signingOut ? "Signing out…" : "Log out"}
                 </button>
                 <Link href={APP_ENTRY_PATH} onClick={() => setIsOpen(false)} className="premium-button mt-3 min-h-12">

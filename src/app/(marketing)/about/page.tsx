@@ -63,9 +63,10 @@ export default function AboutPage() {
           </p>
           <p className="mt-5">
             YO Voice is developed by a small, focused team shipping in the
-            open — the web app is live today, with native apps for iOS,
-            iOS and Android builds available to invited testers while the
-            public store and desktop releases continue toward launch.
+            open — the web app is live today. YO Voice 1.0.0 build 16 is ready
+            for invited mobile testing and awaits distribution on both iOS
+            and Android, while public store and desktop releases continue
+            toward launch.
           </p>
         </div>
       </section>

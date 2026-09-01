@@ -10,7 +10,7 @@ export function DownloadSection() {
     {
       icon: Smartphone,
       title: "Mobile",
-      description: "Android build 15 is available in Internal Testing. iOS build 15 is uploaded and awaiting TestFlight group assignment.",
+      description: "YO Voice 1.0.0 build 16 is ready and awaiting invited-tester distribution through Google Play Internal Testing and TestFlight.",
       href: "/download",
       action: "View tester access",
     },

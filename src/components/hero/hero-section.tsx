@@ -60,11 +60,11 @@ export function HeroSection() {
           >
             <HeroPrimaryCta href={APP_ENTRY_PATH}>
               Start talking
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-4" aria-hidden="true" />
             </HeroPrimaryCta>
             <HeroSecondaryCta href="#experience">
               <span className="flex size-7 items-center justify-center rounded-full bg-white text-[#0d0618]">
-                <Play className="ml-0.5 size-3.5 fill-current" />
+                <Play className="ml-0.5 size-3.5 fill-current" aria-hidden="true" />
               </span>
               Explore YO Voice
             </HeroSecondaryCta>
@@ -105,11 +105,11 @@ export function HeroSection() {
         <motion.a
           href="#stats"
           whileHover={{ y: 2 }}
-          className="focus-ring mx-auto flex size-10 items-center justify-center text-white/30 transition hover:text-white/60"
+          className="focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-white/45 transition hover:bg-white/[.04] hover:text-white/70"
           aria-label="Scroll to statistics"
         >
           <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
-            <ArrowDown className="size-4" />
+            <ArrowDown className="size-4" aria-hidden="true" />
           </motion.span>
         </motion.a>
       </div>

@@ -24,8 +24,8 @@ export function SiteFooter() {
           {columns.map((column) => (
             <div key={column.title}>
               <h2 className="text-sm font-bold">{column.title}</h2>
-              <ul className="mt-5 space-y-3">
-                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="text-sm text-white/65 transition hover:text-white">{label}</Link></li>)}
+              <ul className="mt-3">
+                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="inline-flex min-h-11 items-center text-sm text-white/65 transition hover:text-white">{label}</Link></li>)}
               </ul>
             </div>
           ))}
@@ -43,9 +43,10 @@ export function SiteFooter() {
               [Mail,"mailto:hello@yovoice.app","Email"],
             ].map(([Icon,href,label]) => {
               const Comp = Icon as typeof Code2;
+              const opensNewTab = String(href).startsWith("http");
               return (
-                <a key={String(label)} href={String(href)} target={String(href).startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[.04] text-white/60 transition hover:border-fuchsia-300/30 hover:bg-fuchsia-400/10 hover:text-white" aria-label={String(label)}>
-                  <Comp className="size-4"/>
+                <a key={String(label)} href={String(href)} target={opensNewTab ? "_blank" : undefined} rel={opensNewTab ? "noreferrer" : undefined} className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/[.04] text-white/60 transition hover:border-fuchsia-300/30 hover:bg-fuchsia-400/10 hover:text-white" aria-label={`${String(label)}${opensNewTab ? " (opens in a new tab)" : ""}`}>
+                  <Comp className="size-4" aria-hidden="true"/>
                 </a>
               )
             })}

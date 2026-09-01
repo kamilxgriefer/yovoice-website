@@ -23,7 +23,6 @@ const columns = [
       "Push and in-app notifications",
       "Email verification and secure password reset",
       "In-app reporting, blocking and room moderation flows",
-      "Google Play Internal Testing channel",
       "Web app at yovoice.app",
     ],
   },
@@ -35,7 +34,7 @@ const columns = [
     items: [
       "Native desktop apps for Windows and macOS",
       "Public iOS App Store and Google Play release",
-      "iOS build 15 assignment to permanent TestFlight groups",
+      "Build 16 distribution to Google Play Internal Testing and TestFlight",
       "Expanded club discovery",
     ],
   },

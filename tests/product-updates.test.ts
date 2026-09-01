@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 
 import { productUpdates } from "../src/content/product-updates.ts";
@@ -37,17 +38,70 @@ describe("product update ledger", () => {
     }
   });
 
-  test("keeps build 15 truthful while iOS tester assignment is pending", () => {
+  test("keeps the September security wave behind explicit rollout gates", () => {
+    const media = productUpdates.find(
+      (update) => update.slug === "private-media-access-hardening",
+    );
+    const privilegedAuth = productUpdates.find(
+      (update) => update.slug === "privileged-authentication-gates",
+    );
+    const video = productUpdates.find(
+      (update) => update.slug === "direct-video-release-verification",
+    );
+
+    assert.ok(media);
+    assert.equal(media.updatedOn, "2026-09-01");
+    assert.equal(media.status, "verification");
+    assert.match(media.summary, /90-second ceiling/i);
+    assert.match(media.summary, /not presented as deployed/i);
+    assert.match(media.highlights.join(" "), /IAM/i);
+
+    assert.ok(privilegedAuth);
+    assert.equal(privilegedAuth.status, "verification");
+    assert.match(privilegedAuth.summary, /after staff enrollment/i);
+    assert.match(privilegedAuth.summary, /App Check enforcement/i);
+
+    assert.ok(video);
+    assert.equal(video.status, "verification");
+    assert.match(video.summary, /implemented in source but remains unreleased/i);
+    assert.match(video.highlights.join(" "), /does not claim FaceTime-style application E2EE/i);
+  });
+
+  test("keeps build 16 ready until both tester channels are confirmed", () => {
     const mobile = productUpdates.find(
-      (update) => update.slug === "mobile-build-15",
+      (update) => update.slug === "mobile-build-16",
     );
 
     assert.ok(mobile);
-    assert.equal(mobile.updatedOn, "2026-08-31");
-    assert.equal(mobile.status, "testing");
-    assert.match(mobile.summary, /Android is published to Internal Testing/i);
-    assert.match(mobile.summary, /iOS assignment remains the final rollout boundary/i);
-    assert.doesNotMatch(mobile.summary, /available to all testers/i);
+    assert.equal(mobile.updatedOn, "2026-09-01");
+    assert.equal(mobile.status, "ready");
+    assert.match(mobile.summary, /1\.0\.0 build 16/i);
+    assert.match(mobile.summary, /awaiting distribution/i);
+    assert.match(mobile.summary, /Google Play Internal Testing/i);
+    assert.match(mobile.summary, /TestFlight/i);
+    assert.doesNotMatch(mobile.summary, /Android is published|iOS (?:is |has been )?uploaded/i);
+  });
+
+  test("keeps every visible current-release reference on the same build truth", () => {
+    const releaseSurfaces = [
+      "../src/components/sections/download-section.tsx",
+      "../src/components/download/platform-selector.tsx",
+      "../src/app/(marketing)/download/page.tsx",
+      "../src/app/(marketing)/faq/page.tsx",
+      "../src/app/(marketing)/roadmap/page.tsx",
+      "../src/app/(marketing)/about/page.tsx",
+    ];
+
+    for (const relativePath of releaseSurfaces) {
+      const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
+      assert.match(source, /build 16/i, relativePath);
+      assert.doesNotMatch(source, /build 15/i, relativePath);
+      assert.doesNotMatch(
+        source,
+        /Android build 16[^.\n]*(?:published|available)|iOS build 16[^.\n]*uploaded/i,
+        relativePath,
+      );
+    }
   });
 
   test("marks the rebuilt website live only after production verification", () => {

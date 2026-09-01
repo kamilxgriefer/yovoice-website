@@ -31,32 +31,27 @@ const statusPresentation: Record<
   {
     label: string;
     description: string;
-    className: string;
     icon: typeof CheckCircle2;
   }
 > = {
   live: {
     label: "Live",
     description: "Verified in production",
-    className: "border-emerald-300/25 bg-emerald-400/10 text-emerald-200",
     icon: CheckCircle2,
   },
   testing: {
     label: "In testing",
     description: "Available; acceptance continues",
-    className: "border-sky-300/25 bg-sky-400/10 text-sky-100",
     icon: TestTube2,
   },
   ready: {
     label: "Ready for rollout",
     description: "Built and release-tested",
-    className: "border-amber-300/25 bg-amber-400/10 text-amber-100",
     icon: Clock3,
   },
   verification: {
     label: "In verification",
     description: "Still behind a release boundary",
-    className: "border-fuchsia-300/25 bg-fuchsia-400/10 text-fuchsia-100",
     icon: FlaskConical,
   },
 };
@@ -67,6 +62,7 @@ const currentWave = productUpdates.filter(
 const earlierUpdates = productUpdates.filter(
   (update) => update.updatedOn < "2026-08-29",
 );
+const releaseWaveRange = formatReleaseWaveRange(currentWave);
 
 export default function UpdatesPage() {
   return (
@@ -85,7 +81,7 @@ export default function UpdatesPage() {
           </h2>
 
           <ul
-            className="grid grid-cols-2 gap-2.5 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 lg:grid-cols-4"
             aria-label="Release status legend"
           >
             {(Object.keys(statusPresentation) as ProductUpdateStatus[]).map(
@@ -95,13 +91,14 @@ export default function UpdatesPage() {
                 return (
                   <li
                     key={status}
-                    className="rounded-2xl border border-white/10 bg-[var(--surface-muted)] px-3.5 py-3"
+                    data-status={status}
+                    className="release-status rounded-2xl border px-3.5 py-3"
                   >
-                    <div className="flex items-center gap-2 text-xs font-black text-white sm:text-sm">
-                      <Icon className="size-4 text-[#d986ff]" aria-hidden="true" />
+                    <div className="flex items-center gap-2 text-xs font-black sm:text-sm">
+                      <Icon className="size-4" aria-hidden="true" />
                       {item.label}
                     </div>
-                    <p className="mt-1 text-[11px] leading-4 text-white/60 sm:text-xs">
+                    <p className="mt-1 text-[11px] leading-4 opacity-70 sm:text-xs">
                       {item.description}
                     </p>
                   </li>
@@ -111,15 +108,15 @@ export default function UpdatesPage() {
           </ul>
 
           <div className="mt-8 flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-2xl border border-[#d986ff]/25 bg-[#d986ff]/10 text-[#d986ff]">
+            <span className="flex size-9 items-center justify-center rounded-2xl border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/10 text-[var(--accent)]">
               <Sparkles className="size-4" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-xs font-black uppercase tracking-[.18em] text-[#d986ff]">
+              <p className="text-xs font-black uppercase tracking-[.18em] text-[var(--accent)]">
                 Current release wave
               </p>
               <p className="mt-0.5 text-sm text-white/60">
-                August 29–31 · app, tester builds and website
+                {releaseWaveRange} · source, tests and rollout truth
               </p>
             </div>
           </div>
@@ -162,7 +159,7 @@ export default function UpdatesPage() {
             </details>
           ) : null}
 
-          <div className="mt-8 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-[#d986ff]/20 bg-gradient-to-r from-[#7b2ff7]/12 to-[#d986ff]/8 p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="mt-8 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-[color:var(--accent)]/20 bg-gradient-to-r from-[color:var(--primary)]/12 to-[color:var(--accent)]/8 p-6 sm:flex-row sm:items-center sm:p-8">
             <div>
               <h2 className="text-xl font-bold text-white">
                 Want the longer view?
@@ -196,7 +193,7 @@ function UpdateCard({
   const StatusIcon = status.icon;
 
   return (
-    <li id={update.slug}>
+    <li id={update.slug} className="scroll-mt-28">
       <article
         className={`${featured ? "glass-panel-glow" : "glass-panel"} rounded-[26px] p-5 sm:p-7 lg:grid lg:grid-cols-[160px_minmax(0,1fr)] lg:gap-8`}
       >
@@ -214,7 +211,8 @@ function UpdateCard({
             }).format(new Date(`${update.updatedOn}T00:00:00Z`))}
           </time>
           <div
-            className={`mt-3 inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${status.className}`}
+            data-status={update.status}
+            className="release-status mt-3 inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold"
           >
             <StatusIcon className="size-3.5" aria-hidden="true" />
             {status.label}
@@ -223,7 +221,7 @@ function UpdateCard({
 
         <div className="mt-5 min-w-0 lg:mt-0">
           <p className="eyebrow">{update.eyebrow}</p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.035em] text-white sm:text-3xl">
+          <h2 className="mt-2 break-words font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.035em] text-white sm:text-3xl">
             {update.title}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/65 sm:text-[15px]">
@@ -233,7 +231,7 @@ function UpdateCard({
             {update.highlights.map((highlight) => (
               <li
                 key={highlight}
-                className="rounded-2xl border border-white/10 bg-[#0c0814]/75 p-3.5 text-sm leading-6 text-white/65"
+                className="rounded-2xl border border-white/10 bg-[var(--surface-sunken)]/75 p-3.5 text-sm leading-6 text-white/65"
               >
                 {highlight}
               </li>
@@ -243,4 +241,19 @@ function UpdateCard({
       </article>
     </li>
   );
+}
+
+function formatReleaseWaveRange(updates: readonly ProductUpdate[]) {
+  if (updates.length === 0) return "No current entries";
+
+  const dates = updates.map((update) => update.updatedOn).sort();
+  const format = new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+  const first = format.format(new Date(`${dates[0]}T00:00:00Z`));
+  const last = format.format(new Date(`${dates.at(-1)}T00:00:00Z`));
+
+  return first === last ? first : `${first} – ${last}`;
 }

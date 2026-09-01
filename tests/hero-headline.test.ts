@@ -11,6 +11,19 @@ test("the gradient hero line reserves paint space for letter descenders", async 
   assert.match(hero, /text-gradient-descender-safe/);
   assert.match(
     css,
-    /\.text-gradient-descender-safe\s*\{[^}]*margin-bottom:\s*-\.12em;[^}]*padding-bottom:\s*\.12em;/s,
+    /\.text-gradient-descender-safe\s*\{[^}]*overflow:\s*visible;[^}]*margin-bottom:\s*-\.12em;[^}]*padding-bottom:\s*\.12em;/s,
   );
+});
+
+test("hero rotator uses compact 44px controls instead of tiny pagination dots", async () => {
+  const rotator = await readFile(
+    "src/components/hero/hero-prompt-rotator.tsx",
+    "utf8",
+  );
+
+  assert.match(rotator, /Show previous welcome message/);
+  assert.match(rotator, /Show next welcome message/);
+  assert.match(rotator, /min-h-11/);
+  assert.match(rotator, /size-11/);
+  assert.doesNotMatch(rotator, /heroPrompts\.map\(\(prompt, index\)/);
 });

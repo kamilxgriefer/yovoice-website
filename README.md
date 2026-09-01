@@ -24,7 +24,7 @@ The official website serves as the public face of the project, allowing users to
 
 # 🚀 Tech Stack
 
-- Next.js 15
+- Next.js 16.3.4
 - React 19
 - TypeScript
 - Tailwind CSS
@@ -103,7 +103,7 @@ cp .env.example .env.local   # fill in Firebase config, see below
 npm run dev
 ```
 
-Requires Node 20+. Uses [Turbopack](https://nextjs.org/docs/app/api-reference/turbopack) (`next dev`/`next build --turbopack`).
+Requires Node 20.9 or newer. Uses [Turbopack](https://nextjs.org/docs/app/api-reference/turbopack) (`next dev`/`next build`).
 
 ```bash
 npm run lint     # ESLint
@@ -160,10 +160,6 @@ the run context.
 - **Desktop/mobile installers** aren't published — the download center
   is honest about this rather than linking to store pages that don't
   exist.
-- **`npm audit`** currently reports 3 high-severity advisories, all
-  transitive (bundled inside `next`'s own `postcss`/`sharp` deps, not a
-  direct dependency of this project). `npm audit fix` should resolve
-  them once verified not to break the Next.js build.
 
 ---
 

@@ -10,9 +10,9 @@ const cards = [
     icon: Smartphone,
     title: "Mobile",
     description: "iOS and Android apps.",
-    status: "Android build 15 is in Internal Testing. iOS build 15 is uploaded; TestFlight group assignment is pending.",
-    href: "/updates#mobile-build-15",
-    action: "See build 15 status",
+    status: "YO Voice 1.0.0 build 16 is ready and awaiting distribution through Google Play Internal Testing and TestFlight.",
+    href: "/updates#mobile-build-16",
+    action: "See build 16 status",
   },
   {
     icon: Monitor,

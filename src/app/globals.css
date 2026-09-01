@@ -10,12 +10,24 @@
   --surface-raised: #21192b;
   --surface-sunken: #0c0814;
   --primary: #7b2ff7;
+  --secondary: #c026ff;
+  --brand-cyan: #5ce1e6;
   --accent: #d986ff;
   --border: #342a43;
   --border-strong: #7c6790;
   --text-secondary: #b8afc2;
   --text-tertiary: #958b9f;
+  --navigation-surface: #17111f;
+  --navigation-outline: #725c86;
+  --navigation-inactive: #9189a6;
+  --focus: #d986ff;
+  --success-surface: #10271c;
   --success: #57d99a;
+  --warning-surface: #2e2410;
+  --warning: #ffc94d;
+  --info-surface: #102337;
+  --info: #6fc3ff;
+  --danger-surface: #32131d;
   --error: #ffb3be;
 
   /* Design tokens — single source of truth for radius/spacing so pages stop
@@ -46,6 +58,10 @@ a { color: inherit; text-decoration: none; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; cursor: pointer; }
 img { user-select: none; -webkit-user-drag: none; }
+:where(a,button,summary,[tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
 ::selection { background: rgba(192,38,255,.4); color: white; }
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--background); }
@@ -71,6 +87,7 @@ img { user-select: none; -webkit-user-drag: none; }
    background-painting box. Reserve paint space for letters such as g/y/p,
    then cancel that space in layout so the hero rhythm does not move. */
 .text-gradient-descender-safe {
+  overflow: visible;
   margin-bottom: -.12em;
   padding-bottom: .12em;
 }
@@ -87,9 +104,9 @@ img { user-select: none; -webkit-user-drag: none; }
 .app-dock-preview {
   isolation: isolate;
   min-height: 70px;
-  border: 1px solid #725c86;
+  border: 1px solid var(--navigation-outline);
   border-radius: 25px;
-  background: linear-gradient(180deg,#21192b,#17111f);
+  background: linear-gradient(180deg,var(--surface-raised),var(--navigation-surface));
   box-shadow: 0 16px 34px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
 }
 .app-dock-preview::before {
@@ -101,10 +118,10 @@ img { user-select: none; -webkit-user-drag: none; }
   width: 106px;
   height: 62px;
   transform: translateX(-50%);
-  border: 1px solid #725c86;
+  border: 1px solid var(--navigation-outline);
   border-bottom: 0;
   border-radius: 60px 60px 0 0;
-  background: #17111f;
+  background: var(--navigation-surface);
 }
 .app-dock-preview[data-theme="pearl"] {
   border-color: #9a83aa;
@@ -123,7 +140,36 @@ img { user-select: none; -webkit-user-drag: none; }
     linear-gradient(145deg,rgba(35,24,55,.82),rgba(17,9,29,.8)) padding-box,
     linear-gradient(135deg, rgba(240,171,252,.5), rgba(124,58,237,.15) 40%, rgba(56,189,248,.2)) border-box;
 }
-.focus-ring:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.focus-ring:focus-visible { outline-color: var(--focus); }
+
+/* Product update states use the same semantic status pairs as Flutter's
+   AppPalette. Icons and text keep communicating the state when colour is not
+   available, while the shared surface/foreground pair preserves contrast. */
+.release-status {
+  border-color: var(--border);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+}
+.release-status[data-status="live"] {
+  border-color: color-mix(in srgb, var(--success) 38%, transparent);
+  background: var(--success-surface);
+  color: var(--success);
+}
+.release-status[data-status="testing"] {
+  border-color: color-mix(in srgb, var(--info) 38%, transparent);
+  background: var(--info-surface);
+  color: var(--info);
+}
+.release-status[data-status="ready"] {
+  border-color: color-mix(in srgb, var(--warning) 38%, transparent);
+  background: var(--warning-surface);
+  color: var(--warning);
+}
+.release-status[data-status="verification"] {
+  border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 76%, var(--primary));
+  color: var(--accent);
+}
 
 /* Light CTA links need an explicit class because the global anchor rule keeps
    inherited white text. A named class also survives production CSS pruning,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
 export const heroPrompts = [
   "Drop into a Community Room and join one shared conversation when you are ready.",
@@ -24,6 +24,16 @@ export function HeroPromptRotator() {
   const [interactionPaused, setInteractionPaused] = useState(false);
 
   const autoRotationPaused = paused || interactionPaused || reduceMotion === true;
+
+  function showPreviousPrompt() {
+    setActiveIndex((current) =>
+      current === 0 ? heroPrompts.length - 1 : current - 1,
+    );
+  }
+
+  function showNextPrompt() {
+    setActiveIndex((current) => (current + 1) % heroPrompts.length);
+  }
 
   useEffect(() => {
     if (autoRotationPaused) return;
@@ -71,15 +81,23 @@ export function HeroPromptRotator() {
       </div>
 
       <div
-        className="mt-2 flex items-center justify-center gap-2.5 lg:justify-start"
+        className="mt-1 flex flex-wrap items-center justify-center gap-1.5 lg:justify-start"
         role="group"
         aria-label="Choose a welcome message"
+        onMouseEnter={() => setInteractionPaused(true)}
+        onMouseLeave={() => setInteractionPaused(false)}
+        onFocusCapture={() => setInteractionPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setInteractionPaused(false);
+          }
+        }}
       >
         {reduceMotion !== true && (
           <button
             type="button"
             onClick={() => setPaused((current) => !current)}
-            className="focus-ring inline-flex min-h-8 items-center gap-1.5 rounded-full px-2 text-[11px] font-semibold text-white/40 transition hover:text-white/70 reduce-motion:transition-none"
+            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold text-white/55 transition hover:bg-white/[.04] hover:text-white/80 reduce-motion:transition-none"
             aria-label={paused ? "Resume welcome messages" : "Pause welcome messages"}
           >
             {paused ? (
@@ -91,31 +109,29 @@ export function HeroPromptRotator() {
           </button>
         )}
 
-        <div
-          className="flex items-center gap-1.5"
-          onMouseEnter={() => setInteractionPaused(true)}
-          onMouseLeave={() => setInteractionPaused(false)}
-          onFocusCapture={() => setInteractionPaused(true)}
-          onBlurCapture={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
-              setInteractionPaused(false);
-            }
-          }}
-        >
-          {heroPrompts.map((prompt, index) => (
-            <button
-              key={prompt}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              aria-label={`Show message ${index + 1} of ${heroPrompts.length}: ${prompt}`}
-              aria-current={activeIndex === index ? "true" : undefined}
-              className={`focus-ring h-2.5 rounded-full transition-[width,background-color] duration-300 reduce-motion:transition-none ${
-                activeIndex === index
-                  ? "w-6 bg-fuchsia-300/85"
-                  : "w-2.5 bg-white/20 hover:bg-white/40"
-              }`}
-            />
-          ))}
+        <div className="flex items-center rounded-full border border-white/[.08] bg-white/[.025]">
+          <button
+            type="button"
+            onClick={showPreviousPrompt}
+            className="focus-ring flex size-11 items-center justify-center rounded-full text-white/55 transition hover:bg-white/[.06] hover:text-white reduce-motion:transition-none"
+            aria-label="Show previous welcome message"
+          >
+            <ChevronLeft className="size-3.5" aria-hidden="true" />
+          </button>
+          <span
+            className="min-w-12 text-center text-[11px] font-bold tabular-nums tracking-[.12em] text-white/55"
+            aria-hidden="true"
+          >
+            {String(activeIndex + 1).padStart(2, "0")} / {String(heroPrompts.length).padStart(2, "0")}
+          </span>
+          <button
+            type="button"
+            onClick={showNextPrompt}
+            className="focus-ring flex size-11 items-center justify-center rounded-full text-white/55 transition hover:bg-white/[.06] hover:text-white reduce-motion:transition-none"
+            aria-label="Show next welcome message"
+          >
+            <ChevronRight className="size-3.5" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </div>

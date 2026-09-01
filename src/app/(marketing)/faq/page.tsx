@@ -20,7 +20,7 @@ const groups: FaqGroup[] = [
       {
         question: "What platforms is YO Voice available on?",
         answer:
-          "The web app is live in modern browsers and Android build 15 is available through Google Play Internal Testing. iOS build 15 has been uploaded but is still awaiting TestFlight group assignment. Public store and desktop releases are not available yet — see Download for the current status.",
+          "The web app is live in modern browsers. YO Voice 1.0.0 build 16 is ready and awaiting invited-tester distribution through Google Play Internal Testing and TestFlight. Neither mobile channel is marked available until delivery is independently confirmed; public store and desktop releases are not available yet.",
       },
       {
         question: "Do I need to verify my email?",

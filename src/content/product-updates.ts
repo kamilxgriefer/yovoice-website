@@ -23,17 +23,59 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
-    slug: "mobile-build-15",
-    updatedOn: "2026-08-31",
-    status: "testing",
-    eyebrow: "Mobile",
-    title: "Build 15 brings the newest YO Voice experience together",
+    slug: "private-media-access-hardening",
+    updatedOn: "2026-09-01",
+    status: "verification",
+    eyebrow: "Security",
+    title: "Private media access is short-lived and account-bound in source",
     summary:
-      "YO Voice 1.0.0 build 15 brings the latest navigation, account, profile, room and visual refinements into one coordinated tester release. Android is published to Internal Testing; iOS assignment remains the final rollout boundary.",
+      "The source-tested private-media boundary now authorises each request before issuing a V4 access capability with a 90-second ceiling. Cloud IAM, migration and revocation checks remain rollout gates, so this is not presented as deployed yet.",
+    highlights: [
+      "Access is checked before a short-lived media capability is minted",
+      "Upload reservations bind the owner, object path, media contract, quota and finalisation lease",
+      "Legacy token revocation, migration dry-runs and bucket IAM still require production verification",
+    ],
+  },
+  {
+    slug: "privileged-authentication-gates",
+    updatedOn: "2026-09-01",
+    status: "verification",
+    eyebrow: "Security",
+    title: "Sensitive staff actions have a stronger authentication gate",
+    summary:
+      "A shared backend guard now checks verified identity and recent authentication for privileged operations, with MFA enforcement ready to activate after staff enrollment. App Check enforcement also remains deliberately gated until real attestation telemetry is healthy.",
+    highlights: [
+      "Privileged operations fail closed when identity or authentication freshness is insufficient",
+      "MFA can be required centrally without trusting a role badge or client-side state",
+      "Staff enrollment, App Check telemetry and production configuration remain explicit release gates",
+    ],
+  },
+  {
+    slug: "direct-video-release-verification",
+    updatedOn: "2026-09-01",
+    status: "verification",
+    eyebrow: "Calls",
+    title: "Private video calls have entered release verification",
+    summary:
+      "The direct-call path now carries server-validated audio or video intent, bounded token minting and mixed-version protection. It is implemented in source but remains unreleased until the physical two-device matrix and store rollout gates pass.",
+    highlights: [
+      "Camera and microphone lifecycle cleanup blocks late permission or connection work after hang-up",
+      "Recipient capability checks prevent a new video request from silently degrading on an older client",
+      "Media is encrypted in transit through LiveKit; YO Voice does not claim FaceTime-style application E2EE",
+    ],
+  },
+  {
+    slug: "mobile-build-16",
+    updatedOn: "2026-09-01",
+    status: "ready",
+    eyebrow: "Mobile",
+    title: "Build 16 is ready for tester distribution",
+    summary:
+      "YO Voice 1.0.0 build 16 is the current mobile release candidate, bringing the latest navigation, account, profile, room and visual refinements into one coordinated release. It is ready and awaiting distribution to invited testers through both Google Play Internal Testing and TestFlight; neither channel is marked delivered until independently confirmed.",
     highlights: [
       "A complete Dark and Pearl pass across primary journeys and shared controls",
       "The sculpted navigation dock, compact live-room capsule and safer room-session transitions",
-      "Guided onboarding, responsive authentication and stronger profile and chat identity consistency",
+      "Store assignment and tester availability will move this release to Testing only after both channels are confirmed",
     ],
   },
   {
