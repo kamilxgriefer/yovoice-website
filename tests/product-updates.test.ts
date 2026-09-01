@@ -67,7 +67,7 @@ describe("product update ledger", () => {
     assert.match(video.highlights.join(" "), /does not claim FaceTime-style application E2EE/i);
   });
 
-  test("keeps build 16 ready until both tester channels are confirmed", () => {
+  test("keeps build 17 ready until both tester channels are confirmed", () => {
     const mobile = productUpdates.find(
       (update) => update.slug === "mobile-build-16",
     );
@@ -75,7 +75,7 @@ describe("product update ledger", () => {
     assert.ok(mobile);
     assert.equal(mobile.updatedOn, "2026-09-01");
     assert.equal(mobile.status, "ready");
-    assert.match(mobile.summary, /1\.0\.0 build 16/i);
+    assert.match(mobile.summary, /1\.0\.0 build 17/i);
     assert.match(mobile.summary, /awaiting distribution/i);
     assert.match(mobile.summary, /Google Play Internal Testing/i);
     assert.match(mobile.summary, /TestFlight/i);
@@ -94,11 +94,11 @@ describe("product update ledger", () => {
 
     for (const relativePath of releaseSurfaces) {
       const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
-      assert.match(source, /build 16/i, relativePath);
+      assert.match(source, /build 17/i, relativePath);
       assert.doesNotMatch(source, /build 15/i, relativePath);
       assert.doesNotMatch(
         source,
-        /Android build 16[^.\n]*(?:published|available)|iOS build 16[^.\n]*uploaded/i,
+        /Android build 17[^.\n]*(?:published|available)|iOS build 17[^.\n]*uploaded/i,
         relativePath,
       );
     }

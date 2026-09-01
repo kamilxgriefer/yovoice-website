@@ -69,9 +69,9 @@ export const productUpdates: readonly ProductUpdate[] = [
     updatedOn: "2026-09-01",
     status: "ready",
     eyebrow: "Mobile",
-    title: "Build 16 is ready for tester distribution",
+    title: "Build 17 is ready for tester distribution",
     summary:
-      "YO Voice 1.0.0 build 16 is the current mobile release candidate, bringing the latest navigation, account, profile, room and visual refinements into one coordinated release. It is ready and awaiting distribution to invited testers through both Google Play Internal Testing and TestFlight; neither channel is marked delivered until independently confirmed.",
+      "YO Voice 1.0.0 build 17 is the current mobile release candidate, bringing the latest navigation, account, profile, room and visual refinements into one coordinated release. It also preserves Android device coverage while keeping camera hardware optional. It is ready and awaiting distribution to invited testers through both Google Play Internal Testing and TestFlight; neither channel is marked delivered until independently confirmed.",
     highlights: [
       "A complete Dark and Pearl pass across primary journeys and shared controls",
       "The sculpted navigation dock, compact live-room capsule and safer room-session transitions",
