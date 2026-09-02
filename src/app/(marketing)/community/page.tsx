@@ -13,9 +13,9 @@ export const metadata = createPageMetadata({
 const highlights = [
   {
     icon: Users,
-    title: "One room, everyone present",
+    title: "Look before you connect",
     description:
-      "Community Rooms use one shared presence model. People here shows the room clearly without separating members into an audience lane.",
+      "Opening a room shows a passive preview first. Audio, presence and microphone access begin only after you choose Join conversation.",
   },
   {
     icon: DoorOpen,
@@ -27,7 +27,7 @@ const highlights = [
     icon: UserPlus,
     title: "Friends and follows",
     description:
-      "Follow the creators and rooms you like, add friends you meet, and build a circle that follows you across YO Voice.",
+      "Send, accept or cancel a friend request without duplicate states, then keep that identity current across search, Home and Chats.",
   },
   {
     icon: Compass,
@@ -37,9 +37,9 @@ const highlights = [
   },
   {
     icon: Mic2,
-    title: "Fast, local controls",
+    title: "Chat stays within reach",
     description:
-      "Mute responds locally first, and compact Chat and People actions remain within reach without covering the conversation.",
+      "Compact room chat is visible when you arrive, remains readable beside the conversation and folds away whenever you want more space.",
   },
   {
     icon: ShieldCheck,
@@ -64,7 +64,7 @@ export default function CommunityPage() {
             {highlights.map(({ icon: Icon, title, description }) => (
               <article key={title} className="glass-panel rounded-[28px] p-7">
                 <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                  <Icon className="size-6" />
+                  <Icon className="size-6" aria-hidden="true" />
                 </div>
                 <h2 className="mt-6 text-lg font-bold">{title}</h2>
                 <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
@@ -82,7 +82,7 @@ export default function CommunityPage() {
             with chat, roles and rooms of its own.
           </p>
           <Link href="/clubs" className="premium-button focus-ring mt-2 min-h-12 px-6 text-sm">
-            Explore clubs <ArrowRight className="size-4" />
+            Explore clubs <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
       </section>

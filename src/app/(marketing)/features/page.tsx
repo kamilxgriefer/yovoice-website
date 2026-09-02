@@ -3,9 +3,13 @@ import {
   AudioLines,
   ArrowRight,
   Bell,
+  CircleUserRound,
   Crown,
+  Languages,
+  MessageCircle,
   Mic2,
   Radio,
+  Settings2,
   ShieldCheck,
   Trophy,
   UserPlus,
@@ -68,7 +72,31 @@ const features = [
     icon: ShieldCheck,
     title: "Safety by default",
     description:
-      "Email verification before you can post or host, plus blocking and room moderation tools built in from day one.",
+      "A persistent verification notice guides unverified accounts, with blocking and room moderation tools built into the product.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Private chats and calls",
+    description:
+      "Text appears immediately with clear recovery states, alongside private photo, voice-message and one-to-one voice-call paths.",
+  },
+  {
+    icon: CircleUserRound,
+    title: "Identity that stays current",
+    description:
+      "Fresh avatars follow a person through search, Home and Chats, and profile photos can open in a focused full-screen viewer.",
+  },
+  {
+    icon: Settings2,
+    title: "Permission readiness",
+    description:
+      "One guided review explains microphone, camera and notification access; each operating-system prompt appears only when needed.",
+  },
+  {
+    icon: Languages,
+    title: "A broader language choice",
+    description:
+      "Polish is a production option and the core interface catalog now spans major European and global locales, with English fallback on specialist screens.",
   },
 ];
 
@@ -93,7 +121,7 @@ export default function FeaturesPage() {
             {features.map(({ icon: Icon, title, description }) => (
               <article key={title} className="glass-panel rounded-[28px] p-7">
                 <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                  <Icon className="size-6" />
+                  <Icon className="size-6" aria-hidden="true" />
                 </div>
                 <h2 className="mt-6 text-lg font-bold">{title}</h2>
                 <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
@@ -122,7 +150,7 @@ export default function FeaturesPage() {
                 <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
                 <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-300 transition group-hover:text-white">
                   Learn more
-                  <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+                  <ArrowRight className="size-4 transition group-hover:translate-x-1" aria-hidden="true" />
                 </span>
               </Link>
             ))}

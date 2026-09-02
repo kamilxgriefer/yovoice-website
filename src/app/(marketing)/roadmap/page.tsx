@@ -34,7 +34,7 @@ const columns = [
     items: [
       "Native desktop apps for Windows and macOS",
       "Public iOS App Store and Google Play release",
-      "Build 17 distribution to Google Play Internal Testing and TestFlight",
+      "Build 18 tester feedback from Google Play Internal Testing and TestFlight",
       "Expanded club discovery",
     ],
   },

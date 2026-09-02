@@ -23,6 +23,62 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "mobile-build-18",
+    updatedOn: "2026-09-02",
+    status: "testing",
+    eyebrow: "Mobile",
+    title: "Build 18 is available to invited testers",
+    summary:
+      "YO Voice 1.0.0 build 18 is now available through both private mobile testing channels. Android is active in Google Play Internal Testing for the permanent 14-person tester list. On Apple, the build is Testing in the one-person internal group and the six-person YO Voice Beta Testers external group, with automatic TestFlight notifications enabled.",
+    highlights: [
+      "A complete Dark and Pearl pass across primary journeys and shared controls",
+      "The sculpted navigation dock, compact live-room capsule and safer room-session transitions",
+      "Android and Apple tester assignments are confirmed while public store release remains a separate milestone",
+    ],
+  },
+  {
+    slug: "room-consent-and-docked-chat",
+    updatedOn: "2026-09-01",
+    status: "verification",
+    eyebrow: "Rooms",
+    title: "Room entry now waits for an explicit choice",
+    summary:
+      "The coordinated release source now opens Community and Podcast Rooms as passive previews. Audio, roster presence and credentials begin only after Join conversation, while final device and rollout checks are still in progress.",
+    highlights: [
+      "The prejoin view explains the room and enters with the microphone off by default",
+      "Compact room chat is visible after joining and can be folded away without losing the conversation",
+      "Local mute and join paths are being checked across compact, enlarged-text and desktop layouts",
+    ],
+  },
+  {
+    slug: "friends-identity-and-chat-recovery",
+    updatedOn: "2026-09-01",
+    status: "verification",
+    eyebrow: "Friends & Chats",
+    title: "Friendship, avatars and message recovery move as one system",
+    summary:
+      "Friend requests are now optimistic and idempotent in source, profile revisions invalidate stale avatar access, and private messages keep immediate local feedback with bounded retry or removal. Production latency still depends on the network and final backend rollout.",
+    highlights: [
+      "Search, suggestions, Home and Chats use current profile imagery instead of falling back to stale initials",
+      "The full-screen profile-photo viewer preserves clear loading, retry and close states",
+      "Terminal message failures explain the next action without exposing backend error details",
+    ],
+  },
+  {
+    slug: "account-readiness-and-language-choice",
+    updatedOn: "2026-09-01",
+    status: "verification",
+    eyebrow: "Account readiness",
+    title: "Verification, permissions and language choice are easier to find",
+    summary:
+      "The current source keeps an unverified-email reminder above authenticated content, offers one guided permission review and expands the core locale catalog. Final release QA remains open, and specialist screens may still use English fallback while coverage grows.",
+    highlights: [
+      "The email reminder stays visible until verification and opens the correct verification flow",
+      "Microphone, camera and notification status are reviewed together while each native prompt remains an operating-system decision",
+      "Polish is a production language alongside a broader catalog including major European locales",
+    ],
+  },
+  {
     slug: "private-media-access-hardening",
     updatedOn: "2026-09-01",
     status: "verification",
@@ -62,20 +118,6 @@ export const productUpdates: readonly ProductUpdate[] = [
       "Camera and microphone lifecycle cleanup blocks late permission or connection work after hang-up",
       "Recipient capability checks prevent a new video request from silently degrading on an older client",
       "Media is encrypted in transit through LiveKit; YO Voice does not claim FaceTime-style application E2EE",
-    ],
-  },
-  {
-    slug: "mobile-build-16",
-    updatedOn: "2026-09-01",
-    status: "ready",
-    eyebrow: "Mobile",
-    title: "Build 17 is ready for tester distribution",
-    summary:
-      "YO Voice 1.0.0 build 17 is the current mobile release candidate, bringing the latest navigation, account, profile, room and visual refinements into one coordinated release. It also preserves Android device coverage while keeping camera hardware optional. It is ready and awaiting distribution to invited testers through both Google Play Internal Testing and TestFlight; neither channel is marked delivered until independently confirmed.",
-    highlights: [
-      "A complete Dark and Pearl pass across primary journeys and shared controls",
-      "The sculpted navigation dock, compact live-room capsule and safer room-session transitions",
-      "Store assignment and tester availability will move this release to Testing only after both channels are confirmed",
     ],
   },
   {

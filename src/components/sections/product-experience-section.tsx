@@ -22,7 +22,7 @@ const featureCards = [
     title: "Community Rooms",
     label: "Speak naturally",
     description:
-      "Open voice spaces built around shared presence instead of rigid stages and cold meeting layouts.",
+      "Preview the room first, then join one shared conversation with chat already within reach.",
     gradient: "from-violet-500/25 via-purple-500/8 to-transparent",
     featured: false,
     highlights: [],
@@ -66,7 +66,7 @@ const featureCards = [
     title: "Friends & Creators",
     label: "Stay connected",
     description:
-      "Make friends, follow creators and discover the people behind the conversations you enjoy.",
+      "Add friends without duplicate states, follow creators and keep current avatars across discovery and chats.",
     gradient: "from-cyan-500/20 via-violet-500/7 to-transparent",
     featured: false,
     highlights: [],
@@ -217,9 +217,9 @@ export function ProductExperienceSection() {
               </h3>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50 sm:mt-5 sm:leading-7">
-                Everyone enters one shared room. People keeps the full roster
-                clear, while fast mute, chat and room controls stay close
-                without turning the conversation into a rigid stage.
+                Look around before any audio connects. After you choose Join
+                conversation, everyone shares one room and the compact chat
+                stays visible until you decide to hide it.
               </p>
 
               <CommunityRoomPreview />

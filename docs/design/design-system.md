@@ -43,6 +43,20 @@ surface tokens. Product-update statuses use those pairs through
 - Decorative icons are hidden from assistive technology. Meaningful icons sit
   beside a visible label or receive an explicit accessible name.
 
+## Product illustrations
+
+- App previews are labelled illustrations, not simulated live accounts. They
+  never contain fabricated member names, audience totals or online states.
+- Room artwork follows the current consent boundary: a passive **Before you
+  join** surface comes before **Join conversation**; only the connected state
+  shows the room chat. The chat is shown open by default and visibly hideable.
+- Account-readiness artwork may show the persistent verification reminder, but
+  it must not imply that an email has been sent or verified without a real
+  account action.
+- Dark is the website shell. Pearl appears as a clearly bounded application
+  preview using the exact light `AppPalette` colours; it is not a second,
+  partially implemented website theme.
+
 ## Interaction and accessibility
 
 - Pointer and touch targets are at least 44 by 44 CSS pixels.

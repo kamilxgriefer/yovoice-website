@@ -1,178 +1,149 @@
 import {
-  Crown,
+  ChevronDown,
   MessageCircle,
-  Mic,
   MicOff,
-  PhoneOff,
+  Send,
+  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 
-const people = [
-  {
-    initials: "YO",
-    role: "Host",
-    speaking: true,
-    muted: false,
-    avatar: "from-fuchsia-400 to-violet-700",
-  },
-  {
-    initials: "01",
-    role: "Member",
-    speaking: false,
-    muted: false,
-    avatar: "from-violet-400 to-indigo-700",
-  },
-  {
-    initials: "02",
-    role: "Member",
-    speaking: false,
-    muted: true,
-    avatar: "from-purple-400 to-slate-700",
-  },
-] as const;
-
 /**
- * An interface illustration, not a live room. The current product uses one
- * shared presence model, so this preview intentionally contains no audience
- * total, listener lane or stage hierarchy.
+ * A truthful two-step product illustration. Opening a room is a passive
+ * preview; audio and presence start only after the explicit join action. Once
+ * connected, the compact chat is visible by default and remains hideable.
  */
 export function CommunityRoomPreview() {
   return (
     <div
       role="img"
-      aria-label="Illustrative YO Voice Community Room preview with one People here area and compact voice controls. No live audience data is shown."
-      className="relative mx-auto mt-7 w-full max-w-[700px] overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--surface-sunken)] p-2.5 shadow-[0_28px_80px_rgba(0,0,0,.34)] sm:mt-10 sm:rounded-[30px] sm:p-4"
+      aria-label="Illustrative YO Voice Community Room flow. A passive Before you join preview appears before audio connects. After joining, compact room chat is visible by default and can be hidden. No live user data is shown."
+      className="relative mx-auto mt-7 w-full max-w-[760px] overflow-hidden rounded-[24px] border border-[var(--border)] bg-[var(--surface-sunken)] p-2.5 shadow-[0_28px_80px_rgba(0,0,0,.34)] sm:mt-10 sm:rounded-[30px] sm:p-4"
     >
-      <div className="pointer-events-none absolute inset-x-[16%] top-[-10%] h-48 rounded-full bg-[#7b2ff7]/18 blur-[75px]" />
+      <div className="pointer-events-none absolute inset-x-[12%] top-[-8%] h-52 rounded-full bg-[#7b2ff7]/18 blur-[80px]" />
 
-      <div className="relative flex items-center justify-between px-1 pb-2 sm:pb-3">
+      <div className="relative flex items-center justify-between gap-3 px-1 pb-2 sm:pb-3">
         <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#d986ff]">
-          Current room model
+          Current room flow
         </span>
-        <span className="text-[10px] font-semibold text-[var(--text-tertiary)]">
-          Interface preview
+        <span className="text-right text-[10px] font-semibold text-[var(--text-tertiary)]">
+          No audio before consent
         </span>
       </div>
 
-      <div className="relative space-y-2.5 rounded-[19px] border border-white/[.04] bg-[#080711]/88 p-2.5 sm:space-y-3 sm:rounded-[24px] sm:p-3">
-        <div className="relative overflow-hidden rounded-[19px] border border-[#7b2ff7]/35 bg-gradient-to-br from-[#21192b] via-[#321548] to-[#7117a2] px-4 py-4 sm:rounded-[22px] sm:px-5 sm:py-5">
-          <div className="absolute right-[-8%] top-[-55%] size-40 rounded-full bg-fuchsia-300/18 blur-3xl" />
-          <div className="relative flex items-start justify-between gap-3">
+      <div className="relative grid gap-2.5 sm:grid-cols-[1.04fr_.96fr] sm:gap-3">
+        <div className="rounded-[20px] border border-[var(--border)] bg-[#080711]/92 p-3 sm:rounded-[24px] sm:p-4">
+          <div className="flex items-center gap-2">
+            <span className="flex size-6 items-center justify-center rounded-full bg-[#7b2ff7] text-[10px] font-black text-white">
+              1
+            </span>
             <div className="min-w-0">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-white/85">
-                <UsersRound className="size-3 text-[#d986ff]" aria-hidden="true" />
-                Community Room
-              </span>
-              <p className="mt-4 truncate text-lg font-black text-white sm:text-xl">
-                Open conversation
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#d986ff]">
+                Before you join
               </p>
-              <p className="mt-1 max-w-md text-[11px] leading-4 text-white/70 sm:text-xs">
-                Everyone joins the same room and can take part naturally.
+              <p className="mt-0.5 text-[9px] text-[var(--text-tertiary)]">
+                Look first. Connect when ready.
               </p>
             </div>
-            <span className="rounded-full border border-white/12 bg-black/20 px-2.5 py-1 text-[9px] font-black text-white/80">
-              LIVE
+          </div>
+
+          <div className="relative mt-3 overflow-hidden rounded-[18px] border border-[#7b2ff7]/38 bg-gradient-to-br from-[#21192b] via-[#321548] to-[#7117a2] p-4">
+            <div className="absolute right-[-12%] top-[-55%] size-36 rounded-full bg-fuchsia-300/18 blur-3xl" />
+            <div className="relative flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/25 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.12em] text-white/90">
+                <UsersRound className="size-3 text-[#d986ff]" aria-hidden="true" />
+                Community room
+              </span>
+              <span className="inline-flex rounded-full border border-[#57d99a]/30 bg-[#10271c] px-2.5 py-1 text-[8px] font-black text-[#57d99a]">
+                Live now
+              </span>
+            </div>
+            <p className="relative mt-6 text-base font-black text-white">
+              Open conversation
+            </p>
+            <p className="relative mt-1 text-[10px] leading-4 text-white/70">
+              See the topic and host before joining the voice session.
+            </p>
+          </div>
+
+          <div className="mt-2.5 flex items-center gap-2.5 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#7b2ff7]/18 text-[#d986ff]">
+              <MicOff className="size-4" aria-hidden="true" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[10px] font-black text-white">
+                Microphone off
+              </span>
+              <span className="mt-0.5 block text-[9px] leading-3.5 text-[var(--text-tertiary)]">
+                You enter muted by default.
+              </span>
             </span>
           </div>
+
+          <span className="mt-2.5 flex min-h-11 items-center justify-center rounded-[14px] bg-gradient-to-r from-[#7b2ff7] to-[#c026ff] px-4 text-[11px] font-black text-white shadow-[0_10px_28px_rgba(123,47,247,.28)]">
+            Join conversation
+          </span>
         </div>
 
-        <div className="rounded-[19px] border border-[var(--border)] bg-[var(--surface)] p-3 sm:rounded-[22px] sm:p-3.5">
+        <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-3 sm:rounded-[24px] sm:p-4">
           <div className="flex items-center gap-2">
-            <UsersRound className="size-4 text-[#d986ff]" aria-hidden="true" />
-            <span className="flex-1 text-xs font-black text-white sm:text-sm">
+            <span className="flex size-6 items-center justify-center rounded-full border border-[#d986ff]/35 bg-[#7b2ff7]/18 text-[10px] font-black text-[#d986ff]">
+              2
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#d986ff]">
+                After joining
+              </p>
+              <p className="mt-0.5 text-[9px] text-[var(--text-tertiary)]">
+                Chat starts open and stays compact.
+              </p>
+            </div>
+            <ShieldCheck className="size-4 text-[#57d99a]" aria-hidden="true" />
+          </div>
+
+          <div className="mt-3 overflow-hidden rounded-[18px] border border-[var(--border)] bg-[#0c0814]">
+            <div className="flex min-h-11 items-center gap-2 border-b border-[var(--border)] px-3">
+              <MessageCircle className="size-4 text-[#d986ff]" aria-hidden="true" />
+              <span className="flex-1 text-[10px] font-black text-white">
+                Room chat
+              </span>
+              <span className="text-[8px] font-bold text-[var(--text-tertiary)]">
+                Visible by default
+              </span>
+              <ChevronDown className="size-4 text-[var(--text-secondary)]" aria-hidden="true" />
+            </div>
+
+            <div className="flex min-h-[132px] flex-col items-center justify-center px-4 text-center sm:min-h-[160px]">
+              <span className="flex size-10 items-center justify-center rounded-full bg-[#7b2ff7]/14 text-[#d986ff]">
+                <MessageCircle className="size-4" aria-hidden="true" />
+              </span>
+              <p className="mt-2 text-[11px] font-black text-white">
+                Start the conversation
+              </p>
+              <p className="mt-1 max-w-[190px] text-[9px] leading-4 text-[var(--text-tertiary)]">
+                Hide the panel whenever you want more room for the conversation.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 border-t border-[var(--border)] p-2.5">
+              <span className="flex min-h-10 min-w-0 flex-1 items-center rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-3 text-[9px] text-[var(--text-tertiary)]">
+                Say something…
+              </span>
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#7b2ff7] text-white">
+                <Send className="size-4" aria-hidden="true" />
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            <span className="rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-2.5 py-1 text-[8px] font-bold text-[var(--text-secondary)]">
               People here
             </span>
-            <span className="text-[10px] font-bold text-[var(--text-tertiary)]">
-              One shared room
+            <span className="rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-2.5 py-1 text-[8px] font-bold text-[var(--text-secondary)]">
+              Fast local mute
             </span>
           </div>
-
-          <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-2.5">
-            {people.map((person) => (
-              <div
-                key={person.initials}
-                className={`relative rounded-2xl border bg-[var(--surface-raised)] px-1.5 py-3 text-center sm:px-3 ${
-                  person.speaking
-                    ? "border-[#d986ff]/75 shadow-[0_0_22px_rgba(217,134,255,.18)]"
-                    : "border-[var(--border)]"
-                }`}
-              >
-                <div className="relative mx-auto w-fit">
-                  <div
-                    className={`rounded-full border p-[2px] ${
-                      person.speaking ? "border-[#d986ff]" : "border-white/15"
-                    }`}
-                  >
-                    <div
-                      className={`flex size-11 items-center justify-center rounded-full bg-gradient-to-br ${person.avatar} text-[10px] font-black text-white sm:size-14 sm:text-xs`}
-                    >
-                      {person.initials}
-                    </div>
-                  </div>
-                  <span
-                    className={`absolute -bottom-0.5 -right-0.5 flex size-5 items-center justify-center rounded-full border-2 border-[var(--surface-raised)] text-white ${
-                      person.muted ? "bg-[var(--border-strong)]" : "bg-[#7b2ff7]"
-                    }`}
-                  >
-                    {person.muted ? (
-                      <MicOff className="size-2.5" aria-hidden="true" />
-                    ) : (
-                      <Mic className="size-2.5" aria-hidden="true" />
-                    )}
-                  </span>
-                </div>
-
-                <div className="mt-2 flex min-w-0 items-center justify-center gap-1">
-                  {person.role === "Host" ? (
-                    <Crown className="size-2.5 shrink-0 text-amber-300" aria-hidden="true" />
-                  ) : null}
-                  <span className="truncate text-[9px] font-bold text-white sm:text-[11px]">
-                    {person.role}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2 rounded-[18px] border border-[var(--border)] bg-[var(--surface)] p-2">
-          <RoomAction icon={Mic} label="Mute" active />
-          <RoomAction icon={MessageCircle} label="Chat" />
-          <RoomAction icon={UsersRound} label="People" />
-          <RoomAction icon={PhoneOff} label="Leave" danger />
         </div>
       </div>
     </div>
-  );
-}
-
-function RoomAction({
-  icon: Icon,
-  label,
-  active = false,
-  danger = false,
-}: {
-  icon: typeof Mic;
-  label: string;
-  active?: boolean;
-  danger?: boolean;
-}) {
-  return (
-    <span className="flex min-w-0 flex-col items-center justify-center gap-1.5 py-1 text-center">
-      <span
-        className={`flex size-9 items-center justify-center rounded-full border sm:size-10 ${
-          danger
-            ? "border-rose-400/25 bg-rose-400/12 text-rose-300"
-            : active
-              ? "border-[#d986ff]/40 bg-[#7b2ff7] text-white shadow-[0_8px_22px_rgba(123,47,247,.28)]"
-              : "border-[var(--border)] bg-[var(--surface-raised)] text-[var(--text-secondary)]"
-        }`}
-      >
-        <Icon className="size-4" aria-hidden="true" />
-      </span>
-      <span className="truncate text-[8px] font-bold text-[var(--text-secondary)] sm:text-[9px]">
-        {label}
-      </span>
-    </span>
   );
 }

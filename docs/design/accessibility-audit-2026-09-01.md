@@ -21,6 +21,13 @@ with the current Flutter application.
   titles to wrap on narrow screens.
 - Changed the Updates status legend to one column on the narrowest screens and
   two columns once space permits.
+- Rebuilt the Community Room illustration as one labelled image with a concise
+  screen-reader description of both states: passive prejoin first, docked chat
+  after joining. Its decorative controls are not exposed as fake buttons.
+- Kept new feature-card icons decorative and paired every capability with a
+  visible heading and description.
+- Verified Home and Updates without horizontal document overflow at 320, 390,
+  768 and 1440 CSS pixels in the local production build.
 
 ## Automated evidence
 
@@ -32,6 +39,8 @@ with the current Flutter application.
 - ESLint and the production Next.js build complete without errors.
 - All routes are statically or server-rendered successfully by the production
   build.
+- The release ledger tests guard the new consent, message-latency and language
+  claims against premature rollout, 1 ms or application-E2EE promises.
 
 ## Manual checks still required before publication
 

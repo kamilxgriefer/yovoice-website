@@ -46,3 +46,25 @@ protobufjs postinstall scripts.
 - Treat a zero-result dependency audit as one control, not a complete security
   guarantee; Firebase rules, environment configuration and platform headers
   require independent review.
+
+## Browser response baseline
+
+All routes now declare the following low-risk response controls through
+`next.config.ts`:
+
+- `X-Content-Type-Options: nosniff` and `X-Frame-Options: DENY`;
+- `Referrer-Policy: strict-origin-when-cross-origin`, tightened to `no-referrer`
+  on Firebase action-code pages;
+- two-year HSTS on the marketing origin. Subdomain inclusion remains a DNS and
+  infrastructure release decision rather than being assumed by application
+  source;
+- a restrictive Permissions Policy. The marketing/account website itself does
+  not request camera, microphone, location or sensor access;
+- a `Content-Security-Policy-Report-Only` baseline that names the current
+  Firebase, Google/Apple Auth and Stripe boundaries.
+
+The CSP is intentionally not enforcing yet. Firebase provider popups and
+Stripe account/payment hand-offs require production violation telemetry before
+`Content-Security-Policy-Report-Only` can safely become
+`Content-Security-Policy`. This staging choice is a release gate, not a claim
+that CSP enforcement is already active.

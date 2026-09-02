@@ -67,19 +67,49 @@ describe("product update ledger", () => {
     assert.match(video.highlights.join(" "), /does not claim FaceTime-style application E2EE/i);
   });
 
-  test("keeps build 17 ready until both tester channels are confirmed", () => {
+  test("keeps the coordinated social and room wave honest before rollout", () => {
+    const rooms = productUpdates.find(
+      (update) => update.slug === "room-consent-and-docked-chat",
+    );
+    const social = productUpdates.find(
+      (update) => update.slug === "friends-identity-and-chat-recovery",
+    );
+    const account = productUpdates.find(
+      (update) => update.slug === "account-readiness-and-language-choice",
+    );
+
+    assert.ok(rooms);
+    assert.ok(social);
+    assert.ok(account);
+    assert.equal(rooms.status, "verification");
+    assert.equal(social.status, "verification");
+    assert.equal(account.status, "verification");
+    assert.match(rooms.summary, /only after Join conversation/i);
+    assert.match(rooms.summary, /rollout checks are still in progress/i);
+    assert.match(social.summary, /Production latency still depends on the network/i);
+    assert.match(account.summary, /specialist screens may still use English fallback/i);
+    assert.doesNotMatch(
+      [rooms, social, account].map((update) => update.summary).join(" "),
+      /1\s*ms|FaceTime|end-to-end encrypted/i,
+    );
+  });
+
+  test("records build 18 on both confirmed tester channels", () => {
     const mobile = productUpdates.find(
-      (update) => update.slug === "mobile-build-16",
+      (update) => update.slug === "mobile-build-18",
     );
 
     assert.ok(mobile);
-    assert.equal(mobile.updatedOn, "2026-09-01");
-    assert.equal(mobile.status, "ready");
-    assert.match(mobile.summary, /1\.0\.0 build 17/i);
-    assert.match(mobile.summary, /awaiting distribution/i);
+    assert.equal(mobile.updatedOn, "2026-09-02");
+    assert.equal(mobile.status, "testing");
+    assert.match(mobile.summary, /1\.0\.0 build 18/i);
     assert.match(mobile.summary, /Google Play Internal Testing/i);
+    assert.match(mobile.summary, /14-person tester list/i);
     assert.match(mobile.summary, /TestFlight/i);
-    assert.doesNotMatch(mobile.summary, /Android is published|iOS (?:is |has been )?uploaded/i);
+    assert.match(mobile.summary, /one-person internal group/i);
+    assert.match(mobile.summary, /six-person YO Voice Beta Testers external group/i);
+    assert.match(mobile.summary, /automatic TestFlight notifications enabled/i);
+    assert.doesNotMatch(mobile.summary, /public store release/i);
   });
 
   test("keeps every visible current-release reference on the same build truth", () => {
@@ -94,13 +124,9 @@ describe("product update ledger", () => {
 
     for (const relativePath of releaseSurfaces) {
       const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
-      assert.match(source, /build 17/i, relativePath);
-      assert.doesNotMatch(source, /build 15/i, relativePath);
-      assert.doesNotMatch(
-        source,
-        /Android build 17[^.\n]*(?:published|available)|iOS build 17[^.\n]*uploaded/i,
-        relativePath,
-      );
+      assert.match(source, /build 18/i, relativePath);
+      assert.doesNotMatch(source, /build 17/i, relativePath);
+      assert.doesNotMatch(source, /awaiting (?:invited-tester )?distribution/i);
     }
   });
 

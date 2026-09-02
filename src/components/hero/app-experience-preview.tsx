@@ -4,6 +4,7 @@ import {
   Bell,
   Home,
   LayoutGrid,
+  Mail,
   MessageCircle,
   Plus,
   UsersRound,
@@ -99,7 +100,7 @@ export function AppExperiencePreview() {
   return (
     <div
       role="img"
-      aria-label="Illustrative YO Voice app preview showing Dark and Pearl themes, Voice Moments, a Community Room card and the sculpted YO navigation dock. It contains no live user activity data."
+      aria-label="Illustrative YO Voice app preview showing Dark and Pearl themes, a persistent email-verification notice, Voice Moments, a Community Room card and the sculpted YO navigation dock. It contains no live user activity data."
       className="relative mx-auto w-full max-w-[560px] pb-9 sm:pb-12"
     >
       <div aria-hidden="true">
@@ -116,7 +117,17 @@ export function AppExperiencePreview() {
             </span>
           </div>
 
-          <div className="mt-5 flex items-start justify-between">
+          <div className="mt-3 flex min-h-11 items-center gap-2.5 rounded-[15px] border border-[#ffc94d]/22 bg-[#2e2410] px-3 py-2 text-left">
+            <Mail className="size-4 shrink-0 text-[#ffc94d]" aria-hidden="true" />
+            <span className="min-w-0 flex-1 text-[9px] font-bold leading-3.5 text-[#f8f5fc]">
+              Your email isn&apos;t verified yet.
+            </span>
+            <span className="shrink-0 text-[8px] font-black text-[#ffc94d]">
+              Verify now
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-start justify-between">
             <div>
               <p className="text-[11px] text-[#b8afc2]">Good evening,</p>
               <p className="mt-1 font-[family-name:var(--font-display)] text-xl font-black">
