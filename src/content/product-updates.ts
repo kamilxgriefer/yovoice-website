@@ -12,6 +12,11 @@ export type ProductUpdate = {
   title: string;
   summary: string;
   highlights: readonly string[];
+  release?: {
+    version: string;
+    stage: string;
+    buildNumber: number;
+  };
 };
 
 // This is a release-truth ledger, not aspirational marketing copy. Only mark
@@ -22,6 +27,25 @@ export type ProductUpdate = {
 // still pending. `verification` means the implementation is intentionally not
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
+  {
+    slug: "mobile-build-19-release-candidate",
+    updatedOn: "2026-09-03",
+    status: "verification",
+    eyebrow: "Build 19 · Release candidate",
+    title: "Build 19 is being finished as one connected release",
+    summary:
+      "YO Voice 1.0.0 build 19 is in final source, compatibility and physical-device verification before the next tester rollout. The release brings the private conversation, profile media, calls, Voice Moments and first Reels experience under one safer media contract; it is not marked as available until both tester channels are confirmed.",
+    highlights: [
+      "Chats and identity: organised photo, video and voice-note views, camera or library capture, reliable avatar refresh and bounded media recovery",
+      "Live connection: mixed-version-safe private audio and video call negotiation plus repair work for publishing and playing Voice Moments",
+      "Creation and trust: a Reels MVP for user-supplied photo, video, text, links and licensed or owned audio, with short-lived media access and fail-safe compatibility",
+    ],
+    release: {
+      version: "1.0.0 (19)",
+      stage: "Final verification",
+      buildNumber: 19,
+    },
+  },
   {
     slug: "mobile-build-18",
     updatedOn: "2026-09-02",

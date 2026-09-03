@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Clock3,
   FlaskConical,
+  Layers3,
   Sparkles,
   TestTube2,
 } from "lucide-react";
@@ -57,10 +58,10 @@ const statusPresentation: Record<
 };
 
 const currentWave = productUpdates.filter(
-  (update) => update.updatedOn >= "2026-08-29",
+  (update) => update.updatedOn >= "2026-09-01",
 );
 const earlierUpdates = productUpdates.filter(
-  (update) => update.updatedOn < "2026-08-29",
+  (update) => update.updatedOn < "2026-09-01",
 );
 const releaseWaveRange = formatReleaseWaveRange(currentWave);
 
@@ -72,7 +73,20 @@ export default function UpdatesPage() {
         eyebrow="Updates"
         title="What changed — and where it really stands"
         description="A release-truth ledger for the current YO Voice experience: verified production work, tester builds, rollout-ready changes and items that still have a boundary to clear."
-      />
+      >
+        <Link
+          href="#mobile-build-19-release-candidate"
+          className="focus-ring mx-auto mt-7 inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/[.075] px-4 text-left transition hover:border-[color:var(--accent)]/45 hover:bg-[color:var(--accent)]/[.12]"
+        >
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-[11px] font-black text-white shadow-[0_8px_24px_rgba(123,47,247,.35)]">
+            19
+          </span>
+          <span className="min-w-0 text-xs font-bold text-white/80 sm:text-sm">
+            Build 19 · final verification
+          </span>
+          <ArrowRight className="size-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
+        </Link>
+      </PageHero>
 
       <section className="px-5 pb-24 sm:px-8" aria-labelledby="updates-heading">
         <div className="mx-auto max-w-6xl">
@@ -80,38 +94,40 @@ export default function UpdatesPage() {
             YO Voice product updates
           </h2>
 
-          <ul
-            className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 lg:grid-cols-4"
-            aria-label="Release status legend"
-          >
-            {(Object.keys(statusPresentation) as ProductUpdateStatus[]).map(
-              (status) => {
-                const item = statusPresentation[status];
-                const Icon = item.icon;
-                return (
-                  <li
-                    key={status}
-                    data-status={status}
-                    className="release-status rounded-2xl border px-3.5 py-3"
-                  >
-                    <div className="flex items-center gap-2 text-xs font-black sm:text-sm">
-                      <Icon className="size-4" aria-hidden="true" />
-                      {item.label}
-                    </div>
-                    <p className="mt-1 text-[11px] leading-4 opacity-70 sm:text-xs">
-                      {item.description}
-                    </p>
-                  </li>
-                );
-              },
-            )}
-          </ul>
+          <div className="rounded-[26px] border border-white/[.07] bg-[var(--surface-muted)]/70 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.035)] sm:p-3">
+            <ul
+              className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 lg:grid-cols-4"
+              aria-label="Release status legend"
+            >
+              {(Object.keys(statusPresentation) as ProductUpdateStatus[]).map(
+                (status) => {
+                  const item = statusPresentation[status];
+                  const Icon = item.icon;
+                  return (
+                    <li
+                      key={status}
+                      data-status={status}
+                      className="release-status rounded-2xl border px-3.5 py-3"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-black sm:text-sm">
+                        <Icon className="size-4" aria-hidden="true" />
+                        {item.label}
+                      </div>
+                      <p className="mt-1 text-[11px] leading-4 opacity-70 sm:text-xs">
+                        {item.description}
+                      </p>
+                    </li>
+                  );
+                },
+              )}
+            </ul>
+          </div>
 
-          <div className="mt-8 flex items-center gap-3">
+          <div className="mt-9 flex items-center gap-3">
             <span className="flex size-9 items-center justify-center rounded-2xl border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/10 text-[var(--accent)]">
               <Sparkles className="size-4" aria-hidden="true" />
             </span>
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-black uppercase tracking-[.18em] text-[var(--accent)]">
                 Current release wave
               </p>
@@ -119,6 +135,10 @@ export default function UpdatesPage() {
                 {releaseWaveRange} · source, tests and rollout truth
               </p>
             </div>
+            <span className="hidden min-h-9 items-center gap-2 rounded-full border border-white/[.08] bg-white/[.035] px-3 text-xs font-bold text-white/55 sm:inline-flex">
+              <Layers3 className="size-3.5" aria-hidden="true" />
+              {currentWave.length} entries
+            </span>
           </div>
 
           <ol className="mt-5 space-y-4">
@@ -142,7 +162,7 @@ export default function UpdatesPage() {
                     Earlier updates
                   </span>
                   <span className="mt-0.5 block text-xs text-white/60">
-                    {earlierUpdates.length} verified historical entries
+                    {earlierUpdates.length} archived ledger entries
                   </span>
                 </span>
                 <ChevronDown
@@ -195,20 +215,32 @@ function UpdateCard({
   return (
     <li id={update.slug} className="scroll-mt-28">
       <article
-        className={`${featured ? "glass-panel-glow" : "glass-panel"} rounded-[26px] p-5 sm:p-7 lg:grid lg:grid-cols-[160px_minmax(0,1fr)] lg:gap-8`}
+        aria-labelledby={update.slug + "-title"}
+        className={[
+          "relative rounded-[26px] p-5 sm:p-7 lg:grid lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8",
+          featured && update.release
+            ? "release-card-featured"
+            : featured
+              ? "glass-panel-glow"
+              : "glass-panel",
+        ].join(" ")}
       >
         <div>
           <time
             dateTime={update.updatedOn}
-            className="text-xs font-semibold text-white/60 sm:text-sm"
+            className="block text-xs font-semibold text-white/60 sm:text-sm"
           >
-            Updated{" "}
-            {new Intl.DateTimeFormat("en", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-              timeZone: "UTC",
-            }).format(new Date(`${update.updatedOn}T00:00:00Z`))}
+            <span className="block text-[10px] font-black uppercase tracking-[.16em] text-white/40">
+              Updated
+            </span>
+            <span className="mt-1 block">
+              {new Intl.DateTimeFormat("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC",
+              }).format(new Date(`${update.updatedOn}T00:00:00Z`))}
+            </span>
           </time>
           <div
             data-status={update.status}
@@ -217,21 +249,42 @@ function UpdateCard({
             <StatusIcon className="size-3.5" aria-hidden="true" />
             {status.label}
           </div>
+          {update.release ? (
+            <div className="mt-5 flex items-center gap-3 lg:block">
+              <span
+                className="release-build-orb flex size-14 shrink-0 items-center justify-center rounded-2xl font-[family-name:var(--font-display)] text-2xl font-black tabular-nums text-white lg:size-20 lg:rounded-[24px] lg:text-3xl"
+                aria-label={"Build " + update.release.buildNumber}
+              >
+                {update.release.buildNumber}
+              </span>
+              <div className="min-w-0 lg:mt-3">
+                <p className="break-words text-sm font-black text-white">
+                  {update.release.version}
+                </p>
+                <p className="mt-0.5 text-xs text-white/50">
+                  {update.release.stage}
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-5 min-w-0 lg:mt-0">
           <p className="eyebrow">{update.eyebrow}</p>
-          <h2 className="mt-2 break-words font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.035em] text-white sm:text-3xl">
+          <h2
+            id={update.slug + "-title"}
+            className="mt-2 break-words font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.035em] text-white sm:text-3xl"
+          >
             {update.title}
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/65 sm:text-[15px]">
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--text-secondary)] sm:text-[15px]">
             {update.summary}
           </p>
           <ul className="mt-4 grid gap-2.5 md:grid-cols-3">
             {update.highlights.map((highlight) => (
               <li
                 key={highlight}
-                className="rounded-2xl border border-white/10 bg-[var(--surface-sunken)]/75 p-3.5 text-sm leading-6 text-white/65"
+                className="rounded-[18px] border border-white/[.085] bg-[var(--surface-sunken)]/78 p-3.5 text-sm leading-6 text-[var(--text-secondary)] shadow-[inset_0_1px_0_rgba(255,255,255,.025)]"
               >
                 {highlight}
               </li>

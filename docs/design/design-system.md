@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-01
+Last reviewed: 2026-09-03
 
 ## Source of truth
 
@@ -29,6 +29,11 @@ Success, warning, information and danger messages use paired foreground and
 surface tokens. Product-update statuses use those pairs through
 `.release-status`; colour never carries the status without an icon and label.
 
+Derived glass and glow tokens (`--glass-soft`, `--glass-strong`,
+`--glow-primary` and `--glow-secondary`) are compositing values, not new
+brand colours. They may add depth to Dark surfaces, but text and state colours
+still come from the semantic palette above.
+
 ## Components and shape
 
 - Inter is the shared text and display face.
@@ -40,6 +45,10 @@ surface tokens. Product-update statuses use those pairs through
 - Primary actions use `.premium-button`; lower-emphasis actions use the
   secondary or ghost variants. Interactive components should not introduce a
   new gradient or glow without a distinct hierarchy reason.
+- Release highlights use one shared pattern: `.release-spotlight` for a
+  cross-page release summary, `.release-build-orb` for the build identifier and
+  `.release-scope-card` for capability groups. The first ledger entry may use
+  `.release-card-featured`; ordinary historical cards remain `.glass-panel`.
 - Decorative icons are hidden from assistive technology. Meaningful icons sit
   beside a visible label or receive an explicit accessible name.
 
@@ -78,3 +87,8 @@ Use `live` only after production verification, `testing` only when the named
 tester channel actually has the build, `ready` when release gates are complete,
 and `verification` for source work that still has rollout or physical-device
 gates. Unfinished work belongs on the roadmap, not in Updates.
+
+The website may surface the next release candidate on Home only when that
+surface reads from the same ledger entry and repeats its rollout boundary.
+Build 19 therefore remains labelled **Final verification** until the store
+channels and device matrix are independently confirmed.

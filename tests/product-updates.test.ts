@@ -112,6 +112,42 @@ describe("product update ledger", () => {
     assert.doesNotMatch(mobile.summary, /public store release/i);
   });
 
+  test("keeps build 19 behind final tester-rollout verification", () => {
+    const candidate = productUpdates.find(
+      (update) => update.slug === "mobile-build-19-release-candidate",
+    );
+
+    assert.ok(candidate);
+    assert.equal(candidate.updatedOn, "2026-09-03");
+    assert.equal(candidate.status, "verification");
+    assert.deepEqual(candidate.release, {
+      version: "1.0.0 (19)",
+      stage: "Final verification",
+      buildNumber: 19,
+    });
+    assert.match(candidate.summary, /not marked as available/i);
+    assert.match(candidate.summary, /physical-device verification/i);
+
+    const scope = candidate.highlights.join(" ");
+    for (const capability of [
+      /Chats and identity/i,
+      /photo, video and voice-note/i,
+      /avatar refresh/i,
+      /private audio and video/i,
+      /Voice Moments/i,
+      /Reels MVP/i,
+      /short-lived media access/i,
+      /fail-safe compatibility/i,
+    ]) {
+      assert.match(scope, capability);
+    }
+
+    assert.doesNotMatch(
+      JSON.stringify(candidate),
+      /1\s*ms|end-to-end encrypted|available to invited testers/i,
+    );
+  });
+
   test("keeps every visible current-release reference on the same build truth", () => {
     const releaseSurfaces = [
       "../src/components/sections/download-section.tsx",

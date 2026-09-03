@@ -38,3 +38,25 @@ test("feature copy is honest about language fallback and native permission promp
   assert.match(features, /English fallback on specialist screens/i);
   assert.doesNotMatch(features, /one (?:click|prompt).*(?:camera|microphone|notification)/i);
 });
+
+test("homepage Build 19 spotlight mirrors scope without claiming rollout", async () => {
+  const spotlight = await readFile(
+    "src/components/sections/latest-release-spotlight.tsx",
+    "utf8",
+  );
+
+  for (const label of [
+    "Chats & media",
+    "Current identity",
+    "Private calls",
+    "Voice Moments",
+    "Reels MVP",
+    "Trust boundary",
+  ]) {
+    assert.ok(spotlight.includes(label), label);
+  }
+
+  assert.match(spotlight, /not marked as available/i);
+  assert.match(spotlight, /physical-device checks/i);
+  assert.doesNotMatch(spotlight, /1\s*ms|end-to-end encrypted|now available/i);
+});

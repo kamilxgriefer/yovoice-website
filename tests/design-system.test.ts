@@ -45,3 +45,25 @@ test("release states and global keyboard focus use semantic tokens", async () =>
   assert.match(updates, /data-status=\{status\}/);
   assert.match(updates, /data-status=\{update\.status\}/);
 });
+
+test("premium release surfaces reuse shared tokens and preserve semantic headings", async () => {
+  const [css, spotlight, updates] = await Promise.all([
+    readFile("src/app/globals.css", "utf8"),
+    readFile("src/components/sections/latest-release-spotlight.tsx", "utf8"),
+    readFile("src/app/(marketing)/updates/page.tsx", "utf8"),
+  ]);
+
+  for (const pattern of [
+    /\.release-spotlight\s*\{/,
+    /\.release-build-orb\s*\{/,
+    /\.release-scope-card\s*\{/,
+    /\.release-card-featured\s*\{/,
+  ]) {
+    assert.match(css, pattern);
+  }
+
+  assert.match(spotlight, /aria-labelledby="latest-release-heading"/);
+  assert.match(spotlight, /id="latest-release-heading"/);
+  assert.match(spotlight, /min-h-12/);
+  assert.match(updates, /aria-labelledby=\{update\.slug \+ "-title"\}/);
+});
