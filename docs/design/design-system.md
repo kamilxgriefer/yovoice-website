@@ -88,7 +88,8 @@ tester channel actually has the build, `ready` when release gates are complete,
 and `verification` for source work that still has rollout or physical-device
 gates. Unfinished work belongs on the roadmap, not in Updates.
 
-The website may surface the next release candidate on Home only when that
-surface reads from the same ledger entry and repeats its rollout boundary.
-Build 19 therefore remains labelled **Final verification** until the store
-channels and device matrix are independently confirmed.
+The website may surface a tester release on Home only when that surface reads
+from the same ledger entry and repeats its distribution boundary. Build 19 is
+labelled **Invited testing** because Google Play Internal Testing and both
+TestFlight groups are confirmed; the copy must still say that public App Store
+and Google Play release is a separate milestone.

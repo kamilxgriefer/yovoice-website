@@ -8,8 +8,8 @@ Components reviewed: 9 | Issues found: 5 | Resolved in this pass: 5
 
 The existing YO Voice website already had a strong Dark foundation, exact
 semantic palette mapping and a coherent glass-card language. The main gap was
-release hierarchy: the live Build 18 tester state and the unfinished Build 19
-scope had no shared, visually distinct pattern. Updates also kept too much
+release hierarchy: the live Build 18 tester state and the then-unfinished Build
+19 scope had no shared, visually distinct pattern. Updates also kept too much
 August work in the current wave, which made the newest release harder to scan.
 
 ## Findings and resolutions
@@ -17,7 +17,7 @@ August work in the current wave, which made the newest release harder to scan.
 | Priority | Finding | Resolution |
 | --- | --- | --- |
 | High | No release-candidate pattern shared by Home and Updates | Added the token-driven release spotlight, build orb, scope cards and featured ledger card |
-| High | Build 19 scope was absent from the public release ledger | Added one source-of-truth entry with an explicit verification boundary |
+| High | Build 19 scope was absent from the public release ledger | Added one source-of-truth entry whose state advances only after channel verification |
 | Medium | Current-wave hierarchy mixed August and September work | Current wave now begins on 1 September; earlier work remains available in the disclosure |
 | Medium | The featured release resembled every historical card | Added a restrained brand-light border, build identity and stronger information hierarchy |
 | Low | Desktop update dates wrapped incidentally | Split the semantic “Updated” label from a compact day-first date |
@@ -44,8 +44,9 @@ August work in the current wave, which made the newest release harder to scan.
 
 ## Release-truth rule
 
-Build 19 is represented as `verification`, not `testing`, `ready` or
-`live`. The copy explicitly says that tester-channel confirmation and
-physical-device checks are still required. It does not promise one-millisecond
-delivery, universal cross-version behavior or application-level end-to-end
-encryption.
+Build 19 advanced from `verification` to `testing` only after Google Play
+Internal Testing and both TestFlight groups were confirmed. The current copy
+records the 15 Android testers, 7 external and 1 internal TestFlight tester,
+while explicitly separating invited testing from a public App Store or Google
+Play release. It does not promise one-millisecond delivery, universal
+cross-version behavior or application-level end-to-end encryption.

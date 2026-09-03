@@ -82,7 +82,7 @@ export default function UpdatesPage() {
             19
           </span>
           <span className="min-w-0 text-xs font-bold text-white/80 sm:text-sm">
-            Build 19 · final verification
+            Build 19 · invited testing
           </span>
           <ArrowRight className="size-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
         </Link>

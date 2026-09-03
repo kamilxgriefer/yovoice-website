@@ -44,15 +44,15 @@ featured Build 19 ledger card.
 
 ## Automated evidence
 
-- Product-ledger tests require Build 19 to remain in verification and reject
-  premature tester-availability, one-millisecond and end-to-end-encryption
-  claims.
+- Product-ledger tests require Build 19 to name both confirmed invited-testing
+  channels and reject public-availability, one-millisecond and
+  end-to-end-encryption claims.
 - Design-system tests require the shared release classes, semantic section
   label and matching heading identifier.
-- Product-visual tests require all six Build 19 scope labels and the physical
-  device rollout boundary.
+- Product-visual tests require all six Build 19 scope labels and the explicit
+  boundary between invited testing and public store release.
 
-## Manual checks still required before publication
+## Manual checks retained for follow-up acceptance
 
 - VoiceOver reading order and spoken link names in Safari.
 - Complete keyboard traversal in Safari, Chrome and Firefox.

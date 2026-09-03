@@ -39,7 +39,7 @@ test("feature copy is honest about language fallback and native permission promp
   assert.doesNotMatch(features, /one (?:click|prompt).*(?:camera|microphone|notification)/i);
 });
 
-test("homepage Build 19 spotlight mirrors scope without claiming rollout", async () => {
+test("homepage Build 19 spotlight mirrors the tester release without claiming public rollout", async () => {
   const spotlight = await readFile(
     "src/components/sections/latest-release-spotlight.tsx",
     "utf8",
@@ -56,7 +56,10 @@ test("homepage Build 19 spotlight mirrors scope without claiming rollout", async
     assert.ok(spotlight.includes(label), label);
   }
 
-  assert.match(spotlight, /not marked as available/i);
-  assert.match(spotlight, /physical-device checks/i);
-  assert.doesNotMatch(spotlight, /1\s*ms|end-to-end encrypted|now available/i);
+  assert.match(spotlight, /invited iOS and Android testers/i);
+  assert.match(
+    spotlight,
+    /not publicly\s+released on the App Store or Google Play/i,
+  );
+  assert.doesNotMatch(spotlight, /1\s*ms|end-to-end encrypted|publicly available/i);
 });

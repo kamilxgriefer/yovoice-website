@@ -38,7 +38,7 @@ describe("product update ledger", () => {
     }
   });
 
-  test("keeps the September security wave behind explicit rollout gates", () => {
+  test("tracks the September security wave at its verified release boundary", () => {
     const media = productUpdates.find(
       (update) => update.slug === "private-media-access-hardening",
     );
@@ -51,10 +51,10 @@ describe("product update ledger", () => {
 
     assert.ok(media);
     assert.equal(media.updatedOn, "2026-09-01");
-    assert.equal(media.status, "verification");
+    assert.equal(media.status, "live");
     assert.match(media.summary, /90-second ceiling/i);
-    assert.match(media.summary, /not presented as deployed/i);
-    assert.match(media.highlights.join(" "), /IAM/i);
+    assert.match(media.summary, /strict Storage rules are live/i);
+    assert.match(media.highlights.join(" "), /IAM are verified in production/i);
 
     assert.ok(privilegedAuth);
     assert.equal(privilegedAuth.status, "verification");
@@ -62,12 +62,14 @@ describe("product update ledger", () => {
     assert.match(privilegedAuth.summary, /App Check enforcement/i);
 
     assert.ok(video);
-    assert.equal(video.status, "verification");
-    assert.match(video.summary, /implemented in source but remains unreleased/i);
+    assert.equal(video.status, "testing");
+    assert.match(video.summary, /Build 19 tester release/i);
+    assert.match(video.summary, /Device-to-device acceptance continues/i);
+    assert.match(video.summary, /public App Store and Google Play release remains a separate milestone/i);
     assert.match(video.highlights.join(" "), /does not claim FaceTime-style application E2EE/i);
   });
 
-  test("keeps the coordinated social and room wave honest before rollout", () => {
+  test("keeps the coordinated social and room wave honest in invited testing", () => {
     const rooms = productUpdates.find(
       (update) => update.slug === "room-consent-and-docked-chat",
     );
@@ -81,12 +83,12 @@ describe("product update ledger", () => {
     assert.ok(rooms);
     assert.ok(social);
     assert.ok(account);
-    assert.equal(rooms.status, "verification");
-    assert.equal(social.status, "verification");
-    assert.equal(account.status, "verification");
+    assert.equal(rooms.status, "testing");
+    assert.equal(social.status, "testing");
+    assert.equal(account.status, "testing");
     assert.match(rooms.summary, /only after Join conversation/i);
-    assert.match(rooms.summary, /rollout checks are still in progress/i);
-    assert.match(social.summary, /Production latency still depends on the network/i);
+    assert.match(rooms.summary, /invited tester acceptance continues/i);
+    assert.match(social.summary, /latency still depends on each device and network/i);
     assert.match(account.summary, /specialist screens may still use English fallback/i);
     assert.doesNotMatch(
       [rooms, social, account].map((update) => update.summary).join(" "),
@@ -112,21 +114,24 @@ describe("product update ledger", () => {
     assert.doesNotMatch(mobile.summary, /public store release/i);
   });
 
-  test("keeps build 19 behind final tester-rollout verification", () => {
+  test("records build 19 on both invited tester channels", () => {
     const candidate = productUpdates.find(
       (update) => update.slug === "mobile-build-19-release-candidate",
     );
 
     assert.ok(candidate);
     assert.equal(candidate.updatedOn, "2026-09-03");
-    assert.equal(candidate.status, "verification");
+    assert.equal(candidate.status, "testing");
     assert.deepEqual(candidate.release, {
       version: "1.0.0 (19)",
-      stage: "Final verification",
+      stage: "Invited testing",
       buildNumber: 19,
     });
-    assert.match(candidate.summary, /not marked as available/i);
-    assert.match(candidate.summary, /physical-device verification/i);
+    assert.match(candidate.summary, /Google Play Internal Testing/i);
+    assert.match(candidate.summary, /15 Android testers/i);
+    assert.match(candidate.summary, /TestFlight for 7 external plus 1 internal tester/i);
+    assert.match(candidate.summary, /internal TestFlight installation is confirmed/i);
+    assert.match(candidate.summary, /not a public App Store or Google Play release/i);
 
     const scope = candidate.highlights.join(" ");
     for (const capability of [
@@ -144,7 +149,7 @@ describe("product update ledger", () => {
 
     assert.doesNotMatch(
       JSON.stringify(candidate),
-      /1\s*ms|end-to-end encrypted|available to invited testers/i,
+      /1\s*ms|end-to-end encrypted|available to everyone|publicly available/i,
     );
   });
 
@@ -160,8 +165,8 @@ describe("product update ledger", () => {
 
     for (const relativePath of releaseSurfaces) {
       const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
-      assert.match(source, /build 18/i, relativePath);
-      assert.doesNotMatch(source, /build 17/i, relativePath);
+      assert.match(source, /build 19/i, relativePath);
+      assert.doesNotMatch(source, /build 18/i, relativePath);
       assert.doesNotMatch(source, /awaiting (?:invited-tester )?distribution/i);
     }
   });

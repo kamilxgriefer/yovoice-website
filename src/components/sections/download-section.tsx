@@ -10,7 +10,7 @@ export function DownloadSection() {
     {
       icon: Smartphone,
       title: "Mobile",
-      description: "YO Voice 1.0.0 build 18 is available to invited testers through Google Play Internal Testing and TestFlight.",
+      description: "YO Voice 1.0.0 build 19 is available to invited testers through Google Play Internal Testing and TestFlight.",
       href: "/download",
       action: "View tester access",
     },

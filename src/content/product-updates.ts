@@ -30,11 +30,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "mobile-build-19-release-candidate",
     updatedOn: "2026-09-03",
-    status: "verification",
-    eyebrow: "Build 19 · Release candidate",
-    title: "Build 19 is being finished as one connected release",
+    status: "testing",
+    eyebrow: "Build 19 · Invited testing",
+    title: "Build 19 is available to invited testers",
     summary:
-      "YO Voice 1.0.0 build 19 is in final source, compatibility and physical-device verification before the next tester rollout. The release brings the private conversation, profile media, calls, Voice Moments and first Reels experience under one safer media contract; it is not marked as available until both tester channels are confirmed.",
+      "YO Voice 1.0.0 (19) is available on both private mobile testing channels: Google Play Internal Testing for 15 Android testers, and TestFlight for 7 external plus 1 internal tester. The internal TestFlight installation is confirmed. This is a tester release, not a public App Store or Google Play release.",
     highlights: [
       "Chats and identity: organised photo, video and voice-note views, camera or library capture, reliable avatar refresh and bounded media recovery",
       "Live connection: mixed-version-safe private audio and video call negotiation plus repair work for publishing and playing Voice Moments",
@@ -42,7 +42,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     ],
     release: {
       version: "1.0.0 (19)",
-      stage: "Final verification",
+      stage: "Invited testing",
       buildNumber: 19,
     },
   },
@@ -63,11 +63,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "room-consent-and-docked-chat",
     updatedOn: "2026-09-01",
-    status: "verification",
+    status: "testing",
     eyebrow: "Rooms",
     title: "Room entry now waits for an explicit choice",
     summary:
-      "The coordinated release source now opens Community and Podcast Rooms as passive previews. Audio, roster presence and credentials begin only after Join conversation, while final device and rollout checks are still in progress.",
+      "The Build 19 tester release opens Community and Podcast Rooms as passive previews. Audio, roster presence and credentials begin only after Join conversation, while invited tester acceptance continues across real devices.",
     highlights: [
       "The prejoin view explains the room and enters with the microphone off by default",
       "Compact room chat is visible after joining and can be folded away without losing the conversation",
@@ -77,11 +77,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "friends-identity-and-chat-recovery",
     updatedOn: "2026-09-01",
-    status: "verification",
+    status: "testing",
     eyebrow: "Friends & Chats",
     title: "Friendship, avatars and message recovery move as one system",
     summary:
-      "Friend requests are now optimistic and idempotent in source, profile revisions invalidate stale avatar access, and private messages keep immediate local feedback with bounded retry or removal. Production latency still depends on the network and final backend rollout.",
+      "The Build 19 tester release makes friend requests optimistic and idempotent, invalidates stale avatar access after profile revisions, and gives private messages immediate local feedback with bounded retry or removal. End-to-end latency still depends on each device and network.",
     highlights: [
       "Search, suggestions, Home and Chats use current profile imagery instead of falling back to stale initials",
       "The full-screen profile-photo viewer preserves clear loading, retry and close states",
@@ -91,11 +91,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "account-readiness-and-language-choice",
     updatedOn: "2026-09-01",
-    status: "verification",
+    status: "testing",
     eyebrow: "Account readiness",
     title: "Verification, permissions and language choice are easier to find",
     summary:
-      "The current source keeps an unverified-email reminder above authenticated content, offers one guided permission review and expands the core locale catalog. Final release QA remains open, and specialist screens may still use English fallback while coverage grows.",
+      "The Build 19 tester release keeps an unverified-email reminder above authenticated content, offers one guided permission review and expands the core locale catalog. Specialist screens may still use English fallback while translated coverage grows.",
     highlights: [
       "The email reminder stays visible until verification and opens the correct verification flow",
       "Microphone, camera and notification status are reviewed together while each native prompt remains an operating-system decision",
@@ -105,15 +105,15 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "private-media-access-hardening",
     updatedOn: "2026-09-01",
-    status: "verification",
+    status: "live",
     eyebrow: "Security",
-    title: "Private media access is short-lived and account-bound in source",
+    title: "Private media access is short-lived and account-bound",
     summary:
-      "The source-tested private-media boundary now authorises each request before issuing a V4 access capability with a 90-second ceiling. Cloud IAM, migration and revocation checks remain rollout gates, so this is not presented as deployed yet.",
+      "The production private-media boundary authorises each request before issuing a V4 access capability with a 90-second ceiling. Upload reservations are account-bound, legacy chat objects are migrated and token-free, and strict Storage rules are live.",
     highlights: [
       "Access is checked before a short-lived media capability is minted",
       "Upload reservations bind the owner, object path, media contract, quota and finalisation lease",
-      "Legacy token revocation, migration dry-runs and bucket IAM still require production verification",
+      "Legacy token revocation, migration scans and bucket IAM are verified in production",
     ],
   },
   {
@@ -133,11 +133,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "direct-video-release-verification",
     updatedOn: "2026-09-01",
-    status: "verification",
+    status: "testing",
     eyebrow: "Calls",
-    title: "Private video calls have entered release verification",
+    title: "Private video calls are available to invited testers",
     summary:
-      "The direct-call path now carries server-validated audio or video intent, bounded token minting and mixed-version protection. It is implemented in source but remains unreleased until the physical two-device matrix and store rollout gates pass.",
+      "The Build 19 tester release carries server-validated audio or video intent, bounded token minting and mixed-version protection. Device-to-device acceptance continues, and public App Store and Google Play release remains a separate milestone.",
     highlights: [
       "Camera and microphone lifecycle cleanup blocks late permission or connection work after hang-up",
       "Recipient capability checks prevent a new video request from silently degrading on an older client",

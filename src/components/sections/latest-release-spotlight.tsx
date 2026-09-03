@@ -94,16 +94,17 @@ export function LatestReleaseSpotlight() {
             </span>
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)] sm:text-[15px]">
-            Build 19 is being verified as a complete product update rather than
-            a collection of isolated fixes. It is not marked as available until
-            both tester channels and the physical-device checks are confirmed.
+            Build 19 brings connected chat and media, refreshed identity, private
+            audio and video calls, Voice Moments, the Reels MVP and tighter media
+            safeguards to invited iOS and Android testers. It is not publicly
+            released on the App Store or Google Play.
           </p>
 
           <Link
             href="/updates#mobile-build-19-release-candidate"
             className="premium-button-secondary focus-ring mt-7 min-h-12 w-fit px-5 text-sm"
           >
-            Follow Build 19
+            See Build 19 tester release
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
