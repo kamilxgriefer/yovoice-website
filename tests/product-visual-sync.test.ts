@@ -39,7 +39,7 @@ test("feature copy is honest about language fallback and native permission promp
   assert.doesNotMatch(features, /one (?:click|prompt).*(?:camera|microphone|notification)/i);
 });
 
-test("homepage Build 19 spotlight mirrors the tester release without claiming public rollout", async () => {
+test("homepage Build 20 spotlight mirrors invited testing without claiming public rollout", async () => {
   const spotlight = await readFile(
     "src/components/sections/latest-release-spotlight.tsx",
     "utf8",
@@ -47,19 +47,36 @@ test("homepage Build 19 spotlight mirrors the tester release without claiming pu
 
   for (const label of [
     "Chats & media",
-    "Current identity",
+    "YO Moments",
     "Private calls",
-    "Voice Moments",
+    "Sound with restraint",
     "Reels MVP",
     "Trust boundary",
   ]) {
     assert.ok(spotlight.includes(label), label);
   }
 
-  assert.match(spotlight, /invited iOS and Android testers/i);
+  assert.match(spotlight, /available to invited iOS and Android\s+testers/i);
+  assert.match(spotlight, /matching web release is live/i);
+  assert.doesNotMatch(spotlight, /pending|staged/i);
   assert.match(
     spotlight,
     /not publicly\s+released on the App Store or Google Play/i,
   );
   assert.doesNotMatch(spotlight, /1\s*ms|end-to-end encrypted|publicly available/i);
+});
+
+test("Moments navigation mirrors the app's clean frame-and-play geometry", async () => {
+  const [icon, preview] = await Promise.all([
+    readFile("src/components/brand/frame-echo-icon.tsx", "utf8"),
+    readFile("src/components/hero/app-experience-preview.tsx", "utf8"),
+  ]);
+
+  assert.match(preview, /icon: FrameEchoIcon, label: "Moments"/);
+  assert.match(icon, /viewBox="0 0 100 100"/);
+  assert.equal((icon.match(/<rect\b/g) ?? []).length, 1);
+  assert.equal((icon.match(/<path\b/g) ?? []).length, 1);
+  assert.match(icon, /rx="27"/);
+  assert.match(icon, /strokeWidth="7\.5"/);
+  assert.doesNotMatch(icon, /<line\b|rotate|skew|AudioLines/);
 });

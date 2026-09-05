@@ -23,7 +23,9 @@ const columns = [
       "Push and in-app notifications",
       "Email verification and secure password reset",
       "In-app reporting, blocking and room moderation flows",
-      "Web app at yovoice.app",
+      "Unified YO Moments and the photo/video Reels MVP on web",
+      "Frame Echo Clean navigation and optional Velvet Prism sound cues",
+      "Web app at app.yovoice.app",
     ],
   },
   {
@@ -34,7 +36,8 @@ const columns = [
     items: [
       "Native desktop apps for Windows and macOS",
       "Public iOS App Store and Google Play release",
-      "Build 19 tester feedback from Google Play Internal Testing and TestFlight",
+      "Build 20 tester feedback from Google Play Internal Testing and TestFlight",
+      "Real-device media and mixed-version audio/video call acceptance",
       "Expanded club discovery",
     ],
   },

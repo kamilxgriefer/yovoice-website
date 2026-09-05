@@ -153,6 +153,42 @@ describe("product update ledger", () => {
     );
   });
 
+  test("records build 20 on both confirmed invited tester channels", () => {
+    const release = productUpdates[0];
+
+    assert.equal(release.slug, "mobile-build-20-invited-testing");
+    assert.equal(release.updatedOn, "2026-09-05");
+    assert.equal(release.status, "testing");
+    assert.deepEqual(release.release, {
+      version: "1.0.0 (20)",
+      stage: "Invited testing",
+      buildNumber: 20,
+    });
+    assert.match(release.summary, /Google Play Internal Testing/i);
+    assert.match(release.summary, /15-person tester list/i);
+    assert.match(release.summary, /matching web release is live/i);
+    assert.match(release.summary, /TestFlight for the six-person external group plus the internal tester/i);
+    assert.match(release.summary, /Five external TestFlight installations are confirmed/i);
+    assert.doesNotMatch(release.summary, /pending|staged|awaiting/i);
+    assert.match(release.summary, /not a public App Store or Google Play release/i);
+    assert.match(release.highlights.join(" "), /real-device media and mixed-version audio\/video call acceptance continues/i);
+    assert.doesNotMatch(JSON.stringify(release), /1\s*ms|end-to-end encrypted|available to everyone|publicly available/i);
+  });
+
+  test("keeps Build 20 creation and sound scope within verified product boundaries", () => {
+    const moments = productUpdates.find((update) => update.slug === "yo-moments-unified-feed");
+    const identity = productUpdates.find((update) => update.slug === "frame-echo-and-velvet-prism");
+
+    assert.ok(moments);
+    assert.ok(identity);
+    assert.match(moments.summary, /focused Reels MVP/i);
+    assert.match(moments.highlights.join(" "), /owned or licensed/i);
+    assert.match(moments.highlights.join(" "), /Spotify and Apple Music tracks are not extracted/i);
+    assert.match(identity.summary, /without internal bars or tilt/i);
+    assert.match(identity.highlights.join(" "), /Sound effects are optional/i);
+    assert.match(identity.highlights.join(" "), /Do Not Disturb remain authoritative/i);
+  });
+
   test("keeps every visible current-release reference on the same build truth", () => {
     const releaseSurfaces = [
       "../src/components/sections/download-section.tsx",
@@ -161,12 +197,14 @@ describe("product update ledger", () => {
       "../src/app/(marketing)/faq/page.tsx",
       "../src/app/(marketing)/roadmap/page.tsx",
       "../src/app/(marketing)/about/page.tsx",
+      "../src/app/(marketing)/updates/page.tsx",
+      "../src/components/sections/latest-release-spotlight.tsx",
     ];
 
     for (const relativePath of releaseSurfaces) {
       const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
-      assert.match(source, /build 19/i, relativePath);
-      assert.doesNotMatch(source, /build 18/i, relativePath);
+      assert.match(source, /build 20/i, relativePath);
+      assert.doesNotMatch(source, /build (?:18|19)/i, relativePath);
       assert.doesNotMatch(source, /awaiting (?:invited-tester )?distribution/i);
     }
   });

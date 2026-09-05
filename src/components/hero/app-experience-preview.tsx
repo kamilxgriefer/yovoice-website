@@ -10,10 +10,12 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { FrameEchoIcon } from "@/components/brand/frame-echo-icon";
+
 const dockItems = [
   { icon: Home, label: "Home", active: true },
   { icon: MessageCircle, label: "Chats", active: false },
-  { icon: AudioLines, label: "Moments", active: false },
+  { icon: FrameEchoIcon, label: "Moments", active: false },
   { icon: LayoutGrid, label: "More", active: false },
 ] as const;
 
@@ -100,7 +102,7 @@ export function AppExperiencePreview() {
   return (
     <div
       role="img"
-      aria-label="Illustrative YO Voice app preview showing Dark and Pearl themes, a persistent email-verification notice, Voice Moments, a Community Room card and the sculpted YO navigation dock. It contains no live user activity data."
+      aria-label="Illustrative YO Voice app preview showing Dark and Pearl themes, a persistent email-verification notice, Voice Moments, a Community Room card and the sculpted YO navigation dock with the Frame Echo Clean Moments mark. It contains no live user activity data."
       className="relative mx-auto w-full max-w-[560px] pb-9 sm:pb-12"
     >
       <div aria-hidden="true">

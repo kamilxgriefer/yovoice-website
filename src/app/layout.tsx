@@ -84,7 +84,7 @@ export default function RootLayout({
         />
         <a
           href="#main-content"
-          className="focus-ring fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-white px-5 py-3 text-sm font-black text-[#211629] shadow-xl transition focus:translate-y-0"
+          className="skip-link focus-ring fixed left-4 top-4 z-[100] -translate-y-24 rounded-full px-5 py-3 text-sm font-black shadow-xl transition focus:translate-y-0"
         >
           Skip to content
         </a>

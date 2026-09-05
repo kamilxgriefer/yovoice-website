@@ -75,14 +75,14 @@ export default function UpdatesPage() {
         description="A release-truth ledger for the current YO Voice experience: verified production work, tester builds, rollout-ready changes and items that still have a boundary to clear."
       >
         <Link
-          href="#mobile-build-19-release-candidate"
+          href="#mobile-build-20-invited-testing"
           className="focus-ring mx-auto mt-7 inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/[.075] px-4 text-left transition hover:border-[color:var(--accent)]/45 hover:bg-[color:var(--accent)]/[.12]"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-[11px] font-black text-white shadow-[0_8px_24px_rgba(123,47,247,.35)]">
-            19
+            20
           </span>
           <span className="min-w-0 text-xs font-bold text-white/80 sm:text-sm">
-            Build 19 · invited testing
+            Build 20 · invited testing
           </span>
           <ArrowRight className="size-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
         </Link>
@@ -113,7 +113,7 @@ export default function UpdatesPage() {
                         <Icon className="size-4" aria-hidden="true" />
                         {item.label}
                       </div>
-                      <p className="mt-1 text-[11px] leading-4 opacity-70 sm:text-xs">
+                      <p className="mt-1 text-[11px] leading-4 sm:text-xs">
                         {item.description}
                       </p>
                     </li>
@@ -253,8 +253,8 @@ function UpdateCard({
             <div className="mt-5 flex items-center gap-3 lg:block">
               <span
                 className="release-build-orb flex size-14 shrink-0 items-center justify-center rounded-2xl font-[family-name:var(--font-display)] text-2xl font-black tabular-nums text-white lg:size-20 lg:rounded-[24px] lg:text-3xl"
-                aria-label={"Build " + update.release.buildNumber}
               >
+                <span className="sr-only">Build </span>
                 {update.release.buildNumber}
               </span>
               <div className="min-w-0 lg:mt-3">

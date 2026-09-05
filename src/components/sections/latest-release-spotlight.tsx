@@ -2,14 +2,14 @@ import Link from "next/link";
 import {
   ArrowRight,
   Clapperboard,
-  Images,
   MessageSquareMore,
   PhoneCall,
-  Radio,
   ShieldCheck,
   Sparkles,
+  Volume2,
 } from "lucide-react";
 
+import { FrameEchoIcon } from "@/components/brand/frame-echo-icon";
 import { productUpdates } from "@/content/product-updates";
 
 const releaseScope = [
@@ -19,9 +19,9 @@ const releaseScope = [
     description: "Shared-media views and resilient voice, photo and video handling.",
   },
   {
-    icon: Images,
-    title: "Current identity",
-    description: "Avatar refresh and profile media that stay consistent across surfaces.",
+    icon: FrameEchoIcon,
+    title: "YO Moments",
+    description: "Voice updates and photo/video Reels together in one audience-aware feed.",
   },
   {
     icon: PhoneCall,
@@ -29,9 +29,9 @@ const releaseScope = [
     description: "Safer audio and video negotiation across mixed app versions.",
   },
   {
-    icon: Radio,
-    title: "Voice Moments",
-    description: "Publishing and playback recovery under the current media boundary.",
+    icon: Volume2,
+    title: "Sound with restraint",
+    description: "Original Velvet Prism cues with optional, bounded playback.",
   },
   {
     icon: Clapperboard,
@@ -47,7 +47,7 @@ const releaseScope = [
 
 export function LatestReleaseSpotlight() {
   const update = productUpdates.find(
-    (item) => item.slug === "mobile-build-19-release-candidate",
+    (item) => item.slug === "mobile-build-20-invited-testing",
   );
 
   if (!update?.release) return null;
@@ -70,8 +70,8 @@ export function LatestReleaseSpotlight() {
           <div className="mt-8 flex items-end gap-4 sm:mt-10 sm:gap-5">
             <span
               className="release-build-orb flex size-[5.6rem] shrink-0 items-center justify-center rounded-[1.8rem] font-[family-name:var(--font-display)] text-4xl font-black tabular-nums text-white sm:size-28 sm:rounded-[2rem] sm:text-5xl"
-              aria-label={"Build " + update.release.buildNumber}
             >
+              <span className="sr-only">Build </span>
               {update.release.buildNumber}
             </span>
             <div className="min-w-0 pb-1">
@@ -94,22 +94,22 @@ export function LatestReleaseSpotlight() {
             </span>
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)] sm:text-[15px]">
-            Build 19 brings connected chat and media, refreshed identity, private
-            audio and video calls, Voice Moments, the Reels MVP and tighter media
-            safeguards to invited iOS and Android testers. It is not publicly
+            Build 20 unites YO Moments, the Reels MVP, Frame Echo Clean and
+            original sound cues. It is available to invited iOS and Android
+            testers, and the matching web release is live. It is not publicly
             released on the App Store or Google Play.
           </p>
 
           <Link
-            href="/updates#mobile-build-19-release-candidate"
+            href="/updates#mobile-build-20-invited-testing"
             className="premium-button-secondary focus-ring mt-7 min-h-12 w-fit px-5 text-sm"
           >
-            See Build 19 tester release
+            See Build 20 tester release
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
 
-        <ul className="relative grid gap-3 sm:grid-cols-2" aria-label="Build 19 release scope">
+        <ul className="relative grid gap-3 sm:grid-cols-2" aria-label="Build 20 release scope">
           {releaseScope.map(({ icon: Icon, title, description }, index) => (
             <li
               key={title}

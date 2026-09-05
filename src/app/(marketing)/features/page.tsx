@@ -4,6 +4,7 @@ import {
   ArrowRight,
   Bell,
   CircleUserRound,
+  Clapperboard,
   Crown,
   Languages,
   MessageCircle,
@@ -13,6 +14,7 @@ import {
   ShieldCheck,
   Trophy,
   UserPlus,
+  Volume2,
 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
@@ -40,9 +42,21 @@ const features = [
   },
   {
     icon: AudioLines,
-    title: "Voice Moments",
+    title: "YO Moments",
     description:
-      "Record, review and share a short voice update with the circle you choose, then decide exactly how long it stays available.",
+      "Voice updates and photo/video Reels share one feed. Record, review and share with the audience you choose, with clear availability and playback states.",
+  },
+  {
+    icon: Clapperboard,
+    title: "Reels MVP",
+    description:
+      "Create with your own photos, short videos, text, links and owned or licensed audio. A focused editor, not a streaming-music catalog.",
+  },
+  {
+    icon: Volume2,
+    title: "An original sound identity",
+    description:
+      "Optional Velvet Prism cues mark meaningful room, microphone and notification events. Your device volume and notification preferences stay in control.",
   },
   {
     icon: Crown,

@@ -28,6 +28,53 @@ export type ProductUpdate = {
 // represented as shipped yet.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "mobile-build-20-invited-testing",
+    updatedOn: "2026-09-05",
+    status: "testing",
+    eyebrow: "Build 20 · Invited testing",
+    title: "Build 20 brings YO Moments together",
+    summary:
+      "YO Voice 1.0.0 (20) is available through Google Play Internal Testing for the existing 15-person tester list and TestFlight for the six-person external group plus the internal tester. Five external TestFlight installations are confirmed, and the matching web release is live. This remains invited testing, not a public App Store or Google Play release.",
+    highlights: [
+      "YO Moments brings voice updates and the photo/video Reels MVP into one feed, with audience choices, reporting and owned or licensed audio uploads",
+      "Frame Echo Clean replaces the Moments navigation mark with a simple frame and play symbol, alongside original Velvet Prism sound cues and updated translations",
+      "Chat, avatar, friendship and media recovery improvements are included; real-device media and mixed-version audio/video call acceptance continues",
+    ],
+    release: {
+      version: "1.0.0 (20)",
+      stage: "Invited testing",
+      buildNumber: 20,
+    },
+  },
+  {
+    slug: "yo-moments-unified-feed",
+    updatedOn: "2026-09-05",
+    status: "testing",
+    eyebrow: "YO Moments",
+    title: "One place for voice, photos and short videos",
+    summary:
+      "The Build 20 experience brings Voice Moments and Reels into a unified YO Moments feed. Share a voice update or create with your own photo, video, text, links and audio, then choose the audience. This is a focused Reels MVP, not a licensed streaming-music catalog or a promise of Instagram feature parity.",
+    highlights: [
+      "Clear loading, empty, error and playback-recovery states keep creation and browsing understandable",
+      "Music must be owned or licensed by the uploader; Spotify and Apple Music tracks are not extracted into uploads",
+      "Server-validated publishing, reporting and short-lived media access retain the privacy boundary",
+    ],
+  },
+  {
+    slug: "frame-echo-and-velvet-prism",
+    updatedOn: "2026-09-05",
+    status: "testing",
+    eyebrow: "Navigation & sound",
+    title: "A cleaner Moments mark, a quieter sound identity",
+    summary:
+      "Build 20 pairs Frame Echo Clean with YO Voice's original Velvet Prism cues. The navigation mark uses a rounded frame and play symbol, without internal bars or tilt. Short material-like sounds clarify meaningful room, microphone and notification events without turning every tap into an effect.",
+    highlights: [
+      "The Frame Echo Clean shape stays consistent in Dark and Pearl navigation",
+      "Sound effects are optional, with bounded playback and protection against overlapping foreground cues",
+      "Device volume, notification settings and Do Not Disturb remain authoritative; speech and user recordings are not sound effects",
+    ],
+  },
+  {
     slug: "mobile-build-19-release-candidate",
     updatedOn: "2026-09-03",
     status: "testing",

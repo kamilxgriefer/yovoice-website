@@ -27,7 +27,7 @@ const routes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-31T00:00:00Z");
+  const lastModified = new Date("2026-09-05T00:00:00Z");
 
   return routes.map((route) => ({
     url: `${siteConfig.url}${route}`,

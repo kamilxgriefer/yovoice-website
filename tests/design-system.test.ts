@@ -44,6 +44,7 @@ test("release states and global keyboard focus use semantic tokens", async () =>
   }
   assert.match(updates, /data-status=\{status\}/);
   assert.match(updates, /data-status=\{update\.status\}/);
+  assert.doesNotMatch(updates, /leading-4 opacity-70/);
 });
 
 test("premium release surfaces reuse shared tokens and preserve semantic headings", async () => {
@@ -66,4 +67,21 @@ test("premium release surfaces reuse shared tokens and preserve semantic heading
   assert.match(spotlight, /id="latest-release-heading"/);
   assert.match(spotlight, /min-h-12/);
   assert.match(updates, /aria-labelledby=\{update\.slug \+ "-title"\}/);
+  for (const source of [spotlight, updates]) {
+    assert.match(source, /<span className="sr-only">Build <\/span>/);
+    assert.doesNotMatch(source, /aria-label=\{"Build " \+ update\.release\.buildNumber\}/);
+  }
+});
+
+test("keyboard skip link retains explicit contrast above the anchor reset", async () => {
+  const [css, layout] = await Promise.all([
+    readFile("src/app/globals.css", "utf8"),
+    readFile("src/app/layout.tsx", "utf8"),
+  ]);
+
+  assert.match(layout, /href="#main-content"/);
+  assert.match(layout, /className="skip-link focus-ring /);
+  assert.match(layout, /focus:translate-y-0/);
+  assert.match(css, /\.skip-link\s*\{[^}]*background:\s*#fff;/s);
+  assert.match(css, /\.skip-link\s*\{[^}]*color:\s*#211629;/s);
 });
