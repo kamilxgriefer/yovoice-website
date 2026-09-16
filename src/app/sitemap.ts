@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
 
-const highPriorityRoutes = ["/", "/features", "/community", "/clubs", "/download"];
+const highPriorityRoutes = ["/", "/features", "/community", "/servers", "/download"];
 
 const routes = [
   "/",
   "/features",
   "/community",
-  "/clubs",
+  "/servers",
   "/achievements",
   "/about",
   "/updates",
@@ -27,11 +27,11 @@ const routes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-09-05T00:00:00Z");
+  const refreshedRoutes = new Set(["/", "/servers", "/features", "/community", "/faq", "/help-center", "/about", "/roadmap", "/premium", "/updates"]);
 
   return routes.map((route) => ({
     url: `${siteConfig.url}${route}`,
-    lastModified,
+    lastModified: new Date(refreshedRoutes.has(route) ? "2026-09-16T00:00:00Z" : "2026-09-05T00:00:00Z"),
     changeFrequency: route === "/" || route === "/updates" ? "weekly" : "monthly",
     priority:
       route === "/"

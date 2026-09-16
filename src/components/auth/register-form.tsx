@@ -7,6 +7,8 @@ import { Lock, Mail, User } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import { verifyEmailPathAfterRegistration } from "@/lib/auth/registration-flow";
+import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -21,6 +23,10 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // True from submit until this page navigates away. Firebase signs the new
+  // account in before signUp resolves; without this the signed-in redirect
+  // would unmount the form and lose the verification-email outcome.
+  const [registrationStarted, setRegistrationStarted] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,25 +42,31 @@ export function RegisterForm() {
     }
 
     setSubmitting(true);
+    setRegistrationStarted(true);
     try {
-      await signUp(email, password, displayName);
+      const { verificationEmail } = await signUp(email, password, displayName);
       // Straight to the app would skip past email verification entirely —
       // land on the verify-email prompt instead, carrying the original
       // destination forward so it can pick up where this would have gone
-      // once the account is actually verified.
-      const redirectParam = searchParams.get("redirect");
-      const verifyUrl = redirectParam
-        ? `/verify-email?redirect=${encodeURIComponent(redirectParam)}`
-        : "/verify-email";
-      router.push(verifyUrl);
+      // once the account is actually verified. A failed send is reported
+      // there (the account exists, so this form can no longer help).
+      router.push(
+        verifyEmailPathAfterRegistration(
+          verificationEmail,
+          searchParams.get("redirect"),
+        ),
+      );
     } catch (err) {
+      // The account was not created: stay here and show why.
       setError(getAuthErrorMessage(err));
       setSubmitting(false);
+      setRegistrationStarted(false);
     }
   }
 
   return (
     <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
+      <RedirectIfAuthenticated suspended={registrationStarted} />
       {error ? (
         <p
           role="alert"

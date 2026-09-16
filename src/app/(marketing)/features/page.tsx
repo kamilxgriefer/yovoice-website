@@ -1,17 +1,16 @@
 import Link from "next/link";
 import {
-  AudioLines,
   ArrowRight,
+  AudioLines,
   Bell,
   CircleUserRound,
   Clapperboard,
-  Crown,
   Languages,
+  LayoutGrid,
   MessageCircle,
-  Mic2,
-  Radio,
-  Settings2,
+  PhoneCall,
   ShieldCheck,
+  Sparkles,
   Trophy,
   UserPlus,
   Volume2,
@@ -23,115 +22,109 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 export const metadata = createPageMetadata({
   title: "Features",
   description:
-    "Voice rooms, clubs, friends, achievements and notifications — everything inside YO Voice.",
+    "Explore the Servers interface, refreshed Home, Chats, Friends, YO Moments and media-first Yeels in YO Voice internal testing.",
   path: "/features",
 });
 
 const features = [
   {
-    icon: Mic2,
-    title: "Community rooms",
+    icon: LayoutGrid,
+    title: "Servers · in internal testing",
     description:
-      "Open voice spaces where anyone can speak. No stage, no hierarchy — just a conversation everyone is part of.",
+      "Choose Friends, Community, Podcast, Family or Company from one compact selector. The interface is in internal testing; server creation and channel activity remain behind the backend release gate.",
   },
   {
-    icon: Radio,
-    title: "Podcast rooms",
+    icon: MessageCircle,
+    title: "Private Chats",
     description:
-      "Host events with structure: a stage, raised hands, and moderator controls for managing speakers and larger audiences.",
-  },
-  {
-    icon: AudioLines,
-    title: "YO Moments",
-    description:
-      "Voice updates and photo/video Reels share one feed. Record, review and share with the audience you choose, with clear availability and playback states.",
-  },
-  {
-    icon: Clapperboard,
-    title: "Reels MVP",
-    description:
-      "Create with your own photos, short videos, text, links and owned or licensed audio. A focused editor, not a streaming-music catalog.",
-  },
-  {
-    icon: Volume2,
-    title: "An original sound identity",
-    description:
-      "Optional Velvet Prism cues mark meaningful room, microphone and notification events. Your device volume and notification preferences stay in control.",
-  },
-  {
-    icon: Crown,
-    title: "Clubs",
-    description:
-      "Persistent communities with their own chat, roles, invites and dedicated rooms — public or invite-only.",
+      "Start a private conversation, send text, voice, photos or video, and open shared media in a responsive full-screen viewer with clear loading and recovery states.",
   },
   {
     icon: UserPlus,
-    title: "Friends & following",
+    title: "Friends",
     description:
-      "Follow creators, add friends and keep a feed of the people and communities you actually care about.",
+      "A visible Add Friend action, plain-language search and separate All, Online, Requests and Blocked views make the social graph easier to understand.",
+  },
+  {
+    icon: AudioLines,
+    title: "Voice Moments",
+    description:
+      "Record, review and share short voice updates inside YO Moments. Discovery, playback and creation use the same visual hierarchy as Yeels.",
+  },
+  {
+    icon: Clapperboard,
+    title: "Yeels",
+    description:
+      "Create with your own photo or short video, movable text and link overlays, and audio you own or license. Media remains the focus across phone and desktop.",
+  },
+  {
+    icon: Sparkles,
+    title: "YO Voice Originals",
+    description:
+      "The Build 27 candidate bundles 16 original GIF animations. GIF search and sending wait for a backend rollout that has not happened yet, so GIFs are not available in any build today.",
+  },
+  {
+    icon: PhoneCall,
+    title: "Private voice and video calls",
+    description:
+      "Tester builds carry call setup, teardown and retry corrections into internal testing. Quality still depends on the devices and network involved.",
+  },
+  {
+    icon: CircleUserRound,
+    title: "Creator audience",
+    description:
+      "Following is reserved for a Premium Creator profile after age verification and explicit opt-in. Public audience visibility is derived by the server, rather than trusted from a browser control.",
   },
   {
     icon: Trophy,
     title: "Achievements",
     description:
-      "A real progression system across messages, hosting time, communities and more — from common to mythic.",
+      "A progression system recognises messages, moments and community milestones across common, uncommon, rare, epic, legendary and mythic tiers.",
   },
   {
     icon: Bell,
     title: "Notifications",
     description:
-      "Push and in-app alerts for friend requests, mentions and club activity, with granular controls for what you hear about.",
+      "Push and in-app alerts cover friend requests, private messages, mentions and replies, with account-level controls that preserve the existing backend preference keys.",
   },
   {
     icon: ShieldCheck,
     title: "Safety by default",
     description:
-      "A persistent verification notice guides unverified accounts, with blocking and room moderation tools built into the product.",
+      "Email verification, blocking, reporting and moderation checks stay part of the product foundation, with privileged actions enforced on the server.",
   },
   {
-    icon: MessageCircle,
-    title: "Private chats and calls",
+    icon: Volume2,
+    title: "An original sound identity",
     description:
-      "Text appears immediately with clear recovery states, alongside private photo, voice-message and one-to-one voice-call paths.",
-  },
-  {
-    icon: CircleUserRound,
-    title: "Identity that stays current",
-    description:
-      "Fresh avatars follow a person through search, Home and Chats, and profile photos can open in a focused full-screen viewer.",
-  },
-  {
-    icon: Settings2,
-    title: "Permission readiness",
-    description:
-      "One guided review explains microphone, camera and notification access; each operating-system prompt appears only when needed.",
+      "Optional original sound cues mark meaningful events without replacing device volume, notification settings or Do Not Disturb controls.",
   },
   {
     icon: Languages,
     title: "A broader language choice",
     description:
-      "Polish is a production option and the core interface catalog now spans major European and global locales, with English fallback on specialist screens.",
+      "Polish is a production option and the core interface spans major European and global locales, with English fallback where specialist screens are still being translated.",
   },
-];
+] as const;
 
 const deepDives = [
-  { title: "Community", description: "Rooms, friends and discovery in depth.", href: "/community" },
-  { title: "Clubs", description: "Build and run your own community.", href: "/clubs" },
-  { title: "Achievements", description: "How progression works, tier by tier.", href: "/achievements" },
-];
+  { title: "Servers", description: "Five types and the backend release boundary.", href: "/servers" },
+  { title: "Community", description: "Home, Chats, Friends and Creator audience.", href: "/community" },
+  { title: "Updates", description: "Verified tester-build and release status.", href: "/updates" },
+] as const;
 
 export default function FeaturesPage() {
   return (
     <>
       <PageHero
-        eyebrow="Features"
-        title="Everything inside YO Voice"
-        description="Voice-first tools for hosting, connecting and belonging — built together, not bolted on."
+        eyebrow="Features in testing"
+        title="One YO Voice, from Home to Yeels"
+        description="The same visual language now connects Servers, private Chats, Friends and YO Moments. Every release boundary is stated where it matters."
       />
 
       <section className="px-5 pb-8 sm:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {features.map(({ icon: Icon, title, description }) => (
               <article key={title} className="glass-panel rounded-[28px] p-7">
                 <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
@@ -150,21 +143,17 @@ export default function FeaturesPage() {
           <div className="text-center">
             <p className="eyebrow">Go deeper</p>
             <h2 className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-.04em] text-white sm:text-4xl">
-              Explore each part of the experience
+              Explore the current experience
             </h2>
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-3">
             {deepDives.map(({ title, description, href }) => (
-              <Link
-                key={title}
-                href={href}
-                className="glass-panel group rounded-[28px] p-7 transition hover:-translate-y-1 hover:border-fuchsia-300/25"
-              >
-                <h3 className="text-xl font-bold text-white">{title}</h3>
+              <Link key={title} href={href} className="glass-panel group rounded-[28px] p-7 transition hover:-translate-y-1 hover:border-fuchsia-300/25">
+                <Sparkles className="size-5 text-fuchsia-200" aria-hidden="true" />
+                <h3 className="mt-5 text-xl font-bold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
                 <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-300 transition group-hover:text-white">
-                  Learn more
-                  <ArrowRight className="size-4 transition group-hover:translate-x-1" aria-hidden="true" />
+                  Learn more <ArrowRight className="size-4 transition group-hover:translate-x-1" aria-hidden="true" />
                 </span>
               </Link>
             ))}

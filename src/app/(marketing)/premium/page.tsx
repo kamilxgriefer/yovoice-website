@@ -2,9 +2,9 @@ import { PremiumPlansView } from "@/components/premium/premium-plans-view";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
-  title: "YO Voice Premium — Creator, Clubs and more",
+  title: "YO Voice Premium — Creator and Premium identity",
   description:
-    "Go Premium on YO Voice: become a Creator, build your own Clubs and see your final local currency securely at checkout.",
+    "Explore Creator Studio, a Premium badge and profile ring, and up to 30 owned Servers once Servers launch.",
   path: "/premium",
 });
 

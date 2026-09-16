@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Clock3,
   FlaskConical,
+  History,
   Layers3,
   Sparkles,
   TestTube2,
@@ -18,6 +19,13 @@ import {
   type ProductUpdateStatus,
 } from "@/content/product-updates";
 import { createPageMetadata } from "@/lib/seo/metadata";
+import {
+  currentRelease,
+  currentReleaseAvailability,
+  nextReleaseCandidate,
+  nextReleaseCandidateStatus,
+} from "@/content/current-release";
+import { serverLaunchPolicy } from "@/content/server-templates";
 
 export const metadata = createPageMetadata({
   title: "Updates",
@@ -55,6 +63,11 @@ const statusPresentation: Record<
     description: "Still behind a release boundary",
     icon: FlaskConical,
   },
+  superseded: {
+    label: "Superseded",
+    description: "Replaced by a later tester build or surface; kept for history",
+    icon: History,
+  },
 };
 
 const currentWave = productUpdates.filter(
@@ -75,18 +88,27 @@ export default function UpdatesPage() {
         description="A release-truth ledger for the current YO Voice experience: verified production work, tester builds, rollout-ready changes and items that still have a boundary to clear."
       >
         <Link
-          href="#mobile-build-20-invited-testing"
+          href={`#mobile-build-${currentRelease.buildNumber}-internal-testing`}
           className="focus-ring mx-auto mt-7 inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/[.075] px-4 text-left transition hover:border-[color:var(--accent)]/45 hover:bg-[color:var(--accent)]/[.12]"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-[11px] font-black text-white shadow-[0_8px_24px_rgba(123,47,247,.35)]">
-            20
+            {currentRelease.buildNumber}
           </span>
           <span className="min-w-0 text-xs font-bold text-white/80 sm:text-sm">
-            Build 20 · invited testing
+            Build {currentRelease.buildNumber} · internal testing
           </span>
           <ArrowRight className="size-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
         </Link>
       </PageHero>
+
+      <aside aria-labelledby="servers-development-heading" className="mx-auto mb-10 w-[calc(100%-40px)] max-w-6xl rounded-[24px] border border-[var(--border-strong)] bg-[var(--surface)] p-6 sm:w-[calc(100%-64px)] sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-[.15em] text-[var(--accent)]">{serverLaunchPolicy.stage} · September 16, 2026</p>
+        <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-tight">A new home for every circle</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
+          YO Voice {currentRelease.version}: {currentReleaseAvailability} It includes the five-type Servers interface and preserves the established Hub. Server backend activation remains gated, Podcast recording remains disabled, and the planned ownership allowances of {serverLaunchPolicy.freeOwnedServers} on Free or {serverLaunchPolicy.premiumOwnedServers} on Premium are not active yet. Joining will stay unlimited for everyone. {nextReleaseCandidateStatus} Its {nextReleaseCandidate.gifOriginalsBundled} bundled YO Voice GIF originals stay unavailable until the GIF backend rollout happens.
+        </p>
+        <Link href="/servers" className="focus-ring mt-4 inline-flex min-h-12 items-center gap-2 rounded-xl text-sm font-semibold text-[var(--accent)]">Explore the Servers interface <ArrowRight className="size-4" aria-hidden="true" /></Link>
+      </aside>
 
       <section className="px-5 pb-24 sm:px-8" aria-labelledby="updates-heading">
         <div className="mx-auto max-w-6xl">
@@ -96,7 +118,7 @@ export default function UpdatesPage() {
 
           <div className="rounded-[26px] border border-white/[.07] bg-[var(--surface-muted)]/70 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.035)] sm:p-3">
             <ul
-              className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 lg:grid-cols-4"
+              className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
               aria-label="Release status legend"
             >
               {(Object.keys(statusPresentation) as ProductUpdateStatus[]).map(

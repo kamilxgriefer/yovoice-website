@@ -4,7 +4,7 @@ import {
   Crown,
   Download,
   Mail,
-  Mic2,
+  MessageCircle,
   ShieldCheck,
   UserCircle,
 } from "lucide-react";
@@ -28,20 +28,20 @@ const topics = [
     linkLabel: "Account FAQs",
   },
   {
-    icon: Mic2,
-    title: "Rooms & voice",
+    icon: MessageCircle,
+    title: "Chats, Friends & Yeels",
     description:
-      "Community rooms, podcast rooms, raising your hand, and hosting your own conversation.",
+      "Adding friends, private media, voice and video calls, Voice Moments and media-first Yeels.",
     href: "/features",
-    linkLabel: "How rooms work",
+    linkLabel: "Explore conversations",
   },
   {
     icon: Crown,
-    title: "Clubs & achievements",
+    title: "Servers",
     description:
-      "Creating a club, managing members, and how the achievement system works.",
-    href: "/clubs",
-    linkLabel: "Explore clubs",
+      "Understand the five server types, the internal-testing interface and the backend activation boundary.",
+    href: "/servers",
+    linkLabel: "Explore Servers",
   },
   {
     icon: Download,
@@ -55,7 +55,7 @@ const topics = [
     icon: ShieldCheck,
     title: "Safety & moderation",
     description:
-      "Blocking, room moderation tools and how to report a problem.",
+      "Blocking, reporting, server-side eligibility checks and how to report a problem.",
     href: "/safety",
     linkLabel: "Read our safety guidelines",
   },

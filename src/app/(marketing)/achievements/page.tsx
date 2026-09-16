@@ -21,16 +21,16 @@ export const metadata = createPageMetadata({
 });
 
 const tracks = [
-  { icon: MessageSquare, title: "Messages", description: "Sent in chats and clubs." },
-  { icon: UserPlus, title: "Followers", description: "People following your profile." },
-  { icon: Mic2, title: "Voice minutes", description: "Time spent speaking in rooms." },
-  { icon: Radio, title: "Rooms", description: "Rooms you've joined or hosted." },
-  { icon: Users, title: "Communities", description: "Clubs you're part of." },
+  { icon: MessageSquare, title: "Messages", description: "Sent in private Chats and compatible community spaces." },
+  { icon: UserPlus, title: "Creator audience", description: "Follower milestones for eligible, opted-in Creator profiles." },
+  { icon: Mic2, title: "Voice minutes", description: "Time spent speaking in live voice conversations." },
+  { icon: Radio, title: "Voice activity", description: "Compatible participation and hosting activity from existing data." },
+  { icon: Users, title: "Communities", description: "Community membership progress preserved as Servers arrive." },
   { icon: Heart, title: "Friends", description: "Friend connections you've made." },
   { icon: Sparkles, title: "Reactions", description: "Reactions you've given and received." },
-  { icon: Crown, title: "Host minutes", description: "Time spent hosting a room." },
+  { icon: Crown, title: "Host minutes", description: "Time spent hosting live voice conversations." },
   { icon: CalendarDays, title: "Active days", description: "Days you've shown up on YO Voice." },
-  { icon: Activity, title: "Moments", description: "Voice moments you've recorded and shared." },
+  { icon: Activity, title: "Moments", description: "Voice Moments you've recorded and shared." },
 ];
 
 const rarities = [
@@ -82,7 +82,8 @@ export default function AchievementsPage() {
             <p className="mx-auto mt-3 max-w-2xl text-sm text-white/65">
               Each track has ten milestones, from your first step to a
               10,000-strong feat. Progress is tracked automatically as you
-              use YO Voice.
+              use YO Voice. Some counters retain earlier internal data names so
+              existing progress is not discarded during the Servers transition.
             </p>
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-5">

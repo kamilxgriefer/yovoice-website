@@ -1,82 +1,174 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("Community Room artwork mirrors consent-first entry and docked chat", async () => {
-  const preview = await readFile(
-    "src/components/sections/community-room-preview.tsx",
+const build26ScreenshotPaths = [
+  "public/screenshots/build-26/home-desktop.jpg",
+  "public/screenshots/build-26/chats-desktop.jpg",
+  "public/screenshots/build-26/friends-desktop.jpg",
+  "public/screenshots/build-26/servers-desktop.jpg",
+  "public/screenshots/build-26/yeels-desktop.jpg",
+] as const;
+
+test("tester-build experience shows only labelled Build 26 captures", async () => {
+  const experience = await readFile(
+    "src/components/sections/tester-build-experience.tsx",
     "utf8",
   );
 
-  assert.match(preview, /Before you join/);
-  assert.match(preview, /No audio before consent/);
-  assert.match(preview, /Microphone off/);
-  assert.match(preview, /Join conversation/);
-  assert.match(preview, /Visible by default/);
-  assert.match(preview, /Hide the panel/);
-  assert.doesNotMatch(preview, /listeners?|audience total/i);
+  for (const path of build26ScreenshotPaths) {
+    await access(path);
+    const assetPath = path.replace("public", "");
+    assert.ok(
+      experience.includes(assetPath) || assetPath.endsWith("servers-desktop.jpg"),
+      path,
+    );
+  }
+
+  for (const label of ["Home", "Chats", "Friends", "Yeels"]) {
+    assert.match(experience, new RegExp(`label: "${label}"`), label);
+  }
+
+  assert.match(experience, /Build 26 fixture-fed capture from source d1c036b7/i);
+  assert.match(experience, /real desktop Hub|real Hub/i);
+  // Nothing records that Build 27 left these surfaces unchanged.
+  assert.doesNotMatch(experience, /unchanged in Build 27|reused for Build 27/i);
+  assert.doesNotMatch(experience, /active users|people online/i);
 });
 
-test("homepage artwork keeps account readiness visible without live-user claims", async () => {
-  const preview = await readFile(
-    "src/components/hero/app-experience-preview.tsx",
+test("tester-build experience keeps the four surfaces keyboard accessible", async () => {
+  const experience = await readFile(
+    "src/components/sections/tester-build-experience.tsx",
     "utf8",
   );
 
-  assert.match(preview, /Your email isn&apos;t verified yet/);
-  assert.match(preview, /Verify now/);
-  assert.match(preview, /No live activity shown/);
+  for (const expected of [
+    'role="tablist"',
+    'role="tab"',
+    'role="tabpanel"',
+    "aria-controls=",
+    "aria-labelledby=",
+    "aria-selected=",
+    "tabIndex={index === selectedIndex ? 0 : -1}",
+    "buttons.current[next]?.focus()",
+    "hidden={index !== selectedIndex}",
+  ]) {
+    assert.ok(experience.includes(expected), expected);
+  }
+
+  assert.match(experience, /ArrowLeft/);
+  assert.match(experience, /ArrowRight/);
+  assert.match(experience, /Home/);
+  assert.match(experience, /End/);
 });
 
-test("feature copy is honest about language fallback and native permission prompts", async () => {
+test("Chats, Friends and Yeels copy matches the tester-build interface boundary", async () => {
+  const experience = await readFile(
+    "src/components/sections/tester-build-experience.tsx",
+    "utf8",
+  );
+
+  assert.match(experience, /Add Friend beside New Message/i);
+  assert.match(experience, /responsive full-screen viewer/i);
+  assert.match(
+    experience,
+    /call setup and recovery changes are being exercised by internal testers/i,
+  );
+  assert.match(experience, /All, Online, Requests and Blocked/i);
+  assert.match(experience, /same YO Moments language as Voice/i);
+  assert.match(
+    experience,
+    /text and link overlays that can be moved before publishing/i,
+  );
+  assert.match(experience, /Controls avoid covering the centre of the media/i);
+  assert.match(
+    experience,
+    /Premium Creator profile after age verification and explicit opt-in/i,
+  );
+  assert.match(
+    experience,
+    /do not use a client-side toggle as proof of eligibility/i,
+  );
+  assert.doesNotMatch(experience, /flawless|zero latency|publicly available/i);
+});
+
+test("feature copy keeps current capabilities and release gates honest", async () => {
   const features = await readFile(
     "src/app/(marketing)/features/page.tsx",
     "utf8",
   );
 
-  assert.match(features, /each operating-system prompt appears only when needed/i);
-  assert.match(features, /English fallback on specialist screens/i);
-  assert.doesNotMatch(features, /one (?:click|prompt).*(?:camera|microphone|notification)/i);
+  assert.match(features, /Friends, Community, Podcast, Family or Company/i);
+  assert.match(
+    features,
+    /server creation and channel activity remain behind the backend release gate/i,
+  );
+  assert.match(features, /responsive full-screen viewer/i);
+  assert.match(features, /movable text and link overlays/i);
+  assert.match(features, /setup, teardown and retry corrections into internal testing/i);
+  assert.match(
+    features,
+    /quality still depends on the devices and network involved/i,
+  );
+  assert.match(features, /Public audience visibility is derived by the server/i);
+  assert.match(features, /Build 27 candidate bundles 16 original GIF animations/i);
+  assert.match(features, /GIFs are not available in any build today/i);
+  assert.doesNotMatch(features, /GIPHY|Android session continuity|Velvet Prism/i);
+  assert.doesNotMatch(features, /Build 27 (?:is|are) available/i);
+  assert.match(
+    features,
+    /English fallback where specialist screens are still being translated/i,
+  );
+  assert.doesNotMatch(
+    features,
+    /one (?:click|prompt).*(?:camera|microphone|notification)/i,
+  );
 });
 
-test("homepage Build 20 spotlight mirrors invited testing without claiming public rollout", async () => {
+test("homepage spotlight features the confirmed Build 26 without claiming public rollout", async () => {
   const spotlight = await readFile(
     "src/components/sections/latest-release-spotlight.tsx",
     "utf8",
   );
 
   for (const label of [
+    "Five Server types",
+    "Hub preserved",
     "Chats & media",
-    "YO Moments",
-    "Private calls",
-    "Sound with restraint",
-    "Reels MVP",
-    "Trust boundary",
+    "Friends",
+    "Yeels media-first",
+    "Calls under test",
   ]) {
     assert.ok(spotlight.includes(label), label);
   }
 
-  assert.match(spotlight, /available to invited iOS and Android\s+testers/i);
-  assert.match(spotlight, /matching web release is live/i);
-  assert.doesNotMatch(spotlight, /pending|staged/i);
+  assert.match(spotlight, /mobile-build-\$\{currentRelease\.buildNumber\}-internal-testing/);
+  assert.match(spotlight, /Build 26 is available through the existing Google Play Internal\s+Testing list and TestFlight internal group/i);
+  assert.match(spotlight, /nextReleaseCandidateStatus/);
   assert.match(
     spotlight,
-    /not publicly\s+released on the App Store or Google Play/i,
+    /internal tester release, not\s+a public App Store or Google Play release/i,
   );
-  assert.doesNotMatch(spotlight, /1\s*ms|end-to-end encrypted|publicly available/i);
+  assert.match(spotlight, /server backend activation remains gated/i);
+  assert.match(spotlight, /Podcast\s+recording remains disabled/i);
+  assert.doesNotMatch(
+    spotlight,
+    /matching web release is live|available to everyone|publicly available|GIPHY|Build 27 is available/i,
+  );
 });
 
-test("Moments navigation mirrors the app's clean frame-and-play geometry", async () => {
-  const [icon, preview] = await Promise.all([
-    readFile("src/components/brand/frame-echo-icon.tsx", "utf8"),
-    readFile("src/components/hero/app-experience-preview.tsx", "utf8"),
-  ]);
+test("the real Servers screenshot and product frame both preserve the Hub", async () => {
+  const landing = await readFile(
+    "src/components/servers/servers-landing.tsx",
+    "utf8",
+  );
 
-  assert.match(preview, /icon: FrameEchoIcon, label: "Moments"/);
-  assert.match(icon, /viewBox="0 0 100 100"/);
-  assert.equal((icon.match(/<rect\b/g) ?? []).length, 1);
-  assert.equal((icon.match(/<path\b/g) ?? []).length, 1);
-  assert.match(icon, /rx="27"/);
-  assert.match(icon, /strokeWidth="7\.5"/);
-  assert.doesNotMatch(icon, /<line\b|rotate|skew|AudioLines/);
+  await access("public/screenshots/build-26/servers-desktop.jpg");
+  assert.match(landing, /screenshots\/build-26\/servers-desktop\.jpg/);
+  assert.match(landing, /real Hub and five choices/i);
+  assert.match(landing, /familiar\s+YO Voice Hub stays in place/i);
+  assert.match(landing, /Build 26 fixture-fed capture from source d1c036b7/i);
+  assert.doesNotMatch(landing, /unchanged in Build 27|reused for Build 27/i);
+  assert.match(landing, /no live account or server\s+connection/i);
+  assert.doesNotMatch(landing, /CSS mockup|concept render/i);
 });

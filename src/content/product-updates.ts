@@ -2,7 +2,8 @@ export type ProductUpdateStatus =
   | "live"
   | "testing"
   | "ready"
-  | "verification";
+  | "verification"
+  | "superseded";
 
 export type ProductUpdate = {
   slug: string;
@@ -25,12 +26,53 @@ export type ProductUpdate = {
 // while final store/device acceptance is still in progress.
 // `ready` means the source and its release gates are complete but rollout is
 // still pending. `verification` means the implementation is intentionally not
-// represented as shipped yet.
+// represented as shipped yet. `superseded` means a later tester build or
+// surface replaced the entry (older builds no longer on the tester channels,
+// and the standalone Rooms and Clubs surfaces that Servers replaced); it stays
+// for history and is never presented as currently available.
 export const productUpdates: readonly ProductUpdate[] = [
+  {
+    slug: "mobile-build-26-internal-testing",
+    updatedOn: "2026-09-13",
+    status: "testing",
+    eyebrow: "Build 26 · Internal testing",
+    title: "Build 26 brings the server-first YO Voice together",
+    summary:
+      "YO Voice 2.0.0 (26), built from source revision d1c036b7, is available to the existing 15-person Google Play Internal Testing list and the existing TestFlight internal group. This is an internal tester release, not a public App Store or Google Play release. The Servers interface is included, while server backend activation remains gated and Podcast recording remains disabled.",
+    highlights: [
+      "Servers replace the old Rooms destination with five starting points — Friends, Community, Podcast, Family and Company — while preserving the established animated Hub",
+      "Home, Chats and Friends make people and private conversation easier to reach; shared private photos and videos now open in a responsive full-screen viewer",
+      "Yeels gives media more space, shares one visual system with Voice and lets creators position text and links before publishing; call reliability changes continue through real-device tester validation",
+    ],
+    release: {
+      version: "2.0.0 (26)",
+      stage: "Internal testing",
+      buildNumber: 26,
+    },
+  },
+  {
+    slug: "mobile-build-27-internal-tester-candidate",
+    updatedOn: "2026-09-13",
+    status: "verification",
+    eyebrow: "Build 27 · Candidate",
+    title: "Build 27 is being prepared for internal testers",
+    summary:
+      "YO Voice 2.0.0 (27) is an internal tester candidate for the existing Google Play Internal Testing list and TestFlight internal group. Its final source revision, signed artifacts and store read-backs are not recorded yet, so it is not described as available. It is not a public App Store or Google Play release, and Server backend activation remains gated.",
+    highlights: [
+      "Prepared scope includes one Voice and Yeels format selector, shared Add friend state with retry, full-row unread state and safer archive recovery in Chats",
+      "Sixteen original YO Voice GIF animations are bundled in the candidate; GIF search and sending wait for a backend rollout that has not happened yet",
+      "Servers V1 activation and Podcast recording remain gated in production; the owned-Server allowance of 5 on Free and 30 on Premium applies only after activation",
+    ],
+    release: {
+      version: "2.0.0 (27)",
+      stage: "Candidate",
+      buildNumber: 27,
+    },
+  },
   {
     slug: "mobile-build-20-invited-testing",
     updatedOn: "2026-09-05",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Build 20 · Invited testing",
     title: "Build 20 brings YO Moments together",
     summary:
@@ -77,7 +119,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "mobile-build-19-release-candidate",
     updatedOn: "2026-09-03",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Build 19 · Invited testing",
     title: "Build 19 is available to invited testers",
     summary:
@@ -96,7 +138,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "mobile-build-18",
     updatedOn: "2026-09-02",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Mobile",
     title: "Build 18 is available to invited testers",
     summary:
@@ -110,7 +152,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "room-consent-and-docked-chat",
     updatedOn: "2026-09-01",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Rooms",
     title: "Room entry now waits for an explicit choice",
     summary:
@@ -208,7 +250,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "podcast-studio-rebuild",
     updatedOn: "2026-08-31",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Podcast Rooms",
     title: "Podcast Studio gives hosts a calmer place to run a show",
     summary:
@@ -292,7 +334,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "room-cover-studio",
     updatedOn: "2026-08-31",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Rooms",
     title: "Room covers can finally be framed your way",
     summary:
@@ -334,7 +376,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "direct-chat-reliability-build-11",
     updatedOn: "2026-08-28",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Chats",
     title: "Build 11 makes private conversations fast and dependable",
     summary:
@@ -348,7 +390,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "mobile-build-8-testing",
     updatedOn: "2026-08-28",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Mobile",
     title: "Build 8 is available to Android and iOS testers",
     summary:
@@ -362,7 +404,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "moderator-premium-preview",
     updatedOn: "2026-08-28",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Premium",
     title: "Moderators can test the complete Premium experience",
     summary:
@@ -432,7 +474,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "community-room-presence",
     updatedOn: "2026-08-27",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Community Rooms",
     title: "Community Rooms now feel like open voice channels",
     summary:
@@ -502,7 +544,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "shared-room-experience",
     updatedOn: "2026-08-17",
-    status: "live",
+    status: "superseded",
     eyebrow: "Rooms",
     title: "A clearer stage is live for every kind of conversation",
     summary:
@@ -530,7 +572,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "family-room-reliability",
     updatedOn: "2026-08-17",
-    status: "live",
+    status: "superseded",
     eyebrow: "Family Rooms",
     title: "Safer Family Room creation is live",
     summary:

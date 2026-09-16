@@ -45,7 +45,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--background); }
+html { scroll-behavior: smooth; scroll-padding-top: 6rem; background: var(--background); }
 body {
   min-height: 100vh;
   margin: 0;
@@ -256,6 +256,13 @@ img { user-select: none; -webkit-user-drag: none; }
   border-color: color-mix(in srgb, var(--accent) 38%, transparent);
   background: color-mix(in srgb, var(--surface-raised) 76%, var(--primary));
   color: var(--accent);
+}
+/* Superseded history stays legible but deliberately neutral, so it never reads
+   as a current or available state. */
+.release-status[data-status="superseded"] {
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
 }
 
 /* Light CTA links need an explicit class because the global anchor rule keeps

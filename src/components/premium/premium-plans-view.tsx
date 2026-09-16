@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight,
-  AudioLines,
   Check,
   Clock3,
   CreditCard,
@@ -400,14 +399,17 @@ function PremiumPlansContent() {
         <p className="mt-8 text-center text-xs leading-5 text-white/60">
           Recurring subscriptions can be cancelled any time. Prepaid BLIK
           access ends automatically. Everything essential on YO Voice stays
-          free — rooms, chats, friends and joining Clubs.
+          free — Chats, Friends, Voice Moments and the current web experience.
+          After launch, Free can own up to 5 Servers and Premium can own up to
+          30; everyone can join without a limit. These allowances remain
+          inactive while server backend activation is gated.
         </p>
       </div>
     </div>
   );
 }
 
-const includedIcons = [UserRound, Crown, Sparkles, AudioLines, Sparkles];
+const includedIcons = [UserRound, Crown, Sparkles, Sparkles];
 
 /** Stripe-hosted Checkout keeps payment details and provider pricing off-site. */
 function CheckoutBoundary({

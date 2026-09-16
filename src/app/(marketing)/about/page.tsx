@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Heart, Mic2, ShieldCheck, Sparkles } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -19,21 +20,21 @@ const principles = [
   },
   {
     icon: Sparkles,
-    title: "Built for creators and hosts",
+    title: "Built for people and creators",
     description:
-      "Rooms and clubs are designed around the people who show up to run them — clear moderation tools, structure when you need it, and freedom when you don't.",
+      "Friends, Chats and Servers are designed around the people who return — clear structure when it helps, direct conversation when it matters.",
   },
   {
     icon: ShieldCheck,
     title: "Safety isn't an afterthought",
     description:
-      "Email verification, blocking and room moderation ship as core features, not add-ons bolted on after launch.",
+      "Email verification, blocking, reporting and server-side eligibility checks ship as core features, not add-ons bolted on after launch.",
   },
   {
     icon: Heart,
     title: "Be you",
     description:
-      "YO Voice exists so people can show up as themselves — in a Club about a niche interest, a late-night Community Room, or a Podcast Room where strangers become friends.",
+      "YO Voice exists so people can show up as themselves — with close friends, around a shared interest, through a Voice Moment or inside a story told as a Yeel.",
   },
 ];
 
@@ -48,7 +49,7 @@ export default function AboutPage() {
             <span className="text-gradient block">become communities.</span>
           </>
         }
-        description="YO Voice is a voice-first social platform — rooms, clubs, friends and achievements built around real, live conversation instead of another feed to scroll."
+        description="YO Voice brings private conversation, voice and everyday moments together. The current tester build carries a server-first interface for friends, communities, podcasts, families and teams."
       />
 
       <section className="px-5 pb-8 sm:px-8">
@@ -56,17 +57,14 @@ export default function AboutPage() {
           <p>
             Most social platforms optimize for content you consume alone.
             We&apos;re building the opposite: a place where you show up, speak,
-            and leave with people you actually know. A community room where
-            everyone can jump in. A podcast room when someone needs the
-            stage. A club that keeps your people together between
-            conversations.
+            and leave with people you actually know. Home begins with friends.
+            Chats lead directly into private conversation. Voice Moments and
+            Yeels give everyday stories two related forms. Servers give each
+            circle a clear place to begin.
           </p>
           <p className="mt-5">
             YO Voice is developed by a small, focused team shipping in the
-            open — the web app is live today, and YO Voice 1.0.0 build 20 is
-            available to invited testers through Google Play Internal Testing
-            and TestFlight. Public store and desktop releases continue toward
-            launch.
+            open — the web app is live today, and YO Voice {currentRelease.version} is in {currentRelease.stage.toLowerCase()}. {currentReleaseAvailability} Server backend activation remains gated, and public store and desktop releases remain separate milestones.
           </p>
         </div>
       </section>

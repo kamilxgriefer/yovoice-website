@@ -1,61 +1,69 @@
 import Link from "next/link";
-import { ArrowRight, Compass, DoorOpen, Mic2, ShieldCheck, UserPlus, Users } from "lucide-react";
+import {
+  ArrowRight,
+  Clapperboard,
+  House,
+  MessageCircle,
+  ShieldCheck,
+  UserPlus,
+  Users,
+} from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "Community",
-  description: "Community rooms, friends and discovery on YO Voice.",
+  description: "How Home, Chats, Friends, Creator audience and YO Moments connect people in the current YO Voice tester build.",
   path: "/community",
 });
 
 const highlights = [
   {
-    icon: Users,
-    title: "Look before you connect",
+    icon: House,
+    title: "Your people lead Home",
     description:
-      "Opening a room shows a passive preview first. Audio, presence and microphone access begin only after you choose Join conversation.",
+      "Friends stay at the top, recent private Chats stay close, and a clear server invitation replaces the old room-heavy starting point.",
   },
   {
-    icon: DoorOpen,
-    title: "A lifecycle you choose",
+    icon: MessageCircle,
+    title: "Chats open the next connection",
     description:
-      "When creating a room, choose whether it stays open or ends when its host leaves. The rule is clear before anyone joins.",
+      "Add Friend is visible beside New Message, so a new member can move from conversation to discovery without hunting through settings.",
   },
   {
     icon: UserPlus,
-    title: "Friends and follows",
+    title: "Friends explains each path",
     description:
-      "Send, accept or cancel a friend request without duplicate states, then keep that identity current across search, Home and Chats.",
+      "Adding someone new is separate from filtering current friends, with dedicated All, Online, Requests and Blocked views.",
   },
   {
-    icon: Compass,
-    title: "Discover new people",
+    icon: Users,
+    title: "Following belongs to Creators",
     description:
-      "Find active rooms and clubs around topics you care about instead of starting from an empty feed.",
+      "Audience visibility appears only for a Premium Creator profile after age verification and explicit opt-in. The server derives eligibility before it becomes public.",
   },
   {
-    icon: Mic2,
-    title: "Chat stays within reach",
+    icon: Clapperboard,
+    title: "Voice and Yeels feel related",
     description:
-      "Compact room chat is visible when you arrive, remains readable beside the conversation and folds away whenever you want more space.",
+      "YO Moments keeps one header, typography and control language across voice posts and media-first Yeels, while preserving the needs of each format.",
   },
   {
     icon: ShieldCheck,
-    title: "Moderated, not chaotic",
+    title: "Boundaries stay visible",
     description:
-      "Hosts can mute or remove participants from People, helping every conversation stay focused and welcoming.",
+      "Blocking, reporting, email verification and server-side checks remain part of the path into friendship, publishing and Creator visibility.",
   },
-];
+] as const;
 
 export default function CommunityPage() {
   return (
     <>
       <PageHero
-        eyebrow="Community"
-        title="Feel the room, not the interface."
-        description="Community on YO Voice starts with one shared, live conversation — then grows into the friends, Clubs and creators you keep coming back to."
+        eyebrow="People on YO Voice"
+        title="A clearer path from hello to conversation."
+        description="Home, Chats and Friends now explain where to start. Creator following stays behind verified Premium Creator eligibility instead of appearing as a default social layer for every account."
       />
 
       <section className="px-5 pb-8 sm:px-8">
@@ -75,14 +83,15 @@ export default function CommunityPage() {
       </section>
 
       <section className="px-5 py-16 sm:px-8">
-        <div className="glass-panel mx-auto flex max-w-4xl flex-col items-center gap-4 rounded-[32px] p-10 text-center">
-          <h2 className="text-2xl font-bold">Ready to build with others?</h2>
-          <p className="max-w-xl text-sm leading-7 text-white/50">
-            Clubs turn a one-time conversation into an ongoing community —
-            with chat, roles and rooms of its own.
+        <div className="glass-panel mx-auto flex max-w-4xl flex-col items-center gap-4 rounded-[32px] p-8 text-center sm:p-10">
+          <h2 className="text-2xl font-bold">See where every circle can begin</h2>
+          <p className="max-w-xl text-sm leading-7 text-white/60">
+            The Servers selector covers Friends, Community, Podcast, Family
+            and Company. The interface is in internal testing while
+            server-backed activation remains gated.
           </p>
-          <Link href="/clubs" className="premium-button focus-ring mt-2 min-h-12 px-6 text-sm">
-            Explore clubs <ArrowRight className="size-4" aria-hidden="true" />
+          <Link href="/servers" className="premium-button focus-ring mt-2 min-h-12 px-6 text-sm">
+            Explore Servers <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
       </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useEffectEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { applyActionCode } from "firebase/auth";
@@ -15,9 +15,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
 import { getFirebaseAuth } from "@/lib/firebase/config";
 import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
+import {
+  verificationSendState,
+  verifyEmailPathWithoutSendState,
+} from "@/lib/auth/registration-flow";
+import {
+  startVerificationAutoCheck,
+  type VerificationAutoCheckEnvironment,
+} from "@/lib/auth/verification-auto-check";
 
 const RESEND_COOLDOWN_SECONDS = 60;
-const AUTO_CHECK_INTERVAL_MS = 5000;
 // A courtesy auto-continue for anyone who doesn't click — the "Open App"
 // button is the real affordance (immediately visible, immediately
 // clickable), this is just a fallback for people who walk away from the
@@ -114,9 +121,24 @@ function ActionCodeHandler({ oobCode }: { oobCode: string }) {
   return <VerifiedSuccess email={getFirebaseAuth().currentUser?.email ?? null} />;
 }
 
+function browserAutoCheckEnvironment(): VerificationAutoCheckEnvironment<number> {
+  return {
+    isVisible: () => document.visibilityState === "visible",
+    onVisibilityChange: (listener) => {
+      document.addEventListener("visibilitychange", listener);
+      return () => document.removeEventListener("visibilitychange", listener);
+    },
+    setTimer: (callback, delayMs) => window.setTimeout(callback, delayMs),
+    clearTimer: (handle) => window.clearTimeout(handle),
+    now: () => Date.now(),
+  };
+}
+
 function VerifyEmailPrompt() {
   const { user, loading } = useRequireAuth();
   const { resendVerificationEmail, reloadUser } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [verified, setVerified] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -126,34 +148,43 @@ function VerifyEmailPrompt() {
   const [cooldown, setCooldown] = useState(0);
 
   const cooldownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const autoCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const resendButtonRef = useRef<HTMLButtonElement>(null);
+  const failedSendFocusedRef = useRef(false);
 
-  // Reload once on arrival — `user` from context can be stale if the
-  // account was verified in another tab (or on another device) before
-  // landing back here. This is also what makes "already verified? skip
-  // straight to the success screen" work.
-  useEffect(() => {
-    if (!user) return;
-    reloadUser().then(setVerified);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  // "failed" only when the sign-up just reported that the email was not
+  // sent; this page never claims a send it has no evidence for.
+  const sendState = verificationSendState({
+    searchParams,
+    resentFromThisPage: sent,
+  });
+  const showsPrompt = !loading && Boolean(user) && !verified;
 
+  // Checks whether the account has been verified (in another tab, or on
+  // another device): once on arrival, then on a bounded backoff while this
+  // tab is visible. reloadUser() replaces the context `user` object on every
+  // call, so the schedule is keyed on the account id, not on `user`;
+  // depending on `user` re-ran the check after every reload in a tight loop.
+  const uid = user?.uid ?? null;
+  const checkVerified = useEffectEvent(() => reloadUser());
   useEffect(() => {
-    if (!user || verified) return;
-    autoCheckIntervalRef.current = setInterval(async () => {
-      const isVerified = await reloadUser();
-      if (isVerified) setVerified(true);
-    }, AUTO_CHECK_INTERVAL_MS);
-    return () => {
-      if (autoCheckIntervalRef.current) clearInterval(autoCheckIntervalRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, verified]);
+    if (!uid || verified) return;
+    return startVerificationAutoCheck({
+      check: () => checkVerified(),
+      onVerified: () => setVerified(true),
+      environment: browserAutoCheckEnvironment(),
+    });
+  }, [uid, verified]);
+
+  // After a failed send, put keyboard focus on the way to fix it.
+  useEffect(() => {
+    if (sendState !== "failed" || !showsPrompt || failedSendFocusedRef.current) return;
+    failedSendFocusedRef.current = true;
+    resendButtonRef.current?.focus();
+  }, [sendState, showsPrompt]);
 
   useEffect(() => {
     return () => {
       if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
-      if (autoCheckIntervalRef.current) clearInterval(autoCheckIntervalRef.current);
     };
   }, []);
 
@@ -178,6 +209,12 @@ function VerifyEmailPrompt() {
       await resendVerificationEmail();
       setSent(true);
       startCooldown();
+      if (sendState === "failed") {
+        // The failure report is no longer true; keep a reload from showing it.
+        router.replace(verifyEmailPathWithoutSendState(searchParams), {
+          scroll: false,
+        });
+      }
     } catch (err) {
       setSendError(getAuthErrorMessage(err));
     } finally {
@@ -212,10 +249,23 @@ function VerifyEmailPrompt() {
   return (
     <>
       <h1 className="mt-8 text-center text-3xl font-bold">Verify your email</h1>
-      <p className="mt-2 text-center text-sm text-white/45">
-        We sent a confirmation link to {user.email}. Open it to verify your
-        account.
-      </p>
+      {sendState === "failed" ? (
+        <div
+          role="alert"
+          className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+        >
+          <p className="font-semibold">The confirmation email was not sent.</p>
+          <p className="mt-1">
+            Your account for {user.email} was created, but we couldn&apos;t
+            send its confirmation link. Use Resend email below to try again.
+          </p>
+        </div>
+      ) : (
+        <p className="mt-2 text-center text-sm text-white/45">
+          We sent a confirmation link to {user.email}. Open it to verify your
+          account.
+        </p>
+      )}
 
       {sendError ? (
         <p
@@ -232,6 +282,7 @@ function VerifyEmailPrompt() {
       ) : null}
 
       <button
+        ref={resendButtonRef}
         type="button"
         onClick={handleResend}
         disabled={sending || cooldown > 0}

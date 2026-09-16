@@ -4,50 +4,50 @@ import {
   Clapperboard,
   MessageSquareMore,
   PhoneCall,
-  ShieldCheck,
   Sparkles,
-  Volume2,
+  Users,
 } from "lucide-react";
 
 import { FrameEchoIcon } from "@/components/brand/frame-echo-icon";
+import { currentRelease, nextReleaseCandidateStatus } from "@/content/current-release";
 import { productUpdates } from "@/content/product-updates";
 
 const releaseScope = [
   {
-    icon: MessageSquareMore,
-    title: "Chats & media",
-    description: "Shared-media views and resilient voice, photo and video handling.",
+    icon: Sparkles,
+    title: "Five Server types",
+    description: "Friends, Community, Podcast, Family and Company in one selector.",
   },
   {
     icon: FrameEchoIcon,
-    title: "YO Moments",
-    description: "Voice updates and photo/video Reels together in one audience-aware feed.",
+    title: "Hub preserved",
+    description: "The established animated navigation remains the shared foundation.",
   },
   {
-    icon: PhoneCall,
-    title: "Private calls",
-    description: "Safer audio and video negotiation across mixed app versions.",
+    icon: MessageSquareMore,
+    title: "Chats & media",
+    description: "Add Friend, full-screen media and clearer private-chat recovery.",
   },
   {
-    icon: Volume2,
-    title: "Sound with restraint",
-    description: "Original Velvet Prism cues with optional, bounded playback.",
+    icon: Users,
+    title: "Friends",
+    description: "A clearer route to add, search and manage the people you know.",
   },
   {
     icon: Clapperboard,
-    title: "Reels MVP",
-    description: "User-supplied photo, video, overlays, links and owned or licensed audio.",
+    title: "Yeels media-first",
+    description: "Consistent Moments chrome with movable text and link overlays.",
   },
   {
-    icon: ShieldCheck,
-    title: "Trust boundary",
-    description: "Short-lived access, bounded uploads and fail-safe compatibility.",
+    icon: PhoneCall,
+    title: "Calls under test",
+    description: "Call setup, teardown and retry corrections continue on tester devices.",
   },
 ] as const;
 
 export function LatestReleaseSpotlight() {
   const update = productUpdates.find(
-    (item) => item.slug === "mobile-build-20-invited-testing",
+    (item) => item.slug === `mobile-build-${currentRelease.buildNumber}-internal-testing`,
   );
 
   if (!update?.release) return null;
@@ -94,22 +94,25 @@ export function LatestReleaseSpotlight() {
             </span>
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)] sm:text-[15px]">
-            Build 20 unites YO Moments, the Reels MVP, Frame Echo Clean and
-            original sound cues. It is available to invited iOS and Android
-            testers, and the matching web release is live. It is not publicly
-            released on the App Store or Google Play.
+            Build 26 is available through the existing Google Play Internal
+            Testing list and TestFlight internal group. Servers, the refreshed
+            Home, Chats, Friends and media-first Yeels are ready for tester
+            review. Server backend activation remains gated and Podcast
+            recording remains disabled. This is an internal tester release, not
+            a public App Store or Google Play release.{" "}
+            {nextReleaseCandidateStatus}
           </p>
 
           <Link
-            href="/updates#mobile-build-20-invited-testing"
+            href={`/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`}
             className="premium-button-secondary focus-ring mt-7 min-h-12 w-fit px-5 text-sm"
           >
-            See Build 20 tester release
+            See Build 26 tester release
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
 
-        <ul className="relative grid gap-3 sm:grid-cols-2" aria-label="Build 20 release scope">
+        <ul className="relative grid gap-3 sm:grid-cols-2" aria-label="Build 26 release scope">
           {releaseScope.map(({ icon: Icon, title, description }, index) => (
             <li
               key={title}

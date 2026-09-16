@@ -51,7 +51,7 @@ export default function OpengraphImage() {
             display: "flex",
           }}
         >
-          Your voice. Your community.
+          Servers · Chats · Friends · Yeels
         </div>
       </div>
     ),

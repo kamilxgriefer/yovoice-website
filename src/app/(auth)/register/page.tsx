@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { RegisterForm } from "@/components/auth/register-form";
-import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 import { APP_ENTRY_PATH, isAppLaunchRedirect } from "@/lib/auth/auth-redirect";
 
 export const metadata: Metadata = {
@@ -28,7 +27,8 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
         Create an account to download, sign in and launch the app.
       </p>
       <Suspense>
-        <RedirectIfAuthenticated />
+        {/* The form mounts the signed-in redirect itself, so it can hold the
+            redirect off while its own sign-up is still running. */}
         <RegisterForm />
       </Suspense>
       <Link

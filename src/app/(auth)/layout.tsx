@@ -34,7 +34,7 @@ export default function AuthLayout({
               </span>
             </h1>
             <p className="mt-6 max-w-md text-base leading-8 text-white/65">
-              Enter the same YO Voice account used for Chats, Moments, Rooms
+              Enter the same YO Voice account used for Chats, Moments, Servers
               and your public Voice identity.
             </p>
           </div>

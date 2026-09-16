@@ -15,7 +15,7 @@ const benefitIcons = [
 /**
  * The homepage Premium SHOWCASE — the website rendition of the app's
  * Premium presentation (board screen 3). Its one job is selling the
- * idea — identity, Creator, Clubs — and handing off to /premium, which
+ * idea — identity, Creator, existing entitlements — and handing off to /premium, which
  * sells the plan. Deliberately contains no prices, no comparison table,
  * no billing detail.
  */
@@ -41,9 +41,10 @@ export function PremiumSection() {
               Create. Lead. Build communities. Stand out.
             </p>
             <p className="mt-3 max-w-xl text-[15px] leading-7 text-white/50 sm:text-base sm:leading-8">
-              Everything essential stays free. Premium adds the ways you
-              create and stand out — become a Creator, build your own Clubs,
-              and carry a premium identity across YO Voice.
+              Premium adds Creator Studio and a distinctive Premium identity
+              across YO Voice. Public following also requires age
+              confirmation and explicit opt-in. After Servers launch, Free can
+              own 5 Servers and Premium can own 30; joining stays unlimited.
             </p>
 
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
@@ -98,7 +99,7 @@ export function PremiumSection() {
 
               <HeroPill
                 icon={<Users className="size-3.5 text-[#d3a5ff]" aria-hidden />}
-                label="Club Owner"
+                label="Your identity"
                 className="left-0 top-[178px]"
               />
               <HeroPill

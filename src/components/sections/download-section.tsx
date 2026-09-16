@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
 
+import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_RELEASES_URL = "https://github.com/kamilxgriefer/yovoice/releases";
@@ -10,21 +11,21 @@ export function DownloadSection() {
     {
       icon: Smartphone,
       title: "Mobile",
-      description: "YO Voice 1.0.0 build 20 is available to invited testers through Google Play Internal Testing and TestFlight.",
+      description: `YO Voice ${currentRelease.version} is in internal testing. ${currentReleaseAvailability}`,
       href: "/download",
       action: "View tester access",
     },
     {
       icon: Monitor,
       title: "Windows",
-      description: "Continue every conversation with a dedicated desktop application.",
+      description: "Desktop installers are not available yet. On Windows, use the web app in a modern browser.",
       href: REPO_RELEASES_URL,
       action: "Check releases",
     },
     {
       icon: Laptop,
       title: "macOS",
-      description: "Native desktop builds prepared for Apple Silicon and Intel Macs.",
+      description: "Desktop installers are not available yet. On a Mac, use the web app in a modern browser.",
       href: REPO_RELEASES_URL,
       action: "Check releases",
     },
@@ -47,7 +48,7 @@ export function DownloadSection() {
             Ready to find <span className="text-gradient block">your people?</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-white/65 sm:mt-7 sm:text-base sm:leading-8">
-            Join from your phone, continue on desktop or open the web app. Your account, friends and communities stay connected everywhere.
+            Existing internal testers can review Build 26, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
           </p>
         </div>
 
@@ -71,7 +72,7 @@ export function DownloadSection() {
             <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white"><Download className="size-6"/></div>
             <div>
               <h3 className="text-2xl font-bold">One identity across every device</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-white/65">Your account, friends and communities stay connected on the web and tester builds. Public mobile and desktop installers will be linked here only when they are genuinely available.</p>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-white/65">Your account contract remains shared across the web app and tester builds. Public mobile and desktop installers will be linked here only when they are genuinely available.</p>
             </div>
           </div>
           <Link href={APP_ENTRY_PATH} className="premium-button min-h-13 shrink-0 px-6">

@@ -4,7 +4,7 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "FAQ",
-  description: "Answers to common questions about accounts, rooms, clubs and downloads.",
+  description: "Answers about tester builds, Servers, Yeels, Chats, Friends, Creator audience, Premium and downloads.",
   path: "/faq",
 });
 
@@ -15,52 +15,82 @@ const groups: FaqGroup[] = [
       {
         question: "Is YO Voice free?",
         answer:
-          "Yes. Creating an account, joining rooms and clubs, and using the web app are all free.",
+          "Yes. Creating an account, using the web app, adding friends and starting private Chats are free. After Servers launch, a Free account can own up to 5 Servers, a Premium account up to 30, and everyone can join without a limit. Those allowances and server-backed actions are not active while the backend release gate remains closed.",
       },
       {
-        question: "What platforms is YO Voice available on?",
+        question: "Which mobile build can testers use?",
         answer:
-          "The web app is live in modern browsers. YO Voice 1.0.0 build 20 is available to invited testers through Google Play Internal Testing and TestFlight. This is not a public App Store or Google Play release, and desktop releases are not available yet.",
+          "YO Voice 2.0.0 (26) is available to our existing Google Play Internal Testing list and TestFlight internal group. Build 27 is being prepared for the same testers and is not yet confirmed as available. Neither is a public App Store or Google Play release. The web app remains available in modern browsers; desktop installers are not published yet.",
       },
       {
         question: "Do I need to verify my email?",
         answer:
-          "Yes. Verifying your email unlocks posting, hosting rooms, messaging and downloads. It's a quick link sent to your inbox after you register.",
+          "Yes. Verifying your email unlocks protected actions such as posting and messaging. It is a short link sent after registration.",
       },
     ],
   },
   {
-    title: "Rooms and voice",
+    title: "Servers",
     items: [
       {
-        question: "What's the difference between a community room and a podcast room?",
+        question: "What are the five Server types?",
         answer:
-          "Community rooms are open conversations where everyone can speak. Podcast rooms give a host structure — a stage, raised hands and speaker management — for events and larger audiences.",
+          "Friends begins with close-group voice and text; Community is shaped for shared interests and events; Podcast brings hosts, guests and audience questions together; Family focuses on private plans and memories; Company points toward team channels, meetings and collaboration tools.",
       },
       {
-        question: "Can I record a room?",
+        question: "Can testers create and use a Server yet?",
         answer:
-          "We don't record live rooms. You can record and share a standalone voice moment any time you want to post a specific clip.",
+          "The Build 26 tester app includes the real five-type selector and server-first workspace interface. Server creation, membership and channel activity still depend on backend activation, which remains gated, so the website does not present those actions as available.",
       },
       {
-        question: "Who can moderate a room?",
+        question: "Can a Podcast Server record an episode?",
         answer:
-          "The host and anyone they grant moderator access to can mute or remove participants and manage who can speak. Community Rooms keep everyone in one People here roster; Podcast Rooms keep the structured host and speaker workflow.",
+          "No. Podcast recording is disabled in the current tester build and is planned as a separate release. Hosts, guests, audience questions and episode planning describe the interface direction; no Podcast recording or published-episode promise is active at this release boundary.",
+      },
+      {
+        question: "Will I need Premium to create a Server?",
+        answer:
+          "After activation, a Free account can own up to 5 Servers and a Premium account up to 30. Joining other Servers is unlimited for both. One Family Server per owner counts toward the same ownership limit. These allowances are not active until the backend gate is cleared.",
+      },
+      {
+        question: "What happened to Rooms and Clubs from older versions?",
+        answer:
+          "The current app interface uses Servers, and the old marketing /clubs address redirects to /servers. Servers are built over the existing data so identities, memberships, moderation and media history stay compatible; no production data migration is implied by the website redesign.",
       },
     ],
   },
   {
-    title: "Clubs and achievements",
+    title: "Chats, Friends and Yeels",
     items: [
       {
-        question: "What is a club?",
+        question: "How do I add someone from Chats?",
         answer:
-          "A club is a community space with its own chat, members and rooms — public or invite-only, run by its owner and moderators.",
+          "Choose Add Friend at the top of Chats. It opens the redesigned Friends area, where adding a new person is kept separate from searching the friends you already have.",
       },
       {
-        question: "How do achievements work?",
+        question: "Can I open a private photo or video full screen?",
         answer:
-          "Achievements unlock as you use YO Voice — sending messages, growing your following, hosting rooms and more — across common, uncommon, rare, epic, legendary and mythic tiers.",
+          "Yes, in the current tester build. Received private photos and videos open in a responsive full-screen viewer with visible loading, retry and close states. Transfer speed still depends on the media size, device and network.",
+      },
+      {
+        question: "Who can have followers?",
+        answer:
+          "Following is a Creator feature. Public audience visibility appears only for a Premium Creator profile after age verification and explicit opt-in. Eligibility is derived on the server; an ordinary account does not gain a public follower surface from a browser setting alone.",
+      },
+      {
+        question: "What are Yeels?",
+        answer:
+          "Yeels are media-first posts inside YO Moments. You can use your own photo or short video, place text and link overlays before publishing, and add audio you own or are licensed to use. Voice and Yeels share one visual language while keeping their own creation needs.",
+      },
+      {
+        question: "Can I use GIFs yet?",
+        answer:
+          "Not yet. The Build 27 candidate bundles 16 original YO Voice GIF animations, but GIF search and sending need a backend rollout that has not happened yet, so GIFs are not presented as available.",
+      },
+      {
+        question: "Are private voice and video calls guaranteed to be smooth?",
+        answer:
+          "Tester builds include call setup, teardown and retry corrections that are still being checked on real devices. Call quality depends on the devices, permissions and network on both sides, so the website does not promise flawless or zero-latency calling.",
       },
     ],
   },
@@ -80,7 +110,7 @@ const groups: FaqGroup[] = [
       {
         question: "How do I report abuse?",
         answer:
-          "Block the person from your Friends screen, and email safety@yovoice.app with details — see our Safety page.",
+          "Use the report or block controls available in the relevant profile or content view, and email safety@yovoice.app if you need further help.",
       },
     ],
   },
@@ -92,7 +122,7 @@ export default function FaqPage() {
       <PageHero
         eyebrow="FAQ"
         title="Frequently asked questions"
-        description="Can't find your answer here? Reach out on our Contact page."
+        description="Build 26 is available on our existing internal testing channels. These answers separate what the interface shows from what the gated backend currently enables."
       />
       <section className="px-5 pb-28 sm:px-8">
         <FaqAccordion groups={groups} />

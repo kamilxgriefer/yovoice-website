@@ -2,12 +2,12 @@ export const siteConfig = {
   name: "YO Voice",
   tagline: "Be You.",
   description:
-    "Where conversations become communities. A modern voice platform for creators, friends and communities.",
+    "Your people. Your space. Your voice. Explore the Servers interface, refreshed Home, Chats, Friends and media-first Yeels in internal testing.",
   url: "https://yovoice.app",
   navigation: [
     { label: "Features", href: "/features" },
     { label: "Community", href: "/community" },
-    { label: "Clubs", href: "/clubs" },
+    { label: "Servers", href: "/servers" },
     { label: "Premium", href: "/premium" },
     { label: "Updates", href: "/updates" },
     { label: "Download", href: "/download" },

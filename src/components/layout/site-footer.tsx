@@ -4,7 +4,7 @@ import { BriefcaseBusiness, Camera, Code2, Mail } from "lucide-react";
 import { BrandLockup } from "@/components/layout/brand-lockup";
 
 const columns = [
-  { title: "Product", links: [["Features","/features"],["Community","/community"],["Clubs","/clubs"],["Achievements","/achievements"]] },
+  { title: "Product", links: [["Features","/features"],["Community","/community"],["Servers","/servers"],["Achievements","/achievements"]] },
   { title: "Company", links: [["About","/about"],["Updates","/updates"],["Roadmap","/roadmap"],["Careers","/careers"],["Contact","/contact"]] },
   { title: "Support", links: [["Help Center","/help-center"],["Safety","/safety"],["Status","/status"],["FAQ","/faq"]] },
   { title: "Legal", links: [["Privacy","/privacy"],["Terms","/terms"],["Cookies","/cookies"]] },
@@ -16,7 +16,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-[1400px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.4fr] lg:px-12">
         <div className="max-w-sm">
           <BrandLockup className="w-fit" />
-          <p className="mt-6 text-sm leading-7 text-white/65">Where conversations become communities. Built for creators, friends and people looking for something real.</p>
+          <p className="mt-6 text-sm leading-7 text-white/65">Your people. Your space. Your voice. A place for the conversations, communities and little moments that bring us closer.</p>
           <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/55">Voice first. Community always.</p>
         </div>
 

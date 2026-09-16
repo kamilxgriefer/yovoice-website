@@ -109,12 +109,16 @@ export function paymentOptionsForPlan(
 /**
  * The short per-plan checklist on the plan cards. Identical for both
  * plans on purpose — the plans differ in billing, not capabilities.
- * Mirrors the app's PremiumPlans.planChecklist.
+ * Mirrors the app's PremiumPlans.planChecklist as released in Build 26
+ * (source d1c036b7). Benefits that exist only in an unreleased build or an
+ * undeployed backend — Incognito messaging privacy and the Yeels ranking
+ * boost prepared for Build 27 — are not sold here until they are released.
  */
 export const premiumPlanChecklist = [
   "Creator access",
-  "Create Clubs",
-  "Premium identity",
+  "Audience tools",
+  "Premium profile appearance",
+  "Up to 30 Servers after launch",
   "Exclusive features",
 ];
 
@@ -128,26 +132,26 @@ export const premiumShowcaseBenefits = [
     kicker: "Creator",
     title: "Become a Creator",
     description:
-      "Build a public Creator identity people can follow, and unlock Creator tools.",
+      "Unlock Creator eligibility. Public following also requires age verification and explicit opt-in.",
   },
   {
-    kicker: "Clubs",
-    title: "Create your own Clubs",
-    description: "Build spaces for your people. Joining stays free for everyone.",
+    kicker: "Servers",
+    title: "Create up to 30 Servers",
+    description:
+      "After Servers launch, Free includes 5 owned Servers and Premium includes 30. Joining stays unlimited for everyone.",
   },
   {
     kicker: "Premium identity",
     title: "Stand out",
     description:
-      "A distinctive premium ring on your profile and avatar across YO Voice.",
+      "A Premium badge and a shimmering profile ring that carry your Premium identity across YO Voice.",
   },
 ];
 
 /** Everything both plans include — plans differ by billing period only. */
 export const premiumIncludedFeatures = [
-  "Creator profile and Creator tools",
-  "Create and own your own Clubs",
-  "Premium profile and avatar styling",
-  "Premium identity inside rooms",
-  "Future Premium capabilities as they launch",
+  "Creator account and Studio; age confirmation and opt-in enable Follow",
+  "After Servers launch: up to 30 owned Servers (Free: 5); unlimited joins for everyone",
+  "Premium badge and shimmering profile ring",
+  "More benefits coming soon",
 ];

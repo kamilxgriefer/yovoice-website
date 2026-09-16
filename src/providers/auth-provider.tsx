@@ -21,7 +21,7 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 
 import {
   getFirebaseAuth,
@@ -33,29 +33,43 @@ import {
   verifyEmailActionCodeSettings,
 } from "@/lib/auth/action-code-settings";
 import {
+  completeRegistration,
+  planUserProfileBootstrap,
+} from "@/lib/auth/registration-profile";
+import {
+  verificationEmailDelivery,
+  type RegistrationResult,
+} from "@/lib/auth/registration-flow";
+import {
   createFirebaseTotpSignInChallenge,
   isMultiFactorRequiredError,
   type EmailPasswordSignInResult,
 } from "@/lib/auth/totp-sign-in";
 
-// Matches the shape FriendService.ensureUserDocument() / PresenceService
-// write from the Flutter app — accounts created here need the same
-// users/{uid} doc shape so the app doesn't see a partial profile the first
-// time someone who registered on the website opens it.
+// Bootstraps users/{uid} with the same seed the app's
+// ProfileService.ensureProfile() writes, restricted to the keys the app's
+// Firestore Rules accept (see registration-profile.ts). A transaction picks
+// create vs. merge from the document's real state, so a partial document
+// written first by presence never turns the create payload into a refused
+// update.
 async function ensureUserProfile(user: User, displayName: string) {
-  await setDoc(
-    doc(getFirebaseFirestore(), "users", user.uid),
-    {
+  const firestore = getFirebaseFirestore();
+  const profileRef = doc(firestore, "users", user.uid);
+  await runTransaction(firestore, async (transaction) => {
+    const snapshot = await transaction.get(profileRef);
+    const plan = planUserProfileBootstrap({
       uid: user.uid,
-      displayName: displayName.trim() || user.email?.split("@")[0] || "YO Voice user",
-      email: user.email?.trim().toLowerCase() ?? "",
-      photoUrl: user.photoURL,
-      isOnline: false,
-      lastSeen: serverTimestamp(),
-      createdAt: serverTimestamp(),
-    },
-    { merge: true },
-  );
+      email: user.email,
+      displayName,
+      existing: snapshot.exists() ? snapshot.data() : null,
+      serverTimestamp: serverTimestamp(),
+    });
+    if (plan.kind === "create") {
+      transaction.set(profileRef, plan.data);
+    } else if (plan.kind === "merge") {
+      transaction.set(profileRef, plan.data, { merge: true });
+    }
+  });
 }
 
 type AuthContextValue = {
@@ -65,11 +79,13 @@ type AuthContextValue = {
     email: string,
     password: string,
   ) => Promise<EmailPasswordSignInResult>;
+  /** Throws only when the account could not be created. Once it exists, the
+   * result says whether the verification email was sent. */
   signUp: (
     email: string,
     password: string,
     displayName: string,
-  ) => Promise<void>;
+  ) => Promise<RegistrationResult>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
@@ -143,13 +159,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email,
           password,
         );
-        if (displayName.trim()) {
-          await updateProfile(credential.user, {
-            displayName: displayName.trim(),
-          });
-        }
-        await ensureUserProfile(credential.user, displayName);
-        await sendEmailVerification(credential.user, verifyEmailActionCodeSettings());
+        const trimmedDisplayName = displayName.trim();
+        // The account already exists at this point. A refused profile write
+        // is recoverable (the app completes the profile on first sign-in);
+        // a skipped verification email is not, so it is always attempted.
+        // Its failure is returned, not thrown: the account exists, so the
+        // form must move on to /verify-email and say the email was not sent.
+        const verificationEmail = await verificationEmailDelivery(
+          () =>
+            completeRegistration({
+              updateAuthDisplayName: trimmedDisplayName
+                ? () =>
+                    updateProfile(credential.user, {
+                      displayName: trimmedDisplayName,
+                    })
+                : undefined,
+              writeProfile: () =>
+                ensureUserProfile(credential.user, displayName),
+              sendVerificationEmail: () =>
+                sendEmailVerification(
+                  credential.user,
+                  verifyEmailActionCodeSettings(),
+                ),
+              onNonFatalError: (step, error) => {
+                console.error(
+                  `YO Voice registration: the ${step} step failed; the account was created and verification email delivery was still attempted.`,
+                  error,
+                );
+              },
+            }),
+          (error) => {
+            console.error(
+              "YO Voice registration: the account was created but the verification email was not sent.",
+              error,
+            );
+          },
+        );
+        return { verificationEmail };
       },
       signOut: async () => {
         await firebaseSignOut(getFirebaseAuth());

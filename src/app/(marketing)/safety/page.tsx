@@ -6,34 +6,34 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "Community Safety",
-  description: "How YO Voice keeps rooms, clubs and conversations safe.",
+  description: "How YO Voice protects private Chats, moments, voice conversations and community activity.",
   path: "/safety",
 });
 
 const tools = [
   {
     icon: UserCog,
-    title: "Room and club moderation",
+    title: "Conversation and content moderation",
     description:
-      "Hosts and club owners can mute, remove or manage the access of anyone in their room or club at any time.",
+      "Supported live-voice and content surfaces provide host, moderator and reporting controls. Server actions in the tester build remain behind the backend release gate.",
   },
   {
     icon: Ban,
     title: "Block anyone, instantly",
     description:
-      "Blocking someone removes them from your friends and hides their messages and rooms from you immediately — from your Friends screen.",
+      "Blocking is available from Friends and supported profile or content views, removing the connection and limiting future contact through the app.",
   },
   {
     icon: Flag,
     title: "Report a problem",
     description:
-      "An in-app report button is on our roadmap. Until then, email us with details and we'll act on it quickly — see below.",
+      "Supported content and profiles include in-app reporting. You can also email the safety address below when you need more help.",
   },
   {
     icon: ShieldCheck,
     title: "Account-level protection",
     description:
-      "Email verification is required before you can post, host a room or message others, which cuts down on throwaway and spam accounts.",
+      "Email verification is required before protected posting and messaging actions, which reduces throwaway and spam activity.",
   },
 ];
 
@@ -41,7 +41,7 @@ const rules = [
   "No harassment, hate speech, threats or targeted abuse.",
   "No sharing sexual content involving minors — zero tolerance, reported to authorities where required by law.",
   "No doxxing or sharing someone else's private information without consent.",
-  "No recording or redistributing a room's audio without the participants' consent.",
+  "No recording or redistributing live audio without the participants' consent.",
   "No spam, scams or coordinated inauthentic behavior.",
   "No impersonating another person, brand or YO Voice staff.",
 ];
@@ -82,8 +82,8 @@ export default function SafetyPage() {
               ))}
             </ul>
             <p className="mt-8 text-sm leading-7 text-white/65">
-              Breaking these rules can lead to content removal, room or club
-              restrictions, or account suspension — see our{" "}
+              Breaking these rules can lead to content removal, community
+              restrictions or account suspension — see our{" "}
               <Link href="/terms" className="text-fuchsia-300 hover:text-white">
                 Terms of Service
               </Link>
@@ -101,8 +101,8 @@ export default function SafetyPage() {
           <h2 className="text-2xl font-bold">Report something</h2>
           <p className="max-w-xl text-sm leading-7 text-white/50">
             Email <strong className="text-white">safety@yovoice.app</strong> with
-            what happened, who was involved, and a screenshot or room/club
-            name if you have one. Urgent safety issues get priority.
+            what happened, who was involved, and a screenshot or content or
+            profile name if you have one. Urgent safety issues get priority.
           </p>
           <a
             href="mailto:safety@yovoice.app?subject=Safety report"

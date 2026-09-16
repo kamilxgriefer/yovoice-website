@@ -14,7 +14,7 @@ export default function NotFound() {
         </div>
         <p className="eyebrow mt-8">404</p>
         <h1 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-.05em] text-white sm:text-5xl">
-          This room doesn&apos;t exist.
+          This place doesn&apos;t exist.
         </h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-white/50">
           The page you&apos;re looking for isn&apos;t here — it may have moved,

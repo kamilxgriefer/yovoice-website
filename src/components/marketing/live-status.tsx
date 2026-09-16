@@ -8,7 +8,7 @@ type CheckState = "checking" | "ok" | "down";
 const systems = [
   { name: "Website", description: "yovoice.app and marketing pages" },
   { name: "Accounts & sign-in", description: "Registration, login, email verification" },
-  { name: "Voice rooms", description: "Real-time voice via LiveKit" },
+  { name: "Voice services", description: "Real-time voice via LiveKit" },
   { name: "Email delivery", description: "Verification and password-reset email" },
 ] as const;
 

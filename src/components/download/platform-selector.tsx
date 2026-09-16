@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Code2, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
 
+import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_URL = "https://github.com/kamilxgriefer/yovoice";
@@ -10,23 +11,23 @@ const cards = [
     icon: Smartphone,
     title: "Mobile",
     description: "iOS and Android apps.",
-    status: "YO Voice 1.0.0 build 20 is available to invited Android and TestFlight testers.",
-    href: "/updates#mobile-build-20-invited-testing",
-    action: "See build 20 status",
+    status: `YO Voice ${currentRelease.version}. ${currentReleaseAvailability}`,
+    href: `/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`,
+    action: `See Build ${currentRelease.buildNumber} status`,
   },
   {
     icon: Monitor,
     title: "Windows",
-    description: "Native desktop build.",
-    status: "Installer not published yet.",
+    description: "Desktop installer not started.",
+    status: "Until then, use the web app in a modern browser.",
     href: `${REPO_URL}/releases`,
     action: "Check releases",
   },
   {
     icon: Laptop,
     title: "macOS",
-    description: "Apple Silicon and Intel builds.",
-    status: "Installer not published yet.",
+    description: "Desktop installer not started.",
+    status: "Until then, use the web app in a modern browser.",
     href: `${REPO_URL}/releases`,
     action: "Check releases",
   },

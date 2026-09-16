@@ -2,6 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
 
+import {
+  currentRelease,
+  currentReleaseAvailability,
+  nextReleaseCandidate,
+  nextReleaseCandidateStatus,
+} from "../src/content/current-release.ts";
 import { productUpdates } from "../src/content/product-updates.ts";
 
 describe("product update ledger", () => {
@@ -69,7 +75,7 @@ describe("product update ledger", () => {
     assert.match(video.highlights.join(" "), /does not claim FaceTime-style application E2EE/i);
   });
 
-  test("keeps the coordinated social and room wave honest in invited testing", () => {
+  test("keeps the social wave in testing and the retired Rooms entry as history", () => {
     const rooms = productUpdates.find(
       (update) => update.slug === "room-consent-and-docked-chat",
     );
@@ -83,7 +89,7 @@ describe("product update ledger", () => {
     assert.ok(rooms);
     assert.ok(social);
     assert.ok(account);
-    assert.equal(rooms.status, "testing");
+    assert.equal(rooms.status, "superseded");
     assert.equal(social.status, "testing");
     assert.equal(account.status, "testing");
     assert.match(rooms.summary, /only after Join conversation/i);
@@ -96,14 +102,14 @@ describe("product update ledger", () => {
     );
   });
 
-  test("records build 18 on both confirmed tester channels", () => {
+  test("keeps build 18 as superseded tester-channel history", () => {
     const mobile = productUpdates.find(
       (update) => update.slug === "mobile-build-18",
     );
 
     assert.ok(mobile);
     assert.equal(mobile.updatedOn, "2026-09-02");
-    assert.equal(mobile.status, "testing");
+    assert.equal(mobile.status, "superseded");
     assert.match(mobile.summary, /1\.0\.0 build 18/i);
     assert.match(mobile.summary, /Google Play Internal Testing/i);
     assert.match(mobile.summary, /14-person tester list/i);
@@ -114,14 +120,14 @@ describe("product update ledger", () => {
     assert.doesNotMatch(mobile.summary, /public store release/i);
   });
 
-  test("records build 19 on both invited tester channels", () => {
+  test("keeps build 19 as superseded invited-tester history", () => {
     const candidate = productUpdates.find(
       (update) => update.slug === "mobile-build-19-release-candidate",
     );
 
     assert.ok(candidate);
     assert.equal(candidate.updatedOn, "2026-09-03");
-    assert.equal(candidate.status, "testing");
+    assert.equal(candidate.status, "superseded");
     assert.deepEqual(candidate.release, {
       version: "1.0.0 (19)",
       stage: "Invited testing",
@@ -153,12 +159,87 @@ describe("product update ledger", () => {
     );
   });
 
-  test("records build 20 on both confirmed invited tester channels", () => {
-    const release = productUpdates[0];
+  test("records Build 27 only as an unconfirmed internal tester candidate", () => {
+    const candidate = productUpdates.find(
+      (update) => update.slug === "mobile-build-27-internal-tester-candidate",
+    );
 
-    assert.equal(release.slug, "mobile-build-20-invited-testing");
-    assert.equal(release.updatedOn, "2026-09-05");
+    assert.ok(candidate);
+    assert.equal(
+      productUpdates.some((update) => update.slug === "mobile-build-27-internal-testing"),
+      false,
+    );
+    assert.equal(candidate.status, "verification");
+    assert.deepEqual(candidate.release, {
+      version: "2.0.0 (27)",
+      stage: "Candidate",
+      buildNumber: 27,
+    });
+    assert.match(candidate.summary, /internal tester candidate/i);
+    assert.match(candidate.summary, /store read-backs are not recorded yet/i);
+    assert.match(candidate.summary, /not described as available/i);
+    assert.match(candidate.summary, /not a public App Store or Google Play release/i);
+    assert.match(candidate.highlights.join(" "), /Sixteen original YO Voice GIF animations/i);
+    assert.match(candidate.highlights.join(" "), /backend rollout that has not happened yet/i);
+
+    const text = JSON.stringify(candidate);
+    // The committed app records name no Build 27 source revision, upload or
+    // store read-back, and GIPHY is a dormant option rather than a pending one.
+    assert.doesNotMatch(text, /22cc2313|is available to|GIPHY|Android session continuity/i);
+    assert.doesNotMatch(text, /available to everyone|publicly available|server backend is active/i);
+  });
+
+  test("records Build 26 as the current confirmed internal tester release", () => {
+    const release = productUpdates.find(
+      (update) => update.slug === "mobile-build-26-internal-testing",
+    );
+
+    assert.ok(release);
+
+    assert.equal(productUpdates[0], release);
+    assert.equal(release.slug, "mobile-build-26-internal-testing");
+    assert.equal(release.updatedOn, "2026-09-13");
     assert.equal(release.status, "testing");
+    assert.deepEqual(release.release, {
+      version: "2.0.0 (26)",
+      stage: "Internal testing",
+      buildNumber: 26,
+    });
+    assert.match(release.summary, /source revision d1c036b7/i);
+    assert.match(release.summary, /15-person Google Play Internal Testing list/i);
+    assert.match(release.summary, /existing TestFlight internal group/i);
+    assert.match(release.summary, /internal tester release/i);
+    assert.match(release.summary, /not a public App Store or Google Play release/i);
+    assert.match(release.summary, /server backend activation remains gated/i);
+    assert.match(release.summary, /Podcast recording remains disabled/i);
+
+    const scope = release.highlights.join(" ");
+    for (const capability of [
+      /Friends, Community, Podcast, Family and Company/i,
+      /preserving the established animated Hub/i,
+      /Home, Chats and Friends/i,
+      /full-screen viewer/i,
+      /Yeels/i,
+      /position text and links before publishing/i,
+      /real-device tester validation/i,
+    ]) {
+      assert.match(scope, capability);
+    }
+
+    assert.doesNotMatch(
+      JSON.stringify(release),
+      /available to everyone|publicly available|server backend is active|Podcast recording is active/i,
+    );
+  });
+
+  test("keeps build 20 as superseded invited-tester history", () => {
+    const release = productUpdates.find(
+      (update) => update.slug === "mobile-build-20-invited-testing",
+    );
+
+    assert.ok(release);
+    assert.equal(release.updatedOn, "2026-09-05");
+    assert.equal(release.status, "superseded");
     assert.deepEqual(release.release, {
       version: "1.0.0 (20)",
       stage: "Invited testing",
@@ -189,7 +270,40 @@ describe("product update ledger", () => {
     assert.match(identity.highlights.join(" "), /Do Not Disturb remain authoritative/i);
   });
 
-  test("keeps every visible current-release reference on the same build truth", () => {
+  test("centralizes the present-tense release boundary on the confirmed build", () => {
+    assert.deepEqual(currentRelease, {
+      version: "2.0.0 (26)",
+      buildNumber: 26,
+      sourceRevision: "d1c036b75fea16e8962e7af932166cf95aa8f0ab",
+      stage: "Internal testing",
+      mobileChannelsConfirmed: true,
+      publicStoreRelease: false,
+      serversInterfaceIncluded: true,
+      serversBackendActive: false,
+      podcastRecordingActive: false,
+    });
+    assert.match(currentReleaseAvailability, /existing internal testers/i);
+    assert.match(currentReleaseAvailability, /Google Play Internal Testing/i);
+    assert.match(currentReleaseAvailability, /TestFlight/i);
+
+    assert.deepEqual(nextReleaseCandidate, {
+      version: "2.0.0 (27)",
+      buildNumber: 27,
+      stage: "Candidate",
+      availabilityConfirmed: false,
+      publicStoreRelease: false,
+      gifOriginalsBundled: 16,
+      gifBackendActive: false,
+    });
+    assert.match(nextReleaseCandidateStatus, /not yet confirmed as available/i);
+    assert.ok(
+      productUpdates.some(
+        (update) =>
+          update.slug === `mobile-build-${currentRelease.buildNumber}-internal-testing` &&
+          update.status === "testing",
+      ),
+    );
+
     const releaseSurfaces = [
       "../src/components/sections/download-section.tsx",
       "../src/components/download/platform-selector.tsx",
@@ -203,10 +317,62 @@ describe("product update ledger", () => {
 
     for (const relativePath of releaseSurfaces) {
       const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
-      assert.match(source, /build 20/i, relativePath);
-      assert.doesNotMatch(source, /build (?:18|19)/i, relativePath);
+      assert.match(source, /currentRelease|build 26/i, relativePath);
+      assert.doesNotMatch(source, /build (?:18|19|20)\b/i, relativePath);
       assert.doesNotMatch(source, /awaiting (?:invited-tester )?distribution/i);
+      assert.doesNotMatch(source, /publicly available|available to everyone/i);
+      assert.doesNotMatch(
+        source,
+        /Build 27 (?:is|are) available|2\.0\.0 \(27\) is available|GIPHY|Android session continuity|22cc2313/i,
+        relativePath,
+      );
     }
+  });
+
+  test("badges only the current confirmed build as in testing and never presents retired Rooms or Clubs as current", () => {
+    const currentSlug = `mobile-build-${currentRelease.buildNumber}-internal-testing`;
+    const buildEntries = productUpdates.filter(
+      (update) =>
+        update.release !== undefined ||
+        /\bbuild-\d+\b/.test(update.slug) ||
+        /\bBuild \d+\b/i.test(update.title),
+    );
+
+    assert.ok(buildEntries.length >= 7, "build entries are recognised");
+    assert.deepEqual(
+      buildEntries
+        .filter((update) => update.status === "testing")
+        .map((update) => update.slug),
+      [currentSlug],
+    );
+    for (const update of buildEntries) {
+      if (update.slug === currentSlug) continue;
+      assert.ok(
+        update.status === "superseded" || update.status === "verification",
+        `${update.slug} is ${update.status}`,
+      );
+    }
+
+    // Servers replaced the standalone Rooms and Clubs surfaces, so no entry
+    // headed or summarised as a Room or Club may carry a current status.
+    const retiredSurfaces = productUpdates.filter((update) =>
+      /\b(?:Rooms?|Clubs?)\b/.test(`${update.eyebrow} ${update.title} ${update.summary}`),
+    );
+    assert.ok(retiredSurfaces.length >= 7, "retired surface entries are recognised");
+    for (const update of retiredSurfaces) {
+      assert.ok(
+        !["testing", "live", "ready"].includes(update.status),
+        `${update.slug} presents a retired surface as ${update.status}`,
+      );
+    }
+  });
+
+  test("describes superseded history in the Updates legend", () => {
+    const updates = readFileSync(
+      new URL("../src/app/(marketing)/updates/page.tsx", import.meta.url),
+      "utf8",
+    );
+    assert.match(updates, /superseded: \{\s*label: "Superseded",\s*description: "Replaced by a later tester build or surface; kept for history"/);
   });
 
   test("marks the rebuilt website live only after production verification", () => {
@@ -235,13 +401,13 @@ describe("product update ledger", () => {
     assert.match(premium.highlights.join(" "), /PLN 260 for 365 days/);
   });
 
-  test("records build 11 on both permanent tester channels", () => {
+  test("keeps build 11 as superseded tester-channel history", () => {
     const chat = productUpdates.find(
       (update) => update.slug === "direct-chat-reliability-build-11",
     );
 
     assert.ok(chat);
-    assert.equal(chat.status, "testing");
+    assert.equal(chat.status, "superseded");
     assert.equal(chat.updatedOn, "2026-08-28");
     assert.match(chat.summary, /1\.0\.0 build 11/);
     assert.match(chat.summary, /source commit a67036b/);
@@ -253,7 +419,7 @@ describe("product update ledger", () => {
     assert.match(chat.highlights.join(" "), /one-to-one calls/i);
   });
 
-  test("keeps mobile build 8 rollout truthful for each store", () => {
+  test("keeps mobile build 8 and the Clubs-era Premium preview as superseded history", () => {
     const mobile = productUpdates.find(
       (update) => update.slug === "mobile-build-8-testing",
     );
@@ -262,7 +428,7 @@ describe("product update ledger", () => {
     );
 
     assert.ok(mobile);
-    assert.equal(mobile.status, "testing");
+    assert.equal(mobile.status, "superseded");
     assert.equal(mobile.updatedOn, "2026-08-28");
     assert.match(mobile.summary, /1\.0\.0 build 8/);
     assert.match(mobile.summary, /source commit 5f61c71/);
@@ -281,7 +447,7 @@ describe("product update ledger", () => {
       (update) => update.slug === "moderator-premium-preview",
     );
     assert.ok(moderatorPreview);
-    assert.equal(moderatorPreview.status, "testing");
+    assert.equal(moderatorPreview.status, "superseded");
     assert.match(moderatorPreview.summary, /without creating a subscription/i);
     assert.match(moderatorPreview.highlights.join(" "), /No plan, renewal, payment provider or paid entitlement/i);
 

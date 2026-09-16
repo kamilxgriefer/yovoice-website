@@ -26,27 +26,27 @@ type NotificationType =
 // there's nothing to opt out of for those.
 const GROUPS: {
   title: string;
+  creatorOnly?: boolean;
   types: { id: NotificationType; label: string }[];
 }[] = [
   {
-    title: "Friends & follows",
+    title: "Friends",
     types: [
       { id: "friendRequest", label: "Friend requests" },
       { id: "friendAccepted", label: "Friend request accepted" },
-      { id: "follow", label: "New followers" },
     ],
   },
   {
-    title: "Clubs",
-    types: [
-      { id: "clubInvite", label: "Club invitations" },
-      { id: "clubInviteAccepted", label: "Club invitation accepted" },
-    ],
+    title: "Creator audience",
+    creatorOnly: true,
+    types: [{ id: "follow", label: "New followers" }],
   },
   {
-    title: "Rooms",
+    title: "Servers",
     types: [
-      { id: "roomInvite", label: "Room invitations" },
+      { id: "clubInvite", label: "Server invitations" },
+      { id: "clubInviteAccepted", label: "Server invitation accepted" },
+      { id: "roomInvite", label: "Voice channel invitations" },
       { id: "broadcastInvite", label: "Podcast invitations" },
     ],
   },
@@ -65,6 +65,14 @@ type BrowserPermission = "unsupported" | NotificationPermission;
 export default function NotificationsPage() {
   const { user } = useAuth();
   const [preferences, setPreferences] = useState<Record<string, boolean>>({});
+  const [creatorAudienceProjection, setCreatorAudienceProjection] = useState<{
+    uid: string;
+    visible: boolean;
+  } | null>(null);
+  const creatorAudienceVisible =
+    creatorAudienceProjection !== null &&
+    creatorAudienceProjection.uid === user?.uid &&
+    creatorAudienceProjection.visible;
   const [pending, setPending] = useState<Set<NotificationType>>(new Set());
   // Lazy initializer, not an effect — this only ever READS the browser's
   // existing permission state, it never prompts, so there's nothing here
@@ -79,12 +87,31 @@ export default function NotificationsPage() {
     if (!user) return;
     const ref = doc(getFirebaseFirestore(), "users", user.uid);
     const unsubscribe = onSnapshot(ref, (snapshot) => {
-      const raw = snapshot.data()?.notificationPreferences;
+      const data = snapshot.data();
+      const raw = data?.notificationPreferences;
       setPreferences(
         raw && typeof raw === "object" ? (raw as Record<string, boolean>) : {},
       );
     });
     return unsubscribe;
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const uid = user.uid;
+    const ref = doc(getFirebaseFirestore(), "publicProfiles", user.uid);
+    return onSnapshot(
+      ref,
+      (snapshot) => {
+        // This is the public, server-derived eligibility projection. Premium,
+        // age verification and opt-in are deliberately not recomputed here.
+        setCreatorAudienceProjection({
+          uid,
+          visible: snapshot.data()?.creatorAudienceVisible === true,
+        });
+      },
+      () => setCreatorAudienceProjection({ uid, visible: false }),
+    );
   }, [user]);
 
   async function toggle(type: NotificationType, enabled: boolean) {
@@ -125,9 +152,9 @@ export default function NotificationsPage() {
       <div className="glass-panel mt-6 flex items-center gap-4 rounded-[28px] p-6">
         <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
           {permission === "granted" ? (
-            <BellRing className="size-5" />
+            <BellRing className="size-5" aria-hidden="true" />
           ) : (
-            <Bell className="size-5" />
+            <Bell className="size-5" aria-hidden="true" />
           )}
         </div>
         <div className="flex-1">
@@ -154,8 +181,16 @@ export default function NotificationsPage() {
         )}
       </div>
 
+      {!creatorAudienceVisible ? (
+        <p className="mt-4 rounded-2xl border border-sky-300/15 bg-sky-300/[0.04] px-4 py-3 text-xs leading-5 text-white/60">
+          Follower alerts appear only when the server marks a Premium Creator
+          profile as age-verified and explicitly opted in to public audience
+          visibility.
+        </p>
+      ) : null}
+
       <div className="mt-6 space-y-6">
-        {GROUPS.map((group) => (
+        {GROUPS.filter((group) => !group.creatorOnly || creatorAudienceVisible).map((group) => (
           <div key={group.title}>
             <h2 className="text-sm font-bold text-white">{group.title}</h2>
             <div className="glass-panel mt-2 divide-y divide-white/10 rounded-[24px]">
@@ -176,15 +211,14 @@ export default function NotificationsPage() {
                       aria-label={label}
                       disabled={pending.has(id)}
                       onClick={() => toggle(id, !enabled)}
-                      className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
-                        enabled ? "bg-fuchsia-500" : "bg-white/15"
-                      }`}
+                      className="focus-ring relative h-11 w-12 shrink-0 rounded-xl disabled:opacity-50"
                     >
                       <span
-                        className={`absolute top-0.5 size-5 rounded-full bg-white transition ${
-                          enabled ? "left-[22px]" : "left-0.5"
-                        }`}
-                      />
+                        aria-hidden="true"
+                        className={`absolute left-0 top-2.5 h-6 w-11 rounded-full transition ${enabled ? "bg-fuchsia-500" : "bg-white/15"}`}
+                      >
+                        <span className={`absolute top-0.5 size-5 rounded-full bg-white transition ${enabled ? "left-[22px]" : "left-0.5"}`} />
+                      </span>
                     </button>
                   </div>
                 );

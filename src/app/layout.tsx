@@ -19,20 +19,20 @@ export const metadata: Metadata = {
     template: "%s | YO Voice",
   },
   description:
-    "A modern voice platform where communities connect, creators grow and conversations come alive.",
+    "Your people. Your space. Your voice. Servers, a refreshed Home, Chats, Friends and media-first Yeels are now in internal testing.",
   applicationName: "YO Voice",
   keywords: [
     "YO Voice",
     "voice chat",
-    "voice rooms",
+    "voice channels",
     "online communities",
-    "clubs",
+    "community servers",
     "creators",
   ],
   openGraph: {
     title: "YO Voice — Be You",
     description:
-      "Join communities, meet creators and experience conversations that feel alive.",
+      "Servers, a refreshed Home, Chats, Friends and media-first Yeels are now in YO Voice internal testing.",
     url: "https://yovoice.app",
     siteName: "YO Voice",
     type: "website",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "YO Voice — Be You",
     description:
-      "Join communities, meet creators and experience conversations that feel alive.",
+      "Servers, a refreshed Home, Chats, Friends and media-first Yeels are now in YO Voice internal testing.",
     images: ["/opengraph-image"],
   },
   robots: {

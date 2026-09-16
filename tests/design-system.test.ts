@@ -39,7 +39,7 @@ test("release states and global keyboard focus use semantic tokens", async () =>
   ]);
 
   assert.match(css, /:focus-visible\s*\{[^}]*var\(--focus\)/s);
-  for (const status of ["live", "testing", "ready", "verification"]) {
+  for (const status of ["live", "testing", "ready", "verification", "superseded"]) {
     assert.match(css, new RegExp(`release-status\\[data-status="${status}"\\]`));
   }
   assert.match(updates, /data-status=\{status\}/);

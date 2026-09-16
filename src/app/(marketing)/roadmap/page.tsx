@@ -1,6 +1,7 @@
 import { CheckCircle2, CircleDashed, Loader2 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { currentRelease, nextReleaseCandidate } from "@/content/current-release";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -16,41 +17,45 @@ const columns = [
     icon: CheckCircle2,
     accent: "text-emerald-300",
     items: [
-      "Community, broadcast and podcast voice rooms",
-      "Clubs with chat, roles and member management",
-      "Friends, following and creator profiles",
-      "Achievements across messages, followers and more",
-      "Push and in-app notifications",
-      "Email verification and secure password reset",
-      "In-app reporting, blocking and room moderation flows",
-      "Unified YO Moments and the photo/video Reels MVP on web",
-      "Frame Echo Clean navigation and optional Velvet Prism sound cues",
       "Web app at app.yovoice.app",
+      "Account registration, email verification and secure password recovery",
+      "Server-enforced Premium entitlements",
+      "Private-media access with short-lived, account-bound capabilities",
+      "Friend requests, private messaging, blocking and reporting foundations",
+      "Push and in-app notification preferences",
     ],
   },
   {
     key: "in-progress",
-    title: "In progress",
+    title: "Internal testing",
     icon: Loader2,
     accent: "text-fuchsia-300",
     items: [
-      "Native desktop apps for Windows and macOS",
-      "Public iOS App Store and Google Play release",
-      "Build 20 tester feedback from Google Play Internal Testing and TestFlight",
-      "Real-device media and mixed-version audio/video call acceptance",
-      "Expanded club discovery",
+      `YO Voice ${currentRelease.version} on the existing Google Play Internal Testing list and TestFlight internal group`,
+      `YO Voice ${nextReleaseCandidate.version} prepared as the next internal tester candidate; availability not yet confirmed`,
+      "Five-type Servers interface: Friends, Community, Podcast, Family and Company",
+      "Server-first Home with the established animated Hub preserved",
+      "Chats with Add Friend and responsive full-screen private media",
+      "Redesigned Friends search, filters and request routes",
+      "Unified Voice and media-first Yeels visual language",
+      "Voice and video call setup, teardown and retry corrections",
+      "Creator following gated by Premium, age verification and explicit opt-in",
     ],
   },
   {
     key: "planned",
-    title: "Planned",
+    title: "Gated or planned",
     icon: CircleDashed,
     accent: "text-white/50",
     items: [
-      "Public API for club and room integrations",
-      "Scheduled and recurring rooms",
+      "Server backend activation for creation, membership and channel activity",
+      "Podcast recording and published episodes",
+      "GIF search and sending backend rollout for the 16 original YO Voice animations prepared in the Build 27 candidate",
+      "Video stages, family tools and company screen-sharing or whiteboard modules",
+      "Owned Server limits after activation: 5 on Free and 30 on Premium, with unlimited joins for everyone",
+      "Public iOS App Store and Google Play release",
+      "Native desktop apps for Windows and macOS",
       "Deeper creator analytics",
-      "More granular notification controls",
     ],
   },
 ] as const;
