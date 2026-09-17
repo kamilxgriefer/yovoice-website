@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
 
-import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
+import { currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_RELEASES_URL = "https://github.com/kamilxgriefer/yovoice/releases";
@@ -11,7 +11,7 @@ export function DownloadSection() {
     {
       icon: Smartphone,
       title: "Mobile",
-      description: `YO Voice ${currentRelease.version} is in internal testing. ${currentReleaseAvailability}`,
+      description: `YO Voice on mobile is in internal testing. ${currentReleaseAvailability}`,
       href: "/download",
       action: "View tester access",
     },
@@ -48,7 +48,7 @@ export function DownloadSection() {
             Ready to find <span className="text-gradient block">your people?</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-white/65 sm:mt-7 sm:text-base sm:leading-8">
-            Existing internal testers can review Build 26, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
+            Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
           </p>
         </div>
 

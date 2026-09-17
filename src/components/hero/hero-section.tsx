@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowDown, ArrowRight, HouseHeart, Mic2, Play, UsersRound } from "lucide-react";
+import { ArrowDown, ArrowRight, AudioLines, Clapperboard, Download, MessageCircle, Mic2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { AppExperiencePreview } from "@/components/hero/app-experience-preview";
+import { AppScreenRotator } from "@/components/hero/app-screen-rotator";
 import { DeepSpaceBackground } from "@/components/hero/deep-space-background";
 import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
 import { HeroPromptRotator } from "@/components/hero/hero-prompt-rotator";
@@ -62,11 +62,11 @@ export function HeroSection() {
               Start talking
               <ArrowRight className="size-4" aria-hidden="true" />
             </HeroPrimaryCta>
-            <HeroSecondaryCta href="#experience">
+            <HeroSecondaryCta href="/download">
               <span className="flex size-7 items-center justify-center rounded-full bg-white text-[#0d0618]">
-                <Play className="ml-0.5 size-3.5 fill-current" aria-hidden="true" />
+                <Download className="size-3.5" aria-hidden="true" />
               </span>
-              Explore YO Voice
+              Where to get it
             </HeroSecondaryCta>
           </motion.div>
 
@@ -76,9 +76,10 @@ export function HeroSection() {
             aria-label="YO Voice highlights"
           >
             {[
-              { icon: Mic2, label: "Live voice rooms" },
-              { icon: HouseHeart, label: "Private Family Rooms" },
-              { icon: UsersRound, label: "Clubs & community chats" },
+              { icon: Mic2, label: "Servers & voice channels" },
+              { icon: MessageCircle, label: "Chats" },
+              { icon: AudioLines, label: "Voice Moments" },
+              { icon: Clapperboard, label: "Yeels" },
             ].map(({ icon: Icon, label }) => (
               <li
                 key={label}
@@ -91,22 +92,27 @@ export function HeroSection() {
           </motion.ul>
         </div>
 
-        <div className="relative mx-auto mt-12 w-full max-w-[320px] sm:mt-16 sm:max-w-[560px] lg:mt-0">
+        {/* The device frames. What used to stand here was a hand-drawn
+            approximation of the app that had drifted a long way from it — a
+            dock with a centre logo and no Servers destination. These are
+            screenshots of the current build's real screens, and they rotate
+            through the app's own first four destinations. */}
+        <div className="relative mx-auto mt-12 w-full max-w-[560px] sm:mt-16 lg:mt-0">
           <motion.div
             initial={false}
             className="relative w-full"
           >
-            <AppExperiencePreview />
+            <AppScreenRotator />
           </motion.div>
         </div>
       </div>
 
       <div className="relative mx-auto max-w-[1400px] px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-16 lg:absolute lg:inset-x-0 lg:bottom-3 lg:p-0">
         <motion.a
-          href="#stats"
+          href="#welcome"
           whileHover={{ y: 2 }}
           className="focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-white/45 transition hover:bg-white/[.04] hover:text-white/70"
-          aria-label="Scroll to statistics"
+          aria-label="Scroll to what YO Voice is"
         >
           <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
             <ArrowDown className="size-4" aria-hidden="true" />

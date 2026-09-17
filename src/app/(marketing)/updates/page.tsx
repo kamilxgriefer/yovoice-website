@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
+import { LatestReleaseSpotlight } from "@/components/sections/latest-release-spotlight";
+import { TesterBuildExperience } from "@/components/sections/tester-build-experience";
 import {
   productUpdates,
   type ProductUpdate,
@@ -110,7 +112,16 @@ export default function UpdatesPage() {
         <Link href="/servers" className="focus-ring mt-4 inline-flex min-h-12 items-center gap-2 rounded-xl text-sm font-semibold text-[var(--accent)]">Explore the Servers interface <ArrowRight className="size-4" aria-hidden="true" /></Link>
       </aside>
 
-      <section className="px-5 pb-24 sm:px-8" aria-labelledby="updates-heading">
+      {/* Moved here from the homepage on 2026-09-16: a release spotlight and
+          a build-by-build interface walkthrough are release-ledger content,
+          not a welcome. The components are unchanged, so every truthfulness
+          correction they carry — Build 26 as the latest proven tester build,
+          no Build 27 availability, gated server backend, disabled Podcast
+          recording — moved with them. */}
+      <LatestReleaseSpotlight />
+      <TesterBuildExperience />
+
+      <section className="mt-16 px-5 pb-24 sm:px-8 sm:mt-20" aria-labelledby="updates-heading">
         <div className="mx-auto max-w-6xl">
           <h2 className="sr-only" id="updates-heading">
             YO Voice product updates

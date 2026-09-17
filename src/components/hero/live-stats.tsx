@@ -67,9 +67,15 @@ export function LiveStats() {
         </span>
       )}
 
+      {/* The published field is `existingRooms` and that backend name is
+          unchanged, but "Rooms" is a retired product name, so the label uses
+          the wording the verified-totals section already applied to this same
+          field: "voice spaces that currently exist across the platform". The
+          measurement, the freshness rule and the refusal to render an absent
+          or stale number are untouched. */}
       {showRooms && (
         <span>
-          {format(rooms)} {rooms === 1 ? "room" : "rooms"} on YO Voice
+          {format(rooms)} voice {rooms === 1 ? "space" : "spaces"} on YO Voice
         </span>
       )}
     </motion.div>

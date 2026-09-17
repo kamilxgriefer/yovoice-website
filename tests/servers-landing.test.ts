@@ -70,15 +70,30 @@ test("real tabs link to panels and preserve focus without creating server action
   assert.doesNotMatch(source, /firebase|httpsCallable|getUserMedia|setInterval|autoPlay|fetch\(/);
 });
 
-test("homepage and server route share the current tester-build experience without legacy activity claims", async () => {
-  const [home, route, landing] = await Promise.all([
+// The homepage welcomes, /servers explains the interface, /updates keeps the
+// release ledger. Until 2026-09-16 the homepage did all three at once, which
+// is why this test used to require the tester-build walkthrough there; the
+// owner's correction moved that content, so the assertion moved with it. The
+// truthfulness assertions below are unchanged — they follow the components.
+test("the welcome homepage, the server route and the updates ledger each keep their own job", async () => {
+  const [home, route, updates, landing] = await Promise.all([
     readFile("src/app/page.tsx", "utf8"),
     readFile("src/app/(marketing)/servers/page.tsx", "utf8"),
+    readFile("src/app/(marketing)/updates/page.tsx", "utf8"),
     readFile("src/components/servers/servers-landing.tsx", "utf8"),
   ]);
-  assert.match(home, /<ServersLanding\s*\/>/);
-  assert.match(home, /<TesterBuildExperience\s*\/>/);
+  // A welcome: the rotating hero first, then what YO Voice and a Server are.
+  assert.match(home, /<HeroSection\s*\/>/);
+  assert.match(home, /<ServersWelcome\s*\/>/);
+  // Release-ledger content belongs on /updates, not on the welcome.
+  assert.doesNotMatch(home, /<TesterBuildExperience\s*\/>/);
+  assert.doesNotMatch(home, /<LatestReleaseSpotlight\s*\/>/);
+  assert.match(updates, /<TesterBuildExperience\s*\/>/);
+  assert.match(updates, /<LatestReleaseSpotlight\s*\/>/);
+  // The full landing, with its build capture and release boundary, is the
+  // /servers route's job; the homepage gets the welcome-sized version.
   assert.match(route, /<ServersLanding\s*\/>/);
+  assert.doesNotMatch(home, /<ServersLanding\s*\/>/);
   assert.doesNotMatch(home, /<StatsSection\s*\/>/);
   assert.doesNotMatch(landing, /<PublicShowcaseGrid\s*\/>/);
   assert.match(landing, /screenshots\/build-26\/servers-desktop\.jpg/);

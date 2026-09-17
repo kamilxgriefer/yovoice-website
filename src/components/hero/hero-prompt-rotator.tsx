@@ -1,24 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
+/**
+ * Welcome copy, not release notes. Every line describes what YO Voice is for
+ * someone arriving today: Servers and their voice channels, Chats, Voice
+ * Moments and Yeels. Retired product names (Rooms, Clubs) are deliberately
+ * absent, and no line carries a build number or a "what changed" claim — the
+ * release boundary lives on /updates and /download, where it can be stated
+ * precisely instead of being compressed into a rotating sentence.
+ */
+// A hydration flag that never changes: the server snapshot is false and the client snapshot is true.
+const subscribeToNothing = () => () => {};
+
 export const heroPrompts = [
-  "Drop into a Community Room and join one shared conversation when you are ready.",
-  "Find people who are into what you are into — or start the room they have been looking for.",
-  "Host a Podcast Room with a stage, raised hands, and room for real questions.",
-  "Create a Club where the conversation continues after the room ends.",
-  "Bring your favorite people closer in a private Family Room.",
-  "Follow voices you enjoy, make friends, and know where to meet again.",
+  "Find the people you actually want to hear — then talk to them, out loud.",
+  "A Server gathers your circle into voice channels and chats that stay put.",
+  "Five kinds of space to start from: Friends, Community, Podcast, Family and Company.",
+  "Chats keep the private conversation going between the people you know.",
+  "Voice Moments are short audio stories from your circle, and they last a day.",
+  "Yeels put the photo or video first, with your own words layered over it.",
+  "Follow the voices you enjoy, add friends, and know where to meet again.",
   "No polished post required — just a topic, a microphone, and people worth meeting.",
-  "Join live, take part naturally, or start a room of your own.",
 ] as const;
 
 const ROTATION_INTERVAL_MS = 6200;
 
 export function HeroPromptRotator() {
-  const reduceMotion = useReducedMotion();
+  // framer-motion resolves the reduced-motion preference during the first render, so
+  // gating on it before hydration makes the server and client markup disagree (React #418).
+  const prefersReducedMotion = useReducedMotion();
+  const hydrated = useSyncExternalStore(subscribeToNothing, () => true, () => false);
+  const reduceMotion = hydrated && prefersReducedMotion === true;
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [interactionPaused, setInteractionPaused] = useState(false);
@@ -56,8 +71,9 @@ export function HeroPromptRotator() {
           the accessibility tree. Reduced-motion users see the first prompt
           until they deliberately choose another one. */}
       <span className="sr-only">
-        Join live voice rooms, meet people, create Clubs and private Family
-        Rooms, or host a Podcast Room when you are ready to speak.
+        YO Voice is for small communities that talk out loud: Servers with
+        voice channels, private Chats, short Voice Moments and media-first
+        Yeels.
       </span>
 
       <div
@@ -98,7 +114,7 @@ export function HeroPromptRotator() {
             type="button"
             onClick={() => setPaused((current) => !current)}
             className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold text-white/55 transition hover:bg-white/[.04] hover:text-white/80 reduce-motion:transition-none"
-            aria-label={paused ? "Resume welcome messages" : "Pause welcome messages"}
+            aria-label={paused ? "Play welcome messages" : "Pause welcome messages"}
           >
             {paused ? (
               <Play className="size-3" aria-hidden="true" />
