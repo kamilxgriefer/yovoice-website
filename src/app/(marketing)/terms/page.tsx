@@ -51,10 +51,10 @@ const sections: LegalSection[] = [
           <li>Post or share illegal content, or content that infringes someone else&apos;s rights.</li>
           <li>Spam, or use the platform for unauthorized advertising.</li>
           <li>Attempt to disrupt, reverse engineer or gain unauthorized access to the service.</li>
-          <li>Record or redistribute a live voice room without the consent of participants.</li>
+          <li>Record or redistribute a live voice session without the consent of participants.</li>
         </ul>
         <p>
-          Room hosts and club owners have moderation tools (mute, remove,
+          Server owners and session hosts have moderation tools (mute, remove,
           manage access) and are expected to keep their spaces within these
           Terms and our{" "}
           <a href="/safety">Community Safety guidelines</a>.
@@ -68,7 +68,7 @@ const sections: LegalSection[] = [
     body: (
       <>
         <p>
-          You retain ownership of the messages, voice moments, club content
+          You retain ownership of the messages, Voice Moments, Yeels, Server content
           and profile information you post (&quot;your content&quot;). By
           posting it on YO Voice, you grant us a worldwide, non-exclusive
           license to host, store, transmit and display it as needed to
