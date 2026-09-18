@@ -56,9 +56,9 @@ export function ServerExplorer() {
           <h2 id="server-types-heading">Who is your server for?</h2>
         </div>
         <p>
-          The Build 26 tester app includes the selector and workspace interface.
-          Server-backed creation and channel actions stay gated during this
-          release stage.
+          The current tester build includes the selector and workspace, and
+          every signed-in account can create, join and use a Server. Podcast
+          recording remains disabled.
         </p>
       </div>
 
@@ -140,7 +140,7 @@ export function ServerExplorer() {
                 <div className={styles.panelGate} role="note">
                   <ShieldAlert size={20} aria-hidden="true" />
                   <p>
-                    <strong>{serverLaunchPolicy.backendStage}.</strong> This describes the tester-build interface and product direction. It does not mean server creation, channels or Podcast recording are active.
+                    <strong>{serverLaunchPolicy.backendStage}.</strong> You can create this kind of Server, join one, send invites and use its voice and text channels in the current tester build. The tools listed are product direction; Podcast recording remains disabled.
                   </p>
                 </div>
               </div>

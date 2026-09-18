@@ -104,10 +104,9 @@ test("feature copy keeps current capabilities and release gates honest", async (
   );
 
   assert.match(features, /Friends, Community, Podcast, Family or Company/i);
-  assert.match(
-    features,
-    /server creation and channel activity remain behind the backend release gate/i,
-  );
+  // Servers opened to every signed-in account with Build 30 (app ADR-197).
+  assert.match(features, /open to every signed-in account since Build 30/i);
+  assert.doesNotMatch(features, /backend release gate/i);
   assert.match(features, /responsive full-screen viewer/i);
   assert.match(features, /movable text and link overlays/i);
   assert.match(features, /setup, teardown and retry corrections into internal testing/i);
@@ -116,8 +115,9 @@ test("feature copy keeps current capabilities and release gates honest", async (
     /quality still depends on the devices and network involved/i,
   );
   assert.match(features, /Public audience visibility is derived by the server/i);
-  assert.match(features, /Build 27 candidate bundles 16 original GIF animations/i);
-  assert.match(features, /GIFs are not available in any build today/i);
+  // GIFs shipped in Build 30 as a first-party catalogue of sixteen originals.
+  assert.match(features, /Sixteen original YO Voice GIF animations ship in the app and can be sent in private Chats since Build 30/i);
+  assert.doesNotMatch(features, /not available in any build|Build 27 candidate/i);
   assert.doesNotMatch(features, /GIPHY|Android session continuity|Velvet Prism/i);
   assert.doesNotMatch(features, /Build 27 (?:is|are) available/i);
   assert.match(
@@ -175,6 +175,7 @@ test("the real Servers screenshot and product frame both preserve the Hub", asyn
   assert.match(landing, /real Hub and five choices/i);
   assert.match(landing, /familiar\s+YO Voice Hub stays in place/i);
   assert.match(landing, /Build 26 fixture-fed capture from source d1c036b7/i);
+  assert.match(landing, /Captured in Build 26/);
   assert.doesNotMatch(landing, /unchanged in Build 27|reused for Build 27/i);
   assert.match(landing, /no live account or server\s+connection/i);
   assert.doesNotMatch(landing, /CSS mockup|concept render/i);

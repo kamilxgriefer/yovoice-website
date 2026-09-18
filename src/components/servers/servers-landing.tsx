@@ -4,7 +4,7 @@ import {
   ArrowDown,
   ArrowRight,
   Layers3,
-  LockKeyhole,
+  LockKeyholeOpen,
   ShieldCheck,
   Users,
 } from "lucide-react";
@@ -35,8 +35,8 @@ export function ServersLanding() {
             <Link href="#server-types" className={styles.primaryLink}>
               Explore five types <ArrowDown size={18} aria-hidden="true" />
             </Link>
-            <Link href="/updates#mobile-build-26-internal-testing" className={styles.secondaryLink}>
-              Build 26 status <ArrowRight size={18} aria-hidden="true" />
+            <Link href={`/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`} className={styles.secondaryLink}>
+              Build {currentRelease.buildNumber} status <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
           <p className={styles.releaseNote}>
@@ -47,7 +47,7 @@ export function ServersLanding() {
 
         <figure className={styles.productFrame}>
           <div className={styles.frameTop} aria-hidden="true">
-            <span /><span>Build 26 capture</span><span>d1c036b7</span>
+            <span /><span>Captured in Build 26</span><span>d1c036b7</span>
           </div>
           <Image
             src="/screenshots/build-26/servers-desktop.jpg"
@@ -68,9 +68,9 @@ export function ServersLanding() {
 
       <section className={styles.howSection} aria-labelledby="server-release-boundary">
         <div className={styles.sectionHeading}>
-          <p className={styles.eyebrow}>What testers see in Build 26</p>
-          <h2 id="server-release-boundary">A clear direction, with a clear boundary.</h2>
-          <p>The interface is in internal testing. Activation still waits for the server-side release gate.</p>
+          <p className={styles.eyebrow}>What testers can do today</p>
+          <h2 id="server-release-boundary">Open to everyone signed in, with one clear boundary.</h2>
+          <p>Servers have been open to every signed-in account since 16 September 2026. The app is still an internal tester release, and Podcast recording remains disabled.</p>
         </div>
 
         <ol role="list" className={styles.steps}>
@@ -78,7 +78,7 @@ export function ServersLanding() {
             {
               icon: Layers3,
               title: "Servers replace the old entry points",
-              text: "Home and the Hub lead into Servers, with the five-type selector included in the internal tester build.",
+              text: "Home and the Hub lead into Servers, with the five-type selector included in the current tester build and the web app.",
             },
             {
               icon: Users,
@@ -86,9 +86,9 @@ export function ServersLanding() {
               text: "The established animated navigation remains the shared foundation on mobile and desktop; only the Rooms destination becomes Servers.",
             },
             {
-              icon: LockKeyhole,
-              title: "Backend activation stays gated",
-              text: "Creation, membership, channel activity and Podcast recording are not presented as active until the backend gate is cleared.",
+              icon: LockKeyholeOpen,
+              title: "Creation, joining and channels are live",
+              text: "Every signed-in account can create a Server, join one, send invites and use its voice and text channels. Podcast recording is the one piece still switched off.",
             },
           ].map(({ icon: Icon, title, text }, index) => (
             <li key={title}>
@@ -104,7 +104,7 @@ export function ServersLanding() {
           <div>
             <h3>Release policy preserved</h3>
             <p>
-              Free accounts can own up to {serverLaunchPolicy.freeOwnedServers} Servers and Premium accounts up to {serverLaunchPolicy.premiumOwnedServers}; everyone can join without a limit. One Family Server per owner counts toward the same ownership allowance. These allowances are not active while the server backend remains gated.
+              Free accounts can own up to {serverLaunchPolicy.freeOwnedServers} Servers and Premium accounts up to {serverLaunchPolicy.premiumOwnedServers}; everyone can join without a limit. One Family Server per owner counts toward the same ownership allowance. These allowances are enforced by the server now that Servers are open.
             </p>
           </div>
           <Link href="/faq">Read the release answers <ArrowRight size={18} aria-hidden="true" /></Link>

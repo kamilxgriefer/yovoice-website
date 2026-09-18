@@ -7,8 +7,8 @@ import { nextTemplateIndex, serverLaunchPolicy, serverTemplates } from "../src/c
 test("server concepts preserve approved order, ownership allowance and release boundary", () => {
   assert.deepEqual(serverTemplates.map(({ id }) => id), ["friends", "community", "podcast", "family", "company"]);
   assert.deepEqual(serverLaunchPolicy, {
-    stage: "Build 26 · Internal testing",
-    backendStage: "Activation gated",
+    stage: "Internal testing · open to every signed-in account",
+    backendStage: "Open to every signed-in account",
     freeOwnedServers: 5,
     premiumOwnedServers: 30,
     unlimitedServerJoins: true,
@@ -64,9 +64,12 @@ test("real tabs link to panels and preserve focus without creating server action
   for (const expected of ['role="tablist"', 'role="tab"', 'role="tabpanel"', "aria-controls=", "aria-labelledby=", "aria-selected=", "tabIndex={selectedIndex === index ? 0 : -1}", "buttons.current[next]?.focus()", "hidden={index !== selectedIndex}"]) {
     assert.ok(source.includes(expected), expected);
   }
-  assert.match(source, /Build 26 tester app includes the selector and workspace interface/i);
-  assert.match(source, /Server-backed creation and channel actions stay gated/i);
-  assert.match(source, /It does not mean server creation, channels or Podcast recording are active/i);
+  // Servers have been open to every signed-in account since 2026-09-16 (app
+  // ADR-197); only Podcast recording is still off.
+  assert.match(source, /every signed-in account can create, join and use a Server/i);
+  assert.match(source, /Podcast\s+recording remains disabled/i);
+  assert.match(source, /The tools listed are product direction/i);
+  assert.doesNotMatch(source, /Build 26 tester app|stay gated|does not mean server creation/i);
   assert.doesNotMatch(source, /firebase|httpsCallable|getUserMedia|setInterval|autoPlay|fetch\(/);
 });
 
@@ -101,8 +104,14 @@ test("the welcome homepage, the server route and the updates ledger each keep th
   assert.doesNotMatch(landing, /unchanged in Build 27/i);
   assert.match(landing, /\bpreload\b/);
   assert.doesNotMatch(landing, /\bpriority\b/);
-  assert.match(landing, /Backend activation stays gated/i);
-  assert.match(landing, /These allowances are not active while the server backend remains gated/i);
+  // The Build 26 capture may stay only while it is labelled as such; the
+  // status link and the boundary copy follow the release ledger instead.
+  assert.match(landing, /Captured in Build 26/);
+  assert.match(landing, /mobile-build-\$\{currentRelease\.buildNumber\}-internal-testing/);
+  assert.match(landing, /open to every signed-in account since 16 September 2026/i);
+  assert.match(landing, /Podcast recording is the one piece still switched off/i);
+  assert.match(landing, /These allowances are enforced by the server now that Servers are open/i);
+  assert.doesNotMatch(landing, /Backend activation stays gated|server backend remains gated|Build 26 status|mobile-build-26/i);
   assert.doesNotMatch(landing, /Create server now|Start your server today|end-to-end encrypted|zero latency/i);
 });
 
@@ -131,9 +140,14 @@ test("Premium and Updates do not turn a planned allowance into a paid or shipped
   assert.match(updates, /open to every signed-in account/i);
   assert.match(updates, /Podcast recording remains disabled/i);
   assert.match(faq, /Podcast recording is disabled in the current tester build/i);
-  assert.match(faq, /allowances are not active until the backend gate is cleared/i);
-  assert.match(faq, /16 original YO Voice GIF animations/i);
-  assert.match(faq, /Build 27 is being prepared for the same testers and is not yet confirmed as available/i);
+  assert.match(faq, /Servers have been open to every signed-in account since 16 September 2026/i);
+  assert.match(faq, /the server enforces these allowances/i);
+  assert.match(faq, /Yes, since Build 30\. The composer offers 16 original YO Voice GIF animations/i);
+  // The current build and the next candidate come from current-release.ts, so
+  // the answer cannot name a build the ledger has moved past.
+  assert.match(faq, /\$\{currentRelease\.version\} is the current tester build/);
+  assert.match(faq, /\$\{nextReleaseCandidateStatus\}/);
+  assert.doesNotMatch(faq, /remains gated|backend gate is cleared|backend release gate|not presented as available|Build 27 is being prepared|gated backend|2\.0\.0 \(26\)/i);
   assert.doesNotMatch(`${faq}${updates}`, /GIPHY|Android session continuity|Build 27 (?:is|are) available/i);
 });
 

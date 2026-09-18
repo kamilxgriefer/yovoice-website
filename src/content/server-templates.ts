@@ -1,12 +1,14 @@
 /**
- * Servers interface copy for the current internal tester build. Server-backed
- * actions remain behind the production release gate, so every capability
- * below is presented as product direction. Starter channels are the real
- * seeded channels from the app's server templates (English labels).
+ * Servers interface copy for the current internal tester build. Servers have
+ * been open to every signed-in account since 2026-09-16 (app ADR-197:
+ * appConfig/serversV1 callableAccess "all"); Podcast recording remains
+ * disabled. The per-template tools lists are product direction, not a
+ * per-feature status. Starter channels are the real seeded channels from the
+ * app's server templates (English labels). `stage` names no build number.
  */
 export const serverLaunchPolicy = {
-  stage: "Build 26 · Internal testing",
-  backendStage: "Activation gated",
+  stage: "Internal testing · open to every signed-in account",
+  backendStage: "Open to every signed-in account",
   freeOwnedServers: 5,
   premiumOwnedServers: 30,
   unlimitedServerJoins: true,

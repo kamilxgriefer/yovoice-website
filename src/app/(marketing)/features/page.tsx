@@ -29,9 +29,9 @@ export const metadata = createPageMetadata({
 const features = [
   {
     icon: LayoutGrid,
-    title: "Servers · in internal testing",
+    title: "Servers · open to every signed-in account",
     description:
-      "Choose Friends, Community, Podcast, Family or Company from one compact selector. The interface is in internal testing; server creation and channel activity remain behind the backend release gate.",
+      "Choose Friends, Community, Podcast, Family or Company from one compact selector. Creating a Server, joining one, sending invites and using its voice and text channels have been open to every signed-in account since Build 30; Podcast recording remains disabled.",
   },
   {
     icon: MessageCircle,
@@ -61,7 +61,7 @@ const features = [
     icon: Sparkles,
     title: "YO Voice Originals",
     description:
-      "The Build 27 candidate bundles 16 original GIF animations. GIF search and sending wait for a backend rollout that has not happened yet, so GIFs are not available in any build today.",
+      "Sixteen original YO Voice GIF animations ship in the app and can be sent in private Chats since Build 30. They are a first-party catalogue; no third-party GIF provider is connected.",
   },
   {
     icon: PhoneCall,
@@ -108,7 +108,7 @@ const features = [
 ] as const;
 
 const deepDives = [
-  { title: "Servers", description: "Five types and the backend release boundary.", href: "/servers" },
+  { title: "Servers", description: "Five types, open to every signed-in account.", href: "/servers" },
   { title: "Community", description: "Home, Chats, Friends and Creator audience.", href: "/community" },
   { title: "Updates", description: "Verified tester-build and release status.", href: "/updates" },
 ] as const;
