@@ -26,6 +26,7 @@ function prose(relativePath: string): string {
 
 const privacy = prose("../src/app/(marketing)/privacy/page.tsx");
 const terms = prose("../src/app/(marketing)/terms/page.tsx");
+const faq = prose("../src/app/(marketing)/faq/page.tsx");
 
 test("the policy describes Servers, and never Rooms or Clubs as a current product", () => {
   assert.match(privacy, /voice-first social product built around Servers/);
@@ -92,6 +93,21 @@ test("retention states the one enforced expiry and does not generalise it", () =
   assert.match(privacy, /kept for as long as your account exists/);
   assert.match(privacy, /90 days after that view/);
   assert.match(privacy, /equivalent record for Voice Moments has no expiry/);
+});
+
+test("the terms and FAQ stop promising Premium billing and self-service deletion", () => {
+  // Terms §7: no provider, no price, no plan is presented as purchasable.
+  assert.doesNotMatch(terms, /Stripe|PayPal|BLIK|EUR 6|EUR 60|PLN 26|PLN 260/i);
+  assert.match(terms, /Premium is not available for purchase yet/);
+  assert.match(terms, /Before any purchase is offered/);
+  // Terms §8 and the FAQ: deletion is by email, exactly as the policy says.
+  for (const page of [terms, faq]) {
+    assert.doesNotMatch(page, /from your account settings/);
+    assert.match(page, /no self-service account deletion in the app yet/);
+    assert.ok(page.includes("support@yovoice.app"));
+    assert.match(page, /Delete my YO Voice account/);
+    assert.match(page, /private account record is kept and marked as deleted/);
+  }
 });
 
 test("deletion promises only what the deployed trigger does", () => {

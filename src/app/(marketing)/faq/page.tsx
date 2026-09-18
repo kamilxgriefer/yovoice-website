@@ -100,7 +100,7 @@ const groups: FaqGroup[] = [
       {
         question: "Can I delete my account?",
         answer:
-          "Yes, at any time from your account settings, or by emailing privacy@yovoice.app if you need help.",
+          "Yes, by email — there is no self-service account deletion in the app yet. Email support@yovoice.app with the subject \"Delete my YO Voice account\" (the Delete account row in Settings opens that email for you), or write to privacy@yovoice.app. We may need to verify your identity. Deletion automatically removes your public profile, presence, public badges, member-directory entry and website-showcase consent; your private account record is kept and marked as deleted, and your messages, uploaded media and other content are removed by hand on your request. The Privacy Policy sets out exactly what is deleted and what is retained.",
       },
       {
         question: "Do you sell my data?",

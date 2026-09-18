@@ -115,29 +115,19 @@ const sections: LegalSection[] = [
     body: (
       <>
         <p>
-          Where Premium checkout is available, Stripe provides the hosted
-          checkout and shows the payment method and amount before you confirm.
-          Payment-method availability can depend on your location and the
-          payment provider.
+          <strong>Premium is not available for purchase yet</strong> — not in
+          the apps and not on the website. There is no store billing on either
+          platform and no checkout is deployed, so YO Voice does not collect or
+          process any payment data today: no card number, no bank or
+          payment-method details, no billing address.
         </p>
         <p>
-          <strong>Recurring card or PayPal plans.</strong> The monthly plan is
-          EUR 6 per month and the annual plan is EUR 60 per year. These plans
-          renew automatically using the selected card or PayPal account until
-          you cancel. You can cancel through the Premium billing-management
-          link. Cancellation stops the next renewal; Premium remains available
-          until the end of the period you already paid for.
-        </p>
-        <p>
-          <strong>Prepaid BLIK plans.</strong> A PLN 26 BLIK payment provides
-          30 days of Premium and a PLN 260 BLIK payment provides 365 days.
-          Each is a one-time payment: it does not renew automatically and does
-          not authorize a future charge. To continue after the displayed end
-          date, you must choose and pay for a new term.
-        </p>
-        <p>
-          Your Premium screen shows the current plan, renewal behavior and paid
-          access end date.
+          Before any purchase is offered, we will publish the terms that govern
+          paid plans — prices, billing periods, renewal and cancellation — as an
+          update to these Terms, and our{" "}
+          <a href="/privacy">Privacy Policy</a> will describe what the payment
+          provider receives. Until then, nothing in these Terms creates a paid
+          plan, authorizes a charge, or obliges you to pay anything.
         </p>
       </>
     ),
@@ -146,13 +136,28 @@ const sections: LegalSection[] = [
     id: "termination",
     title: "8. Termination",
     body: (
-      <p>
-        You can delete your account at any time from your account settings.
-        We may suspend or terminate your access if you violate these Terms.
-        Sections that by their nature should survive termination (like
-        content licenses already granted, and limitations of liability) will
-        continue to apply.
-      </p>
+      <>
+        <p>
+          There is no self-service account deletion in the app yet. To delete
+          your account, email{" "}
+          <a href="mailto:support@yovoice.app">support@yovoice.app</a> with the
+          subject &quot;Delete my YO Voice account&quot; — the Delete account
+          row in Settings opens that email for you — or write to{" "}
+          <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. We may
+          need to verify your identity before acting. Deletion automatically
+          removes your public profile, presence, public badges, member-directory
+          entry and website-showcase consent; your private account record is
+          kept and marked as deleted, and your messages, uploaded media and
+          other content are removed by hand on your request, as set out in the{" "}
+          <a href="/privacy#deletion">Privacy Policy</a>.
+        </p>
+        <p>
+          We may suspend or terminate your access if you violate these Terms.
+          Sections that by their nature should survive termination (like
+          content licenses already granted, and limitations of liability) will
+          continue to apply.
+        </p>
+      </>
     ),
   },
   {
@@ -201,7 +206,7 @@ export default function TermsPage() {
         description="The rules that keep YO Voice fair, safe and usable for everyone."
       />
       <LegalDocument
-        updatedOn="August 28, 2026"
+        updatedOn="September 18, 2026"
         intro="These Terms apply to yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />
