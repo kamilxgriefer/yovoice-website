@@ -128,7 +128,7 @@ test("Premium and Updates do not turn a planned allowance into a paid or shipped
   assert.match(premium, /Free includes 5 owned Servers/i);
   assert.match(premium, /Premium includes 30/i);
   assert.match(premium, /Joining stays unlimited for everyone/i);
-  assert.match(updates, /server backend activation remains gated/i);
+  assert.match(updates, /open to every signed-in account/i);
   assert.match(updates, /Podcast recording remains disabled/i);
   assert.match(faq, /Podcast recording is disabled in the current tester build/i);
   assert.match(faq, /allowances are not active until the backend gate is cleared/i);

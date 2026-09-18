@@ -64,7 +64,7 @@ export default function AboutPage() {
           </p>
           <p className="mt-5">
             YO Voice is developed by a small, focused team shipping in the
-            open — the web app is live today, and YO Voice {currentRelease.version} is in {currentRelease.stage.toLowerCase()}. {currentReleaseAvailability} Server backend activation remains gated, and public store and desktop releases remain separate milestones.
+            open — the web app is live today, and YO Voice {currentRelease.version} is in {currentRelease.stage.toLowerCase()}. {currentReleaseAvailability} Public store and desktop releases remain separate milestones.
           </p>
         </div>
       </section>

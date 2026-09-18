@@ -31,6 +31,11 @@ test("tester-build experience shows only labelled Build 26 captures", async () =
 
   assert.match(experience, /Build 26 fixture-fed capture from source d1c036b7/i);
   assert.match(experience, /real desktop Hub|real Hub/i);
+  // The captures are Build 26; the heading must say so rather than present
+  // them as the current tester build, which it names separately.
+  assert.match(experience, /Captured in Build 26/);
+  assert.match(experience, /Current tester build \{currentRelease\.version\}/);
+  assert.doesNotMatch(experience, /Build \{currentRelease\.buildNumber\} experience/);
   // Nothing records that Build 27 left these surfaces unchanged.
   assert.doesNotMatch(experience, /unchanged in Build 27|reused for Build 27/i);
   assert.doesNotMatch(experience, /active users|people online/i);
@@ -125,7 +130,7 @@ test("feature copy keeps current capabilities and release gates honest", async (
   );
 });
 
-test("homepage spotlight features the confirmed Build 26 without claiming public rollout", async () => {
+test("the release spotlight on /updates features the confirmed current build without claiming public rollout", async () => {
   const spotlight = await readFile(
     "src/components/sections/latest-release-spotlight.tsx",
     "utf8",
@@ -143,13 +148,15 @@ test("homepage spotlight features the confirmed Build 26 without claiming public
   }
 
   assert.match(spotlight, /mobile-build-\$\{currentRelease\.buildNumber\}-internal-testing/);
-  assert.match(spotlight, /Build 26 is available through the existing Google Play Internal\s+Testing list and TestFlight internal group/i);
+  assert.match(spotlight, /Build \{currentRelease\.buildNumber\} is available through Google Play Internal\s+Testing, both TestFlight groups and the web app at app\.yovoice\.app/i);
+  assert.match(spotlight, /See Build \{currentRelease\.buildNumber\} tester release/);
+  assert.doesNotMatch(spotlight, /Build 2\d\b/);
   assert.match(spotlight, /nextReleaseCandidateStatus/);
   assert.match(
     spotlight,
     /internal tester release, not\s+a public App Store or Google Play release/i,
   );
-  assert.match(spotlight, /server backend activation remains gated/i);
+  assert.match(spotlight, /Servers are open to every signed-in account/i);
   assert.match(spotlight, /Podcast\s+recording remains disabled/i);
   assert.doesNotMatch(
     spotlight,

@@ -24,10 +24,8 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 import {
   currentRelease,
   currentReleaseAvailability,
-  nextReleaseCandidate,
   nextReleaseCandidateStatus,
 } from "@/content/current-release";
-import { serverLaunchPolicy } from "@/content/server-templates";
 
 export const metadata = createPageMetadata({
   title: "Updates",
@@ -104,20 +102,19 @@ export default function UpdatesPage() {
       </PageHero>
 
       <aside aria-labelledby="servers-development-heading" className="mx-auto mb-10 w-[calc(100%-40px)] max-w-6xl rounded-[24px] border border-[var(--border-strong)] bg-[var(--surface)] p-6 sm:w-[calc(100%-64px)] sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-[.15em] text-[var(--accent)]">{serverLaunchPolicy.stage} · September 16, 2026</p>
+        <p className="text-xs font-bold uppercase tracking-[.15em] text-[var(--accent)]">Build {currentRelease.buildNumber} · {currentRelease.stage} · September 18, 2026</p>
         <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-tight">A new home for every circle</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
-          YO Voice {currentRelease.version}: {currentReleaseAvailability} It includes the five-type Servers interface and preserves the established Hub. Server backend activation remains gated, Podcast recording remains disabled, and the planned ownership allowances of {serverLaunchPolicy.freeOwnedServers} on Free or {serverLaunchPolicy.premiumOwnedServers} on Premium are not active yet. Joining will stay unlimited for everyone. {nextReleaseCandidateStatus} Its {nextReleaseCandidate.gifOriginalsBundled} bundled YO Voice GIF originals stay unavailable until the GIF backend rollout happens.
+          YO Voice {currentRelease.version}: {currentReleaseAvailability} Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account, with the established Hub preserved. Podcast recording remains disabled, and this is not a public App Store or Google Play release. {nextReleaseCandidateStatus}
         </p>
         <Link href="/servers" className="focus-ring mt-4 inline-flex min-h-12 items-center gap-2 rounded-xl text-sm font-semibold text-[var(--accent)]">Explore the Servers interface <ArrowRight className="size-4" aria-hidden="true" /></Link>
       </aside>
 
       {/* Moved here from the homepage on 2026-09-16: a release spotlight and
           a build-by-build interface walkthrough are release-ledger content,
-          not a welcome. The components are unchanged, so every truthfulness
-          correction they carry — Build 26 as the latest proven tester build,
-          no Build 27 availability, gated server backend, disabled Podcast
-          recording — moved with them. */}
+          not a welcome. The spotlight reads the current tester build from
+          current-release.ts; the walkthrough's captures are labelled with the
+          build they were taken in (Build 26) and never claim a later one. */}
       <LatestReleaseSpotlight />
       <TesterBuildExperience />
 

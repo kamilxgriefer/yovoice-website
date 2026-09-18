@@ -159,7 +159,7 @@ describe("product update ledger", () => {
     );
   });
 
-  test("records Build 27 only as an unconfirmed internal tester candidate", () => {
+  test("keeps Build 27 as superseded candidate history that was never called available", () => {
     const candidate = productUpdates.find(
       (update) => update.slug === "mobile-build-27-internal-tester-candidate",
     );
@@ -169,7 +169,7 @@ describe("product update ledger", () => {
       productUpdates.some((update) => update.slug === "mobile-build-27-internal-testing"),
       false,
     );
-    assert.equal(candidate.status, "verification");
+    assert.equal(candidate.status, "superseded");
     assert.deepEqual(candidate.release, {
       version: "2.0.0 (27)",
       stage: "Candidate",
@@ -189,17 +189,89 @@ describe("product update ledger", () => {
     assert.doesNotMatch(text, /available to everyone|publicly available|server backend is active/i);
   });
 
-  test("records Build 26 as the current confirmed internal tester release", () => {
+  test("records Build 31 as the current confirmed tester release", () => {
+    const release = productUpdates.find(
+      (update) => update.slug === "mobile-build-31-internal-testing",
+    );
+
+    assert.ok(release);
+    assert.equal(productUpdates[0], release);
+    assert.equal(release.updatedOn, "2026-09-18");
+    assert.equal(release.status, "testing");
+    assert.deepEqual(release.release, {
+      version: "2.0.0 (31)",
+      stage: "Internal testing",
+      buildNumber: 31,
+    });
+    // Evidence: yovoice-evidence/2026-09-18/build31-play/play-readback.md,
+    // build31-asc-*.json and build31-2026-09-18.md §Web.
+    assert.match(release.summary, /source revision 98f9413c/i);
+    assert.match(release.summary, /Google Play Internal Testing/i);
+    assert.match(release.summary, /18 September 2026 at 18:30 CEST/i);
+    assert.match(release.summary, /both TestFlight groups/i);
+    assert.match(release.summary, /web app at app\.yovoice\.app/i);
+    assert.match(release.summary, /internal tester release/i);
+    assert.match(release.summary, /not a public App Store or Google Play release/i);
+    assert.match(release.summary, /Podcast recording remains disabled/i);
+
+    const scope = release.highlights.join(" ");
+    for (const capability of [
+      /typed while offline/i,
+      /Edit is offered only on text messages/i,
+      /read from the conversation/i,
+      /publish button shows Preparing, Publishing and Finishing/i,
+      /no longer locks the draft/i,
+      /web-recorder videos/i,
+      /Voice Moments feed/i,
+      /display name/i,
+      /direct-message notifications/i,
+      /mutual-friends and suggestions limits/i,
+    ]) {
+      assert.match(scope, capability);
+    }
+
+    // User-facing only: no internal identifiers, and no retired surface or
+    // public-rollout claim on the current build.
+    assert.doesNotMatch(
+      JSON.stringify(release),
+      /RC-\d+|V2\b|canonical|\bRooms?\b|\bClubs?\b|available to everyone|publicly available/,
+    );
+  });
+
+  test("keeps Build 30 as superseded history that records the Servers opening and the repair", () => {
+    const release = productUpdates.find(
+      (update) => update.slug === "mobile-build-30-internal-testing",
+    );
+
+    assert.ok(release);
+    assert.equal(release.updatedOn, "2026-09-17");
+    assert.equal(release.status, "superseded");
+    assert.deepEqual(release.release, {
+      version: "2.0.0 (30)",
+      stage: "Internal testing",
+      buildNumber: 30,
+    });
+    assert.match(release.summary, /source revision 121973fc/i);
+    assert.match(release.summary, /17 September 2026/i);
+    assert.match(release.summary, /open to every signed-in account/i);
+    assert.match(release.summary, /repaired on 16 September 2026/i);
+    assert.match(release.summary, /Build 31 has since replaced Build 30/i);
+    assert.match(release.highlights.join(" "), /GIFs can be sent in private chats/i);
+    assert.match(release.highlights.join(" "), /Web push notifications are restored/i);
+    assert.match(release.highlights.join(" "), /Podcast recording stays disabled/i);
+    assert.doesNotMatch(JSON.stringify(release), /available to everyone|publicly available/i);
+  });
+
+  test("keeps Build 26 as superseded internal tester history", () => {
     const release = productUpdates.find(
       (update) => update.slug === "mobile-build-26-internal-testing",
     );
 
     assert.ok(release);
-
-    assert.equal(productUpdates[0], release);
+    assert.notEqual(productUpdates[0], release);
     assert.equal(release.slug, "mobile-build-26-internal-testing");
     assert.equal(release.updatedOn, "2026-09-13");
-    assert.equal(release.status, "testing");
+    assert.equal(release.status, "superseded");
     assert.deepEqual(release.release, {
       version: "2.0.0 (26)",
       stage: "Internal testing",
@@ -272,30 +344,39 @@ describe("product update ledger", () => {
 
   test("centralizes the present-tense release boundary on the confirmed build", () => {
     assert.deepEqual(currentRelease, {
-      version: "2.0.0 (26)",
-      buildNumber: 26,
-      sourceRevision: "d1c036b75fea16e8962e7af932166cf95aa8f0ab",
+      version: "2.0.0 (31)",
+      buildNumber: 31,
+      sourceRevision: "98f9413c2d0adb0078c5ee0cb34cbec18d73a67d",
       stage: "Internal testing",
       mobileChannelsConfirmed: true,
       publicStoreRelease: false,
       serversInterfaceIncluded: true,
-      serversBackendActive: false,
+      serversBackendActive: true,
       podcastRecordingActive: false,
     });
-    assert.match(currentReleaseAvailability, /existing internal testers/i);
+    // Names who can install today and where; carries no build number so the
+    // welcome homepage may render it (tests/homepage-welcome.test.ts).
+    assert.match(currentReleaseAvailability, /existing testers/i);
     assert.match(currentReleaseAvailability, /Google Play Internal Testing/i);
-    assert.match(currentReleaseAvailability, /TestFlight/i);
+    assert.match(currentReleaseAvailability, /both TestFlight groups/i);
+    assert.match(currentReleaseAvailability, /web app at app\.yovoice\.app/i);
+    assert.doesNotMatch(currentReleaseAvailability, /\bBuilds?\s+\d+|\d+\.\d+\.\d+\s*\(\d+\)/i);
 
     assert.deepEqual(nextReleaseCandidate, {
-      version: "2.0.0 (27)",
-      buildNumber: 27,
-      stage: "Candidate",
+      version: "2.0.0 (32)",
+      buildNumber: 32,
+      stage: "In progress",
       availabilityConfirmed: false,
       publicStoreRelease: false,
-      gifOriginalsBundled: 16,
-      gifBackendActive: false,
+      scope: [
+        "in-app account deletion with a matching web page",
+        "Server invites — any member on a public Server, moderators and admins on a private one",
+        "chat polish",
+      ],
     });
-    assert.match(nextReleaseCandidateStatus, /not yet confirmed as available/i);
+    assert.match(nextReleaseCandidateStatus, /Build 32 is in progress with no date/i);
+    assert.match(nextReleaseCandidateStatus, /not available to testers yet/i);
+    assert.doesNotMatch(nextReleaseCandidateStatus, /\d{4}-\d{2}-\d{2}|September|October/);
     assert.ok(
       productUpdates.some(
         (update) =>
@@ -323,7 +404,7 @@ describe("product update ledger", () => {
       assert.doesNotMatch(source, /publicly available|available to everyone/i);
       assert.doesNotMatch(
         source,
-        /Build 27 (?:is|are) available|2\.0\.0 \(27\) is available|GIPHY|Android session continuity|22cc2313/i,
+        /Build (?:27|32) (?:is|are) available|2\.0\.0 \((?:27|32)\) is available|GIPHY|Android session continuity|22cc2313/i,
         relativePath,
       );
     }

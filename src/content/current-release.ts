@@ -1,41 +1,50 @@
 /**
  * Present-tense release boundary for website copy.
  *
- * Source of truth is the YO Voice app repository as committed:
- * docs/DEPLOYMENT.md, docs/Roadmap.md and docs/Sessions. A build may be called
- * available only when those records carry its store read-back. Keep this
- * separate from the historical update ledger, whose entries record what was
- * true at the time.
+ * Source of truth is the YO Voice app repository as committed
+ * (docs/DEPLOYMENT.md, docs/Roadmap.md and docs/Sessions) together with the
+ * release evidence read back from the stores and from Hosting. A build may be
+ * called available only when those records carry its store read-back. Keep
+ * this separate from the historical update ledger, whose entries record what
+ * was true at the time.
+ *
+ * Build 31 read-backs (2026-09-18): Google Play internal testing published at
+ * 18:30 CEST, TestFlight build 31 VALID and in beta testing in both groups,
+ * and app.yovoice.app serving version.json build_number 31 — all from app
+ * commit 98f9413c.
  */
 export const currentRelease = {
-  version: "2.0.0 (26)",
-  buildNumber: 26,
-  sourceRevision: "d1c036b75fea16e8962e7af932166cf95aa8f0ab",
+  version: "2.0.0 (31)",
+  buildNumber: 31,
+  sourceRevision: "98f9413c2d0adb0078c5ee0cb34cbec18d73a67d",
   stage: "Internal testing",
   mobileChannelsConfirmed: true,
   publicStoreRelease: false,
   serversInterfaceIncluded: true,
-  serversBackendActive: false,
+  serversBackendActive: true,
   podcastRecordingActive: false,
 } as const;
 
 export const currentReleaseAvailability =
-  "Available to our existing internal testers through Google Play Internal Testing and TestFlight.";
+  "Available to our existing testers through Google Play Internal Testing and both TestFlight groups, and running as the web app at app.yovoice.app.";
 
 /**
- * The next build is recorded only as an internal tester candidate: no final
- * source revision, signed artifacts or store read-backs exist yet, so the
- * website never describes it as available.
+ * The next build is recorded only as work in progress: it has no date, no
+ * source revision, no signed artifacts and no store read-back, so the website
+ * never describes it as available.
  */
 export const nextReleaseCandidate = {
-  version: "2.0.0 (27)",
-  buildNumber: 27,
-  stage: "Candidate",
+  version: "2.0.0 (32)",
+  buildNumber: 32,
+  stage: "In progress",
   availabilityConfirmed: false,
   publicStoreRelease: false,
-  gifOriginalsBundled: 16,
-  gifBackendActive: false,
+  scope: [
+    "in-app account deletion with a matching web page",
+    "Server invites — any member on a public Server, moderators and admins on a private one",
+    "chat polish",
+  ],
 } as const;
 
 export const nextReleaseCandidateStatus =
-  "Build 27 is being prepared for the same internal testers and is not yet confirmed as available.";
+  "Build 32 is in progress with no date: in-app account deletion with a matching web page, Server-invite permissions and chat polish. It is not available to testers yet.";

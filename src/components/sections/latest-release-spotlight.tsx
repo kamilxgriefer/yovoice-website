@@ -16,7 +16,7 @@ const releaseScope = [
   {
     icon: Sparkles,
     title: "Five Server types",
-    description: "Friends, Community, Podcast, Family and Company in one selector.",
+    description: "Friends, Community, Podcast, Family and Company, open to every signed-in account.",
   },
   {
     icon: FrameEchoIcon,
@@ -26,7 +26,7 @@ const releaseScope = [
   {
     icon: MessageSquareMore,
     title: "Chats & media",
-    description: "Add Friend, full-screen media and clearer private-chat recovery.",
+    description: "Messages typed offline are kept and sent when you are back online; GIFs, Add Friend and full-screen media.",
   },
   {
     icon: Users,
@@ -36,7 +36,7 @@ const releaseScope = [
   {
     icon: Clapperboard,
     title: "Yeels media-first",
-    description: "Consistent Moments chrome with movable text and link overlays.",
+    description: "The publish button shows its stage, and a failed publish keeps your draft editable.",
   },
   {
     icon: PhoneCall,
@@ -94,10 +94,11 @@ export function LatestReleaseSpotlight() {
             </span>
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)] sm:text-[15px]">
-            Build 26 is available through the existing Google Play Internal
-            Testing list and TestFlight internal group. Servers, the refreshed
-            Home, Chats, Friends and media-first Yeels are ready for tester
-            review. Server backend activation remains gated and Podcast
+            Build {currentRelease.buildNumber} is available through Google Play Internal
+            Testing, both TestFlight groups and the web app at app.yovoice.app.
+            Servers are open to every signed-in account, Chats keep the
+            messages you type offline and send them when you are back online,
+            and a failed Yeel publish keeps the draft editable. Podcast
             recording remains disabled. This is an internal tester release, not
             a public App Store or Google Play release.{" "}
             {nextReleaseCandidateStatus}
@@ -107,12 +108,12 @@ export function LatestReleaseSpotlight() {
             href={`/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`}
             className="premium-button-secondary focus-ring mt-7 min-h-12 w-fit px-5 text-sm"
           >
-            See Build 26 tester release
+            See Build {currentRelease.buildNumber} tester release
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
 
-        <ul className="relative grid gap-3 sm:grid-cols-2" aria-label="Build 26 release scope">
+        <ul className="relative grid gap-3 sm:grid-cols-2" aria-label={`Build ${currentRelease.buildNumber} release scope`}>
           {releaseScope.map(({ icon: Icon, title, description }, index) => (
             <li
               key={title}

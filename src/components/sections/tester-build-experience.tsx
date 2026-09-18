@@ -90,16 +90,16 @@ export function TesterBuildExperience() {
   return (
     <section className={styles.section} aria-labelledby="tester-build-experience-heading">
       <div className={styles.heading}>
-        <p>Build {currentRelease.buildNumber} experience</p>
+        <p>Interface walkthrough · Build 26 captures</p>
         <h2 id="tester-build-experience-heading">One visual language, wherever you go.</h2>
         <div>
-          <span>{currentRelease.version}</span>
-          <span>{currentRelease.stage}</span>
+          <span>Captured in Build 26</span>
+          <span>Current tester build {currentRelease.version}</span>
           <span>Hub preserved</span>
         </div>
       </div>
 
-      <div className={styles.tabs} role="tablist" aria-label={`Build ${currentRelease.buildNumber} app areas`}>
+      <div className={styles.tabs} role="tablist" aria-label="App areas captured in Build 26">
         {surfaces.map((surface, index) => {
           const Icon = surface.icon;
           return (

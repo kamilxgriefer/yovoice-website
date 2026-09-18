@@ -32,9 +32,47 @@ export type ProductUpdate = {
 // for history and is never presented as currently available.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "mobile-build-31-internal-testing",
+    updatedOn: "2026-09-18",
+    status: "testing",
+    eyebrow: "Build 31 · Internal testing",
+    title: "Build 31 keeps chats moving when the network does not",
+    summary:
+      "YO Voice 2.0.0 (31), built from source revision 98f9413c, is available to our existing testers: on Google Play Internal Testing (published 18 September 2026 at 18:30 CEST), in both TestFlight groups — internal and YO Voice Beta Testers — and in the web app at app.yovoice.app, which serves build 31. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
+    highlights: [
+      "Chats: messages typed while offline are kept and sent once you are back online instead of running out of retries; Edit is offered only on text messages; the mute state shown is read from the conversation; opening a new chat retries safely instead of sending duplicate requests",
+      "Yeels and Voice Moments: a failed publish no longer locks the draft, the publish button shows Preparing, Publishing and Finishing, web-recorder videos are no longer refused outright, and the Voice Moments feed tells a loading failure apart from an empty feed",
+      "Server side: a long, emoji-heavy display name no longer blocks publishing or new chats, direct-message notifications are retried for a bounded time, and the mutual-friends and suggestions limits were raised",
+    ],
+    release: {
+      version: "2.0.0 (31)",
+      stage: "Internal testing",
+      buildNumber: 31,
+    },
+  },
+  {
+    slug: "mobile-build-30-internal-testing",
+    updatedOn: "2026-09-17",
+    status: "superseded",
+    eyebrow: "Build 30 · Internal testing",
+    title: "Build 30 opens Servers to everyone and repairs publishing and chats",
+    summary:
+      "YO Voice 2.0.0 (30), built from source revision 121973fc, reached Google Play Internal Testing and both TestFlight groups on 17 September 2026, and the matching web release went live. Servers are open to every signed-in account by owner decision, and the former Rooms are retired. A two-day server-side outage that had blocked publishing Yeels and Voice Moments, the Voice Moments feed and starting new chats was repaired on 16 September 2026 and confirmed from a signed-in client the next day. Build 31 has since replaced Build 30 on every tester channel.",
+    highlights: [
+      "Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account; Podcast recording stays disabled",
+      "GIFs can be sent in private chats",
+      "Web push notifications are restored in the web app after being silently off since 14 September 2026",
+    ],
+    release: {
+      version: "2.0.0 (30)",
+      stage: "Internal testing",
+      buildNumber: 30,
+    },
+  },
+  {
     slug: "mobile-build-26-internal-testing",
     updatedOn: "2026-09-13",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Build 26 · Internal testing",
     title: "Build 26 brings the server-first YO Voice together",
     summary:
@@ -53,7 +91,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "mobile-build-27-internal-tester-candidate",
     updatedOn: "2026-09-13",
-    status: "verification",
+    status: "superseded",
     eyebrow: "Build 27 · Candidate",
     title: "Build 27 is being prepared for internal testers",
     summary:
