@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { BriefcaseBusiness, Camera, Code2, Mail } from "lucide-react";
+import { BriefcaseBusiness, Camera, Code2, Mail, type LucideIcon } from "lucide-react";
 
 import { BrandLockup } from "@/components/layout/brand-lockup";
+import { siteConfig } from "@/config/site";
 
 const columns = [
   { title: "Product", links: [["Features","/features"],["Community","/community"],["Servers","/servers"],["Achievements","/achievements"]] },
@@ -10,43 +11,55 @@ const columns = [
   { title: "Legal", links: [["Privacy","/privacy"],["Terms","/terms"],["Cookies","/cookies"],["Delete account","/delete-account"]] },
 ];
 
+/**
+ * LinkedIn is conditional: `siteConfig.social.linkedin` is unset while the
+ * company page does not exist, and an icon that led to LinkedIn's front page
+ * was a dead end dressed as a profile. Every other destination is a real
+ * account and always renders.
+ */
+const socialLinks: { Icon: LucideIcon; href: string; label: string }[] = [
+  { Icon: Code2, href: siteConfig.social.github, label: "GitHub" },
+  ...(siteConfig.social.linkedin
+    ? [{ Icon: BriefcaseBusiness, href: siteConfig.social.linkedin, label: "LinkedIn" }]
+    : []),
+  { Icon: Camera, href: siteConfig.social.instagram, label: "Instagram" },
+  { Icon: Mail, href: siteConfig.social.email, label: "Email" },
+];
+
 export function SiteFooter() {
   return (
-    <footer id="footer" className="border-t border-white/[.06] bg-[#080711]">
-      <div className="mx-auto grid max-w-[1400px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1.4fr] lg:px-12">
+    <footer id="footer" className="border-t border-[var(--border)] bg-[var(--background)]">
+      <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,1fr)_1.5fr] lg:gap-16 lg:px-12">
         <div className="max-w-sm">
-          <BrandLockup className="w-fit" />
-          <p className="mt-6 text-sm leading-7 text-white/65">Your people. Your space. Your voice. A place for the conversations, communities and little moments that bring us closer.</p>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/55">Voice first. Community always.</p>
+          <p className="text-sm leading-6 text-[var(--text-secondary)]">Your people. Your space. Your voice. A place for the conversations, communities and little moments that bring us closer.</p>
+          <p className="eyebrow mt-5">Voice first. Community always.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {columns.map((column) => (
             <div key={column.title}>
-              <h2 className="text-sm font-bold">{column.title}</h2>
-              <ul className="mt-3">
-                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="inline-flex min-h-11 items-center text-sm text-white/65 transition hover:text-white">{label}</Link></li>)}
+              <h2 className="text-sm font-bold text-white">{column.title}</h2>
+              <ul className="mt-2">
+                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="inline-flex min-h-11 items-center text-sm text-[var(--text-secondary)] transition hover:text-white">{label}</Link></li>)}
               </ul>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="border-t border-white/[.06]">
+      {/* One line: lockup, copyright, profiles. */}
+      <div className="border-t border-[var(--border)]">
         <div className="mx-auto flex max-w-[1400px] flex-col gap-5 px-5 py-6 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
-          <p className="text-xs text-white/55">© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
-          <div className="flex items-center gap-3">
-            {[
-              [Code2,"https://github.com/kamilxgriefer","GitHub"],
-              [BriefcaseBusiness,"https://www.linkedin.com/","LinkedIn"],
-              [Camera,"https://www.instagram.com/yovoice.app/","Instagram"],
-              [Mail,"mailto:hello@yovoice.app","Email"],
-            ].map(([Icon,href,label]) => {
-              const Comp = Icon as typeof Code2;
-              const opensNewTab = String(href).startsWith("http");
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <BrandLockup className="w-fit" />
+            <p className="text-sm text-[var(--text-tertiary)]">© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {socialLinks.map(({ Icon, href, label }) => {
+              const opensNewTab = href.startsWith("http");
               return (
-                <a key={String(label)} href={String(href)} target={opensNewTab ? "_blank" : undefined} rel={opensNewTab ? "noreferrer" : undefined} className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/[.04] text-white/60 transition hover:border-fuchsia-300/30 hover:bg-fuchsia-400/10 hover:text-white" aria-label={`${String(label)}${opensNewTab ? " (opens in a new tab)" : ""}`}>
-                  <Comp className="size-4" aria-hidden="true"/>
+                <a key={label} href={href} target={opensNewTab ? "_blank" : undefined} rel={opensNewTab ? "noreferrer" : undefined} className="focus-ring flex size-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] transition hover:border-[var(--border-strong)] hover:text-white" aria-label={`${label}${opensNewTab ? " (opens in a new tab)" : ""}`}>
+                  <Icon className="size-4" aria-hidden="true"/>
                 </a>
               )
             })}

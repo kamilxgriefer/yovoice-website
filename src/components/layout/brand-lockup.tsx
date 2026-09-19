@@ -24,23 +24,40 @@ import { cn } from "@/lib/utils/cn";
  * aspect ratio so nothing shifts while the image loads, and they keep Next's
  * generated candidates small (96px/192px) instead of shipping a 750px image
  * into a 44px slot.
+ *
+ * Two variants:
+ * - `full` (footer, auth) keeps the letterspaced wordmark and the gradient
+ *   tagline — a signature, at a size that can carry it.
+ * - `compact` (site header) drops both. The slim header is 56px tall, so an
+ *   uppercase, .15em-tracked wordmark stacked over a tagline would eat the
+ *   width the six navigation items need before the desktop row can appear,
+ *   and the tagline would sit at 11px next to 14px navigation. Sentence case
+ *   at one line reads as a wordmark and costs ~70px less.
  */
 export function BrandLockup({
   className,
   priority = false,
+  variant = "full",
   onClick,
 }: {
   className?: string;
   /** Set on the header — it's above the fold on every page. */
   priority?: boolean;
+  variant?: "full" | "compact";
   onClick?: () => void;
 }) {
+  const compact = variant === "compact";
+
   return (
     <Link
       href="/"
       aria-label="YO Voice home"
       onClick={onClick}
-      className={cn("focus-ring flex items-center gap-3 rounded-2xl", className)}
+      className={cn(
+        "focus-ring flex items-center rounded-2xl",
+        compact ? "gap-2.5" : "gap-3",
+        className,
+      )}
     >
       <Image
         src="/logos/yo-voice-symbol.png"
@@ -48,19 +65,28 @@ export function BrandLockup({
         width={88}
         height={91}
         priority={priority}
-        className="h-11 w-auto shrink-0 sm:h-12"
+        className={cn(
+          "w-auto shrink-0",
+          compact ? "h-8" : "h-11 sm:h-12",
+        )}
       />
-      <span className="leading-none">
-        <span className="block font-[family-name:var(--font-display)] text-[17px] font-extrabold uppercase leading-none tracking-[0.15em] text-white sm:text-[19px]">
+      {compact ? (
+        <span className="font-[family-name:var(--font-display)] text-[17px] font-extrabold leading-none tracking-[-.01em] text-white">
           YO Voice
         </span>
-        {/* Purple -> magenta, matching the tagline in the supplied artwork.
-            Tracking eases off below `sm` so it stays readable rather than
-            stretching past the symbol on a narrow phone. */}
-        <span className="mt-[7px] block bg-[linear-gradient(90deg,#a855f7,#c026ff_52%,#e879f9)] bg-clip-text font-[family-name:var(--font-display)] text-[11.5px] font-semibold leading-none tracking-[0.11em] text-transparent sm:text-[12.5px] sm:tracking-[0.15em]">
-          Speak and create
+      ) : (
+        <span className="leading-none">
+          <span className="block font-[family-name:var(--font-display)] text-[17px] font-extrabold uppercase leading-none tracking-[0.15em] text-white sm:text-[19px]">
+            YO Voice
+          </span>
+          {/* Purple -> magenta, matching the tagline in the supplied artwork.
+              Tracking eases off below `sm` so it stays readable rather than
+              stretching past the symbol on a narrow phone. */}
+          <span className="mt-[7px] block bg-[linear-gradient(90deg,#a855f7,#c026ff_52%,#e879f9)] bg-clip-text font-[family-name:var(--font-display)] text-[11.5px] font-semibold leading-none tracking-[0.11em] text-transparent sm:text-[12.5px] sm:tracking-[0.15em]">
+            Speak and create
+          </span>
         </span>
-      </span>
+      )}
     </Link>
   );
 }

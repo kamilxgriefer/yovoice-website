@@ -1,3 +1,23 @@
+/**
+ * Public profiles the footer and the JSON-LD `sameAs` list point at.
+ *
+ * `linkedin` is optional on purpose: the footer used to hard-code
+ * `https://www.linkedin.com/`, a placeholder that sent people to LinkedIn's
+ * own front page instead of a YO Voice profile. The icon is now rendered
+ * only when this field holds a real URL, so the link cannot be a placeholder
+ * again — set it the day the company page exists.
+ */
+const social: {
+  github: string;
+  instagram: string;
+  email: string;
+  linkedin?: string;
+} = {
+  github: "https://github.com/kamilxgriefer",
+  instagram: "https://www.instagram.com/yovoice.app/",
+  email: "mailto:hello@yovoice.app",
+};
+
 export const siteConfig = {
   name: "YO Voice",
   tagline: "Be You.",
@@ -12,4 +32,5 @@ export const siteConfig = {
     { label: "Updates", href: "/updates" },
     { label: "Download", href: "/download" },
   ],
+  social,
 } as const;

@@ -72,9 +72,13 @@ below).
   email-based reporting path instead of pretending a report button exists.
 - **Careers**: no open roles — page says so honestly rather than listing
   fake jobs.
-- **Social links**: LinkedIn and Instagram footer icons still point to
-  generic placeholder URLs (`linkedin.com/`, `instagram.com/`), not real
-  company profiles — explicitly deferred by request, not forgotten.
+- **Social links**: the footer's destinations live in `siteConfig.social`
+  (`src/config/site.ts`). GitHub, Instagram (`@yovoice.app`) and
+  `hello@yovoice.app` are real. LinkedIn has no company page yet, so
+  `social.linkedin` is unset and the footer renders no LinkedIn icon at all
+  — the old `https://www.linkedin.com/` placeholder is gone rather than
+  pointing people at LinkedIn's front page. Set the field to bring the icon
+  back the day the page exists.
 - **`app.yovoice.app` DNS**: live and canonical. The website launch route
   normalizes legacy Firebase Hosting origins to `https://app.yovoice.app`.
 - **Blog**: `src/app/(marketing)/blog/` is still an empty directory. Not
