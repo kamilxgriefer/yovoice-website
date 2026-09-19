@@ -2,6 +2,16 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import {
+  DELETION_LIMITS,
+  DELETION_REMOVES,
+  SELF_SERVICE_DELETION_LIVE,
+  accountDeletionRetains,
+  accountDeletionRoutes,
+  accountDeletionSummary,
+  accountDeletionTiming,
+} from "../src/content/account-deletion.ts";
+
 /**
  * The privacy policy is the document Google Play cross-checks the Data safety
  * declaration against, so every sentence in it has to match what the app code
@@ -95,27 +105,81 @@ test("retention states the one enforced expiry and does not generalise it", () =
   assert.match(privacy, /equivalent record for Voice Moments has no expiry/);
 });
 
-test("the terms and FAQ stop promising Premium billing and self-service deletion", () => {
+test("the terms and FAQ stop promising Premium billing, and gate self-service deletion", () => {
   // Terms §7: no provider, no price, no plan is presented as purchasable.
   assert.doesNotMatch(terms, /Stripe|PayPal|BLIK|EUR 6|EUR 60|PLN 26|PLN 260/i);
   assert.match(terms, /Premium is not available for purchase yet/);
   assert.match(terms, /Before any purchase is offered/);
-  // Terms §8 and the FAQ: deletion is by email, exactly as the policy says.
+  // Terms §8 and the FAQ: while the release switch is off, deletion is by
+  // email, exactly as the policy says. The self-service wording exists in both
+  // files but only behind that switch, so the three pages can never disagree.
   for (const page of [terms, faq]) {
     assert.doesNotMatch(page, /from your account settings/);
+    assert.ok(page.includes("SELF_SERVICE_DELETION_LIVE"));
     assert.match(page, /no self-service account deletion in the app yet/);
     assert.ok(page.includes("support@yovoice.app"));
     assert.match(page, /Delete my YO Voice account/);
     assert.match(page, /private account record is kept and marked as deleted/);
   }
+  assert.equal(SELF_SERVICE_DELETION_LIVE, false);
 });
 
 test("deletion promises only what the deployed trigger does", () => {
-  assert.match(privacy, /no self-service account deletion in the app yet/);
-  assert.ok(privacy.includes("support@yovoice.app"));
-  assert.match(privacy, /still contains your email address/);
-  assert.match(privacy, /your call records/);
+  // Section 9 now renders src/content/account-deletion.ts, which is also what
+  // /delete-account renders, so the claim is asserted where it is written.
+  const live = SELF_SERVICE_DELETION_LIVE;
+  const claims = [
+    ...DELETION_REMOVES,
+    accountDeletionSummary(live),
+    accountDeletionTiming(live).headline,
+    accountDeletionTiming(live).detail,
+    ...accountDeletionRoutes(live).map((route) => route.detail),
+    ...accountDeletionRetains(live).flatMap((entry) => [entry.item, entry.reason]),
+  ].join(" ");
+
+  assert.match(claims, /no self-service account deletion in the app yet/);
+  assert.ok(claims.includes("support@yovoice.app"));
+  assert.match(claims, /still contains your email address/);
+  // A claim the pipeline does not keep is worse than no claim. Three
+  // categories that an earlier draft promised are NOT in the removes list,
+  // because `functions/account/stages.js` does not remove them (ADR-206):
+  // comments and reactions left on other people's posts, uploads that live in
+  // somebody else's Storage container, and directCalls records.
+  assert.doesNotMatch(claims, /[Yy]our call records/);
+  assert.doesNotMatch(claims, /Family memories/);
+  assert.doesNotMatch(claims, /Company channel files/);
+  // Server ownership is not succeeded, so nothing may say a Server is closed
+  // or handed on. The truthful line replaces it.
+  assert.doesNotMatch(claims, /Servers you own are closed/);
+  assert.doesNotMatch(claims, /does not survive without an owner/);
+  assert.match(claims, /keeps running under an anonymous owner/);
+
+  // Each of the three gaps is published where a reader looks for it, rather
+  // than left unmentioned.
+  const limits = DELETION_LIMITS.join(" ");
+  assert.match(limits, /comment or a reaction you left on somebody else's/);
+  assert.match(limits, /Family memory, or a file in a Company channel/);
+  assert.match(limits, /call record in a chat/);
+  // The Storage disclosure is the COMPLETE one: storage.rules has four
+  // prefixes the sweep cannot reach, not two. Room covers and podcast
+  // episodes are the other two (functions/account/stages.js).
+  assert.match(limits, /cover image you set on a voice room/);
+  assert.match(limits, /podcast episode published on a Server/);
+
+  // The store-facing page may not make a categorical claim about everything
+  // we hold; it points at the retained list and at the limits instead.
+  const publicPage = readFileSync(
+    new URL("../src/app/(marketing)/delete-account/page.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(publicPage, /everything we hold/);
+  assert.match(publicPage, /These are the categories we remove/);
   assert.doesNotMatch(privacy, /we (?:remove|erase|delete) (?:or anonymi[sz]e )?(?:all )?your personal data/i);
+  assert.doesNotMatch(claims, /we (?:remove|erase|delete) (?:or anonymi[sz]e )?(?:all )?your personal data/i);
+  // The policy keeps the sentence that made the old text honest, and points at
+  // the public page Google Play links.
+  assert.match(privacy, /not going to promise you an erasure that our systems do not/);
+  assert.ok(privacy.includes("PUBLIC_DELETION_PATH"));
 });
 
 test("the in-product choices list matches the controls that exist", () => {

@@ -1,5 +1,9 @@
 import { LegalDocument, type LegalSection } from "@/components/marketing/legal-document";
 import { PageHero } from "@/components/marketing/page-hero";
+import {
+  PUBLIC_DELETION_PATH,
+  SELF_SERVICE_DELETION_LIVE,
+} from "@/content/account-deletion";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -137,20 +141,38 @@ const sections: LegalSection[] = [
     title: "8. Termination",
     body: (
       <>
-        <p>
-          There is no self-service account deletion in the app yet. To delete
-          your account, email{" "}
-          <a href="mailto:support@yovoice.app">support@yovoice.app</a> with the
-          subject &quot;Delete my YO Voice account&quot; — the Delete account
-          row in Settings opens that email for you — or write to{" "}
-          <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. We may
-          need to verify your identity before acting. Deletion automatically
-          removes your public profile, presence, public badges, member-directory
-          entry and website-showcase consent; your private account record is
-          kept and marked as deleted, and your messages, uploaded media and
-          other content are removed by hand on your request, as set out in the{" "}
-          <a href="/privacy#deletion">Privacy Policy</a>.
-        </p>
+        {SELF_SERVICE_DELETION_LIVE ? (
+          <p>
+            You can delete your account at any time, and you do not need to ask
+            us: in the app from Settings, then Account, then Delete account, or
+            on this website from{" "}
+            <a href="/account/delete">your account pages</a>. Deletion is
+            permanent. Writing to{" "}
+            <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a> also
+            works, and is the route for an account created with Google or Apple
+            sign-in. What deletion removes, and the short list we keep with the
+            reason for each entry, is set out in the{" "}
+            <a href="/privacy#deletion">Privacy Policy</a> and on our{" "}
+            <a href={PUBLIC_DELETION_PATH}>account deletion page</a>.
+          </p>
+        ) : (
+          <p>
+            There is no self-service account deletion in the app yet. To delete
+            your account, email{" "}
+            <a href="mailto:support@yovoice.app">support@yovoice.app</a> with
+            the subject &quot;Delete my YO Voice account&quot; — the Delete
+            account row in Settings opens that email for you — or write to{" "}
+            <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. We may
+            need to verify your identity before acting. Deletion automatically
+            removes your public profile, presence, public badges,
+            member-directory entry and website-showcase consent; your private
+            account record is kept and marked as deleted, and your messages,
+            uploaded media and other content are removed by hand on your
+            request, as set out in the{" "}
+            <a href="/privacy#deletion">Privacy Policy</a> and on our{" "}
+            <a href={PUBLIC_DELETION_PATH}>account deletion page</a>.
+          </p>
+        )}
         <p>
           We may suspend or terminate your access if you violate these Terms.
           Sections that by their nature should survive termination (like

@@ -5,6 +5,7 @@ import {
   currentReleaseAvailability,
   nextReleaseCandidateStatus,
 } from "@/content/current-release";
+import { SELF_SERVICE_DELETION_LIVE } from "@/content/account-deletion";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -104,8 +105,9 @@ const groups: FaqGroup[] = [
     items: [
       {
         question: "Can I delete my account?",
-        answer:
-          "Yes, by email — there is no self-service account deletion in the app yet. Email support@yovoice.app with the subject \"Delete my YO Voice account\" (the Delete account row in Settings opens that email for you), or write to privacy@yovoice.app. We may need to verify your identity. Deletion automatically removes your public profile, presence, public badges, member-directory entry and website-showcase consent; your private account record is kept and marked as deleted, and your messages, uploaded media and other content are removed by hand on your request. The Privacy Policy sets out exactly what is deleted and what is retained.",
+        answer: SELF_SERVICE_DELETION_LIVE
+          ? "Yes, yourself. In the app open Settings, then Account, then Delete account; on this website sign in and open yovoice.app/account/delete. Both confirm your password first, and deletion is permanent. An account created with Google or Apple sign-in is deleted from the app or by writing to privacy@yovoice.app. yovoice.app/delete-account lists what is removed, the short list we keep and the reason for each entry."
+          : "Yes, by email — there is no self-service account deletion in the app yet. Email support@yovoice.app with the subject \"Delete my YO Voice account\" (the Delete account row in Settings opens that email for you), or write to privacy@yovoice.app. We may need to verify your identity. Deletion automatically removes your public profile, presence, public badges, member-directory entry and website-showcase consent; your private account record is kept and marked as deleted, and your messages, uploaded media and other content are removed by hand on your request. yovoice.app/delete-account and the Privacy Policy set out exactly what is deleted and what is retained.",
       },
       {
         question: "Do you sell my data?",

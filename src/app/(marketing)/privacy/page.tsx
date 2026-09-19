@@ -1,5 +1,16 @@
 import { LegalDocument, type LegalSection } from "@/components/marketing/legal-document";
 import { PageHero } from "@/components/marketing/page-hero";
+import {
+  DELETION_LIMITS,
+  DELETION_REMOVES,
+  PUBLIC_DELETION_PATH,
+  SELF_SERVICE_DELETION_LIVE,
+  SUPPORT_MAILBOX,
+  deletionRetains,
+  deletionRoutes,
+  deletionSummary,
+  deletionTiming,
+} from "@/content/account-deletion";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -362,8 +373,9 @@ const sections: LegalSection[] = [
           settings.
         </p>
         <p>
-          What happens when an account is deleted is described in the next
-          section.
+          What happens when an account is deleted — what goes, what we keep and
+          why — is described in the next section and on our{" "}
+          <a href={PUBLIC_DELETION_PATH}>account deletion page</a>.
         </p>
       </>
     ),
@@ -374,43 +386,71 @@ const sections: LegalSection[] = [
     body: (
       <>
         <p>
-          <strong>There is no self-service account deletion in the app yet.</strong>{" "}
-          The Delete account row in Settings opens an email to{" "}
-          <a href="mailto:support@yovoice.app">support@yovoice.app</a> with the
-          subject &quot;Delete my YO Voice account&quot;. You can also write to{" "}
-          <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. Both
-          addresses reach us; we may need to verify your identity before acting.
+          {deletionSummary} The same lists, written for someone who is not
+          signed in, are on our{" "}
+          <a href={PUBLIC_DELETION_PATH}>account deletion page</a>.
         </p>
         <p>
-          When your sign-in account is deleted, an automatic process removes
-          your public profile, your presence record, your public badges, your
-          entry in the member directory and your website-showcase consent, and
-          clears premium messaging-privacy state.
+          <strong>How to ask.</strong>
+        </p>
+        <ul>
+          {deletionRoutes.map((route) => (
+            <li key={route.id}>
+              <strong>{route.title}.</strong> {route.detail}
+            </li>
+          ))}
+        </ul>
+        <p>
+          Mail sent to{" "}
+          <a href={`mailto:${SUPPORT_MAILBOX}`}>{SUPPORT_MAILBOX}</a> reaches a
+          person too, so a request you have already sent there is not lost. We
+          may need to verify that the account is yours before we act, and
+          deletion is permanent — we cannot restore an account or its content
+          afterwards.
         </p>
         <p>
-          <strong>What that automatic process retains.</strong> Your private
-          account document is kept and marked as deleted and disabled, with the
-          time of deletion recorded. That document still contains your email
-          address, display name, username, bio, country, languages,
-          notification preferences and your counters. The automatic process also
-          does not touch your messages and conversations, your uploaded photos,
-          videos, audio and files, your push tokens, notifications, friends,
-          followers and blocks, your viewing history, your call records, or your
-          Voice Moments, Yeels and Server content.
+          <strong>{deletionTiming.headline}</strong> {deletionTiming.detail}
         </p>
+        {!SELF_SERVICE_DELETION_LIVE ? (
+          <p>
+            We are not going to promise you an erasure that our systems do not
+            currently perform. The one automatic step is this: when a sign-in
+            account is deleted, our servers remove the public profile, the
+            presence record, the public badges, the member-directory entry and
+            the website-showcase consent, and clear premium messaging-privacy
+            state. Everything else on the list below is done by a person, which
+            is why a request can take days rather than minutes.
+          </p>
+        ) : null}
         <p>
-          Anything beyond the items listed above is removed <strong>by hand,
-          in response to your request</strong> — we have no automated process
-          that erases it, so please tell us in your email what you want removed.
-          We are not going to promise you an erasure that our systems do not
-          currently perform.
+          <strong>What deletion removes.</strong>
         </p>
+        <ul>
+          {DELETION_REMOVES.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
         <p>
-          Two smaller points. Deleting a chat only for yourself is a separate
-          control inside the app and does not delete the account. And we have no
-          export tool: if you ask for a copy of your data, it is put together
-          manually.
+          <strong>What we keep, and why.</strong> Some records are not ours
+          alone to erase — they are another person&apos;s safety history, or an
+          obligation we carry. This is the whole list, and each entry says why
+          it is kept:
         </p>
+        <ul>
+          {deletionRetains.map((entry) => (
+            <li key={entry.item}>
+              <strong>{entry.item}</strong> {entry.reason}
+            </li>
+          ))}
+        </ul>
+        <p>
+          <strong>What deletion does not do.</strong>
+        </p>
+        <ul>
+          {DELETION_LIMITS.map((limit) => (
+            <li key={limit}>{limit}</li>
+          ))}
+        </ul>
       </>
     ),
   },
@@ -446,15 +486,23 @@ const sections: LegalSection[] = [
           </li>
           <li>Turn on two-factor authentication with an authenticator app.</li>
           <li>Report content or behaviour to us.</li>
+          {SELF_SERVICE_DELETION_LIVE ? (
+            <li>
+              Delete your account, and the data listed in section 9, from
+              Settings in the app or from{" "}
+              <a href="/account/delete">your account on this website</a>.
+            </li>
+          ) : null}
         </ul>
         <p>
           Under the GDPR you also have the right to access your personal data,
           to have it corrected or erased, to restrict or object to how we use
           it, and to data portability. To exercise any of these, email{" "}
           <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. We may
-          need to verify your identity first. These requests are handled by
-          hand: as noted above, we have no automated export or erasure pipeline,
-          and the limits described in section 9 apply to erasure.
+          need to verify your identity first.{" "}
+          {SELF_SERVICE_DELETION_LIVE
+            ? "Erasure you can carry out yourself, from the app or from your account on this website; section 9 sets out what it removes and the short list we keep. The other requests are handled by hand — we have no automated export tool."
+            : "These requests are handled by hand: as noted above, we have no automated export or erasure pipeline, and the limits described in section 9 apply to erasure."}
         </p>
       </>
     ),
