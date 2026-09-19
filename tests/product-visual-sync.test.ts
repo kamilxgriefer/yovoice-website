@@ -106,6 +106,8 @@ test("feature copy keeps current capabilities and release gates honest", async (
   assert.match(features, /Friends, Community, Podcast, Family or Company/i);
   // Servers opened to every signed-in account with Build 30 (app ADR-197).
   assert.match(features, /open to every signed-in account since Build 30/i);
+  assert.match(features, /on a private Server invites stay with its admins and moderators/i);
+  assert.doesNotMatch(features, /sending invites and using its voice/i);
   assert.doesNotMatch(features, /backend release gate/i);
   assert.match(features, /responsive full-screen viewer/i);
   assert.match(features, /movable text and link overlays/i);
