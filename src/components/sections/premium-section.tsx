@@ -44,7 +44,7 @@ export function PremiumSection() {
             </p>
 
             <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-              <Link href="/premium" className="premium-button focus-ring px-6">
+              <Link href="/premium" className="premium-button focus-ring">
                 Check plans
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>

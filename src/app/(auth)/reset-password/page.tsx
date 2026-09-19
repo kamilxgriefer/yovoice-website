@@ -63,7 +63,7 @@ function ResetPasswordContent() {
         </p>
         <Link
           href="/forgot-password"
-          className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
+          className="premium-button mt-8 w-full"
         >
           Send a new reset link
         </Link>
@@ -138,7 +138,7 @@ function ResetPasswordFlow({
               setPhase({ name: "verifying" });
               setVerifyAttempt((current) => current + 1);
             }}
-            className="premium-button min-h-13 mt-8 w-full"
+            className="premium-button mt-8 w-full"
           >
             Try again
           </button>
@@ -153,7 +153,7 @@ function ResetPasswordFlow({
           <p className="mt-2 text-center text-sm text-text-tertiary">{phase.body}</p>
           <Link
             href="/forgot-password"
-            className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
+            className="premium-button mt-8 w-full"
           >
             Send a new reset link
           </Link>
@@ -320,7 +320,7 @@ function ResetSuccess({ continueUrl }: { continueUrl: string | null }) {
 
       <Link
         href="/login"
-        className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
+        className="premium-button mt-8 w-full"
       >
         Continue to YO Voice
       </Link>

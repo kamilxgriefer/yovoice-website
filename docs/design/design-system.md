@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-03
+Last reviewed: 2026-09-19 (Slim redesign)
 
 ## Source of truth
 
@@ -29,28 +29,96 @@ Success, warning, information and danger messages use paired foreground and
 surface tokens. Product-update statuses use those pairs through
 `.release-status`; colour never carries the status without an icon and label.
 
-Derived glass and glow tokens (`--glass-soft`, `--glass-strong`,
-`--glow-primary` and `--glow-secondary`) are compositing values, not new
-brand colours. They may add depth to Dark surfaces, but text and state colours
-still come from the semantic palette above.
+### Slim tokens (2026-09-19)
+
+These sit beside the pinned palette above; they are new tokens, never new
+values for the pinned ones.
+
+| Role | Token | Value |
+| --- | --- | --- |
+| Field and button radius | `--radius-field` | `12px` |
+| Card radius | `--radius-card` | `16px` |
+| Chip and badge radius | `--radius-pill` | `999px` |
+| Live state | `--live` / `--on-live` | `#FF335C` / `#16040A` |
+| Floating chrome shadow | `--shadow-float` | `0 16px 40px rgba(0,0,0,.42)` |
+| Fixed header height | `--header-height` | `56px` |
+
+The `@theme inline` block at the top of `globals.css` maps Tailwind's
+`--color-*` namespace onto these tokens through `var()`, so utilities such as
+`bg-primary`, `text-accent`, `border-border-strong` and `bg-live` carry the
+token itself instead of a copied hex. The old glass and glow compositing
+tokens are gone: nothing on the site blurs or glows any more.
 
 ## Components and shape
 
 - Inter is the shared text and display face.
-- Cards use `--radius-lg` or `--radius-xl`; compact controls and badges use
-  `--radius-pill`.
+- `.panel` is the one card surface: `--surface`, a 1 px `--border` hairline,
+  `--radius-card`, no shadow and no blur. The transitional `.glass-panel`
+  alias and the `.glass-panel-glow` gradient border were removed once every
+  use had moved to `.panel`.
+- Global classes in `globals.css` are deliberately unlayered, so they outrank
+  any Tailwind utility left on the same element. Only new building blocks that
+  must not outrank utilities (`.icon-tile`, `.feature-row`, `.status-alert`)
+  live in `@layer components`.
+- Primary actions use `.premium-button` (solid `--primary`, `--radius-field`,
+  48 px, weight 600); lower-emphasis actions use `.premium-button-secondary`
+  (`--surface` with a `--border-strong` hairline) or `.premium-button-ghost`
+  (no border). The classes own their geometry, so buttons carry only layout
+  utilities (`w-full`, `mt-*`, `shrink-0`), not `min-h-*`, `px-*` or `text-*`.
+- Fields use `.glass-field` (52 px, `--surface`, `--border-strong` hairline,
+  `--radius-field`, 2 px `--focus` ring without glow). Labels and helper text
+  use `--text-secondary` / `--text-tertiary`, not translucent white.
+- Chips (`.chip`, `.chip-active`) and badges (`.badge-*`) sit on the surface
+  with a hairline; the active chip is solid `--primary`, the live badge is
+  `--live` / `--on-live`.
+- Alerts use `.status-alert` on the paired status tokens
+  (`--success`/`--success-surface`, `--warning`/`--warning-surface`,
+  `--info`/`--info-surface`, `--error`/`--danger-surface`) and always carry an
+  icon and a text label.
 - The navigation preview uses the app's navigation surface, outline and inactive
   text tokens. Pearl is intentionally shown only where the product preview
   demonstrates the optional app appearance; the marketing shell remains Dark.
-- Primary actions use `.premium-button`; lower-emphasis actions use the
-  secondary or ghost variants. Interactive components should not introduce a
-  new gradient or glow without a distinct hierarchy reason.
 - Release highlights use one shared pattern: `.release-spotlight` for a
   cross-page release summary, `.release-build-orb` for the build identifier and
   `.release-scope-card` for capability groups. The first ledger entry may use
-  `.release-card-featured`; ordinary historical cards remain `.glass-panel`.
+  `.release-card-featured`; ordinary historical cards use `.panel`.
 - Decorative icons are hidden from assistive technology. Meaningful icons sit
   beside a visible label or receive an explicit accessible name.
+
+## Slim rules
+
+- Chrome is thin: a 56 px fixed header (`--header-height`), 14 px links, one
+  primary action ("Open YO Voice"). Pages pad their top by the header height
+  rather than by a hard-coded 80 px.
+- One accent. Highlighted words in section headings use solid `--accent`.
+  Gradient text exists only on the hero headline ("Start talking."), with
+  `.text-gradient-descender-safe`.
+- No decoration behind content: no deep-space background, blurred blobs,
+  grid texture or particles outside the hero, which keeps one calm radial glow
+  in its corner. The body's top-to-background gradient is the only page
+  gradient.
+- No card in a card. A surface either is a `.panel` or sits on one; auth
+  pages are a single surface, not a shell around an inner card.
+- Feature lists are rows (`.feature-row`: a 40 px `.icon-tile`, title and
+  description) in a two-column grid (one on phones), not boxes.
+- Section type scale: eyebrow 11 px / 700 / `.12em` in `--text-tertiary`;
+  section title 40 px desktop / 30 px phone, 800, `-0.025em`; copy 16 px / 1.6
+  in `--text-secondary`. One `<h1>` per page.
+- Motion (framer-motion) is reserved for the hero rotators, the hero CTA spring
+  and the menu. Use Tailwind v4's `motion-reduce:` variant.
+
+## Legal hygiene
+
+- Borrow patterns, never names, logos, icons or colours of other products
+  (for example Instagram, Discord or Twitch). Such names may appear only in
+  ADRs and code comments, never as a description of our own features in copy
+  or UI.
+- Exceptions that stay as they are: links to our own accounts (the footer's
+  Instagram link to @yovoice.app and the matching `sameAs` entry, where the
+  label names the service the link goes to) and historical release-ledger
+  text in `src/content/product-updates.ts`, which is a factual record.
+- App previews are captions on real captures; they never invent member names,
+  counts or online states (see below).
 
 ## Product illustrations
 

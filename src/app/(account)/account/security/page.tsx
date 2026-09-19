@@ -83,7 +83,7 @@ function PasswordCard() {
           onChange={(event) => setConfirmPassword(event.target.value)}
           className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
-        <button type="submit" disabled={saving} className="premium-button min-h-12 px-6 disabled:opacity-60">
+        <button type="submit" disabled={saving} className="premium-button disabled:opacity-60">
           {saving ? "Updating…" : "Update password"}
         </button>
       </form>
@@ -149,7 +149,7 @@ function EmailCard() {
           onChange={(event) => setNewEmail(event.target.value)}
           className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
-        <button type="submit" disabled={saving} className="premium-button min-h-12 px-6 disabled:opacity-60">
+        <button type="submit" disabled={saving} className="premium-button disabled:opacity-60">
           {saving ? "Updating…" : "Update email"}
         </button>
       </form>

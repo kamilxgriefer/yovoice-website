@@ -258,9 +258,7 @@ function UpdateCard({
             ? ""
             : featured && update.release
               ? "release-card-featured"
-              : featured
-                ? "glass-panel-glow"
-                : "panel",
+              : "panel",
         ].join(" ")}
       >
         <div className="min-w-0">

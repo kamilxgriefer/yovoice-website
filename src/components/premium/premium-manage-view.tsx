@@ -121,7 +121,7 @@ export function PremiumManageView() {
         <CreditCard className="size-10 text-[#d3a5ff]" aria-hidden />
         <h1 className="mt-5 text-2xl font-bold text-white">Sign in to manage Premium</h1>
         <p className="mt-3 text-sm leading-6 text-white/65">Your subscription and billing portal are private to your account.</p>
-        <Link href={`/login?redirect=${encodeURIComponent("/premium/manage")}`} className="premium-button focus-ring mt-6 inline-flex min-h-12 items-center justify-center px-6">Sign in</Link>
+        <Link href={`/login?redirect=${encodeURIComponent("/premium/manage")}`} className="premium-button focus-ring mt-6">Sign in</Link>
       </div>
     );
   }
@@ -132,7 +132,7 @@ export function PremiumManageView() {
         <CreditCard className="size-10 text-[#d3a5ff]" aria-hidden />
         <h1 className="mt-5 text-2xl font-bold text-white">Plans are temporarily unavailable</h1>
         <p className="mt-3 text-sm leading-6 text-white/65">{error}</p>
-        <button type="button" onClick={() => void load()} className="premium-button focus-ring mt-6 inline-flex min-h-12 items-center gap-2 px-6">
+        <button type="button" onClick={() => void load()} className="premium-button focus-ring mt-6">
           <RefreshCw className="size-4" aria-hidden /> Try again
         </button>
       </div>
@@ -168,7 +168,7 @@ export function PremiumManageView() {
         </p>
       </header>
 
-      <section aria-labelledby="current-plan" className="glass-panel mt-10 rounded-[26px] border border-fuchsia-400/30 p-5 sm:p-7">
+      <section aria-labelledby="current-plan" className="panel mt-10 border-[var(--border-strong)] p-5 sm:p-7">
         <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d3a5ff]">Current plan</p>
@@ -193,12 +193,12 @@ export function PremiumManageView() {
             </p>
           </div>
           {billing.portalAvailable ? (
-            <button type="button" disabled={busy !== null} onClick={() => void openPortal()} className="premium-button focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 px-6 disabled:opacity-60 sm:w-auto">
+            <button type="button" disabled={busy !== null} onClick={() => void openPortal()} className="premium-button focus-ring w-full disabled:opacity-60 sm:w-auto">
               <ShieldCheck className="size-4" aria-hidden />
               {busy === "portal" ? "Opening…" : "Change or cancel"}
             </button>
           ) : storeManagementUrl ? (
-            <a href={storeManagementUrl} className="premium-button focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 px-6 sm:w-auto">
+            <a href={storeManagementUrl} className="premium-button focus-ring w-full sm:w-auto">
               <ShieldCheck className="size-4" aria-hidden />
               Open store subscriptions
             </a>
@@ -214,7 +214,7 @@ export function PremiumManageView() {
           {billing.plans.map((plan) => {
             const active = plan.id === currentPlan;
             return (
-              <article key={plan.id} className={`glass-panel rounded-[24px] p-5 sm:p-6 ${active ? "border-fuchsia-400/50" : ""}`}>
+              <article key={plan.id} className={`panel p-5 sm:p-6 ${active ? "border-[var(--border-strong)]" : ""}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-lg font-bold text-white">{plan.id === "yearly" ? "Yearly" : "Monthly"}</h3>

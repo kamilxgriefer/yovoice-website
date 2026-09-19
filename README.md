@@ -30,7 +30,6 @@ The official website serves as the public face of the project, allowing users to
 - Tailwind CSS
 - Firebase
 - Framer Motion
-- Three.js
 - Vercel
 
 ---

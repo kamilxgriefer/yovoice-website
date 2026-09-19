@@ -155,7 +155,7 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
           </p>
           <Link
             href="/forgot-password"
-            className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
+            className="premium-button mt-8 w-full"
           >
             Reset my password
           </Link>
@@ -196,7 +196,7 @@ function InvalidLink({
       </p>
       <Link
         href="/contact"
-        className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
+        className="premium-button mt-8 w-full"
       >
         Contact support
       </Link>

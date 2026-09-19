@@ -57,7 +57,7 @@ export function HeroPrimaryCta({ href, children }: { href: string; children: Rea
     >
       <Link
         href={href}
-        className="premium-button focus-ring w-full whitespace-nowrap px-6 sm:w-auto"
+        className="premium-button focus-ring w-full whitespace-nowrap sm:w-auto"
       >
         {children}
       </Link>
@@ -80,7 +80,7 @@ export function HeroSecondaryCta({ href, children }: { href: string; children: R
     >
       <Link
         href={href}
-        className="premium-button-secondary focus-ring w-full whitespace-nowrap px-6 sm:w-auto"
+        className="premium-button-secondary focus-ring w-full whitespace-nowrap sm:w-auto"
       >
         {children}
       </Link>

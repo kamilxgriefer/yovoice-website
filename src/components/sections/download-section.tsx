@@ -81,7 +81,7 @@ export function DownloadSection() {
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">Your account contract remains shared across the web app and tester builds. Public mobile and desktop installers will be linked here only when they are genuinely available.</p>
             </div>
           </div>
-          <Link href={APP_ENTRY_PATH} className="premium-button focus-ring shrink-0 px-6">
+          <Link href={APP_ENTRY_PATH} className="premium-button focus-ring shrink-0">
             Open YO Voice <ArrowRight className="size-4"/>
           </Link>
         </div>

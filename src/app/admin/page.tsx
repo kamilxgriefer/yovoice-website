@@ -100,7 +100,7 @@ function OwnerBootstrapCard({ onActivated }: { onActivated: () => void }) {
   }
 
   return (
-    <div className="glass-panel rounded-[28px] p-8">
+    <div className="panel p-8">
       <h2 className="text-xl font-bold">Owner access not active</h2>
       <p className="mt-2 text-sm text-white/55">
         This is the owner account, but the current session doesn&apos;t carry
@@ -113,7 +113,7 @@ function OwnerBootstrapCard({ onActivated }: { onActivated: () => void }) {
           type="button"
           onClick={activate}
           disabled={activating}
-          className="premium-button min-h-12 px-6 disabled:opacity-60"
+          className="premium-button disabled:opacity-60"
         >
           {activating ? "Activating…" : "Activate owner access"}
         </button>
@@ -157,7 +157,7 @@ function FindUserCard({
   }
 
   return (
-    <div className="glass-panel rounded-[28px] p-8">
+    <div className="panel p-8">
       <h2 className="text-xl font-bold">Find a user</h2>
       <p className="mt-2 text-sm text-white/55">
         Look up an account by e-mail address or uid to confirm who you&apos;re
@@ -176,7 +176,7 @@ function FindUserCard({
           <button
             type="submit"
             disabled={searching || !query.trim()}
-            className="premium-button min-h-12 shrink-0 px-6 disabled:opacity-60"
+            className="premium-button shrink-0 disabled:opacity-60"
           >
             {searching ? "Searching…" : "Search"}
           </button>
@@ -280,7 +280,7 @@ function GrantPremiumCard({
   }
 
   return (
-    <div className="glass-panel mt-6 rounded-[28px] p-8">
+    <div className="panel mt-6 p-8">
       <h2 className="text-xl font-bold">Grant Premium</h2>
       <p className="mt-2 text-sm text-white/55">
         Writes the server-managed entitlement document for the account:
@@ -338,7 +338,7 @@ function GrantPremiumCard({
         <button
           type="submit"
           disabled={granting || !uid.trim()}
-          className="premium-button min-h-12 px-6 disabled:opacity-60"
+          className="premium-button disabled:opacity-60"
         >
           {granting
             ? "Applying…"
@@ -415,7 +415,7 @@ export default function AdminPage() {
             ) : isOwnerAccount ? (
               <OwnerBootstrapCard onActivated={refreshRole} />
             ) : (
-              <div className="glass-panel rounded-[28px] p-8">
+              <div className="panel p-8">
                 <h2 className="text-xl font-bold">No admin access</h2>
                 <p className="mt-2 text-sm text-white/55">
                   This account ({user.email ?? "unknown"}) doesn&apos;t have an

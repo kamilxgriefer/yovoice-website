@@ -1,6 +1,6 @@
 # YO Voice Website — Project Status
 
-_Last updated: August 5, 2026_
+_Last updated: September 19, 2026_
 
 ## Summary
 
@@ -8,6 +8,34 @@ The marketing website at yovoice.app is now feature-complete: every page
 referenced from navigation or the footer exists, has real content, and
 every link/CTA resolves to something real. This document tracks what
 changed in this pass and what's intentionally deferred.
+
+## Slim redesign (September 2026, branch `slim/website`)
+
+The site now speaks the app's "Slim" visual language: presentation changed,
+content and behaviour did not.
+
+- **Tokens**: new `--radius-field`, `--radius-card`, `--live` / `--on-live`,
+  `--shadow-float` and `--header-height` beside the 21 palette tokens pinned
+  by `tests/design-system.test.ts`; an `@theme inline` block exposes them as
+  Tailwind colour utilities.
+- **Surfaces**: `.panel` (flat surface, hairline, 16 px radius) replaced the
+  blurred, glowing `.glass-panel`; buttons, fields, chips and badges lost their
+  gradients, glows and sheen. The hero keeps its rotators, gradient headline and
+  one calm radial glow; every other section sits flat.
+- **Chrome**: 56 px header, full-screen mobile menu with focus trap and scroll
+  lock, four-column footer.
+- **Auth and account**: one surface instead of a card in a card; one `<h1>` per
+  page; alerts on the semantic status tokens with icon and label.
+- **Cleanup**: removed the `.glass-panel` alias, `.glass-panel-glow`, unused
+  glass/glow tokens and background textures, 17 zero-import components and
+  hooks (old hero orbit/deep-space art, `ui/card|chip|badge|loader|tooltip|
+  avatar-portrait`, `stats-section`, `product-experience-section` and its
+  showcase/room previews) and the five scaffold SVGs from `public/`. Each was
+  confirmed to have no import in `src` or `tests`; `src/lib/public-showcase.ts`,
+  `hooks/use-public-stats.ts` and `public/logos/yovoice-logo.png` (linked from
+  Firebase emails) stay.
+- Rules live in `docs/design/design-system.md` ("Slim rules", "Legal
+  hygiene").
 
 ## What shipped this pass
 

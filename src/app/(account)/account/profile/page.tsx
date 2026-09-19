@@ -262,7 +262,7 @@ function ProfilePageForUser() {
         </div>
         <Link
           href={APP_ENTRY_PATH}
-          className="premium-button focus-ring min-h-11 shrink-0 px-5 text-sm"
+          className="premium-button focus-ring shrink-0"
         >
           Open YO Voice <ExternalLink className="size-4" />
         </Link>
@@ -373,7 +373,7 @@ function ProfilePageForUser() {
         <button
           type="submit"
           disabled={submitDisabled}
-          className="premium-button focus-ring min-h-12 px-6 disabled:cursor-not-allowed disabled:opacity-45"
+          className="premium-button focus-ring disabled:cursor-not-allowed disabled:opacity-45"
         >
           {saving ? (
             "Saving…"

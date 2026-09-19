@@ -183,7 +183,7 @@ function EmailRequestButton() {
   return (
     <a
       href={DELETION_REQUEST_MAILTO}
-      className="premium-button focus-ring mt-5 inline-flex min-h-12 px-6 text-sm"
+      className="premium-button focus-ring mt-5 min-h-12"
     >
       <Mail className="size-4" aria-hidden="true" />
       Email {PRIVACY_MAILBOX}

@@ -110,7 +110,7 @@ function ActionCodeHandler({ oobCode }: { oobCode: string }) {
         <p className="mt-2 text-center text-sm text-text-tertiary">{error}</p>
         <Link
           href="/verify-email"
-          className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
+          className="premium-button mt-8 w-full"
         >
           Request a new link
         </Link>
@@ -288,7 +288,7 @@ function VerifyEmailPrompt() {
         type="button"
         onClick={handleResend}
         disabled={sending || cooldown > 0}
-        className="premium-button min-h-13 mt-8 w-full disabled:opacity-60"
+        className="premium-button mt-8 w-full disabled:opacity-60"
       >
         {sending
           ? "Sending…"
@@ -352,7 +352,7 @@ function VerifiedSuccess({ email }: { email: string | null }) {
       <button
         type="button"
         onClick={openApp}
-        className="premium-button min-h-13 mt-8 w-full"
+        className="premium-button mt-8 w-full"
       >
         Open YO Voice
       </button>
