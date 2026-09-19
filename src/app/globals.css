@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+/* Tailwind v4 builds colour utilities (`bg-primary`, `text-accent`,
+   `border-border-strong`, `bg-live` …) only from the `--color-*` namespace.
+   `inline` makes every utility carry `var(--primary)` itself instead of a
+   copied hex, so the `:root` block below stays the single source of truth. */
+@theme inline {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-live: var(--live);
+  --color-on-live: var(--on-live);
+  --color-error: var(--error);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+}
+
 :root {
   --font-display: var(--font-inter);
   --background: #080711;
@@ -29,29 +49,45 @@
   --info: #6fc3ff;
   --danger-surface: #32131d;
   --error: #ffb3be;
+  /* Live state pair from the app's Dark palette: solid badge + dark ink. */
+  --live: #ff335c;
+  --on-live: #16040a;
   --glass-soft: rgba(33,25,43,.72);
   --glass-strong: rgba(19,12,30,.94);
   --glow-primary: rgba(123,47,247,.28);
   --glow-secondary: rgba(192,38,255,.2);
 
   /* Design tokens — single source of truth for radius/spacing so pages stop
-     inventing their own one-off values. Pill for buttons/chips/badges,
-     lg for cards, per the UI asset pack. */
+     inventing their own one-off values. Pill for chips/badges, field for
+     inputs and buttons, card for panels. */
   --radius-sm: 0.7rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
   --radius-xl: 2rem;
   --radius-pill: 999px;
+  --radius-field: 12px;
+  --radius-card: 16px;
+  /* The one shadow left on the site: floating chrome (menus, popovers) that
+     must separate from content; cards and buttons sit flat on the surface. */
+  --shadow-float: 0 16px 40px rgba(0,0,0,.42);
+  /* The fixed SiteHeader is this tall; every page pads the top by it. */
+  --header-height: 56px;
 }
 
+/* Everything below is deliberately UNLAYERED. Tailwind v4 declares
+   `@layer theme, base, components, utilities`; rules outside any layer win
+   against every utility on the same element, which is how `.panel` and
+   `.premium-button` restyle the whole site without touching TSX. Only
+   genuinely new classes that must not outrank utilities go into
+   `@layer components` at the end of this file. */
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 6rem; background: var(--background); }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 16px); background: var(--background); }
 body {
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
+  /* The only background gradient on the site; sections and cards sit flat. */
   background:
-    radial-gradient(circle at 75% 8%, rgba(123,47,247,.1), transparent 24%),
     linear-gradient(180deg,var(--background-top),var(--background) 34%),
     var(--background);
   color: var(--foreground);
@@ -86,6 +122,8 @@ img { user-select: none; -webkit-user-drag: none; }
 .noise-overlay {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.22'/%3E%3C/svg%3E");
 }
+/* The hero's signature. Gradient text lives only on the hero headline;
+   highlighted words elsewhere use the solid `--accent`. */
 .text-gradient {
   background: linear-gradient(90deg,#a78bfa 0%,#d78bfa 34%,#e879f9 63%,#fb7185 100%);
   background-clip: text;
@@ -100,14 +138,18 @@ img { user-select: none; -webkit-user-drag: none; }
   margin-bottom: -.12em;
   padding-bottom: .12em;
 }
+/* Panel — the one card surface: flat `--surface`, hairline border, card
+   radius, no blur and no shadow. `.glass-panel` is a transitional alias so
+   the existing markup picks the new look up without a 40-file edit; the
+   radius here deliberately outranks the `rounded-[28px]` utilities those
+   elements still carry. */
+.panel,
 .glass-panel {
   position: relative;
   border: 1px solid var(--border);
-  background: linear-gradient(145deg,rgba(33,25,43,.88),rgba(16,13,24,.86));
-  box-shadow: 0 24px 80px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.25);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  transition: border-color .2s ease;
 }
 
 .app-dock-preview {
@@ -150,82 +192,43 @@ img { user-select: none; -webkit-user-drag: none; }
     linear-gradient(135deg, rgba(240,171,252,.5), rgba(124,58,237,.15) 40%, rgba(56,189,248,.2)) border-box;
 }
 
-/* Release spotlight — the website's premium release pattern. It deliberately
-   reuses semantic surfaces and brand light rather than introducing a second
-   visual language for launch content. */
+/* Release spotlight — the website's release pattern. It reuses the panel
+   surface rather than introducing a second visual language for launch
+   content: one hairline border, card radius, no glow. */
 .release-spotlight {
   isolation: isolate;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(145deg,var(--glass-strong),rgba(12,8,20,.96)) padding-box,
-    linear-gradient(130deg,rgba(217,134,255,.58),rgba(123,47,247,.18) 38%,rgba(92,225,230,.2) 82%,rgba(255,255,255,.08)) border-box;
-  box-shadow:
-    0 36px 110px rgba(0,0,0,.38),
-    0 0 90px rgba(123,47,247,.12),
-    inset 0 1px 0 rgba(255,255,255,.07);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: none;
 }
-.release-spotlight::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 16% 8%,var(--glow-primary),transparent 34%),
-    radial-gradient(circle at 88% 86%,rgba(92,225,230,.07),transparent 28%);
-}
-.release-spotlight::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: .26;
-  background-image:
-    linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
-  background-size: 40px 40px;
-  mask-image: linear-gradient(110deg,#000,transparent 68%);
-}
+/* Build identifier: solid `--primary`, no gradient or halo. */
 .release-build-orb {
-  border: 1px solid rgba(217,134,255,.44);
-  background:
-    radial-gradient(circle at 32% 24%,rgba(255,255,255,.24),transparent 21%),
-    linear-gradient(145deg,rgba(123,47,247,.96),rgba(192,38,255,.82));
-  box-shadow:
-    0 18px 50px rgba(123,47,247,.34),
-    inset 0 1px 0 rgba(255,255,255,.28),
-    inset 0 -14px 32px rgba(35,7,62,.34);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--radius-field);
+  background: var(--primary);
+  box-shadow: none;
 }
+/* Capability groups sit on the page background inside the spotlight so the
+   two surfaces separate by tone, not by shadow. */
 .release-scope-card {
-  border: 1px solid rgba(255,255,255,.085);
-  background: linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.022));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
-  transition: border-color .25s ease, background-color .25s ease, transform .25s ease;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--background);
+  box-shadow: none;
+  transition: border-color .2s ease;
 }
 .release-scope-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(217,134,255,.22);
-  background: linear-gradient(145deg,rgba(217,134,255,.075),rgba(255,255,255,.025));
+  border-color: var(--border-strong);
 }
 
+/* The first ledger entry reads as current by its stronger border only. */
 .release-card-featured {
   isolation: isolate;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(145deg,rgba(29,18,47,.96),rgba(14,9,23,.96)) padding-box,
-    linear-gradient(128deg,rgba(217,134,255,.62),rgba(123,47,247,.2) 42%,rgba(92,225,230,.18)) border-box;
-  box-shadow: 0 26px 82px rgba(0,0,0,.34), 0 0 64px rgba(123,47,247,.1);
-}
-.release-card-featured::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 5% 0%,rgba(192,38,255,.2),transparent 29%),
-    radial-gradient(circle at 100% 100%,rgba(92,225,230,.055),transparent 24%);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: none;
 }
 .focus-ring:focus-visible { outline-color: var(--focus); }
 
@@ -274,106 +277,87 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 .roadmap-cta:hover { background: #fae8ff; color: #080711; }
 
-.premium-button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .6rem;
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(90deg,#7c3aed,#a855f7,#d946ef);
-  color: white;
-  font-weight: 800;
-  box-shadow: 0 16px 48px rgba(138,43,226,.38), inset 0 1px 0 rgba(255,255,255,.22);
-  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
-}
-.premium-button::after {
-  /* Glass top highlight */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(255,255,255,.22), transparent 55%);
-  pointer-events: none;
-}
-.premium-button::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-135%);
-  background: linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
-  transition: transform .7s ease;
-}
-.premium-button:hover { transform: translateY(-2px) scale(1.015); box-shadow: 0 22px 62px rgba(192,38,255,.48), inset 0 1px 0 rgba(255,255,255,.22); }
-.premium-button:active { transform: translateY(0) scale(.98); }
-.premium-button:hover::before { transform: translateX(135%); }
-
-/* Secondary — glass pill, no fill */
-.premium-button-secondary {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .6rem;
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.04);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: white;
-  font-weight: 700;
-  transition: transform .25s cubic-bezier(.34,1.56,.64,1), border-color .3s ease, background-color .3s ease;
-}
-.premium-button-secondary:hover { transform: translateY(-2px) scale(1.015); border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.08); }
-.premium-button-secondary:active { transform: translateY(0) scale(.98); }
-
-/* Ghost — text only, fills in softly on hover */
+/* Buttons — one geometry for all three emphases: 48 px, field radius,
+   15 px / 600. Being unlayered, these declarations outrank the leftover
+   `min-h-*`, `px-*` and `text-*` utilities on the 50+ existing buttons, so
+   every page gets the same control without a TSX edit. */
+.premium-button,
+.premium-button-secondary,
 .premium-button-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: .5rem;
-  border-radius: var(--radius-pill);
-  color: rgba(255,255,255,.7);
-  font-weight: 700;
-  transition: color .25s ease, background-color .25s ease;
+  min-height: 3rem;
+  padding: .5rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  font-size: .9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
 }
-.premium-button-ghost:hover { color: white; background: rgba(255,255,255,.06); }
+/* Primary — the single solid `--primary` fill, no gradient, glow or sheen. */
+.premium-button {
+  background: var(--primary);
+  color: #fff;
+}
+.premium-button:hover { background: color-mix(in srgb, var(--primary) 86%, #fff); }
+.premium-button:active { transform: scale(.98); }
 
-.eyebrow { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .24em; color: #e879f9; }
+/* Secondary — surface with a strong hairline. */
+.premium-button-secondary {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--foreground);
+}
+.premium-button-secondary:hover { border-color: color-mix(in srgb, var(--border-strong) 70%, #fff); background: var(--surface-raised); }
+.premium-button-secondary:active { transform: scale(.98); }
 
-/* Chips — filter/tab pills */
+/* Ghost — text only, fills in softly on hover. */
+.premium-button-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.premium-button-ghost:hover { color: var(--foreground); background: var(--surface); }
+.premium-button-ghost:active { transform: scale(.98); }
+
+.eyebrow { font-size: .6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text-tertiary); }
+
+/* Chips — filter/tab pills on the surface; the active chip is solid primary. */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
   border-radius: var(--radius-pill);
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.03);
-  padding: .5rem 1rem;
-  font-size: .8rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: .45rem .9rem;
+  font-size: .8125rem;
   font-weight: 600;
-  color: rgba(255,255,255,.6);
-  transition: all .25s ease;
+  color: var(--text-secondary);
+  transition: border-color .2s ease, background-color .2s ease, color .2s ease;
 }
-.chip:hover { border-color: rgba(255,255,255,.24); color: white; background: rgba(255,255,255,.06); }
+.chip:hover { border-color: var(--border-strong); color: var(--foreground); }
 .chip-active {
-  border-color: transparent;
-  background: linear-gradient(90deg,#7c3aed,#d946ef);
-  color: white;
-  box-shadow: 0 8px 24px rgba(138,43,226,.4);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: none;
 }
+.chip-active:hover { border-color: var(--primary); background: var(--primary); color: #fff; }
 
-/* Badges — small status pills */
-.badge { display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius-pill); padding: .25rem .65rem; font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.badge-live { background: rgba(255,109,109,.15); color: #ff8a8a; border: 1px solid rgba(255,109,109,.3); }
-.badge-verified { background: rgba(139,92,246,.18); color: #c4b5fd; border: 1px solid rgba(139,92,246,.35); }
-.badge-creator { background: rgba(250,204,21,.15); color: #fde68a; border: 1px solid rgba(250,204,21,.3); }
-.badge-neutral { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.12); }
+/* Badges — small status pills on the semantic pairs; live is the app's
+   solid `--live` / `--on-live`. */
+.badge { display: inline-flex; align-items: center; gap: .35rem; border-radius: var(--radius-pill); border: 1px solid var(--border); padding: .25rem .6rem; font-size: .6875rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.badge-live { background: var(--live); color: var(--on-live); border-color: var(--live); }
+.badge-verified { background: color-mix(in srgb, var(--primary) 22%, transparent); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 38%, transparent); }
+.badge-creator { background: var(--warning-surface); color: var(--warning); border-color: color-mix(in srgb, var(--warning) 38%, transparent); }
+.badge-neutral { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
 
-/* Inputs — matches the asset pack's default/focus/error/success states */
-/* The field is the WRAPPER, not the <input>: a flex row of fixed-width
+/* Inputs — one field style: 52 px, surface, strong hairline, field radius,
+   2 px `--focus` ring without a halo.
+   The field is the WRAPPER, not the <input>: a flex row of fixed-width
    slots. Previously the input carried the border/padding and the icon was
    absolutely positioned over it, with its clearance supplied by a `pl-11`
    utility — but Tailwind v4 puts utilities in a cascade layer and this
@@ -387,20 +371,20 @@ img { user-select: none; -webkit-user-drag: none; }
   width: 100%;
   /* Comfortably above the 44px minimum touch target. */
   min-height: 3.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255,255,255,.1);
-  background: rgba(255,255,255,.035);
-  transition: border-color .25s ease, box-shadow .25s ease, background-color .25s ease;
+  border-radius: var(--radius-field);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
-.glass-field:hover { border-color: rgba(255,255,255,.18); }
-/* focus-within, so the ring appears no matter which slot has focus. */
+.glass-field:hover { border-color: color-mix(in srgb, var(--border-strong) 70%, #fff); }
+.glass-field[data-state="error"] { border-color: var(--error); }
+.glass-field[data-state="success"] { border-color: var(--success); }
+/* focus-within, so the ring appears no matter which slot has focus. It sits
+   after the state rules so a focused error field still shows the focus ring. */
 .glass-field:focus-within {
-  border-color: #c084fc;
-  background: rgba(255,255,255,.05);
-  box-shadow: 0 0 0 4px rgba(192,132,252,.15);
+  border-color: var(--focus);
+  box-shadow: 0 0 0 1px var(--focus);
 }
-.glass-field[data-state="error"] { border-color: rgba(255,109,109,.6); box-shadow: 0 0 0 4px rgba(255,109,109,.1); }
-.glass-field[data-state="success"] { border-color: rgba(0,230,118,.5); }
 
 /* Fixed, predictable leading slot — the input can never start inside it. */
 .glass-field__icon,
@@ -411,7 +395,7 @@ img { user-select: none; -webkit-user-drag: none; }
   justify-content: center;
   align-self: stretch;
   width: 2.75rem;
-  color: rgba(255,255,255,.35);
+  color: var(--text-tertiary);
 }
 .glass-field__action { width: 3rem; }
 
@@ -423,7 +407,7 @@ img { user-select: none; -webkit-user-drag: none; }
   border: 0;
   background: transparent;
   padding: .9rem 1.1rem;
-  color: white;
+  color: var(--foreground);
   font: inherit;
   line-height: 1.25;
 }
@@ -431,25 +415,53 @@ img { user-select: none; -webkit-user-drag: none; }
 .glass-field__icon + .glass-field__input { padding-left: 0; }
 .glass-field__input:has(+ .glass-field__action) { padding-right: 0; }
 .glass-field__input:focus { outline: none; }
-.glass-field__input::placeholder { color: rgba(255,255,255,.3); }
+.glass-field__input::placeholder { color: var(--text-tertiary); }
 /* Autofill repaints the input's own background; keep the field's surface
    and text metrics identical so an autofilled row matches an empty one. */
 .glass-field__input:-webkit-autofill,
 .glass-field__input:-webkit-autofill:hover,
 .glass-field__input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #ffffff;
-  caret-color: #ffffff;
-  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  -webkit-text-fill-color: var(--foreground);
+  caret-color: var(--foreground);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
   transition: background-color 100000s ease-in-out 0s;
 }
 .prose-legal ul { list-style: disc; padding-left: 1.25rem; }
 .prose-legal ol { list-style: decimal; padding-left: 1.25rem; }
 .prose-legal li { margin-top: .4rem; }
-.prose-legal a { color: #e879f9; text-decoration: underline; text-underline-offset: 3px; }
-.prose-legal a:hover { color: #ffffff; }
-.prose-legal strong { color: rgba(255,255,255,.85); font-weight: 700; }
-.section-title { margin-top: 1.25rem; font-family: var(--font-display), sans-serif; font-size: clamp(2rem,4vw,3.3rem); line-height: 1.04; font-weight: 800; letter-spacing: -.045em; }
-.section-copy { margin-top: 1.25rem; max-width: 44rem; font-size: .92rem; line-height: 1.8; color: rgba(255,255,255,.5); }
+.prose-legal a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.prose-legal a:hover { color: var(--foreground); }
+.prose-legal strong { color: var(--foreground); font-weight: 700; }
+/* Section scale: 40 px desktop / 30 px phone, 800, tight tracking; copy at
+   16 px / 1.6 on the secondary text token. */
+.section-title { margin-top: 1.25rem; font-family: var(--font-display), sans-serif; font-size: clamp(1.875rem,1.4rem + 1.5vw,2.5rem); line-height: 1.1; font-weight: 800; letter-spacing: -.025em; }
+.section-copy { margin-top: 1.25rem; max-width: 44rem; font-size: 1rem; line-height: 1.6; color: var(--text-secondary); }
+
+/* New building blocks for the slim layout. They are layered on purpose:
+   nothing existing uses them, so they never need to outrank a utility and
+   pages may tune them with ordinary Tailwind classes. */
+@layer components {
+  /* 40 px icon tile: surface + hairline, icon in the accent. */
+  .icon-tile {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-field);
+    background: var(--surface);
+    color: var(--accent);
+  }
+  /* Feature list row: icon tile, then title + description, no box. */
+  .feature-row {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: start;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
