@@ -123,37 +123,36 @@ export default function FeaturesPage() {
       />
 
       <section className="px-5 pb-8 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mx-auto max-w-5xl">
+          <ul className="grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
             {features.map(({ icon: Icon, title, description }) => (
-              <article key={title} className="glass-panel rounded-[28px] p-7">
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                  <Icon className="size-6" aria-hidden="true" />
+              <li key={title} className="feature-row">
+                <span className="icon-tile">
+                  <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-base font-bold text-[var(--foreground)]">{title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
                 </div>
-                <h2 className="mt-6 text-lg font-bold">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
-      <section className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center">
+      <section className="border-t border-[var(--border)] px-5 py-16 sm:mt-8 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="max-w-2xl">
             <p className="eyebrow">Go deeper</p>
-            <h2 className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-.04em] text-white sm:text-4xl">
-              Explore the current experience
-            </h2>
+            <h2 className="section-title">Explore the current experience</h2>
           </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {deepDives.map(({ title, description, href }) => (
-              <Link key={title} href={href} className="glass-panel group rounded-[28px] p-7 transition hover:-translate-y-1 hover:border-fuchsia-300/25">
-                <Sparkles className="size-5 text-fuchsia-200" aria-hidden="true" />
-                <h3 className="mt-5 text-xl font-bold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
-                <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-300 transition group-hover:text-white">
-                  Learn more <ArrowRight className="size-4 transition group-hover:translate-x-1" aria-hidden="true" />
+              <Link key={title} href={href} className="panel focus-ring group p-6 hover:border-[var(--border-strong)]!">
+                <h3 className="text-lg font-bold text-[var(--foreground)]">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
+                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--accent)] transition group-hover:text-[var(--foreground)]">
+                  Learn more <ArrowRight className="size-4 transition group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </Link>
             ))}

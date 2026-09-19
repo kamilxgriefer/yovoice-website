@@ -22,16 +22,16 @@ export function LegalDocument({
           aria-label="Sections on this page"
           className="hidden lg:block"
         >
-          <div className="sticky top-28">
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-white/60">
+          <div className="sticky top-[calc(var(--header-height)+2rem)]">
+            <p className="eyebrow">
               On this page
             </p>
-            <ul className="mt-5 space-y-3 border-l border-white/10 pl-4">
+            <ul className="mt-5 space-y-1 border-l border-[var(--border)] pl-4">
               {sections.map((section) => (
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
-                    className="focus-ring block rounded text-sm text-white/65 transition hover:text-white"
+                    className="focus-ring block rounded py-1 text-sm transition hover:text-[var(--accent)]"
                   >
                     {section.title}
                   </a>
@@ -42,18 +42,18 @@ export function LegalDocument({
         </nav>
 
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[.2em] text-white/60">
+          <p className="eyebrow">
             Last updated {updatedOn}
           </p>
-          <div className="mt-6 text-sm leading-7 text-white/55">{intro}</div>
+          <div className="mt-4 text-base leading-[1.6] text-[var(--text-secondary)]">{intro}</div>
 
-          <div className="mt-14 space-y-14">
+          <div className="mt-12 space-y-12">
             {sections.map((section) => (
               <div key={section.id} id={section.id} className="scroll-mt-28">
-                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.03em] text-white">
+                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.025em] text-[var(--foreground)]">
                   {section.title}
                 </h2>
-                <div className="prose-legal mt-4 space-y-4 text-sm leading-7 text-white/55">
+                <div className="prose-legal mt-4 space-y-4 text-[15px] leading-[1.7] text-[var(--text-secondary)]">
                   {section.body}
                 </div>
               </div>

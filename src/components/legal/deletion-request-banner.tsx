@@ -30,9 +30,10 @@ export function DeletionRequestBanner() {
     <div className="mx-auto max-w-3xl px-5 sm:px-8">
       <div
         role="status"
-        className="flex items-start gap-3 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-4 text-sm leading-6 text-emerald-100"
+        data-tone="success"
+        className="status-alert"
       >
-        <CheckCircle2 className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+        <CheckCircle2 aria-hidden="true" />
         <p>
           Your account is being deleted and you have been signed out. It
           usually finishes within a few minutes; what happens next is set out

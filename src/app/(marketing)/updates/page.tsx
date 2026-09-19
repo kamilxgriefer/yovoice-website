@@ -89,25 +89,25 @@ export default function UpdatesPage() {
       >
         <Link
           href={`#mobile-build-${currentRelease.buildNumber}-internal-testing`}
-          className="focus-ring mx-auto mt-7 inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/[.075] px-4 text-left transition hover:border-[color:var(--accent)]/45 hover:bg-[color:var(--accent)]/[.12]"
+          className="focus-ring mx-auto mt-6 inline-flex min-h-11 max-w-full items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] py-1.5 pl-1.5 pr-4 text-left transition hover:border-[var(--accent)]"
         >
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-[11px] font-black text-white shadow-[0_8px_24px_rgba(123,47,247,.35)]">
+          <span className="flex h-7 min-w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] px-2 text-[13px] font-extrabold tabular-nums text-white">
             {currentRelease.buildNumber}
           </span>
-          <span className="min-w-0 text-xs font-bold text-white/80 sm:text-sm">
+          <span className="min-w-0 text-[13px] font-semibold text-[var(--foreground)] sm:text-sm">
             Build {currentRelease.buildNumber} · internal testing
           </span>
           <ArrowRight className="size-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
         </Link>
       </PageHero>
 
-      <aside aria-labelledby="servers-development-heading" className="mx-auto mb-10 w-[calc(100%-40px)] max-w-6xl rounded-[24px] border border-[var(--border-strong)] bg-[var(--surface)] p-6 sm:w-[calc(100%-64px)] sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-[.15em] text-[var(--accent)]">Build {currentRelease.buildNumber} · {currentRelease.stage} · September 18, 2026</p>
-        <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-tight">A new home for every circle</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
+      <aside aria-labelledby="servers-development-heading" className="panel mx-auto mb-10 w-[calc(100%-40px)] max-w-6xl p-6 sm:w-[calc(100%-64px)] sm:p-8">
+        <p className="eyebrow">Build {currentRelease.buildNumber} · {currentRelease.stage} · September 18, 2026</p>
+        <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-[-.025em] text-[var(--foreground)]">A new home for every circle</h2>
+        <p className="mt-3 max-w-3xl text-base leading-[1.6] text-[var(--text-secondary)]">
           YO Voice {currentRelease.version}: {currentReleaseAvailability} Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account, with the established Hub preserved. Podcast recording remains disabled, and this is not a public App Store or Google Play release. {nextReleaseCandidateStatus}
         </p>
-        <Link href="/servers" className="focus-ring mt-4 inline-flex min-h-12 items-center gap-2 rounded-xl text-sm font-semibold text-[var(--accent)]">Explore the Servers interface <ArrowRight className="size-4" aria-hidden="true" /></Link>
+        <Link href="/servers" className="link-accent focus-ring mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold">Explore the Servers interface <ArrowRight className="size-4" aria-hidden="true" /></Link>
       </aside>
 
       {/* Moved here from the homepage on 2026-09-16: a release spotlight and
@@ -124,7 +124,7 @@ export default function UpdatesPage() {
             YO Voice product updates
           </h2>
 
-          <div className="rounded-[26px] border border-white/[.07] bg-[var(--surface-muted)]/70 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.035)] sm:p-3">
+          <div>
             <ul
               className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
               aria-label="Release status legend"
@@ -137,9 +137,9 @@ export default function UpdatesPage() {
                     <li
                       key={status}
                       data-status={status}
-                      className="release-status rounded-2xl border px-3.5 py-3"
+                      className="release-status rounded-[var(--radius-field)] border px-3.5 py-3"
                     >
-                      <div className="flex items-center gap-2 text-xs font-black sm:text-sm">
+                      <div className="flex items-center gap-2 text-xs font-bold sm:text-sm">
                         <Icon className="size-4" aria-hidden="true" />
                         {item.label}
                       </div>
@@ -154,18 +154,18 @@ export default function UpdatesPage() {
           </div>
 
           <div className="mt-9 flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-2xl border border-[color:var(--accent)]/25 bg-[color:var(--accent)]/10 text-[var(--accent)]">
-              <Sparkles className="size-4" aria-hidden="true" />
+            <span className="icon-tile">
+              <Sparkles className="size-5" strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-black uppercase tracking-[.18em] text-[var(--accent)]">
+              <p className="eyebrow">
                 Current release wave
               </p>
-              <p className="mt-0.5 text-sm text-white/60">
+              <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
                 {releaseWaveRange} · source, tests and rollout truth
               </p>
             </div>
-            <span className="hidden min-h-9 items-center gap-2 rounded-full border border-white/[.08] bg-white/[.035] px-3 text-xs font-bold text-white/55 sm:inline-flex">
+            <span className="hidden min-h-8 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 text-[13px] font-semibold text-[var(--text-secondary)] sm:inline-flex">
               <Layers3 className="size-3.5" aria-hidden="true" />
               {currentWave.length} entries
             </span>
@@ -182,45 +182,45 @@ export default function UpdatesPage() {
           </ol>
 
           {earlierUpdates.length > 0 ? (
-            <details className="group mt-6 rounded-[28px] border border-[var(--border)] bg-[var(--surface-muted)]/80 p-3 sm:p-4">
-              <summary className="focus-ring flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-[20px] px-3 text-left transition hover:bg-white/[.035] sm:px-4 [&::-webkit-details-marker]:hidden">
-                <span className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] text-white/70">
-                  <Archive className="size-4" aria-hidden="true" />
+            <details className="group mt-10 border-t border-[var(--border)] pt-4">
+              <summary className="focus-ring flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-[var(--radius-field)] px-2 text-left transition hover:bg-[var(--surface)] [&::-webkit-details-marker]:hidden">
+                <span className="icon-tile">
+                  <Archive className="size-5" strokeWidth={1.8} aria-hidden="true" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-black text-white">
+                  <span className="block text-sm font-bold text-[var(--foreground)]">
                     Earlier updates
                   </span>
-                  <span className="mt-0.5 block text-xs text-white/60">
+                  <span className="mt-0.5 block text-xs text-[var(--text-secondary)]">
                     {earlierUpdates.length} archived ledger entries
                   </span>
                 </span>
                 <ChevronDown
-                  className="size-4 text-white/60 transition group-open:rotate-180"
+                  className="size-4 text-[var(--text-secondary)] transition group-open:rotate-180"
                   aria-hidden="true"
                 />
               </summary>
 
-              <ol className="mt-3 space-y-4 border-t border-white/[.06] pt-4">
+              <ol className="mt-3 divide-y divide-[var(--border)] border-t border-[var(--border)]">
                 {earlierUpdates.map((update) => (
-                  <UpdateCard key={update.slug} update={update} />
+                  <UpdateCard key={update.slug} update={update} archived />
                 ))}
               </ol>
             </details>
           ) : null}
 
-          <div className="mt-8 flex flex-col items-start justify-between gap-5 rounded-[28px] border border-[color:var(--accent)]/20 bg-gradient-to-r from-[color:var(--primary)]/12 to-[color:var(--accent)]/8 p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="panel mt-10 flex flex-col items-start justify-between gap-5 p-6 sm:flex-row sm:items-center sm:p-8">
             <div>
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-bold text-[var(--foreground)]">
                 Want the longer view?
               </h2>
-              <p className="mt-2 text-sm leading-6 text-white/65">
+              <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                 The roadmap separates what is live, in progress and planned.
               </p>
             </div>
             <Link
               href="/roadmap"
-              className="roadmap-cta focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl px-5 py-2 text-sm font-black transition"
+              className="roadmap-cta focus-ring inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-field)] px-5 py-2 text-sm font-semibold transition"
             >
               View roadmap
               <ArrowRight className="size-4" aria-hidden="true" />
@@ -235,32 +235,40 @@ export default function UpdatesPage() {
 function UpdateCard({
   update,
   featured = false,
+  archived = false,
 }: {
   update: ProductUpdate;
   featured?: boolean;
+  archived?: boolean;
 }) {
   const status = statusPresentation[update.status];
   const StatusIcon = status.icon;
 
+  // Current-wave entries are cards; archived entries are plain rows with the
+  // date on the left, separated by the list's hairlines instead of boxes.
   return (
     <li id={update.slug} className="scroll-mt-28">
       <article
         aria-labelledby={update.slug + "-title"}
         className={[
-          "relative rounded-[26px] p-5 sm:p-7 lg:grid lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8",
-          featured && update.release
-            ? "release-card-featured"
-            : featured
-              ? "glass-panel-glow"
-              : "glass-panel",
+          archived
+            ? "relative grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-x-4 px-1 py-6 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-x-8 sm:px-2"
+            : "relative p-5 sm:p-7 lg:grid lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8",
+          archived
+            ? ""
+            : featured && update.release
+              ? "release-card-featured"
+              : featured
+                ? "glass-panel-glow"
+                : "panel",
         ].join(" ")}
       >
-        <div>
+        <div className="min-w-0">
           <time
             dateTime={update.updatedOn}
-            className="block text-xs font-semibold text-white/60 sm:text-sm"
+            className="block text-xs font-semibold text-[var(--text-secondary)] sm:text-sm"
           >
-            <span className="block text-[10px] font-black uppercase tracking-[.16em] text-white/40">
+            <span className="block text-[11px] font-bold uppercase tracking-[.12em] text-[var(--text-tertiary)]">
               Updated
             </span>
             <span className="mt-1 block">
@@ -274,24 +282,24 @@ function UpdateCard({
           </time>
           <div
             data-status={update.status}
-            className="release-status mt-3 inline-flex min-h-8 items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold"
+            className="release-status mt-3 inline-flex min-h-8 max-w-full items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold"
           >
-            <StatusIcon className="size-3.5" aria-hidden="true" />
+            <StatusIcon className="size-3.5 shrink-0" aria-hidden="true" />
             {status.label}
           </div>
           {update.release ? (
-            <div className="mt-5 flex items-center gap-3 lg:block">
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 lg:block">
               <span
-                className="release-build-orb flex size-14 shrink-0 items-center justify-center rounded-2xl font-[family-name:var(--font-display)] text-2xl font-black tabular-nums text-white lg:size-20 lg:rounded-[24px] lg:text-3xl"
+                className="release-build-orb inline-flex h-7 min-w-10 shrink-0 items-center justify-center px-2.5 text-[13px] font-extrabold tabular-nums text-white"
               >
                 <span className="sr-only">Build </span>
                 {update.release.buildNumber}
               </span>
               <div className="min-w-0 lg:mt-3">
-                <p className="break-words text-sm font-black text-white">
+                <p className="break-words text-sm font-bold text-[var(--foreground)]">
                   {update.release.version}
                 </p>
-                <p className="mt-0.5 text-xs text-white/50">
+                <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
                   {update.release.stage}
                 </p>
               </div>
@@ -299,24 +307,27 @@ function UpdateCard({
           ) : null}
         </div>
 
-        <div className="mt-5 min-w-0 lg:mt-0">
+        <div className={archived ? "min-w-0" : "mt-5 min-w-0 lg:mt-0"}>
           <p className="eyebrow">{update.eyebrow}</p>
           <h2
             id={update.slug + "-title"}
-            className="mt-2 break-words font-[family-name:var(--font-display)] text-2xl font-bold tracking-[-.035em] text-white sm:text-3xl"
+            className={`mt-2 break-words font-[family-name:var(--font-display)] font-bold tracking-[-.025em] text-[var(--foreground)] ${
+              archived ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
+            }`}
           >
             {update.title}
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--text-secondary)] sm:text-[15px]">
+          <p className="mt-3 max-w-3xl text-sm leading-[1.6] text-[var(--text-secondary)] sm:text-base">
             {update.summary}
           </p>
-          <ul className="mt-4 grid gap-2.5 md:grid-cols-3">
+          <ul className={`mt-4 grid gap-x-6 gap-y-2 ${archived ? "" : "md:grid-cols-3"}`}>
             {update.highlights.map((highlight) => (
               <li
                 key={highlight}
-                className="rounded-[18px] border border-white/[.085] bg-[var(--surface-sunken)]/78 p-3.5 text-sm leading-6 text-[var(--text-secondary)] shadow-[inset_0_1px_0_rgba(255,255,255,.025)]"
+                className="flex gap-2.5 text-sm leading-6 text-[var(--text-secondary)]"
               >
-                {highlight}
+                <span className="mt-[.6rem] size-1.5 shrink-0 rounded-full bg-[var(--accent)]" aria-hidden="true" />
+                <span className="min-w-0">{highlight}</span>
               </li>
             ))}
           </ul>

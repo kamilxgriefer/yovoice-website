@@ -10,9 +10,6 @@ export const metadata = createPageMetadata({
 
 export default function PremiumPage() {
   return (
-    <div className="relative overflow-hidden">
-      <div className="pointer-events-none absolute left-1/2 top-[-10%] size-[560px] -translate-x-1/2 rounded-full bg-violet-700/15 blur-[160px]" />
-      <PremiumPlansView />
-    </div>
+    <PremiumPlansView />
   );
 }

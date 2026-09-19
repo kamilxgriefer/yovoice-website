@@ -32,10 +32,10 @@ export function ServersLanding() {
             YO Voice Hub stays in place.
           </p>
           <div className={styles.heroActions}>
-            <Link href="#server-types" className={styles.primaryLink}>
+            <Link href="#server-types" className="premium-button">
               Explore five types <ArrowDown size={18} aria-hidden="true" />
             </Link>
-            <Link href={`/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`} className={styles.secondaryLink}>
+            <Link href={`/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`} className="premium-button-secondary">
               Build {currentRelease.buildNumber} status <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>

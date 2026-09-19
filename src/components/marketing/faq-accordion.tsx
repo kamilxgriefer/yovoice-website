@@ -13,28 +13,28 @@ export function FaqAccordion({ groups }: { groups: FaqGroup[] }) {
     <div className="mx-auto max-w-3xl space-y-12">
       {groups.map((group) => (
         <div key={group.title}>
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-bold text-white">
+          <h2 className="eyebrow">
             {group.title}
           </h2>
-          <div className="mt-5 space-y-3">
+          <div className="panel mt-4 divide-y divide-[var(--border)] overflow-hidden">
             {group.items.map((item) => {
               const id = `${group.title}-${item.question}`;
               const isOpen = openId === id;
               return (
-                <div key={id} className="glass-panel overflow-hidden rounded-2xl">
+                <div key={id}>
                   <button
                     type="button"
                     onClick={() => setOpenId(isOpen ? null : id)}
                     aria-expanded={isOpen}
-                    className="focus-ring flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                    className="focus-ring flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6"
                   >
-                    <span className="text-sm font-semibold text-white">{item.question}</span>
+                    <span className="text-[15px] font-semibold text-[var(--foreground)]">{item.question}</span>
                     <ChevronDown
-                      className={`size-4 shrink-0 text-white/40 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      className={`size-4 shrink-0 text-[var(--text-tertiary)] transition-transform ${isOpen ? "rotate-180" : ""}`}
                     />
                   </button>
                   {isOpen ? (
-                    <p className="px-6 pb-5 text-sm leading-7 text-white/50">{item.answer}</p>
+                    <p className="px-5 pb-5 text-sm leading-[1.6] text-[var(--text-secondary)] sm:px-6">{item.answer}</p>
                   ) : null}
                 </div>
               );

@@ -73,7 +73,7 @@ function PremiumPlansLoadingState() {
   return (
     <div className="mx-auto flex min-h-[62vh] max-w-[900px] items-center justify-center px-5">
       <div role="status" aria-live="polite">
-        <div className="size-9 animate-spin rounded-full border-2 border-white/15 border-t-fuchsia-400" aria-hidden />
+        <div className="size-9 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent)]" aria-hidden />
         <span className="sr-only">Loading Premium plans</span>
       </div>
     </div>
@@ -239,13 +239,13 @@ function PremiumPlansContent() {
   });
 
   return (
-    <div className="relative mx-auto w-full max-w-[900px] px-5 pb-24 pt-24 sm:px-8 sm:pt-24">
+    <div className="relative mx-auto w-full max-w-[900px] px-5 pb-24 pt-28 sm:px-8">
       <div className="mx-auto max-w-xl text-center">
         <PremiumBadge />
-        <h1 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.05em] text-white sm:text-5xl">
-          Choose <span className="text-gradient">your plan</span>
+        <h1 className="mt-5 font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem]">
+          Choose <span className="text-[var(--accent)]">your plan</span>
         </h1>
-        <p className="mt-4 text-[15px] leading-7 text-white/50">
+        <p className="mt-4 text-base leading-[1.6] text-[var(--text-secondary)]">
           Premium is €6 monthly or €60 yearly. The yearly subscription includes
           two months free; BLIK is prepaid and never renews automatically.
         </p>
@@ -254,9 +254,10 @@ function PremiumPlansContent() {
       {searchParams.get("checkout") === "cancelled" ? (
         <div
           role="status"
-          className="mx-auto mt-8 flex max-w-xl items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm leading-6 text-white/65"
+          data-tone="info"
+          className="status-alert mx-auto mt-8 max-w-xl"
         >
-          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#d3a5ff]" aria-hidden />
+          <ShieldCheck aria-hidden />
           Checkout was cancelled. No new payment was started — you can choose a
           plan whenever you&apos;re ready.
         </div>
@@ -265,14 +266,15 @@ function PremiumPlansContent() {
       {visibleBillingError ? (
         <div
           role="status"
-          className="mx-auto mt-8 flex max-w-xl flex-col gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-50/80 sm:flex-row sm:items-center sm:justify-between"
+          data-tone="warning"
+          className="status-alert mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
           <span>{visibleBillingError}</span>
           <button
             type="button"
             disabled={billingLoading}
             onClick={() => void loadBilling()}
-            className="focus-ring inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-amber-100/20 px-4 text-xs font-bold text-white disabled:opacity-50"
+            className="premium-button-secondary focus-ring shrink-0 disabled:opacity-50"
           >
             <RefreshCw
               className={`size-3.5 ${billingLoading ? "animate-spin" : ""}`}
@@ -284,9 +286,9 @@ function PremiumPlansContent() {
       ) : billingLoading ? (
         <p
           role="status"
-          className="mt-8 flex items-center justify-center gap-2 text-xs font-semibold text-white/60"
+          className="mt-8 flex items-center justify-center gap-2 text-xs font-semibold text-[var(--text-secondary)]"
         >
-          <span className="size-3 animate-spin rounded-full border border-white/20 border-t-fuchsia-300" />
+          <span className="size-3 animate-spin rounded-full border border-[var(--border-strong)] border-t-[var(--accent)]" />
           Checking secure checkout availability…
         </p>
       ) : null}
@@ -299,57 +301,57 @@ function PremiumPlansContent() {
             disabled={authLoading}
             onClick={() => choosePlan(plan.id)}
             aria-pressed={selectedPlan === plan.id}
-            className={`focus-ring glass-panel group relative rounded-[28px] p-7 text-left transition duration-300 hover:-translate-y-1 disabled:cursor-wait disabled:hover:translate-y-0 ${
+            className={`focus-ring panel group relative p-7 text-left disabled:cursor-wait ${
               plan.highlight
-                ? "border border-fuchsia-400/50 shadow-[0_0_44px_rgba(192,38,255,0.22)]"
-                : "hover:border-white/20"
-            } ${selectedPlan === plan.id ? "ring-2 ring-fuchsia-400" : ""}`}
+                ? "border-[var(--primary)]!"
+                : "hover:border-[var(--border-strong)]!"
+            } ${selectedPlan === plan.id ? "ring-2 ring-[var(--accent)]" : ""}`}
           >
             {plan.highlight ? (
-              <span className="absolute -top-3.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-gradient-to-r from-[#7b2ff7] to-[#c026ff] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-[0_0_14px_rgba(192,38,255,0.45)]">
+              <span className="absolute -top-3.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-[var(--primary)] px-3.5 py-1.5 text-[11px] font-bold text-white">
                 <Crown className="size-3" aria-hidden />
                 Best value
               </span>
             ) : null}
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/60">
+            <p className="eyebrow">
               {plan.name}
             </p>
             <p className="mt-3 text-4xl font-bold text-white">
               {plan.price}
-              <span className="text-base font-semibold text-white/60">
+              <span className="text-base font-semibold text-[var(--text-secondary)]">
                 {" "}
                 {plan.period}
               </span>
             </p>
             {billing?.localizedAtCheckout ? (
-              <p className="mt-2 text-xs leading-5 text-white/55">
+              <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
                 Base price · final local currency at checkout
               </p>
             ) : null}
             {plan.equivalent ? (
-              <p className="mt-2 text-sm text-white/50">{plan.equivalent}</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">{plan.equivalent}</p>
             ) : null}
             {plan.savings ? (
-              <span className="mt-3 inline-flex rounded-full bg-gradient-to-r from-[#7b2ff7] to-[#c026ff] px-3 py-1 text-[11px] font-bold text-white">
+              <span className="badge badge-verified mt-3">
                 {plan.savings}
               </span>
             ) : null}
-            <ul className="mt-5 space-y-2 border-t border-white/[0.07] pt-5">
+            <ul className="mt-5 space-y-2 border-t border-[var(--border)] pt-5">
               {premiumPlanChecklist.map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
                   <Check
                     className={`size-3.5 shrink-0 ${
-                      plan.highlight ? "text-[#e879f9]" : "text-[#5ce1e6]"
+                      plan.highlight ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"
                     }`}
                     aria-hidden
                   />
-                  <span className="text-[13px] text-white/65">{item}</span>
+                  <span className="text-[13px] text-[var(--text-secondary)]">{item}</span>
                 </li>
               ))}
             </ul>
-            <span className="premium-button mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2">
+            <span className="premium-button mt-6 w-full">
               {authLoading ? "Checking your account…" : plan.cta}
-              <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+              <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
             </span>
           </button>
         ))}
@@ -361,7 +363,7 @@ function PremiumPlansContent() {
           tabIndex={-1}
           role="region"
           aria-label="Premium checkout options"
-          className="scroll-mt-24 rounded-[24px] focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/80"
+          className="scroll-mt-24 rounded-[var(--radius-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
         >
           <CheckoutBoundary
             key={selectedPlan}
@@ -380,23 +382,23 @@ function PremiumPlansContent() {
       ) : null}
 
       <div id="included" className="mx-auto mt-16 max-w-xl scroll-mt-24">
-        <h2 className="text-[15px] font-bold text-white">
+        <h2 className="text-base font-bold text-[var(--foreground)]">
           Everything Premium includes:
         </h2>
-        <ul className="mt-4 space-y-1 rounded-3xl border border-white/[0.07] bg-white/[0.02] px-5 py-3">
+        <ul className="panel mt-4 space-y-1 px-5 py-3">
           {premiumIncludedFeatures.map((feature, index) => {
             const Icon = includedIcons[index] ?? Sparkles;
             return (
               <li key={feature} className="flex items-center gap-3.5 py-2.5">
-                <Icon className="size-[18px] shrink-0 text-[#d3a5ff]" aria-hidden />
-                <span className="text-sm font-medium leading-6 text-[#efeaf7]">
+                <Icon className="size-5 shrink-0 text-[var(--accent)]" strokeWidth={1.8} aria-hidden />
+                <span className="text-sm font-medium leading-6 text-[var(--foreground)]">
                   {feature}
                 </span>
               </li>
             );
           })}
         </ul>
-        <p className="mt-8 text-center text-xs leading-5 text-white/60">
+        <p className="mt-8 text-center text-xs leading-5 text-[var(--text-secondary)]">
           Recurring subscriptions can be cancelled any time. Prepaid BLIK
           access ends automatically. Everything essential on YO Voice stays
           free — Chats, Friends, Voice Moments and the current web experience.
@@ -498,14 +500,14 @@ function CheckoutBoundary({
   return (
     <section
       aria-labelledby="premium-checkout-selection"
-      className="glass-panel mx-auto mt-6 max-w-xl rounded-[24px] border border-fuchsia-400/25 p-6 text-center"
+      className="panel mx-auto mt-6 max-w-xl p-6 text-center"
     >
       <p id="premium-checkout-selection" className="text-sm font-bold text-white">
         {planConfig?.name} Premium selected — {selectedPrice}
       </p>
 
       <fieldset className="mt-5" disabled={busy}>
-        <legend className="text-left text-xs font-bold uppercase tracking-[0.16em] text-white/60">
+        <legend className="eyebrow text-left">
           Payment method
         </legend>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -514,10 +516,10 @@ function CheckoutBoundary({
             return (
               <label
                 key={option.id}
-                className={`focus-within:ring-2 focus-within:ring-fuchsia-300/80 relative cursor-pointer rounded-2xl border px-3 py-3 text-left transition ${
+                className={`focus-within:ring-2 focus-within:ring-[var(--focus)] relative cursor-pointer rounded-[var(--radius-field)] border px-3 py-3 text-left transition ${
                   selected
-                    ? "border-fuchsia-400/60 bg-fuchsia-400/10"
-                    : "border-white/10 bg-white/[0.025] hover:border-white/20"
+                    ? "border-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_16%,var(--surface))]"
+                    : "border-[var(--border-strong)] bg-[var(--background)] hover:border-[var(--accent)]"
                 } ${busy ? "cursor-wait opacity-60" : ""}`}
               >
                 <input
@@ -533,7 +535,7 @@ function CheckoutBoundary({
                 />
                 <span className="flex items-center gap-2 text-sm font-bold text-white">
                   {option.id === "recurring" ? (
-                    <CreditCard className="size-4 text-[#d3a5ff]" aria-hidden />
+                    <CreditCard className="size-4 text-[var(--accent)]" aria-hidden />
                   ) : (
                     <span
                       className="inline-flex h-4 min-w-7 items-center justify-center rounded bg-white px-1 text-[8px] font-black tracking-[-0.04em] text-[#e6007e]"
@@ -544,7 +546,7 @@ function CheckoutBoundary({
                   )}
                   {option.label}
                 </span>
-                <span className="mt-1.5 block text-xs leading-4 text-white/60">
+                <span className="mt-1.5 block text-xs leading-4 text-[var(--text-secondary)]">
                   {option.description}
                 </span>
               </label>
@@ -553,7 +555,7 @@ function CheckoutBoundary({
         </div>
       </fieldset>
 
-      <p className="mt-4 text-xs leading-5 text-white/55">
+      <p className="mt-4 text-xs leading-5 text-[var(--text-secondary)]">
         {recurring
           ? billing?.taxNotice ??
             "The subscription renews automatically until cancelled. The final total is shown before payment."
@@ -561,14 +563,14 @@ function CheckoutBoundary({
       </p>
 
       {!checkoutConfirmed ? (
-        <p role="status" className="mt-3 text-sm leading-6 text-amber-100/75">
+        <p role="status" data-tone="warning" className="status-alert mt-3">
           {billingLoading
             ? "We’re confirming secure checkout availability."
             : "Secure checkout has not been confirmed by the billing server, so payment remains disabled."}
         </p>
       ) : null}
       {error ? (
-        <p role="alert" className="mt-3 text-sm leading-6 text-rose-200">
+        <p role="alert" data-tone="error" className="status-alert mt-3">
           {error}
         </p>
       ) : null}
@@ -579,7 +581,7 @@ function CheckoutBoundary({
             type="button"
             disabled={billingLoading}
             onClick={() => void onRetryBilling()}
-            className="premium-button focus-ring min-h-12 inline-flex items-center justify-center gap-2 px-6 disabled:cursor-wait disabled:opacity-50"
+            className="premium-button focus-ring disabled:cursor-wait disabled:opacity-50"
           >
             <RefreshCw
               className={`size-4 ${billingLoading ? "animate-spin" : ""}`}
@@ -591,21 +593,21 @@ function CheckoutBoundary({
           <button
             type="button"
             disabled
-            className="premium-button min-h-12 inline-flex items-center justify-center px-6 opacity-50"
+            className="premium-button opacity-50"
           >
             Checking your account…
           </button>
         ) : !signedIn ? (
           <Link
             href={signInHref}
-            className="premium-button focus-ring min-h-12 inline-flex items-center justify-center px-6"
+            className="premium-button focus-ring"
           >
             Sign in to continue
           </Link>
         ) : !emailVerified ? (
           <Link
             href={verifyEmailHref}
-            className="premium-button focus-ring min-h-12 inline-flex items-center justify-center px-6"
+            className="premium-button focus-ring"
           >
             Verify email to continue
           </Link>
@@ -614,7 +616,7 @@ function CheckoutBoundary({
             type="button"
             disabled={busy}
             onClick={() => void checkout()}
-            className="premium-button focus-ring min-h-12 inline-flex items-center justify-center px-6 disabled:cursor-wait disabled:opacity-50"
+            className="premium-button focus-ring disabled:cursor-wait disabled:opacity-50"
           >
             {busy ? "Opening secure checkout…" : "Continue to secure checkout"}
           </button>
@@ -622,13 +624,13 @@ function CheckoutBoundary({
 
         <Link
           href="/download"
-          className="focus-ring inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"
+          className="premium-button-secondary focus-ring"
         >
           Get the app
         </Link>
       </div>
 
-      <p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-white/60">
+      <p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)]">
         <ShieldCheck className="size-3" aria-hidden />
         Payment details are handled by the secure checkout provider.
       </p>
@@ -657,28 +659,28 @@ function CheckoutConfirmationState({
   const pending = !timedOut && !needsSignIn;
 
   return (
-    <div className="mx-auto flex min-h-[62vh] w-full max-w-[560px] flex-col items-center justify-center px-5 py-16 text-center">
-      <div className="flex size-16 items-center justify-center rounded-full border border-fuchsia-300/25 bg-fuchsia-300/[0.08]">
+    <div className="mx-auto flex min-h-[62vh] w-full max-w-[560px] flex-col items-center justify-center px-5 pb-16 pt-28 text-center">
+      <div className="flex size-16 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]">
         {pending ? (
           <span
-            className="size-7 animate-spin rounded-full border-2 border-white/15 border-t-fuchsia-300"
+            className="size-7 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent)]"
             aria-hidden
           />
         ) : (
-          <Clock3 className="size-7 text-[#d3a5ff]" aria-hidden />
+          <Clock3 className="size-7 text-[var(--accent)]" strokeWidth={1.8} aria-hidden />
         )}
       </div>
       <div className="mt-6">
         <PremiumBadge />
       </div>
-      <h1 className="mt-5 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-0.04em] text-white sm:text-4xl">
+      <h1 className="mt-5 font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem]">
         {needsSignIn
           ? "Sign in to confirm Premium"
           : pending
             ? "Confirming your Premium access"
             : "Activation is taking a little longer"}
       </h1>
-      <p className="mt-4 max-w-lg text-sm leading-7 text-white/60">
+      <p className="mt-4 max-w-lg text-base leading-[1.6] text-[var(--text-secondary)]">
         {needsSignIn
           ? "We need your account to read the trusted Premium entitlement. The checkout return alone does not activate access."
           : pending
@@ -687,7 +689,7 @@ function CheckoutConfirmationState({
       </p>
 
       {pending ? (
-        <p role="status" className="mt-5 text-xs font-semibold text-white/60">
+        <p role="status" className="mt-5 text-xs font-semibold text-[var(--text-secondary)]">
           Waiting for secure confirmation…
         </p>
       ) : null}
@@ -696,7 +698,7 @@ function CheckoutConfirmationState({
         {needsSignIn ? (
           <Link
             href={signInHref}
-            className="premium-button focus-ring inline-flex min-h-12 items-center justify-center px-6"
+            className="premium-button focus-ring"
           >
             Sign in to confirm
           </Link>
@@ -704,7 +706,7 @@ function CheckoutConfirmationState({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="premium-button focus-ring inline-flex min-h-12 items-center justify-center gap-2 px-6"
+            className="premium-button focus-ring"
           >
             <RefreshCw className="size-4" aria-hidden />
             Check again
@@ -712,7 +714,7 @@ function CheckoutConfirmationState({
         ) : null}
         <Link
           href="/premium"
-          className="focus-ring inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"
+          className="premium-button-secondary focus-ring"
         >
           Back to plans
         </Link>
@@ -727,7 +729,7 @@ function PremiumActiveState() {
   const periodEnd = entitlements.currentPeriodEnd;
 
   return (
-    <div className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 pb-24 pt-16 text-center sm:pt-24">
+    <div className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 pb-24 pt-28 text-center">
       <PremiumRing size={104}>
         <Image
           src="/logos/yo-voice-symbol.png"
@@ -737,14 +739,14 @@ function PremiumActiveState() {
           className="object-contain"
         />
       </PremiumRing>
-      <h1 className="mt-8 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-0.04em] text-white">
-        You&apos;re on <span className="text-gradient">YO Voice Premium</span>
+      <h1 className="mt-8 font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem]">
+        You&apos;re on <span className="text-[var(--accent)]">YO Voice Premium</span>
       </h1>
-      <p className="mt-3 text-[15px] leading-7 text-white/50">
+      <p className="mt-3 text-base leading-[1.6] text-[var(--text-secondary)]">
         Your voice just got more room to grow.
       </p>
 
-      <div className="glass-panel mt-8 w-full rounded-[22px] p-5 text-sm text-white/60">
+      <div className="panel mt-8 w-full p-5 text-sm text-[var(--text-secondary)]">
         <p>
           <span className="font-semibold text-white">
             {entitlements.plan === "yearly" ? "Yearly" : "Monthly"} plan
@@ -754,7 +756,7 @@ function PremiumActiveState() {
             : null}
         </p>
         {entitlements.inGracePeriod ? (
-          <p className="mt-2 text-amber-300">
+          <p className="mt-2 text-[var(--warning)]">
             There&apos;s a payment issue — check your billing details to keep
             Premium active.
           </p>
@@ -764,13 +766,13 @@ function PremiumActiveState() {
       <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
         <Link
           href={APP_ENTRY_PATH}
-          className="premium-button focus-ring min-h-13 inline-flex items-center justify-center px-7"
+          className="premium-button focus-ring"
         >
           Open YO Voice
         </Link>
         <Link
           href="/premium/manage"
-          className="focus-ring inline-flex min-h-13 items-center justify-center rounded-2xl border border-white/15 px-6 text-sm font-semibold text-white/75 transition hover:border-white/30 hover:text-white"
+          className="premium-button-secondary focus-ring"
         >
           Manage Premium
         </Link>

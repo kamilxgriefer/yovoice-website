@@ -57,34 +57,36 @@ export default function SafetyPage() {
 
       <section className="px-5 pb-8 sm:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-5 md:grid-cols-2">
+          <ul className="mx-auto grid max-w-5xl gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
             {tools.map(({ icon: Icon, title, description }) => (
-              <article key={title} className="glass-panel rounded-[28px] p-7">
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                  <Icon className="size-6" />
+              <li key={title} className="feature-row">
+                <span className="icon-tile">
+                  <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-base font-bold text-[var(--foreground)]">{title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
                 </div>
-                <h2 className="mt-6 text-lg font-bold">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-white/50">{description}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
       <section className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-4xl">
-          <div className="glass-panel rounded-[36px] p-8 sm:p-10">
+          <div className="panel p-8 sm:p-10">
             <p className="eyebrow">Community guidelines</p>
             <h2 className="section-title">What&apos;s never okay on YO Voice.</h2>
-            <ul className="prose-legal mt-8 space-y-3 text-sm leading-7 text-white/60">
+            <ul className="prose-legal mt-8 space-y-3 text-sm leading-7 text-[var(--text-secondary)]">
               {rules.map((rule) => (
                 <li key={rule}>{rule}</li>
               ))}
             </ul>
-            <p className="mt-8 text-sm leading-7 text-white/65">
+            <p className="mt-8 text-sm leading-7 text-[var(--text-secondary)]">
               Breaking these rules can lead to content removal, community
               restrictions or account suspension — see our{" "}
-              <Link href="/terms" className="text-fuchsia-300 hover:text-white">
+              <Link href="/terms" className="link-accent underline underline-offset-4">
                 Terms of Service
               </Link>
               .
@@ -94,19 +96,19 @@ export default function SafetyPage() {
       </section>
 
       <section className="px-5 pb-28 sm:px-8">
-        <div className="glass-panel mx-auto flex max-w-4xl flex-col items-center gap-5 rounded-[32px] p-10 text-center">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white">
-            <Mail className="size-6" />
+        <div className="panel mx-auto flex max-w-4xl flex-col items-center gap-5 p-8 text-center sm:p-10">
+          <div className="icon-tile">
+            <Mail className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
           </div>
-          <h2 className="text-2xl font-bold">Report something</h2>
-          <p className="max-w-xl text-sm leading-7 text-white/50">
-            Email <strong className="text-white">safety@yovoice.app</strong> with
+          <h2 className="text-2xl font-bold text-[var(--foreground)]">Report something</h2>
+          <p className="max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
+            Email <strong className="text-[var(--foreground)]">safety@yovoice.app</strong> with
             what happened, who was involved, and a screenshot or content or
             profile name if you have one. Urgent safety issues get priority.
           </p>
           <a
             href="mailto:safety@yovoice.app?subject=Safety report"
-            className="premium-button focus-ring mt-2 min-h-12 px-6 text-sm"
+            className="premium-button focus-ring mt-2"
           >
             Email safety@yovoice.app
           </a>

@@ -15,7 +15,7 @@ const columns = [
     key: "shipped",
     title: "Live now",
     icon: CheckCircle2,
-    accent: "text-emerald-300",
+    accent: "text-[var(--success)]",
     items: [
       "Web app at app.yovoice.app",
       "Servers for every signed-in account: Friends, Community, Podcast, Family and Company",
@@ -32,7 +32,7 @@ const columns = [
     key: "in-progress",
     title: "Internal testing",
     icon: Loader2,
-    accent: "text-fuchsia-300",
+    accent: "text-[var(--accent)]",
     items: [
       `YO Voice ${currentRelease.version} on Google Play Internal Testing, both TestFlight groups and the web app`,
       `YO Voice ${nextReleaseCandidate.version} in progress, no date: ${nextReleaseCandidate.scope.join("; ")}`,
@@ -51,7 +51,7 @@ const columns = [
     key: "planned",
     title: "Gated or planned",
     icon: CircleDashed,
-    accent: "text-white/50",
+    accent: "text-[var(--text-tertiary)]",
     items: [
       "Podcast recording and published episodes",
       "Video stages, family tools and company screen-sharing or whiteboard modules",
@@ -71,16 +71,16 @@ export default function RoadmapPage() {
         description="An honest snapshot of where YO Voice stands — updated as things ship."
       />
       <section className="px-5 pb-28 sm:px-8">
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl gap-4 lg:grid-cols-3">
           {columns.map(({ key, title, icon: Icon, accent, items }) => (
-            <div key={key} className="glass-panel rounded-[28px] p-7">
+            <div key={key} className="panel p-6 sm:p-7">
               <div className="flex items-center gap-3">
-                <Icon className={`size-5 ${accent}`} />
-                <h2 className="text-lg font-bold">{title}</h2>
+                <Icon className={`size-5 ${accent}`} strokeWidth={1.8} aria-hidden="true" />
+                <h2 className="text-lg font-bold text-[var(--foreground)]">{title}</h2>
               </div>
               <ul className="mt-6 space-y-4">
                 {items.map((item) => (
-                  <li key={item} className="text-sm leading-6 text-white/55">
+                  <li key={item} className="text-sm leading-6 text-[var(--text-secondary)]">
                     {item}
                   </li>
                 ))}

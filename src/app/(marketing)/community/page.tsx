@@ -67,30 +67,32 @@ export default function CommunityPage() {
       />
 
       <section className="px-5 pb-8 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mx-auto max-w-5xl">
+          <ul className="grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
             {highlights.map(({ icon: Icon, title, description }) => (
-              <article key={title} className="glass-panel rounded-[28px] p-7">
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                  <Icon className="size-6" aria-hidden="true" />
+              <li key={title} className="feature-row">
+                <span className="icon-tile">
+                  <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-base font-bold text-[var(--foreground)]">{title}</h2>
+                  <p className="mt-1.5 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
                 </div>
-                <h2 className="mt-6 text-lg font-bold">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-white/65">{description}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
       <section className="px-5 py-16 sm:px-8">
-        <div className="glass-panel mx-auto flex max-w-4xl flex-col items-center gap-4 rounded-[32px] p-8 text-center sm:p-10">
-          <h2 className="text-2xl font-bold">See where every circle can begin</h2>
-          <p className="max-w-xl text-sm leading-7 text-white/60">
+        <div className="panel mx-auto flex max-w-4xl flex-col items-center gap-4 p-8 text-center sm:p-10">
+          <h2 className="text-2xl font-bold text-[var(--foreground)]">See where every circle can begin</h2>
+          <p className="max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
             The Servers selector covers Friends, Community, Podcast, Family
             and Company. The interface is in internal testing while
             server-backed activation remains gated.
           </p>
-          <Link href="/servers" className="premium-button focus-ring mt-2 min-h-12 px-6 text-sm">
+          <Link href="/servers" className="premium-button focus-ring mt-2">
             Explore Servers <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>

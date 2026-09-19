@@ -1,5 +1,11 @@
 import type { ReactNode } from "react";
 
+/**
+ * Subpage header: eyebrow, the page's single H1 and an optional description.
+ * No grid texture and no radial glow; the hero on Start is the only
+ * decorated section. The top padding clears the fixed 56 px header
+ * (`--header-height`) with the compact variant sitting 56 px below it.
+ */
 export function PageHero({
   eyebrow,
   title,
@@ -15,23 +21,21 @@ export function PageHero({
 }) {
   return (
     <section
-      className={`relative overflow-hidden ${
-        compact ? "pb-10 pt-32 sm:pb-12 sm:pt-36" : "pb-16 pt-40 sm:pt-44"
+      className={`relative ${
+        compact ? "pb-10 pt-28 sm:pb-12" : "pb-14 pt-34 sm:pt-38"
       }`}
     >
-      <div className="grid-background absolute inset-0 opacity-20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(192,38,255,.16),transparent_38%)]" />
       <div className="relative mx-auto max-w-4xl px-5 text-center sm:px-8">
         <p className="eyebrow">{eyebrow}</p>
         <h1
-          className={`font-[family-name:var(--font-display)] font-bold tracking-[-.05em] text-white ${
-            compact ? "mt-4 text-4xl sm:text-5xl" : "mt-6 text-4xl sm:text-6xl"
+          className={`font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem] ${
+            compact ? "mt-4" : "mt-5"
           }`}
         >
           {title}
         </h1>
         {description ? (
-          <p className={`mx-auto max-w-2xl text-base text-white/65 ${compact ? "mt-4 leading-7" : "mt-6 leading-8"}`}>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
             {description}
           </p>
         ) : null}

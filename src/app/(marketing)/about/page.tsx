@@ -46,14 +46,14 @@ export default function AboutPage() {
         title={
           <>
             Where conversations
-            <span className="text-gradient block">become communities.</span>
+            <span className="block text-[var(--accent)]">become communities.</span>
           </>
         }
         description="YO Voice brings private conversation, voice and everyday moments together. The current tester build carries a server-first interface for friends, communities, podcasts, families and teams."
       />
 
       <section className="px-5 pb-8 sm:px-8">
-        <div className="mx-auto max-w-3xl text-sm leading-8 text-white/55">
+        <div className="mx-auto max-w-3xl text-base leading-[1.6] text-[var(--text-secondary)]">
           <p>
             Most social platforms optimize for content you consume alone.
             We&apos;re building the opposite: a place where you show up, speak,
@@ -71,35 +71,37 @@ export default function AboutPage() {
 
       <section className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="text-center">
+          <div className="max-w-2xl">
             <p className="eyebrow">What we believe</p>
-            <h2 className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold tracking-[-.04em] text-white sm:text-4xl">
+            <h2 className="section-title">
               The principles behind the product
             </h2>
           </div>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <ul className="mt-10 grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
             {principles.map(({ icon: Icon, title, description }) => (
-              <article key={title} className="glass-panel rounded-[28px] p-7">
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                  <Icon className="size-6" />
+              <li key={title} className="feature-row">
+                <span className="icon-tile">
+                  <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-[var(--foreground)]">{title}</h3>
+                  <p className="mt-1.5 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
                 </div>
-                <h3 className="mt-6 text-lg font-bold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/50">{description}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
       <section className="px-5 pb-28 sm:px-8">
-        <div className="glass-panel mx-auto flex max-w-4xl flex-col items-center gap-4 rounded-[32px] p-10 text-center">
-          <h2 className="text-2xl font-bold">Curious where we&apos;re headed?</h2>
-          <p className="max-w-xl text-sm leading-7 text-white/50">
+        <div className="panel mx-auto flex max-w-4xl flex-col items-center gap-4 p-8 text-center sm:p-10">
+          <h2 className="text-2xl font-bold text-[var(--foreground)]">Curious where we&apos;re headed?</h2>
+          <p className="max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
             See what&apos;s shipped, what&apos;s in progress and what&apos;s
             next on our roadmap.
           </p>
-          <Link href="/roadmap" className="premium-button focus-ring mt-2 min-h-12 px-6 text-sm">
-            View the roadmap <ArrowRight className="size-4" />
+          <Link href="/roadmap" className="premium-button focus-ring mt-2">
+            View the roadmap <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
       </section>

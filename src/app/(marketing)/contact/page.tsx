@@ -47,15 +47,15 @@ export default function ContactPage() {
       <section className="px-5 pb-28 sm:px-8">
         <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-2">
           {channels.map(({ icon: Icon, title, description, email }) => (
-            <article key={title} className="glass-panel flex flex-col rounded-[28px] p-7">
-              <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-                <Icon className="size-6" />
+            <article key={title} className="panel flex flex-col p-7">
+              <div className="icon-tile">
+                <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
               </div>
-              <h2 className="mt-6 text-lg font-bold">{title}</h2>
-              <p className="mt-2 flex-1 text-sm leading-6 text-white/50">{description}</p>
+              <h2 className="mt-5 text-lg font-bold text-[var(--foreground)]">{title}</h2>
+              <p className="mt-2 flex-1 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
               <a
                 href={`mailto:${email}`}
-                className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-300 transition hover:text-white"
+                className="link-accent focus-ring mt-4 inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold"
               >
                 {email}
               </a>

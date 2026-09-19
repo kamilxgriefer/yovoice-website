@@ -45,22 +45,22 @@ const cards = [
 export function PlatformSelector() {
   return (
     <div>
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map(({ icon: Icon, title, description, status, href, action }) => (
-          <article key={title} className="glass-panel rounded-[28px] p-7">
-            <div className="flex size-13 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
-              <Icon className="size-6" />
-            </div>
-            <h2 className="mt-6 text-xl font-bold">{title}</h2>
-            <p className="mt-2 text-sm text-white/65">{description}</p>
-            <p className="mt-3 text-xs font-semibold text-fuchsia-300">{status}</p>
+          <article key={title} className="panel flex flex-col p-6">
+            <span className="icon-tile">
+              <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
+            </span>
+            <h2 className="mt-5 text-lg font-bold text-[var(--foreground)]">{title}</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
+            <p className="mt-3 text-xs font-semibold leading-5 text-[var(--accent)]">{status}</p>
             <a
               href={href}
               target={href.startsWith("http") ? "_blank" : undefined}
               rel={href.startsWith("http") ? "noreferrer" : undefined}
-              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white transition hover:text-fuchsia-200"
+              className="link-accent focus-ring mt-auto inline-flex min-h-11 items-center gap-2 self-start pt-4 text-sm font-semibold"
             >
-              {action} <ArrowRight className="size-4" />
+              {action} <ArrowRight className="size-4" aria-hidden="true" />
             </a>
           </article>
         ))}
@@ -71,9 +71,9 @@ export function PlatformSelector() {
           href={REPO_URL}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-white/65 hover:text-white"
+          className="link-accent focus-ring inline-flex min-h-11 items-center gap-2 text-sm"
         >
-          <Code2 className="size-4" /> Source on GitHub
+          <Code2 className="size-4" aria-hidden="true" /> Source on GitHub
         </Link>
       </div>
     </div>
