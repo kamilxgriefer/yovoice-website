@@ -113,7 +113,7 @@ export function HeroPromptRotator() {
           <button
             type="button"
             onClick={() => setPaused((current) => !current)}
-            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold text-white/55 transition hover:bg-white/[.04] hover:text-white/80 reduce-motion:transition-none"
+            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold text-white/55 transition hover:bg-white/[.04] hover:text-white/80 motion-reduce:transition-none"
             aria-label={paused ? "Play welcome messages" : "Pause welcome messages"}
           >
             {paused ? (
@@ -129,7 +129,7 @@ export function HeroPromptRotator() {
           <button
             type="button"
             onClick={showPreviousPrompt}
-            className="focus-ring flex size-11 items-center justify-center rounded-full text-white/55 transition hover:bg-white/[.06] hover:text-white reduce-motion:transition-none"
+            className="focus-ring flex size-11 items-center justify-center rounded-full text-white/55 transition hover:bg-white/[.06] hover:text-white motion-reduce:transition-none"
             aria-label="Show previous welcome message"
           >
             <ChevronLeft className="size-3.5" aria-hidden="true" />
@@ -143,7 +143,7 @@ export function HeroPromptRotator() {
           <button
             type="button"
             onClick={showNextPrompt}
-            className="focus-ring flex size-11 items-center justify-center rounded-full text-white/55 transition hover:bg-white/[.06] hover:text-white reduce-motion:transition-none"
+            className="focus-ring flex size-11 items-center justify-center rounded-full text-white/55 transition hover:bg-white/[.06] hover:text-white motion-reduce:transition-none"
             aria-label="Show next welcome message"
           >
             <ChevronRight className="size-3.5" aria-hidden="true" />

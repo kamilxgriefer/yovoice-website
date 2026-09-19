@@ -4,7 +4,6 @@ import { ArrowDown, ArrowRight, AudioLines, Clapperboard, Download, MessageCircl
 import { motion } from "framer-motion";
 
 import { AppScreenRotator } from "@/components/hero/app-screen-rotator";
-import { DeepSpaceBackground } from "@/components/hero/deep-space-background";
 import { HeroPrimaryCta, HeroSecondaryCta } from "@/components/hero/hero-cta";
 import { HeroPromptRotator } from "@/components/hero/hero-prompt-rotator";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
@@ -12,22 +11,26 @@ import { LiveStats } from "@/components/hero/live-stats";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden pt-28 sm:pt-36 lg:min-h-[calc(100svh-80px)] lg:pt-0">
-      <DeepSpaceBackground />
+    /* pt matches --header-height plus the hero's own breathing room; the
+       min-height subtracts the same token, so the fold follows the header
+       instead of a hard-coded 80px. */
+    <section className="relative overflow-hidden pt-22 sm:pt-30 lg:min-h-[calc(100svh-var(--header-height))] lg:pt-0">
+      {/* The whole decorative layer of this page is this one radial glow in
+          the top-left corner. The starfield, the nebula wisp, the dust motes
+          and the vignette are gone: the first thing a visitor notices should
+          be the sentence, not the backdrop. */}
+      <div
+        className="pointer-events-none absolute left-[-10%] top-[-18%] size-[640px] rounded-full bg-[radial-gradient(circle,rgba(123,47,247,.14),transparent_70%)]"
+        aria-hidden="true"
+      />
 
       {/* Desktop is one above-fold stage: promise on the left, the human
           conversation scene on the right. Below lg the same pieces return
           to the centered stack that already works well on phones. */}
-      <div className="relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:grid lg:min-h-[calc(100svh-80px)] lg:grid-cols-[minmax(0,.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-16 xl:gap-16">
+      <div className="relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:grid lg:min-h-[calc(100svh-var(--header-height))] lg:grid-cols-[minmax(0,.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-16 xl:gap-16">
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-          <motion.div
-            initial={false}
-            className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/15 bg-fuchsia-300/[0.06] px-3.5 py-2 text-[10.5px] font-bold tracking-[0.16em] text-fuchsia-100/80 sm:text-[11px]"
-          >
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-fuchsia-300 opacity-50" />
-              <span className="relative inline-flex size-2 rounded-full bg-fuchsia-300" />
-            </span>
+          <motion.div initial={false} className="chip">
+            <span className="size-1.5 shrink-0 rounded-full bg-[var(--accent)]" aria-hidden="true" />
             REAL PEOPLE. LIVE CONVERSATIONS.
           </motion.div>
 
@@ -40,7 +43,7 @@ export function HeroSection() {
 
           <motion.h1
             initial={false}
-            className="mt-5 font-[family-name:var(--font-display)] text-[2.65rem] font-bold leading-[1.01] tracking-[-0.04em] text-white sm:text-7xl lg:text-[3.55rem] xl:text-[4.5rem]"
+            className="mt-5 font-[family-name:var(--font-display)] text-[2.5rem] font-extrabold leading-[1.03] tracking-[-.03em] text-white sm:text-6xl lg:text-[3.25rem] xl:text-[4rem]"
           >
             <span className="block">Stop scrolling.</span>
             <span className="text-gradient text-gradient-descender-safe mt-1 block">
@@ -56,23 +59,21 @@ export function HeroSection() {
 
           <motion.div
             initial={false}
-            className="mt-8 flex flex-col items-center gap-3.5 sm:flex-row lg:items-start"
+            className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row lg:items-start"
           >
             <HeroPrimaryCta href={APP_ENTRY_PATH}>
               Start talking
               <ArrowRight className="size-4" aria-hidden="true" />
             </HeroPrimaryCta>
             <HeroSecondaryCta href="/download">
-              <span className="flex size-7 items-center justify-center rounded-full bg-white text-[#0d0618]">
-                <Download className="size-3.5" aria-hidden="true" />
-              </span>
+              <Download className="size-4" aria-hidden="true" />
               Where to get it
             </HeroSecondaryCta>
           </motion.div>
 
           <motion.ul
             initial={false}
-            className="mt-6 flex max-w-[620px] flex-wrap justify-center gap-2 text-[11px] font-semibold text-white/55 lg:justify-start"
+            className="mt-6 flex max-w-[620px] flex-wrap justify-center gap-2 lg:justify-start"
             aria-label="YO Voice highlights"
           >
             {[
@@ -81,11 +82,8 @@ export function HeroSection() {
               { icon: AudioLines, label: "Voice Moments" },
               { icon: Clapperboard, label: "Yeels" },
             ].map(({ icon: Icon, label }) => (
-              <li
-                key={label}
-                className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.035] px-3.5"
-              >
-                <Icon className="size-3.5 text-fuchsia-200/75" aria-hidden="true" />
+              <li key={label} className="chip">
+                <Icon className="size-3.5 text-[var(--accent)]" aria-hidden="true" />
                 {label}
               </li>
             ))}
@@ -111,12 +109,10 @@ export function HeroSection() {
         <motion.a
           href="#welcome"
           whileHover={{ y: 2 }}
-          className="focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-white/45 transition hover:bg-white/[.04] hover:text-white/70"
+          className="focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-[var(--text-tertiary)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           aria-label="Scroll to what YO Voice is"
         >
-          <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
-            <ArrowDown className="size-4" aria-hidden="true" />
-          </motion.span>
+          <ArrowDown className="size-4" aria-hidden="true" />
         </motion.a>
       </div>
     </section>

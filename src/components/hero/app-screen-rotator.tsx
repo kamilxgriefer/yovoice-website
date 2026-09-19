@@ -205,7 +205,7 @@ export function AppScreenRotator() {
           <button
             type="button"
             onClick={() => setPaused((current) => !current)}
-            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-white/55 transition hover:bg-white/[.04] hover:text-white/80 reduce-motion:transition-none"
+            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-white/55 transition hover:bg-white/[.04] hover:text-white/80 motion-reduce:transition-none"
             aria-label={paused ? "Play the app screen tour" : "Pause the app screen tour"}
           >
             {paused ? (
@@ -229,7 +229,7 @@ export function AppScreenRotator() {
               onClick={() => selectScreen(index)}
               aria-current={index === activeIndex ? "true" : undefined}
               aria-controls={panelId}
-              className={`focus-ring inline-flex min-h-11 items-center rounded-full px-2.5 transition reduce-motion:transition-none sm:px-3.5 ${
+              className={`focus-ring inline-flex min-h-11 items-center rounded-full px-2.5 transition motion-reduce:transition-none sm:px-3.5 ${
                 index === activeIndex
                   ? "bg-white/[.12] text-white"
                   : "text-white/55 hover:bg-white/[.06] hover:text-white"

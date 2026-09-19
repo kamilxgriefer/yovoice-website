@@ -31,6 +31,15 @@ function useMagnetic(strength = 0.35) {
   return { style: { x: springX, y: springY }, onMouseMove, onMouseLeave };
 }
 
+/**
+ * The hero used to carry a second button system of its own — a gradient
+ * border layer, a gradient fill, a glass top highlight and a sweeping
+ * sheen — which meant the first control a visitor met looked like nothing
+ * else on the site. The motion is what made it feel alive, so the motion
+ * stays; the paint now comes from the global `.premium-button` pair, which
+ * is unlayered and therefore already carries the height, radius, weight and
+ * colour. These components are only the spring wrapper around it.
+ */
 export function HeroPrimaryCta({ href, children }: { href: string; children: ReactNode }) {
   const magnetic = useMagnetic(0.24);
   const ref = useRef<HTMLDivElement>(null);
@@ -41,22 +50,16 @@ export function HeroPrimaryCta({ href, children }: { href: string; children: Rea
       onMouseMove={magnetic.onMouseMove}
       onMouseLeave={magnetic.onMouseLeave}
       style={magnetic.style}
-      whileHover={{ y: -2, scale: 1.015 }}
-      whileTap={{ scale: 0.97, y: 0 }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98, y: 0 }}
       transition={spring}
-      className="group relative isolate"
+      className="w-full sm:w-auto"
     >
-      {/* A static gradient border, one shade brighter on hover — not a
-          spinning ring. Premium reads as still, not animated at rest. */}
-      <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-violet-400/40 via-fuchsia-300/50 to-violet-400/40 opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
       <Link
         href={href}
-        className="focus-ring relative flex min-h-13 items-center justify-center gap-2.5 overflow-hidden whitespace-nowrap rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-fuchsia-400 px-7 text-[14.5px] font-bold text-white shadow-[0_14px_40px_rgba(192,38,255,.32)]"
+        className="premium-button focus-ring w-full whitespace-nowrap px-6 sm:w-auto"
       >
-        {/* Glass top highlight */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.22] to-transparent" />
-        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
-        <span className="relative flex items-center gap-2.5">{children}</span>
+        {children}
       </Link>
     </motion.div>
   );
@@ -70,17 +73,16 @@ export function HeroSecondaryCta({ href, children }: { href: string; children: R
       onMouseMove={magnetic.onMouseMove}
       onMouseLeave={magnetic.onMouseLeave}
       style={magnetic.style}
-      whileHover={{ y: -2, scale: 1.015 }}
-      whileTap={{ scale: 0.97, y: 0 }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98, y: 0 }}
       transition={spring}
+      className="w-full sm:w-auto"
     >
       <Link
         href={href}
-        className="focus-ring group relative flex min-h-13 items-center justify-center gap-3 overflow-hidden whitespace-nowrap rounded-2xl border border-white/[0.12] bg-white/[0.04] px-7 text-[14.5px] font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-white/22 hover:bg-white/[0.07]"
+        className="premium-button-secondary focus-ring w-full whitespace-nowrap px-6 sm:w-auto"
       >
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.1] to-transparent" />
-        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
-        <span className="relative flex items-center gap-3">{children}</span>
+        {children}
       </Link>
     </motion.div>
   );

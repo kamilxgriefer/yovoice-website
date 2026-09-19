@@ -6,6 +6,13 @@ import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_RELEASES_URL = "https://github.com/kamilxgriefer/yovoice/releases";
 
+/**
+ * The way in. Every sentence here is pinned by `tests/product-updates.test.ts`
+ * and `tests/servers-landing.test.ts` — "Desktop installers are not available
+ * yet" appears exactly twice — so this pass changed the surface only: no
+ * bloom behind the section, panels instead of glass, icon tiles instead of
+ * gradient squares, and the accent instead of fuchsia on the links.
+ */
 export function DownloadSection() {
   const platforms = [
     {
@@ -39,43 +46,42 @@ export function DownloadSection() {
   ];
 
   return (
-    <section id="download" className="relative overflow-hidden border-t border-white/[.06] bg-[#080711] py-16 sm:py-28">
-      <div className="absolute left-1/2 top-1/2 size-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-600/[.1] blur-[170px]" />
-      <div className="relative mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+    <section id="download" className="relative border-t border-[var(--border)] bg-[var(--background)] py-16 sm:py-24">
+      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-4xl text-center">
           <p className="eyebrow">YO Voice everywhere</p>
-          <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-bold tracking-[-.055em] text-white sm:mt-6 sm:text-7xl">
-            Ready to find <span className="text-gradient block">your people?</span>
+          <h2 className="section-title">
+            Ready to find <span className="text-[var(--accent)]">your people?</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-white/65 sm:mt-7 sm:text-base sm:leading-8">
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
             Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
           </p>
         </div>
 
         {/* min-h on the description exists to equalize card heights when
             they sit in a row; stacked on mobile it only added blank space. */}
-        <div id="mobile-downloads" className="mt-10 grid gap-4 sm:mt-16 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div id="mobile-downloads" className="mt-10 grid gap-4 sm:mt-14 md:grid-cols-2 xl:grid-cols-4">
           {platforms.map(({icon: Icon,title,description,href,action}) => (
-            <article key={title} className="glass-panel group rounded-[24px] p-6 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-400/25 sm:rounded-[30px] sm:p-7">
-              <div className="flex size-13 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200"><Icon className="size-6"/></div>
-              <h3 className="mt-5 text-2xl font-bold sm:mt-7">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-white/65 sm:mt-3 sm:leading-7 md:min-h-20">{description}</p>
-              <Link href={href} className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-fuchsia-300 transition hover:text-white sm:mt-7">
-                {action}<ArrowRight className="size-4 transition group-hover:translate-x-1"/>
+            <article key={title} className="panel flex flex-col p-5 sm:p-6">
+              <span className="icon-tile"><Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
+              <h3 className="mt-4 text-lg font-bold text-[var(--foreground)]">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)] md:min-h-20">{description}</p>
+              <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--foreground)]">
+                {action}<ArrowRight className="size-4"/>
               </Link>
             </article>
           ))}
         </div>
 
-        <div className="glass-panel mt-8 flex flex-col items-center justify-between gap-6 rounded-[28px] p-6 sm:mt-10 sm:gap-7 sm:rounded-[36px] sm:p-10 lg:flex-row">
+        <div className="panel mt-8 flex flex-col items-start justify-between gap-6 p-6 sm:p-8 lg:flex-row lg:items-center">
           <div className="flex items-start gap-5">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white"><Download className="size-6"/></div>
+            <span className="icon-tile"><Download className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
             <div>
-              <h3 className="text-2xl font-bold">One identity across every device</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-white/65">Your account contract remains shared across the web app and tester builds. Public mobile and desktop installers will be linked here only when they are genuinely available.</p>
+              <h3 className="text-lg font-bold text-[var(--foreground)]">One identity across every device</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">Your account contract remains shared across the web app and tester builds. Public mobile and desktop installers will be linked here only when they are genuinely available.</p>
             </div>
           </div>
-          <Link href={APP_ENTRY_PATH} className="premium-button min-h-13 shrink-0 px-6">
+          <Link href={APP_ENTRY_PATH} className="premium-button focus-ring shrink-0 px-6">
             Open YO Voice <ArrowRight className="size-4"/>
           </Link>
         </div>

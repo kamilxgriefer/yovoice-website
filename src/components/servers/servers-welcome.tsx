@@ -27,28 +27,17 @@ export function ServersWelcome() {
     <section
       id="servers"
       aria-labelledby="servers-welcome-heading"
-      className="relative overflow-hidden border-t border-white/[.06] bg-[var(--background)] px-5 py-16 sm:px-8 sm:py-24 lg:px-12"
+      className="relative border-t border-[var(--border)] bg-[var(--background)] px-5 py-16 sm:px-8 sm:py-24 lg:px-12"
     >
-      <div className="grid-background absolute inset-0 opacity-15" aria-hidden="true" />
-      <div
-        className="pointer-events-none absolute left-[-8%] top-[18%] size-[440px] rounded-full bg-violet-700/12 blur-[150px]"
-        aria-hidden="true"
-      />
-
-      <div className="relative mx-auto max-w-[1240px]">
+      <div className="mx-auto max-w-[1240px]">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:gap-14">
           <div className="max-w-2xl">
             <p className="eyebrow">Servers</p>
-            <h2
-              id="servers-welcome-heading"
-              className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold leading-[1.06] tracking-[-.045em] text-white sm:text-5xl"
-            >
-              A server for
-              <span className="text-gradient text-gradient-descender-safe block">
-                every circle.
-              </span>
+            <h2 id="servers-welcome-heading" className="section-title">
+              A server for{" "}
+              <span className="text-[var(--accent)]">every circle.</span>
             </h2>
-            <p className="mt-5 text-[15px] leading-7 text-[var(--text-secondary)] sm:text-base sm:leading-8">
+            <p className="mt-5 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
               A Server is the home your group comes back to: voice channels to
               talk in, text channels to carry on in, and a shape that suits the
               people inside it. Pick the one that sounds like your circle.
@@ -73,9 +62,9 @@ export function ServersWelcome() {
               transform until the cache TTL lapses. A new href is a cold key
               everywhere. */}
           <figure className="mx-auto w-full max-w-[272px] lg:mx-0 lg:ml-auto">
-            <div className="relative rounded-[2.4rem] border border-[#342a43] bg-[#0b0714] p-[6px] shadow-[0_38px_120px_rgba(0,0,0,.5),inset_0_1px_0_rgba(255,255,255,.07)]">
+            <div className="rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface)] p-1.5">
               <div
-                className="relative overflow-hidden rounded-[2rem] bg-[#08040f]"
+                className="relative overflow-hidden rounded-[10px] bg-[var(--surface-sunken)]"
                 style={{ aspectRatio: "1206 / 2160" }}
               >
                 <Image
@@ -88,28 +77,23 @@ export function ServersWelcome() {
                 />
               </div>
             </div>
-            <figcaption className="mt-4 text-center text-xs leading-5 text-white/55 lg:text-left">
+            <figcaption className="mt-4 text-center text-xs leading-5 text-[var(--text-tertiary)] lg:text-left">
               Text and voice channels inside one server, with invites in reach.
             </figcaption>
           </figure>
         </div>
 
         <ul
-          className="mt-10 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
+          className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
           aria-label="The five kinds of Server"
         >
           {serverTemplates.map((template) => (
-            <li
-              key={template.id}
-              className="glass-panel flex min-w-0 flex-col rounded-[24px] p-5 sm:p-6"
-            >
-              <p className="text-[11px] font-black uppercase tracking-[.18em] text-[var(--accent)]">
-                {template.short}
-              </p>
-              <h3 className="mt-3 font-[family-name:var(--font-display)] text-xl font-bold text-white">
+            <li key={template.id} className="panel flex min-w-0 flex-col p-5">
+              <p className="eyebrow">{template.short}</p>
+              <h3 className="mt-3 text-lg font-bold text-[var(--foreground)]">
                 {template.name}
               </h3>
-              <p className="mt-1.5 text-sm font-semibold text-white/75">
+              <p className="mt-1.5 text-sm font-semibold text-[var(--text-secondary)]">
                 {template.headline}
               </p>
               <p className="mt-2.5 text-sm leading-6 text-[var(--text-secondary)]">
@@ -126,15 +110,14 @@ export function ServersWelcome() {
                   const isVoice = channel === template.channel;
                   const Icon = isVoice ? AudioLines : Hash;
                   return (
-                    <li
-                      key={channel}
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-                        isVoice
-                          ? "border-[var(--accent)]/30 bg-[var(--accent)]/[.09] text-[var(--accent)]"
-                          : "border-white/10 bg-white/[.035] text-white/60"
-                      }`}
-                    >
-                      <Icon className="size-3" aria-hidden="true" />
+                    <li key={channel} className="chip">
+                      {/* The colour rides on the glyph, not the chip: `.chip`
+                          is unlayered, so a `text-*` utility on the chip
+                          itself would be discarded. */}
+                      <Icon
+                        className={`size-3.5 ${isVoice ? "text-[var(--accent)]" : "text-[var(--text-tertiary)]"}`}
+                        aria-hidden="true"
+                      />
                       {channel}
                       <span className="sr-only">
                         {isVoice ? " voice channel" : " text channel"}
@@ -144,32 +127,26 @@ export function ServersWelcome() {
                 })}
               </ul>
 
-              <p className="mt-auto flex items-center gap-1.5 pt-5 text-xs font-semibold text-white/45">
-                <Lock className="size-3" aria-hidden="true" />
+              <p className="mt-auto flex items-center gap-1.5 pt-5 text-xs font-semibold text-[var(--text-tertiary)]">
+                <Lock className="size-3.5" aria-hidden="true" />
                 {template.privacy}
               </p>
             </li>
           ))}
         </ul>
 
-        <div className="glass-panel mt-8 flex flex-col gap-5 rounded-[26px] p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="panel mt-8 flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <p className="max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
             Servers are with our internal testers right now. Creating a server,
             joining channels and Podcast recording are not switched on yet —
             when they are, you will read it here first.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/servers"
-              className="premium-button-secondary focus-ring min-h-12 px-5 text-sm"
-            >
+            <Link href="/servers" className="premium-button-secondary focus-ring">
               See the Servers interface
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
-            <Link
-              href="/updates"
-              className="premium-button-ghost focus-ring min-h-12 px-5 text-sm"
-            >
+            <Link href="/updates" className="premium-button-ghost focus-ring">
               Where it stands
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>

@@ -14,6 +14,10 @@ import {
  * name, and the Servers card repeats the one boundary that matters to a
  * newcomer — the interface is in internal testing and the backend gate has
  * not been cleared — without turning the homepage into release notes.
+ *
+ * The descriptions are unchanged. What changed is that five boxes became
+ * five rows: an icon tile, a title and the same sentence, in two columns on
+ * a wide screen and one on a phone.
  */
 const features = [
   {
@@ -53,47 +57,36 @@ export function WelcomeFeatures() {
     <section
       id="features"
       aria-labelledby="welcome-features-heading"
-      className="relative overflow-hidden border-t border-white/[.06] bg-[var(--surface-sunken)] px-5 py-16 sm:px-8 sm:py-24 lg:px-12"
+      className="relative border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-16 sm:px-8 sm:py-24 lg:px-12"
     >
-      <div
-        className="pointer-events-none absolute right-[-10%] top-[10%] size-[420px] rounded-full bg-fuchsia-700/10 blur-[150px]"
-        aria-hidden="true"
-      />
-
-      <div className="relative mx-auto max-w-[1240px]">
+      <div className="mx-auto max-w-[1240px]">
         <div className="max-w-2xl">
           <p className="eyebrow">What you get</p>
-          <h2
-            id="welcome-features-heading"
-            className="mt-4 font-[family-name:var(--font-display)] text-3xl font-bold leading-[1.06] tracking-[-.045em] text-white sm:text-5xl"
-          >
-            One place for the
-            <span className="text-gradient text-gradient-descender-safe block">
-              people you talk to.
-            </span>
+          <h2 id="welcome-features-heading" className="section-title">
+            One place for the{" "}
+            <span className="text-[var(--accent)]">people you talk to.</span>
           </h2>
         </div>
 
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <ul className="mt-10 grid gap-8 sm:mt-12 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
           {features.map(({ icon: Icon, title, description }) => (
-            <li key={title} className="glass-panel min-w-0 rounded-[24px] p-5 sm:p-6">
-              <span className="flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[.045] text-[var(--accent)]">
-                <Icon className="size-5" aria-hidden="true" />
+            <li key={title} className="feature-row">
+              <span className="icon-tile">
+                <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true" />
               </span>
-              <h3 className="mt-5 font-[family-name:var(--font-display)] text-xl font-bold text-white">
-                {title}
-              </h3>
-              <p className="mt-2.5 text-sm leading-6 text-[var(--text-secondary)]">
-                {description}
-              </p>
+              <div className="min-w-0">
+                <h3 className="text-base font-bold text-[var(--foreground)]">
+                  {title}
+                </h3>
+                <p className="mt-1.5 text-sm leading-6 text-[var(--text-secondary)]">
+                  {description}
+                </p>
+              </div>
             </li>
           ))}
         </ul>
 
-        <Link
-          href="/features"
-          className="premium-button-secondary focus-ring mt-8 min-h-12 w-fit px-5 text-sm"
-        >
+        <Link href="/features" className="premium-button-secondary focus-ring mt-10 w-fit">
           See every feature
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
