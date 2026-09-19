@@ -2,7 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 import Link from "next/link";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 
 const spring = { type: "spring" as const, stiffness: 400, damping: 22 };
 const magneticSpring = { type: "spring" as const, stiffness: 200, damping: 18, mass: 0.4 };
@@ -17,8 +17,12 @@ function useMagnetic(strength = 0.35) {
   const y = useMotionValue(0);
   const springX = useSpring(x, magneticSpring);
   const springY = useSpring(y, magneticSpring);
+  // A spring bound to `style` through motion values is not covered by
+  // `MotionConfig reducedMotion="user"`, so reduced motion opts out here.
+  const reduceMotion = useReducedMotion();
 
   function onMouseMove(e: React.MouseEvent<HTMLElement>) {
+    if (reduceMotion) return;
     const rect = e.currentTarget.getBoundingClientRect();
     x.set((e.clientX - rect.left - rect.width / 2) * strength);
     y.set((e.clientY - rect.top - rect.height / 2) * strength);

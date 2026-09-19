@@ -44,7 +44,7 @@ const FOCUSABLE_SELECTOR =
   'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
 
 const NAV_LINK =
-  "focus-ring inline-flex min-h-11 items-center rounded-xl px-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface)] hover:text-white";
+  "focus-ring inline-flex min-h-11 items-center rounded-xl px-2 text-sm font-medium link-muted transition hover:bg-[var(--surface)]";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,6 +72,36 @@ export function SiteHeader() {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    /* The Tab trap below does nothing for screen-reader swipes or switch
+       access, which never press Tab. Make everything outside the header
+       inert instead: walk from the header up to <body> and mark each
+       ancestor's siblings (page content, footer, skip link), whatever the
+       layout nesting. Only elements this effect changed are restored. */
+    const madeInert: HTMLElement[] = [];
+    for (
+      let node: HTMLElement | null = headerRef.current;
+      node && node !== document.body;
+      node = node.parentElement
+    ) {
+      const parent = node.parentElement;
+      if (!parent) break;
+      for (const sibling of Array.from(parent.children)) {
+        if (
+          sibling !== node &&
+          sibling instanceof HTMLElement &&
+          !sibling.inert &&
+          // The route announcer is a live region that must keep speaking
+          // the page change a menu link triggers.
+          !["SCRIPT", "STYLE", "LINK", "TEMPLATE", "NEXT-ROUTE-ANNOUNCER"].includes(
+            sibling.tagName,
+          )
+        ) {
+          sibling.inert = true;
+          madeInert.push(sibling);
+        }
+      }
+    }
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -119,6 +149,7 @@ export function SiteHeader() {
       window.removeEventListener("keydown", onKeyDown);
       media.removeEventListener("change", onBreakpointChange);
       document.body.style.overflow = previousOverflow;
+      for (const element of madeInert) element.inert = false;
     };
   }, [isOpen]);
 
@@ -220,7 +251,7 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 onClick={closeMenu}
-                className="focus-ring flex min-h-14 items-center border-b border-[var(--border)] text-base font-semibold text-[var(--text-secondary)] transition hover:text-white"
+                className="focus-ring link-muted flex min-h-14 items-center border-b border-[var(--border)] text-base font-semibold transition"
               >
                 {item.label}
               </Link>
@@ -231,7 +262,7 @@ export function SiteHeader() {
                 <Link
                   href="/account/profile"
                   onClick={closeMenu}
-                  className="focus-ring flex min-h-14 items-center border-b border-[var(--border)] text-base font-semibold text-[var(--text-secondary)] transition hover:text-white"
+                  className="focus-ring link-muted flex min-h-14 items-center border-b border-[var(--border)] text-base font-semibold transition"
                 >
                   My account
                 </Link>
@@ -257,7 +288,7 @@ export function SiteHeader() {
                 <Link
                   href="/login"
                   onClick={closeMenu}
-                  className="focus-ring flex min-h-14 items-center border-b border-[var(--border)] text-base font-semibold text-[var(--text-secondary)] transition hover:text-white"
+                  className="focus-ring link-muted flex min-h-14 items-center border-b border-[var(--border)] text-base font-semibold transition"
                 >
                   Log in
                 </Link>

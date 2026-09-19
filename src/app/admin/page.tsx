@@ -58,15 +58,13 @@ function formatDate(date: Date | null): string {
   });
 }
 
-const inputClassName =
-  "w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40";
+/* Admin fields use the site's one field style: the `.glass-field` wrapper
+   carries border, surface and focus ring; the control inside is bare. */
+const fieldControlClassName = "glass-field__input";
 
 function ErrorBanner({ message }: { message: string }) {
   return (
-    <p
-      role="alert"
-      className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
-    >
+    <p role="alert" className="status-alert" data-tone="error">
       {message}
     </p>
   );
@@ -74,7 +72,7 @@ function ErrorBanner({ message }: { message: string }) {
 
 function SuccessBanner({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+    <p role="status" className="status-alert" data-tone="success">
       {children}
     </p>
   );
@@ -102,7 +100,7 @@ function OwnerBootstrapCard({ onActivated }: { onActivated: () => void }) {
   return (
     <div className="panel p-8">
       <h2 className="text-xl font-bold">Owner access not active</h2>
-      <p className="mt-2 text-sm text-white/55">
+      <p className="mt-2 text-sm text-[var(--text-secondary)]">
         This is the owner account, but the current session doesn&apos;t carry
         the superAdmin role yet. Activate it once and the session refreshes
         with admin permissions.
@@ -159,20 +157,23 @@ function FindUserCard({
   return (
     <div className="panel p-8">
       <h2 className="text-xl font-bold">Find a user</h2>
-      <p className="mt-2 text-sm text-white/55">
+      <p className="mt-2 text-sm text-[var(--text-secondary)]">
         Look up an account by e-mail address or uid to confirm who you&apos;re
         about to change.
       </p>
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
         {error ? <ErrorBanner message={error} /> : null}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <input
-            type="text"
-            placeholder="email@example.com or uid"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className={inputClassName}
-          />
+          <div className="glass-field">
+            <input
+              type="text"
+              aria-label="E-mail address or uid"
+              placeholder="email@example.com or uid"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className={fieldControlClassName}
+            />
+          </div>
           <button
             type="submit"
             disabled={searching || !query.trim()}
@@ -183,32 +184,32 @@ function FindUserCard({
         </div>
       </form>
       {result ? (
-        <div className="mt-6 rounded-2xl border border-white/10 bg-white/[.03] p-5">
+        <div className="mt-6 rounded-[var(--radius-field)] border border-[var(--border)] bg-[var(--background)] p-5">
           <p className="font-semibold text-white">
             {result.displayName ?? "Unnamed account"}
             {result.username ? (
-              <span className="ml-2 text-sm font-normal text-white/45">
+              <span className="ml-2 text-sm font-normal text-[var(--text-tertiary)]">
                 @{result.username}
               </span>
             ) : null}
           </p>
-          <dl className="mt-3 space-y-1.5 text-sm text-white/55">
+          <dl className="mt-3 space-y-1.5 text-sm text-[var(--text-secondary)]">
             <div className="flex gap-2">
-              <dt className="w-14 shrink-0 text-white/35">email</dt>
+              <dt className="w-14 shrink-0 text-[var(--text-tertiary)]">email</dt>
               <dd className="break-all">{result.email ?? "—"}</dd>
             </div>
             <div className="flex gap-2">
-              <dt className="w-14 shrink-0 text-white/35">uid</dt>
+              <dt className="w-14 shrink-0 text-[var(--text-tertiary)]">uid</dt>
               <dd className="break-all font-mono text-xs leading-5">
                 {result.uid}
               </dd>
             </div>
             <div className="flex gap-2">
-              <dt className="w-14 shrink-0 text-white/35">role</dt>
+              <dt className="w-14 shrink-0 text-[var(--text-tertiary)]">role</dt>
               <dd>
                 {result.role}
                 {result.banned ? (
-                  <span className="ml-2 text-rose-300">banned</span>
+                  <span className="ml-2 text-error">banned</span>
                 ) : null}
               </dd>
             </div>
@@ -216,7 +217,7 @@ function FindUserCard({
           <button
             type="button"
             onClick={() => onUseUid(result.uid)}
-            className="mt-4 rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-2 text-sm font-semibold text-fuchsia-200 transition hover:bg-fuchsia-500/20"
+            className="premium-button-secondary focus-ring mt-4"
           >
             Use this uid below
           </button>
@@ -282,7 +283,7 @@ function GrantPremiumCard({
   return (
     <div className="panel mt-6 p-8">
       <h2 className="text-xl font-bold">Grant Premium</h2>
-      <p className="mt-2 text-sm text-white/55">
+      <p className="mt-2 text-sm text-[var(--text-secondary)]">
         Writes the server-managed entitlement document for the account:
         Premium, creator tools, club creation and premium identity until the
         period end. Choosing “none” revokes immediately.
@@ -306,34 +307,43 @@ function GrantPremiumCard({
             )}
           </SuccessBanner>
         ) : null}
-        <input
-          type="text"
-          placeholder="User uid"
-          required
-          value={uid}
-          onChange={(event) => onUidChange(event.target.value)}
-          className={`${inputClassName} font-mono text-sm`}
-        />
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <select
-            value={plan}
-            onChange={(event) => setPlan(event.target.value as PremiumPlan)}
-            className={`${inputClassName} appearance-none`}
-          >
-            <option value="monthly">Monthly (30 days)</option>
-            <option value="yearly">Yearly (365 days)</option>
-            <option value="none">None — revoke</option>
-          </select>
+        <div className="glass-field">
           <input
-            type="number"
-            min={1}
-            max={400}
-            placeholder="Days (optional)"
-            value={days}
-            disabled={plan === "none"}
-            onChange={(event) => setDays(event.target.value)}
-            className={`${inputClassName} disabled:opacity-40`}
+            type="text"
+            aria-label="User uid"
+            placeholder="User uid"
+            required
+            value={uid}
+            onChange={(event) => onUidChange(event.target.value)}
+            className={`${fieldControlClassName} font-mono text-sm`}
           />
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="glass-field">
+            <select
+              aria-label="Plan"
+              value={plan}
+              onChange={(event) => setPlan(event.target.value as PremiumPlan)}
+              className={`${fieldControlClassName} appearance-none [color-scheme:dark]`}
+            >
+              <option value="monthly">Monthly (30 days)</option>
+              <option value="yearly">Yearly (365 days)</option>
+              <option value="none">None — revoke</option>
+            </select>
+          </div>
+          <div className="glass-field">
+            <input
+              type="number"
+              aria-label="Days (optional)"
+              min={1}
+              max={400}
+              placeholder="Days (optional)"
+              value={days}
+              disabled={plan === "none"}
+              onChange={(event) => setDays(event.target.value)}
+              className={`${fieldControlClassName} disabled:opacity-40`}
+            />
+          </div>
         </div>
         <button
           type="submit"
@@ -386,7 +396,7 @@ export default function AdminPage() {
   if (loading || !user || role === null) {
     return (
       <main id="main-content" className="flex min-h-screen items-center justify-center bg-[#080711]">
-        <p className="text-sm text-white/45">Loading…</p>
+        <p className="text-sm text-[var(--text-tertiary)]">Loading…</p>
       </main>
     );
   }
@@ -401,7 +411,7 @@ export default function AdminPage() {
       <main id="main-content" className="min-h-screen bg-[#080711] px-5 pb-24 pt-26 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl font-bold">Admin</h1>
-          <p className="mt-2 text-sm text-white/55">
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
             Owner tools for the live Firebase project. Every action here is
             authorized again by the Cloud Function it calls.
           </p>
@@ -417,7 +427,7 @@ export default function AdminPage() {
             ) : (
               <div className="panel p-8">
                 <h2 className="text-xl font-bold">No admin access</h2>
-                <p className="mt-2 text-sm text-white/55">
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
                   This account ({user.email ?? "unknown"}) doesn&apos;t have an
                   administrator role, so there&apos;s nothing to see here.
                 </p>

@@ -79,10 +79,10 @@ export function BrandLockup({
           <span className="block font-[family-name:var(--font-display)] text-[17px] font-extrabold uppercase leading-none tracking-[0.15em] text-white sm:text-[19px]">
             YO Voice
           </span>
-          {/* Purple -> magenta, matching the tagline in the supplied artwork.
-              Tracking eases off below `sm` so it stays readable rather than
-              stretching past the symbol on a narrow phone. */}
-          <span className="mt-[7px] block bg-[linear-gradient(90deg,#a855f7,#c026ff_52%,#e879f9)] bg-clip-text font-[family-name:var(--font-display)] text-[11.5px] font-semibold leading-none tracking-[0.11em] text-transparent sm:text-[12.5px] sm:tracking-[0.15em]">
+          {/* One solid accent: gradient text belongs to the hero headline
+              alone. Tracking eases off below `sm` so it stays readable rather
+              than stretching past the symbol on a narrow phone. */}
+          <span className="mt-[7px] block font-[family-name:var(--font-display)] text-[11.5px] font-semibold leading-none tracking-[0.11em] text-[var(--accent)] sm:text-[12.5px] sm:tracking-[0.15em]">
             Speak and create
           </span>
         </span>

@@ -47,7 +47,9 @@ The `@theme inline` block at the top of `globals.css` maps Tailwind's
 `--color-*` namespace onto these tokens through `var()`, so utilities such as
 `bg-primary`, `text-accent`, `border-border-strong` and `bg-live` carry the
 token itself instead of a copied hex. The old glass and glow compositing
-tokens are gone: nothing on the site blurs or glows any more.
+tokens are gone: no card, button, badge or ring glows. Two effects remain on
+purpose: the fixed header's `backdrop-blur`, which keeps its links legible
+over scrolled content, and the hero's single corner glow (see below).
 
 ## Components and shape
 
@@ -92,7 +94,9 @@ tokens are gone: nothing on the site blurs or glows any more.
   rather than by a hard-coded 80 px.
 - One accent. Highlighted words in section headings use solid `--accent`.
   Gradient text exists only on the hero headline ("Start talking."), with
-  `.text-gradient-descender-safe`.
+  `.text-gradient-descender-safe`; the lockup tagline and every other
+  highlight are solid `--accent`. The premium ring keeps its conic gradient
+  as the one ornament, without a glow.
 - No decoration behind content: no deep-space background, blurred blobs,
   grid texture or particles outside the hero, which keeps one calm radial glow
   in its corner. The body's top-to-background gradient is the only page
@@ -110,7 +114,7 @@ tokens are gone: nothing on the site blurs or glows any more.
 ## Legal hygiene
 
 - Borrow patterns, never names, logos, icons or colours of other products
-  (for example Instagram, Discord or Twitch). Such names may appear only in
+  (for example other social or voice products). Such names may appear only in
   ADRs and code comments, never as a description of our own features in copy
   or UI.
 - Exceptions that stay as they are: links to our own accounts (the footer's

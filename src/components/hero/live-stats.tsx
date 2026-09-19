@@ -53,7 +53,7 @@ export function LiveStats() {
   return (
     <motion.div
       initial={false}
-      className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-white/40"
+      className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-[var(--text-tertiary)]"
     >
       {showAccounts && (
         <span>
@@ -62,7 +62,7 @@ export function LiveStats() {
       )}
 
       {showAccounts && showRooms && (
-        <span aria-hidden="true" className="text-white/20">
+        <span aria-hidden="true" className="text-[var(--border-strong)]">
           ·
         </span>
       )}

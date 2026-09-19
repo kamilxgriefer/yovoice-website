@@ -66,7 +66,7 @@ export function DownloadSection() {
               <span className="icon-tile"><Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
               <h3 className="mt-4 text-lg font-bold text-[var(--foreground)]">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)] md:min-h-20">{description}</p>
-              <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold text-[var(--accent)] transition hover:text-[var(--foreground)]">
+              <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold link-accent">
                 {action}<ArrowRight className="size-4"/>
               </Link>
             </article>

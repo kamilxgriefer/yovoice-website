@@ -31,7 +31,7 @@ export function LegalDocument({
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
-                    className="focus-ring block rounded py-1 text-sm transition hover:text-[var(--accent)]"
+                    className="focus-ring link-hover-accent block rounded py-1 text-sm transition"
                   >
                     {section.title}
                   </a>

@@ -56,16 +56,19 @@ export default function AccountLayout({
                     key={href}
                     href={href}
                     aria-current={active ? "page" : undefined}
+                    // Text colour comes from the unlayered `.account-nav-link*`
+                    // classes: the global `a { color: inherit }` outranks any
+                    // colour utility on an anchor.
                     className={`focus-ring flex min-h-12 items-center gap-3 rounded-[var(--radius-field)] border px-3 text-sm font-semibold transition ${
                       danger ? "mt-3 " : ""
                     }${
                       danger
                         ? active
-                          ? "border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] text-error"
-                          : "border-transparent bg-[var(--danger-surface)] text-error hover:border-[color-mix(in_srgb,var(--error)_38%,transparent)]"
+                          ? "account-nav-link-danger border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)]"
+                          : "account-nav-link-danger border-transparent bg-[var(--danger-surface)] hover:border-[color-mix(in_srgb,var(--error)_38%,transparent)]"
                         : active
-                          ? "border-border bg-[var(--surface)] text-white"
-                          : "border-transparent text-text-secondary hover:bg-[var(--surface)] hover:text-white"
+                          ? "account-nav-link border-border bg-[var(--surface)]"
+                          : "account-nav-link border-transparent hover:bg-[var(--surface)]"
                     }`}
                   >
                     <Icon className="size-5 shrink-0" strokeWidth={1.8} aria-hidden="true" />

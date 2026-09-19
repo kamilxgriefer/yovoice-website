@@ -220,6 +220,21 @@ img { user-select: none; -webkit-user-drag: none; }
    colour utility on an anchor, so `text-accent` alone renders white. */
 .link-accent { color: var(--accent); transition: color .2s ease; }
 .link-accent:hover { color: var(--foreground); }
+/* Secondary-grey anchors (header and mobile nav, footer columns and icons).
+   Unlayered for the same reason as `.link-accent`; motion
+   comes from the element's own `transition` utility. */
+.link-muted { color: var(--text-secondary); }
+.link-muted:hover { color: var(--foreground); }
+/* Inherited colour at rest, accent on hover (legal page contents list). */
+.link-hover-accent:hover { color: var(--accent); }
+/* Account navigation rows. The current page reads in the foreground colour;
+   the delete entry stays `--error` on its `--danger-surface` in every state. */
+.account-nav-link { color: var(--text-secondary); }
+.account-nav-link:hover,
+.account-nav-link[aria-current="page"] { color: var(--foreground); }
+.account-nav-link-danger,
+.account-nav-link-danger:hover,
+.account-nav-link-danger[aria-current="page"] { color: var(--error); }
 
 /* Buttons — one geometry for all three emphases: 48 px, field radius,
    15 px / 600. Being unlayered, these declarations outrank the leftover
@@ -257,6 +272,17 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 .premium-button-secondary:hover { border-color: color-mix(in srgb, var(--border-strong) 70%, #fff); background: var(--surface-raised); }
 .premium-button-secondary:active { transform: scale(.98); }
+/* Danger — layered on top of secondary (declared after it, same specificity)
+   for the one destructive action on a page: the error pair, never rose. */
+.premium-button-danger {
+  border-color: color-mix(in srgb, var(--error) 38%, transparent);
+  background: var(--danger-surface);
+  color: var(--error);
+}
+.premium-button-danger:hover {
+  border-color: color-mix(in srgb, var(--error) 56%, transparent);
+  background: color-mix(in srgb, var(--danger-surface) 78%, var(--error));
+}
 
 /* Ghost — text only, fills in softly on hover. */
 .premium-button-ghost {

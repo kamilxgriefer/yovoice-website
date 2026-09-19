@@ -1,5 +1,7 @@
 /**
- * Public profiles the footer and the JSON-LD `sameAs` list point at.
+ * Public profiles the footer points at. Only the footer reads this object:
+ * the JSON-LD `sameAs` list in `src/app/layout.tsx` keeps its own copy of the
+ * GitHub and Instagram URLs, so change both places together.
  *
  * `linkedin` is optional on purpose: the footer used to hard-code
  * `https://www.linkedin.com/`, a placeholder that sent people to LinkedIn's

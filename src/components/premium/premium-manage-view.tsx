@@ -108,7 +108,7 @@ export function PremiumManageView() {
     return (
       <div className="mx-auto flex min-h-[62vh] max-w-[800px] items-center justify-center px-5">
         <div role="status" aria-live="polite">
-          <div className="size-9 animate-spin rounded-full border-2 border-white/15 border-t-fuchsia-400" aria-hidden />
+          <div className="size-9 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent)]" aria-hidden />
           <span className="sr-only">Loading Premium subscription</span>
         </div>
       </div>
@@ -118,9 +118,9 @@ export function PremiumManageView() {
   if (!user) {
     return (
       <div className="mx-auto flex min-h-[62vh] max-w-[520px] flex-col items-center justify-center px-5 text-center">
-        <CreditCard className="size-10 text-[#d3a5ff]" aria-hidden />
+        <CreditCard className="size-10 text-[var(--accent)]" aria-hidden />
         <h1 className="mt-5 text-2xl font-bold text-white">Sign in to manage Premium</h1>
-        <p className="mt-3 text-sm leading-6 text-white/65">Your subscription and billing portal are private to your account.</p>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">Your subscription and billing portal are private to your account.</p>
         <Link href={`/login?redirect=${encodeURIComponent("/premium/manage")}`} className="premium-button focus-ring mt-6">Sign in</Link>
       </div>
     );
@@ -129,9 +129,9 @@ export function PremiumManageView() {
   if (!billing) {
     return (
       <div className="mx-auto flex min-h-[62vh] max-w-[520px] flex-col items-center justify-center px-5 text-center">
-        <CreditCard className="size-10 text-[#d3a5ff]" aria-hidden />
+        <CreditCard className="size-10 text-[var(--accent)]" aria-hidden />
         <h1 className="mt-5 text-2xl font-bold text-white">Plans are temporarily unavailable</h1>
-        <p className="mt-3 text-sm leading-6 text-white/65">{error}</p>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{error}</p>
         <button type="button" onClick={() => void load()} className="premium-button focus-ring mt-6">
           <RefreshCw className="size-4" aria-hidden /> Try again
         </button>
@@ -162,7 +162,7 @@ export function PremiumManageView() {
       <header className="text-center">
         <PremiumBadge />
         <h1 className="mt-5 text-4xl font-bold tracking-[-0.045em] text-white sm:text-5xl">Manage Premium</h1>
-        <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-white/65">
+        <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-[var(--text-secondary)]">
           See your current plan, compare options, or open secure billing when
           subscription management is available.
         </p>
@@ -171,11 +171,11 @@ export function PremiumManageView() {
       <section aria-labelledby="current-plan" className="panel mt-10 border-[var(--border-strong)] p-5 sm:p-7">
         <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d3a5ff]">Current plan</p>
+            <p className="eyebrow">Current plan</p>
             <h2 id="current-plan" className="mt-2 text-xl font-bold text-white">
               {currentPlan === "yearly" ? "YO Voice Premium · Yearly" : currentPlan === "monthly" ? "YO Voice Premium · Monthly" : "YO Voice Free"}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-white/60">
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               {billing.billingManagedBy === "admin" && currentPlan !== "none"
                 ? "Complimentary Premium access"
                 : billing.renewalBehavior === "ends" && billingPeriodEnd
@@ -206,7 +206,7 @@ export function PremiumManageView() {
         </div>
       </section>
 
-      {error ? <p role="alert" className="mt-5 rounded-2xl border border-rose-400/35 bg-rose-500/10 px-4 py-3 text-sm leading-6 text-rose-100">{error}</p> : null}
+      {error ? <p role="alert" className="status-alert mt-5" data-tone="error">{error}</p> : null}
 
       <section aria-labelledby="available-plans" className="mt-10">
         <h2 id="available-plans" className="text-xl font-bold text-white">Available plans</h2>
@@ -218,22 +218,22 @@ export function PremiumManageView() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-lg font-bold text-white">{plan.id === "yearly" ? "Yearly" : "Monthly"}</h3>
-                    <p className="mt-2 text-3xl font-bold text-white">{plan.formattedPrice}<span className="text-sm font-semibold text-white/50"> / {plan.interval}</span></p>
-                    {billing.localizedAtCheckout ? <p className="mt-2 text-xs leading-5 text-white/55">Base price · final local currency at checkout</p> : null}
+                    <p className="mt-2 text-3xl font-bold text-white">{plan.formattedPrice}<span className="text-sm font-semibold text-[var(--text-tertiary)]"> / {plan.interval}</span></p>
+                    {billing.localizedAtCheckout ? <p className="mt-2 text-xs leading-5 text-[var(--text-tertiary)]">Base price · final local currency at checkout</p> : null}
                   </div>
-                  {active ? <span className="rounded-full bg-fuchsia-400/15 px-3 py-1 text-xs font-bold text-fuchsia-200">Current</span> : null}
+                  {active ? <span className="rounded-full border border-[color-mix(in_srgb,var(--accent)_38%,transparent)] bg-[var(--surface)] px-3 py-1 text-xs font-bold text-[var(--accent)]">Current</span> : null}
                 </div>
-                {plan.formattedEquivalent ? <p className="mt-2 text-sm text-white/60">{plan.formattedEquivalent} / month</p> : null}
-                {plan.savingsPercent > 0 ? <p className="mt-2 text-sm font-semibold text-emerald-300">Save {plan.savingsPercent}%</p> : null}
-                <p className="mt-5 flex items-center gap-2 text-sm text-white/65"><Check className="size-4 text-fuchsia-300" aria-hidden />All Premium features</p>
+                {plan.formattedEquivalent ? <p className="mt-2 text-sm text-[var(--text-secondary)]">{plan.formattedEquivalent} / month</p> : null}
+                {plan.savingsPercent > 0 ? <p className="mt-2 text-sm font-semibold text-[var(--success)]">Save {plan.savingsPercent}%</p> : null}
+                <p className="mt-5 flex items-center gap-2 text-sm text-[var(--text-secondary)]"><Check className="size-4 text-[var(--accent)]" aria-hidden />All Premium features</p>
                 {active ? (
-                  <button type="button" disabled className="focus-ring mt-5 inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center gap-2 rounded-2xl border border-white/15 px-5 text-sm font-bold text-white opacity-50">
+                  <button type="button" disabled className="premium-button-secondary focus-ring mt-5 w-full cursor-not-allowed opacity-50">
                     Your current plan
                   </button>
                 ) : (
                   <Link
                     href={`/premium?plan=${plan.id}`}
-                    className="focus-ring mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-white/15 px-5 text-sm font-bold text-white transition hover:border-fuchsia-400/50"
+                    className="premium-button-secondary focus-ring mt-5 w-full"
                   >
                     Choose plan and payment method
                     <ArrowRight className="size-4" aria-hidden />
@@ -243,7 +243,7 @@ export function PremiumManageView() {
             );
           })}
         </div>
-        <p className="mt-5 text-center text-xs leading-5 text-white/55">{billing.taxNotice}</p>
+        <p className="mt-5 text-center text-xs leading-5 text-[var(--text-tertiary)]">{billing.taxNotice}</p>
       </section>
     </div>
   );

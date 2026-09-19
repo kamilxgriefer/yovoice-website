@@ -110,7 +110,7 @@ function Consequences() {
         request, is on{" "}
         <Link
           href={PUBLIC_DELETION_PATH}
-          className="focus-ring rounded font-semibold text-accent underline underline-offset-4 hover:text-white"
+          className="focus-ring link-accent rounded font-semibold underline underline-offset-4"
         >
           the public deletion page
         </Link>
@@ -183,7 +183,7 @@ function EmailRequestButton() {
   return (
     <a
       href={DELETION_REQUEST_MAILTO}
-      className="premium-button focus-ring mt-5 min-h-12"
+      className="premium-button focus-ring mt-5"
     >
       <Mail className="size-4" aria-hidden="true" />
       Email {PRIVACY_MAILBOX}
@@ -291,7 +291,7 @@ function DeleteAccountForm() {
           Taking you to{" "}
           <Link
             href={PUBLIC_DELETION_PATH}
-            className="focus-ring rounded font-semibold text-accent underline underline-offset-4 hover:text-white"
+            className="focus-ring link-accent rounded font-semibold underline underline-offset-4"
           >
             the deletion page
           </Link>
@@ -381,7 +381,7 @@ function DeleteAccountForm() {
           Prefer to ask a person?{" "}
           <a
             href={DELETION_REQUEST_MAILTO}
-            className="focus-ring rounded font-semibold text-accent underline underline-offset-4 hover:text-white"
+            className="focus-ring link-accent rounded font-semibold underline underline-offset-4"
           >
             Email {PRIVACY_MAILBOX}
           </a>

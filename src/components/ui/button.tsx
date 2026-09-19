@@ -8,32 +8,31 @@ import { cn } from "@/lib/utils/cn";
 
 const spring = { type: "spring" as const, stiffness: 400, damping: 22 };
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const variantClass: Record<Variant, string> = {
   primary: "premium-button",
   secondary: "premium-button-secondary",
   ghost: "premium-button-ghost",
+  // Secondary geometry, recoloured on the error pair for the one destructive
+  // action on a page. Both classes are unlayered, so the colours cannot be
+  // lost to a leftover utility.
+  danger: "premium-button-secondary premium-button-danger",
 };
 
 type CommonProps = {
   variant?: Variant;
-  size?: "sm" | "md" | "lg";
   icon?: ReactNode;
   isLoading?: boolean;
   className?: string;
   children: ReactNode;
 };
 
-const sizeClass: Record<NonNullable<CommonProps["size"]>, string> = {
-  sm: "min-h-10 px-4 text-xs",
-  md: "min-h-12 px-6 text-sm",
-  lg: "min-h-14 px-8 text-base",
-};
-
 /** Site-wide button primitive. The look comes from the unlayered
  * `.premium-button*` classes in globals.css (solid fill, 12 px radius,
- * 48 px, 600); this adds only GPU-only motion (transform/opacity). Pass
+ * 48 px, 600); this adds only GPU-only motion (transform/opacity). There is
+ * one size on purpose: the unlayered geometry would override any size
+ * utility anyway, so a `size` prop could only ever be a no-op. Pass
  * `href` for a link-styled-as-button, omit it for a real `<button>`. */
 type NativeButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
@@ -43,7 +42,6 @@ type NativeButtonProps = Omit<
 export function Button({
   href,
   variant = "primary",
-  size = "md",
   icon,
   isLoading,
   className,
@@ -53,7 +51,6 @@ export function Button({
   const classes = cn(
     "focus-ring inline-flex items-center justify-center gap-2",
     variantClass[variant],
-    sizeClass[size],
     isLoading && "pointer-events-none opacity-70",
     className,
   );

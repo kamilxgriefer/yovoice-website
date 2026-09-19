@@ -122,12 +122,11 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
           </p>
           <Button
             type="button"
-            size="lg"
-            variant="secondary"
+            variant="danger"
             isLoading={phase.name === "applying"}
             disabled={phase.name === "applying"}
             onClick={removeAuthenticator}
-            className="mt-8 w-full border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] text-error hover:bg-[color-mix(in_srgb,var(--danger-surface)_78%,var(--error))]"
+            className="mt-8 w-full"
           >
             {phase.name === "applying"
               ? "Removing…"

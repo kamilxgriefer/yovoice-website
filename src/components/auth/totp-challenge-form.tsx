@@ -166,7 +166,6 @@ export function TotpChallengeForm({
 
           <Button
             type="submit"
-            size="lg"
             isLoading={submitting}
             disabled={code.length !== 6 || !selectedFactorUid}
             className="w-full"

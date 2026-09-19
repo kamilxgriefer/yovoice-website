@@ -142,7 +142,7 @@ export function RegisterForm() {
         />
       </div>
 
-      <Button type="submit" size="lg" isLoading={submitting} className="w-full">
+      <Button type="submit" isLoading={submitting} className="w-full">
         {submitting ? "Creating account…" : "Create account"}
       </Button>
 

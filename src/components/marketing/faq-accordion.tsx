@@ -16,7 +16,10 @@ export function FaqAccordion({ groups }: { groups: FaqGroup[] }) {
           <h2 className="eyebrow">
             {group.title}
           </h2>
-          <div className="panel mt-4 divide-y divide-[var(--border)] overflow-hidden">
+          {/* No `overflow-hidden`: the rows have no fill to clip at the corners,
+              and clipping would cut the question buttons' 4px-offset focus
+              ring down to a hairline. */}
+          <div className="panel mt-4 divide-y divide-[var(--border)]">
             {group.items.map((item) => {
               const id = `${group.title}-${item.question}`;
               const isOpen = openId === id;

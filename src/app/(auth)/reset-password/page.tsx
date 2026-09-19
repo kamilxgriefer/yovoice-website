@@ -283,7 +283,6 @@ function NewPasswordForm({
 
         <Button
           type="submit"
-          size="lg"
           isLoading={submitting}
           disabled={!canSubmit}
           className="w-full disabled:opacity-60"

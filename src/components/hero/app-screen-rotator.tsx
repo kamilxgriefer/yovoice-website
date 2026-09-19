@@ -130,11 +130,6 @@ export function AppScreenRotator() {
         }
       }}
     >
-      <div
-        className="pointer-events-none absolute inset-x-[10%] top-[6%] h-[80%] rounded-full bg-fuchsia-500/12 blur-[90px]"
-        aria-hidden="true"
-      />
-
       {/* The large-screen layout, behind and to the left, so its navigation
           rail — the one that names Servers — stays clear of the phone in
           front. It does not follow the tabs, and it carries no chrome that

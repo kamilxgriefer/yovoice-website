@@ -40,7 +40,7 @@ export function SiteFooter() {
             <div key={column.title}>
               <h2 className="text-sm font-bold text-white">{column.title}</h2>
               <ul className="mt-2">
-                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="inline-flex min-h-11 items-center text-sm text-[var(--text-secondary)] transition hover:text-white">{label}</Link></li>)}
+                {column.links.map(([label,href]) => <li key={label}><Link href={href} className="link-muted inline-flex min-h-11 items-center text-sm transition">{label}</Link></li>)}
               </ul>
             </div>
           ))}
@@ -58,7 +58,7 @@ export function SiteFooter() {
             {socialLinks.map(({ Icon, href, label }) => {
               const opensNewTab = href.startsWith("http");
               return (
-                <a key={label} href={href} target={opensNewTab ? "_blank" : undefined} rel={opensNewTab ? "noreferrer" : undefined} className="focus-ring flex size-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] transition hover:border-[var(--border-strong)] hover:text-white" aria-label={`${label}${opensNewTab ? " (opens in a new tab)" : ""}`}>
+                <a key={label} href={href} target={opensNewTab ? "_blank" : undefined} rel={opensNewTab ? "noreferrer" : undefined} className="focus-ring flex size-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] link-muted transition hover:border-[var(--border-strong)]" aria-label={`${label}${opensNewTab ? " (opens in a new tab)" : ""}`}>
                   <Icon className="size-4" aria-hidden="true"/>
                 </a>
               )

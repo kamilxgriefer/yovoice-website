@@ -117,7 +117,7 @@ export function LoginForm() {
         </Link>
       </div>
 
-      <Button type="submit" size="lg" isLoading={submitting} className="w-full">
+      <Button type="submit" isLoading={submitting} className="w-full">
         {submitting ? "Signing in…" : "Log in"}
       </Button>
 
