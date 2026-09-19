@@ -93,6 +93,17 @@ test("the GIF claim admits the legacy third-party surface", () => {
   assert.match(privacy, /turning GIF auto-loading off in settings/);
 });
 
+test("GIPHY is disclosed as an independent GIF source", () => {
+  assert.match(privacy, /YO Voice also shows GIFs from GIPHY/);
+  assert.match(privacy, /GIPHY receives your IP address, your device and browser information \(the User-Agent/);
+  assert.match(privacy, /and the search terms you typed/);
+  assert.match(privacy, /GIPHY's own privacy policy applies/);
+  assert.match(privacy, /"Load GIFs automatically"/);
+  assert.match(privacy, /rating filter set to G/);
+  // The old absolute claim that no search text ever leaves the app is gone.
+  assert.doesNotMatch(privacy, /searching for one never sends your search text/);
+});
+
 test("website showcase withdrawal keeps a record instead of deleting one", () => {
   assert.doesNotMatch(privacy, /deletes the consent record/);
   assert.match(privacy, /records the withdrawal/);

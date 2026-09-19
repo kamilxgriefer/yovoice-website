@@ -183,7 +183,7 @@ const sections: LegalSection[] = [
         </p>
         <p>
           Search is handled differently: what you type into GIF or profile
-          search is not stored against your identity. GIF results are cached
+          search is not stored against your identity by us. GIF results are cached
           under a hash of the search text with no account identifier attached,
           and rate-limit counters are kept under a hash of your account
           identifier.
@@ -282,12 +282,24 @@ const sections: LegalSection[] = [
           </li>
         </ul>
         <p>
-          GIFs offered in the app today are first-party animations that ship
-          inside the app itself — searching for one never sends your search text
-          to an outside GIF service. Older messages may still contain a GIF
+          Some GIFs offered in the app are first-party animations that ship
+          inside the app itself — searching among those never sends your search
+          text to an outside GIF service. Older messages may still contain a GIF
           hosted by an external provider; opening such a message loads the image
           from that provider, which sees your IP address. You can stop that by
           turning GIF auto-loading off in settings.
+        </p>
+        <p>
+          YO Voice also shows GIFs from <strong>GIPHY</strong>. GIPHY is an
+          independent service rather than a provider acting on our
+          instructions: when you search for a GIPHY GIF, or one is displayed to
+          you, GIPHY receives your IP address, your device and browser
+          information (the User-Agent your device or browser sends) and the
+          search terms you typed. GIPHY&apos;s own privacy policy applies to
+          what it does with that data. You can limit these requests with the
+          in-app setting &quot;Load GIFs automatically&quot;: with it off, a
+          GIF hosted by GIPHY is not fetched until you tap it. GIPHY results
+          are requested with the content rating filter set to G.
         </p>
         <p>
           We may also disclose information where we are required to by law, or
@@ -478,7 +490,8 @@ const sections: LegalSection[] = [
           <li>Turn the optional public website showcase on or off.</li>
           <li>
             Turn GIF auto-loading off, so a GIF hosted outside the app is not
-            fetched from its provider until you tap it.
+            fetched from its provider until you tap it. The setting is called
+            &quot;Load GIFs automatically&quot; and also covers GIFs from GIPHY.
           </li>
           <li>
             Review the device you are signed in on, and sign out everywhere,
