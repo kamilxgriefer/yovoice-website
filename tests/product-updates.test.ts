@@ -189,15 +189,117 @@ describe("product update ledger", () => {
     assert.doesNotMatch(text, /available to everyone|publicly available|server backend is active/i);
   });
 
-  test("records Build 31 as the current confirmed tester release", () => {
+  test("records Build 33 as the current confirmed tester release", () => {
+    const release = productUpdates.find(
+      (update) => update.slug === "mobile-build-33-internal-testing",
+    );
+
+    assert.ok(release);
+    assert.equal(productUpdates[0], release);
+    assert.equal(release.updatedOn, "2026-09-19");
+    assert.equal(release.status, "testing");
+    assert.deepEqual(release.release, {
+      version: "2.0.0 (33)",
+      stage: "Internal testing",
+      buildNumber: 33,
+    });
+    // Evidence: yovoice-evidence/2026-09-19/build33-2026-09-19.md (§Web,
+    // §iOS, Google Play) and build33-play/play-readback.md.
+    assert.match(release.summary, /source revision 46d6b330/i);
+    assert.match(release.summary, /Google Play Internal Testing/i);
+    assert.match(release.summary, /19 September 2026 at 12:21 CEST/i);
+    assert.match(release.summary, /both TestFlight groups/i);
+    assert.match(release.summary, /web app at app\.yovoice\.app, which serves build 33/i);
+    assert.match(release.summary, /internal tester release/i);
+    assert.match(release.summary, /not a public App Store or Google Play release/i);
+    assert.match(release.summary, /Podcast recording remains disabled/i);
+
+    const scope = release.highlights.join(" ");
+    for (const capability of [
+      /Profile photos and banners load everywhere/i,
+      /clock is a few seconds off/i,
+      /Settings and Creator Studio show your real photo/i,
+      /Every avatar opens a fullscreen preview/i,
+      /banners open fullscreen too/i,
+      /your own profile photo is tappable/i,
+      /Chat previews are localized/i,
+      /large text sizes/i,
+      /like button and spinner no longer get stuck/i,
+    ]) {
+      assert.match(scope, capability);
+    }
+
+    // User-facing only: no internal identifiers, no retired surface, no
+    // public-rollout claim and no version announced for the redesign.
+    assert.doesNotMatch(
+      JSON.stringify(release),
+      /RC-\d+|V1\b|V2\b|canonical|\bRooms?\b|\bClubs?\b|available to everyone|publicly available|3\.0\.0/,
+    );
+  });
+
+  test("keeps Build 32 as superseded history without claiming in-app deletion works", () => {
+    const release = productUpdates.find(
+      (update) => update.slug === "mobile-build-32-internal-testing",
+    );
+
+    assert.ok(release);
+    assert.equal(release.updatedOn, "2026-09-19");
+    assert.equal(release.status, "superseded");
+    assert.deepEqual(release.release, {
+      version: "2.0.0 (32)",
+      stage: "Internal testing",
+      buildNumber: 32,
+    });
+    // Evidence: yovoice-evidence/2026-09-19/build32-2026-09-19.md (§iOS,
+    // Google Play, Hosting read-back) and build32-play/play-readback.md.
+    assert.match(release.summary, /source revision a18fe789/i);
+    assert.match(release.summary, /19 September 2026/i);
+    assert.match(release.summary, /Google Play Internal Testing \(published at 08:35 CEST\)/i);
+    assert.match(release.summary, /both TestFlight groups/i);
+    assert.match(release.summary, /app\.yovoice\.app, which served build 32/i);
+    assert.match(release.summary, /not a public App Store or Google Play release/i);
+    assert.match(release.summary, /Build 33 has since superseded it/i);
+
+    const scope = release.highlights.join(" ");
+    for (const capability of [
+      /Delete account screen/i,
+      /server-side processing switches on later/i,
+      /offers the e-mail route/i,
+      /Members of public Servers can invite friends/i,
+      /private Servers keep invites to admins and moderators/i,
+      /no longer show empty threads other people opened/i,
+      /profile photos load more reliably/i,
+      /reactions work on photo and video messages/i,
+      /keyboard can always be dismissed/i,
+      /participant names in voice sessions never show an e-mail address/i,
+    ]) {
+      assert.match(scope, capability);
+    }
+
+    // The deletion pipeline is switched off server-side, so the entry must not
+    // say an account can be deleted in the app, and it names no internal
+    // function, release-control or block detail.
+    const text = JSON.stringify(release);
+    assert.doesNotMatch(
+      text,
+      /you can (?:now )?delete your account|processed within|deletes? your account in the app/i,
+    );
+    assert.doesNotMatch(text, /block/i);
+    assert.doesNotMatch(
+      text,
+      /RC-\d+|V1\b|deleteAccountSelf|createServerInvite|getProfileMediaAccess|kill.?switch|available to everyone|publicly available/i,
+    );
+  });
+
+  test("keeps Build 31 as superseded history with its original record", () => {
     const release = productUpdates.find(
       (update) => update.slug === "mobile-build-31-internal-testing",
     );
 
     assert.ok(release);
-    assert.equal(productUpdates[0], release);
+    assert.notEqual(productUpdates[0], release);
     assert.equal(release.updatedOn, "2026-09-18");
-    assert.equal(release.status, "testing");
+    assert.equal(release.status, "superseded");
     assert.deepEqual(release.release, {
       version: "2.0.0 (31)",
       stage: "Internal testing",
@@ -344,9 +446,9 @@ describe("product update ledger", () => {
 
   test("centralizes the present-tense release boundary on the confirmed build", () => {
     assert.deepEqual(currentRelease, {
-      version: "2.0.0 (31)",
-      buildNumber: 31,
-      sourceRevision: "98f9413c2d0adb0078c5ee0cb34cbec18d73a67d",
+      version: "2.0.0 (33)",
+      buildNumber: 33,
+      sourceRevision: "46d6b330dabdee6c672faeabb8e9f27dd06df039",
       stage: "Internal testing",
       mobileChannelsConfirmed: true,
       publicStoreRelease: false,
@@ -362,21 +464,19 @@ describe("product update ledger", () => {
     assert.match(currentReleaseAvailability, /web app at app\.yovoice\.app/i);
     assert.doesNotMatch(currentReleaseAvailability, /\bBuilds?\s+\d+|\d+\.\d+\.\d+\s*\(\d+\)/i);
 
+    // The next step is the redesign: no version number and no date until the
+    // app records carry one.
     assert.deepEqual(nextReleaseCandidate, {
-      version: "2.0.0 (32)",
-      buildNumber: 32,
       stage: "In progress",
       availabilityConfirmed: false,
       publicStoreRelease: false,
-      scope: [
-        "in-app account deletion with a matching web page",
-        "Server invites — any member on a public Server, moderators and admins on a private one",
-        "chat polish",
-      ],
+      scope: ["a redesigned YO Voice"],
     });
-    assert.match(nextReleaseCandidateStatus, /Build 32 is in progress with no date/i);
-    assert.match(nextReleaseCandidateStatus, /not available to testers yet/i);
+    assert.match(nextReleaseCandidateStatus, /A redesigned YO Voice is in progress/);
+    assert.match(nextReleaseCandidateStatus, /no date/i);
+    assert.match(nextReleaseCandidateStatus, /not available to testers/i);
     assert.doesNotMatch(nextReleaseCandidateStatus, /\d{4}-\d{2}-\d{2}|September|October/);
+    assert.doesNotMatch(nextReleaseCandidateStatus, /\bBuilds?\s+\d+|\d+\.\d+\.\d+/i);
     assert.ok(
       productUpdates.some(
         (update) =>
@@ -407,6 +507,8 @@ describe("product update ledger", () => {
         /Build (?:27|32) (?:is|are) available|2\.0\.0 \((?:27|32)\) is available|GIPHY|Android session continuity|22cc2313/i,
         relativePath,
       );
+      // The redesign has no announced version yet.
+      assert.doesNotMatch(source, /3\.0\.0|nextReleaseCandidate\.version/, relativePath);
     }
   });
 

@@ -158,6 +158,15 @@ test("the release spotlight on /updates features the confirmed current build wit
   );
   assert.match(spotlight, /Servers are open to every signed-in account/i);
   assert.match(spotlight, /Podcast\s+recording remains disabled/i);
+  // Build 32's Delete account screen ships while server-side processing is
+  // switched off, so the spotlight names the e-mail route instead of claiming
+  // an in-app deletion.
+  assert.match(
+    spotlight,
+    /Delete account screen that offers the e-mail route until the\s+server-side processing switches on/i,
+  );
+  assert.doesNotMatch(spotlight, /you can (?:now )?delete your account|processed within/i);
+  assert.match(spotlight, /members of public Servers can invite friends/i);
   assert.doesNotMatch(
     spotlight,
     /matching web release is live|available to everyone|publicly available|GIPHY|Build 27 is available/i,

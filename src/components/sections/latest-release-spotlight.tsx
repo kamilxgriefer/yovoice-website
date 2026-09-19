@@ -16,7 +16,7 @@ const releaseScope = [
   {
     icon: Sparkles,
     title: "Five Server types",
-    description: "Friends, Community, Podcast, Family and Company, open to every signed-in account.",
+    description: "Friends, Community, Podcast, Family and Company, open to every signed-in account; members of public Servers can invite friends.",
   },
   {
     icon: FrameEchoIcon,
@@ -26,7 +26,7 @@ const releaseScope = [
   {
     icon: MessageSquareMore,
     title: "Chats & media",
-    description: "Messages typed offline are kept and sent when you are back online; GIFs, Add Friend and full-screen media.",
+    description: "Reactions work on photo and video messages, empty threads other people opened stay out of your list, and messages typed offline are sent when you are back online.",
   },
   {
     icon: Users,
@@ -88,9 +88,11 @@ export function LatestReleaseSpotlight() {
           <p className="mt-5 max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
             Build {currentRelease.buildNumber} is available through Google Play Internal
             Testing, both TestFlight groups and the web app at app.yovoice.app.
-            Servers are open to every signed-in account, Chats keep the
-            messages you type offline and send them when you are back online,
-            and a failed Yeel publish keeps the draft editable. Podcast
+            Profile photos and banners load everywhere and open fullscreen,
+            members of public Servers can invite friends, and Settings has a
+            Delete account screen that offers the e-mail route until the
+            server-side processing switches on.
+            Servers are open to every signed-in account and Podcast
             recording remains disabled. This is an internal tester release, not
             a public App Store or Google Play release.{" "}
             {nextReleaseCandidateStatus}

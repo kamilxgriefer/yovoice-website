@@ -32,9 +32,47 @@ export type ProductUpdate = {
 // for history and is never presented as currently available.
 export const productUpdates: readonly ProductUpdate[] = [
   {
+    slug: "mobile-build-33-internal-testing",
+    updatedOn: "2026-09-19",
+    status: "testing",
+    eyebrow: "Build 33 · Internal testing",
+    title: "Build 33 polishes photos, previews and large text",
+    summary:
+      "YO Voice 2.0.0 (33), built from source revision 46d6b330, is available to our existing testers: on Google Play Internal Testing (published 19 September 2026 at 12:21 CEST), in both TestFlight groups — internal and YO Voice Beta Testers — and in the web app at app.yovoice.app, which serves build 33. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
+    highlights: [
+      "Profile photos and banners load everywhere, even when the phone's clock is a few seconds off, and Settings and Creator Studio show your real photo",
+      "Every avatar opens a fullscreen preview, banners open fullscreen too, and your own profile photo is tappable",
+      "Chat previews are localized, headings and the bottom bar read correctly at large text sizes, and a Moment's like button and spinner no longer get stuck",
+    ],
+    release: {
+      version: "2.0.0 (33)",
+      stage: "Internal testing",
+      buildNumber: 33,
+    },
+  },
+  {
+    slug: "mobile-build-32-internal-testing",
+    updatedOn: "2026-09-19",
+    status: "superseded",
+    eyebrow: "Build 32 · Internal testing",
+    title: "Build 32 adds a Delete account screen and opens invites on public Servers",
+    summary:
+      "YO Voice 2.0.0 (32), built from source revision a18fe789, reached our existing testers on 19 September 2026: Google Play Internal Testing (published at 08:35 CEST), both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 32. This was an internal tester release, not a public App Store or Google Play release. Build 33 has since superseded it as the newest build on every tester channel.",
+    highlights: [
+      "Settings has a Delete account screen; the server-side processing switches on later, and until then the screen offers the e-mail route",
+      "Members of public Servers can invite friends, while private Servers keep invites to admins and moderators",
+      "Chats no longer show empty threads other people opened, profile photos load more reliably, reactions work on photo and video messages, the keyboard can always be dismissed, and participant names in voice sessions never show an e-mail address",
+    ],
+    release: {
+      version: "2.0.0 (32)",
+      stage: "Internal testing",
+      buildNumber: 32,
+    },
+  },
+  {
     slug: "mobile-build-31-internal-testing",
     updatedOn: "2026-09-18",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Build 31 · Internal testing",
     title: "Build 31 keeps chats moving when the network does not",
     summary:

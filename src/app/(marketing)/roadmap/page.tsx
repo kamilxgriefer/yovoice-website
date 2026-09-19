@@ -1,7 +1,7 @@
 import { CheckCircle2, CircleDashed, Loader2 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
-import { currentRelease, nextReleaseCandidate } from "@/content/current-release";
+import { currentRelease, nextReleaseCandidateStatus } from "@/content/current-release";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -35,7 +35,11 @@ const columns = [
     accent: "text-[var(--accent)]",
     items: [
       `YO Voice ${currentRelease.version} on Google Play Internal Testing, both TestFlight groups and the web app`,
-      `YO Voice ${nextReleaseCandidate.version} in progress, no date: ${nextReleaseCandidate.scope.join("; ")}`,
+      nextReleaseCandidateStatus,
+      "Profile photos and banners load everywhere, and every avatar and banner opens a fullscreen preview",
+      "Members of public Servers can invite friends; private Servers keep invites to admins and moderators",
+      "A Delete account screen in Settings, which offers the e-mail route until the server-side processing switches on",
+      "Reactions on photo and video messages, and headings and the bottom bar that read correctly at large text sizes",
       "Chats keep messages typed offline and send them once you are back online",
       "Yeels publishing shows its stage, a failed publish keeps the draft editable, and web-recorder videos are no longer refused outright",
       "The Voice Moments feed tells a loading failure apart from an empty feed",
@@ -54,6 +58,7 @@ const columns = [
     accent: "text-[var(--text-tertiary)]",
     items: [
       "Podcast recording and published episodes",
+      "Server-side processing for in-app account deletion",
       "Video stages, family tools and company screen-sharing or whiteboard modules",
       "Public iOS App Store and Google Play release",
       "Native desktop apps for Windows and macOS",

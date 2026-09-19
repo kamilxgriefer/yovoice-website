@@ -102,7 +102,7 @@ export default function UpdatesPage() {
       </PageHero>
 
       <aside aria-labelledby="servers-development-heading" className="panel mx-auto mb-10 w-[calc(100%-40px)] max-w-6xl p-6 sm:w-[calc(100%-64px)] sm:p-8">
-        <p className="eyebrow">Build {currentRelease.buildNumber} · {currentRelease.stage} · September 18, 2026</p>
+        <p className="eyebrow">Build {currentRelease.buildNumber} · {currentRelease.stage} · September 19, 2026</p>
         <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-[-.025em] text-[var(--foreground)]">A new home for every circle</h2>
         <p className="mt-3 max-w-3xl text-base leading-[1.6] text-[var(--text-secondary)]">
           YO Voice {currentRelease.version}: {currentReleaseAvailability} Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account, with the established Hub preserved. Podcast recording remains disabled, and this is not a public App Store or Google Play release. {nextReleaseCandidateStatus}

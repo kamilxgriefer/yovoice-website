@@ -8,15 +8,15 @@
  * this separate from the historical update ledger, whose entries record what
  * was true at the time.
  *
- * Build 31 read-backs (2026-09-18): Google Play internal testing published at
- * 18:30 CEST, TestFlight build 31 VALID and in beta testing in both groups,
- * and app.yovoice.app serving version.json build_number 31 — all from app
- * commit 98f9413c.
+ * Build 33 read-backs (2026-09-19): Google Play internal testing published at
+ * 12:21 CEST, TestFlight build 33 VALID and in beta testing in both groups,
+ * and app.yovoice.app serving version.json build_number 33 — all from app
+ * commit 46d6b330.
  */
 export const currentRelease = {
-  version: "2.0.0 (31)",
-  buildNumber: 31,
-  sourceRevision: "98f9413c2d0adb0078c5ee0cb34cbec18d73a67d",
+  version: "2.0.0 (33)",
+  buildNumber: 33,
+  sourceRevision: "46d6b330dabdee6c672faeabb8e9f27dd06df039",
   stage: "Internal testing",
   mobileChannelsConfirmed: true,
   publicStoreRelease: false,
@@ -29,22 +29,17 @@ export const currentReleaseAvailability =
   "Available to our existing testers through Google Play Internal Testing and both TestFlight groups, and running as the web app at app.yovoice.app.";
 
 /**
- * The next build is recorded only as work in progress: it has no date, no
- * source revision, no signed artifacts and no store read-back, so the website
- * never describes it as available.
+ * The next step is recorded only as work in progress: it has no version
+ * number, no date, no source revision, no signed artifacts and no store
+ * read-back, so the website never describes it as available and never
+ * announces a version for it.
  */
 export const nextReleaseCandidate = {
-  version: "2.0.0 (32)",
-  buildNumber: 32,
   stage: "In progress",
   availabilityConfirmed: false,
   publicStoreRelease: false,
-  scope: [
-    "in-app account deletion with a matching web page",
-    "Server invites — any member on a public Server, moderators and admins on a private one",
-    "chat polish",
-  ],
+  scope: ["a redesigned YO Voice"],
 } as const;
 
 export const nextReleaseCandidateStatus =
-  "Build 32 is in progress with no date: in-app account deletion with a matching web page, Server-invite permissions and chat polish. It is not available to testers yet.";
+  "A redesigned YO Voice is in progress, with no date yet. It is not available to testers.";
