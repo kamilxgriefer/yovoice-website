@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Download, LogOut, Monitor, Shield, User } from "lucide-react";
+import { Bell, Download, LogOut, Monitor, Shield, Trash2, User } from "lucide-react";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -16,6 +16,9 @@ const NAV = [
   { href: "/account/devices", label: "Devices & Sessions", icon: Monitor },
   { href: "/account/notifications", label: "Notifications", icon: Bell },
   { href: "/account/downloads", label: "Downloads", icon: Download },
+  // Last, and styled apart from the rest: it is the one entry whose page
+  // cannot be undone.
+  { href: "/account/delete", label: "Delete account", icon: Trash2, danger: true },
 ] as const;
 
 export default function AccountLayout({
@@ -44,16 +47,25 @@ export default function AccountLayout({
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[240px_1fr]">
             <nav aria-label="Account navigation" className="flex flex-col gap-1">
-              {NAV.map(({ href, label, icon: Icon }) => {
+              {NAV.map((item) => {
+                const { href, label, icon: Icon } = item;
+                const danger = "danger" in item && item.danger;
                 const active = pathname === href;
                 return (
                   <Link
                     key={href}
                     href={href}
-                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    aria-current={active ? "page" : undefined}
+                    className={`focus-ring flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                      danger ? "mt-2 " : ""
+                    }${
                       active
-                        ? "bg-fuchsia-500/15 text-white"
-                        : "text-white/55 hover:bg-white/[.04] hover:text-white"
+                        ? danger
+                          ? "bg-rose-500/15 text-rose-100"
+                          : "bg-fuchsia-500/15 text-white"
+                        : danger
+                          ? "text-rose-200/75 hover:bg-rose-500/10 hover:text-rose-100"
+                          : "text-white/55 hover:bg-white/[.04] hover:text-white"
                     }`}
                   >
                     <Icon className="size-4" />

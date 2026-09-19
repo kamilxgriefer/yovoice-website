@@ -98,6 +98,11 @@ type AuthContextValue = {
     newPassword: string,
   ) => Promise<void>;
   changeEmail: (currentPassword: string, newEmail: string) => Promise<void>;
+  /** Proves the person at the keyboard is the account holder, and refreshes
+   * the ID token so a server call that requires a recent sign-in — account
+   * deletion asks for one no older than five minutes — sees the new
+   * auth_time. Throws the Firebase auth error on a wrong password. */
+  reauthenticate: (currentPassword: string) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -224,6 +229,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!current) throw new Error("Not signed in.");
         await reauthenticate(current, currentPassword);
         await updatePassword(current, newPassword);
+      },
+      reauthenticate: async (currentPassword) => {
+        const current = getFirebaseAuth().currentUser;
+        if (!current) throw new Error("Not signed in.");
+        await reauthenticate(current, currentPassword);
+        // reauthenticateWithCredential mints a new token, but the cached one
+        // is what a callable would send; force the refresh so the server reads
+        // the fresh auth_time rather than the sign-in that happened hours ago.
+        await current.getIdToken(true);
       },
       changeEmail: async (currentPassword, newEmail) => {
         const current = getFirebaseAuth().currentUser;

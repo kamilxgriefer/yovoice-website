@@ -7,7 +7,7 @@ const columns = [
   { title: "Product", links: [["Features","/features"],["Community","/community"],["Servers","/servers"],["Achievements","/achievements"]] },
   { title: "Company", links: [["About","/about"],["Updates","/updates"],["Roadmap","/roadmap"],["Careers","/careers"],["Contact","/contact"]] },
   { title: "Support", links: [["Help Center","/help-center"],["Safety","/safety"],["Status","/status"],["FAQ","/faq"]] },
-  { title: "Legal", links: [["Privacy","/privacy"],["Terms","/terms"],["Cookies","/cookies"]] },
+  { title: "Legal", links: [["Privacy","/privacy"],["Terms","/terms"],["Cookies","/cookies"],["Delete account","/delete-account"]] },
 ];
 
 export function SiteFooter() {
