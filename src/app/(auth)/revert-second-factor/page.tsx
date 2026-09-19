@@ -34,7 +34,7 @@ type Phase =
 export default function RevertSecondFactorPage() {
   return (
     <Suspense
-      fallback={<p className="mt-8 text-center text-sm text-white/45">Loading…</p>}
+      fallback={<p className="mt-8 text-center text-sm text-text-tertiary">Loading…</p>}
     >
       <RevertSecondFactorContent />
     </Suspense>
@@ -101,7 +101,7 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
       return (
         <>
           <LoadingSpinner />
-          <p className="mt-6 text-center text-sm text-white/45">
+          <p className="mt-6 text-center text-sm text-text-tertiary">
             Checking your security link…
           </p>
         </>
@@ -112,10 +112,10 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
       return (
         <>
           <ErrorGlyph />
-          <h1 className="mt-6 text-center text-3xl font-bold">
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
             Wasn&apos;t this you?
           </h1>
-          <p className="mt-2 text-center text-sm text-white/45">
+          <p className="mt-2 text-center text-sm text-text-tertiary">
             A new authenticator was added to your YO Voice account. If you
             don&apos;t recognize it, remove it now. If you added it yourself,
             you can safely close this page.
@@ -127,7 +127,7 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
             isLoading={phase.name === "applying"}
             disabled={phase.name === "applying"}
             onClick={removeAuthenticator}
-            className="mt-8 w-full border-rose-400/30 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20"
+            className="mt-8 w-full border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] text-error hover:bg-[color-mix(in_srgb,var(--danger-surface)_78%,var(--error))]"
           >
             {phase.name === "applying"
               ? "Removing…"
@@ -135,7 +135,7 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
           </Button>
           <Link
             href="/login"
-            className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+            className="mt-6 block text-center text-sm link-accent"
           >
             Keep it and go to log in
           </Link>
@@ -146,10 +146,10 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
       return (
         <>
           <SuccessCheckmark label="Authenticator removed" />
-          <h1 className="mt-6 text-center text-3xl font-bold">
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
             Authenticator removed
           </h1>
-          <p className="mt-2 text-center text-sm text-white/45">
+          <p className="mt-2 text-center text-sm text-text-tertiary">
             The recently added authenticator can no longer access your
             account. If this wasn&apos;t you, reset your password as well.
           </p>
@@ -161,7 +161,7 @@ function RevertSecondFactorFlow({ oobCode }: { oobCode: string }) {
           </Link>
           <Link
             href="/login"
-            className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+            className="mt-6 block text-center text-sm link-accent"
           >
             Back to log in
           </Link>
@@ -189,8 +189,8 @@ function InvalidLink({
   return (
     <>
       <ErrorGlyph />
-      <h1 className="mt-6 text-center text-3xl font-bold">{title}</h1>
-      <p className="mt-2 text-center text-sm text-white/45">
+      <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">{title}</h1>
+      <p className="mt-2 text-center text-sm text-text-tertiary">
         Review your account security, or contact support if an authenticator
         you don&apos;t recognize is still attached to your account.
       </p>
@@ -202,7 +202,7 @@ function InvalidLink({
       </Link>
       <Link
         href="/login"
-        className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+        className="mt-6 block text-center text-sm link-accent"
       >
         Back to log in
       </Link>

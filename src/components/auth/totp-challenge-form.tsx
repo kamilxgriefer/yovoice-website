@@ -73,15 +73,15 @@ export function TotpChallengeForm({
       <button
         type="button"
         onClick={onCancel}
-        className="focus-ring -ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold text-white/65 transition hover:text-white"
+        className="focus-ring -ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold text-text-secondary transition hover:text-white"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Back to password
       </button>
 
-      <div className="mt-5 rounded-[28px] border border-white/10 bg-white/[0.035] p-3 sm:p-7">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-fuchsia-400/25 bg-fuchsia-500/10 text-fuchsia-200">
-          <ShieldCheck className="size-7" aria-hidden />
+      <div className="mt-5">
+        <div className="icon-tile mx-auto size-12">
+          <ShieldCheck className="size-6" strokeWidth={1.8} aria-hidden />
         </div>
         <h2
           id="totp-challenge-title"
@@ -91,7 +91,7 @@ export function TotpChallengeForm({
         </h2>
         <p
           id={descriptionId}
-          className="mx-auto mt-2 max-w-sm text-center text-sm leading-6 text-white/50"
+          className="mx-auto mt-2 max-w-sm text-center text-sm leading-6 text-text-tertiary"
         >
           Enter the current 6-digit code from the authenticator app connected
           to your YO Voice account.
@@ -100,13 +100,13 @@ export function TotpChallengeForm({
         <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
           {challenge.factors.length > 1 ? (
             <fieldset className="space-y-2">
-              <legend className="text-sm font-semibold text-white/75">
+              <legend className="text-sm font-semibold text-text-secondary">
                 Authenticator
               </legend>
               {challenge.factors.map((factor) => (
                 <label
                   key={factor.uid}
-                  className="focus-within:ring-fuchsia-400/70 flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-black/10 px-4 focus-within:ring-2"
+                  className="flex min-h-12 cursor-pointer items-center gap-3 rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--focus)]"
                 >
                   <input
                     type="radio"
@@ -114,16 +114,16 @@ export function TotpChallengeForm({
                     value={factor.uid}
                     checked={selectedFactorUid === factor.uid}
                     onChange={() => setSelectedFactorUid(factor.uid)}
-                    className="size-4 accent-fuchsia-500"
+                    className="size-4 accent-[var(--primary)]"
                   />
-                  <span className="text-sm font-semibold text-white/80">
+                  <span className="text-sm font-semibold text-text-secondary">
                     {factor.displayName}
                   </span>
                 </label>
               ))}
             </fieldset>
           ) : (
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-fuchsia-200/75">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-text-tertiary">
               {challenge.factors[0]?.displayName}
             </p>
           )}
@@ -156,7 +156,8 @@ export function TotpChallengeForm({
               <p
                 id={errorId}
                 role="alert"
-                className="mt-2 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+                data-tone="error"
+                className="status-alert mt-2"
               >
                 {error}
               </p>

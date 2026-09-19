@@ -101,13 +101,13 @@ export function PasswordField({
           aria-label={visible ? "Hide password" : "Show password"}
           aria-pressed={visible}
           disabled={disabled}
-          className="glass-field__action rounded-xl text-white/45 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400"
+          className="glass-field__action rounded-xl text-text-tertiary transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
         >
           {visible ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
         </button>
       </div>
       {invalid && errorMessage ? (
-        <p id={errorId} role="alert" className="mt-1.5 text-xs text-rose-300">
+        <p id={errorId} role="alert" className="mt-1.5 text-xs text-error">
           {errorMessage}
         </p>
       ) : null}
@@ -123,7 +123,7 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
   const { score, label } = passwordStrength(password);
   if (password.length === 0) return null;
 
-  const colors = ["bg-rose-400/80", "bg-amber-400/80", "bg-lime-400/80", "bg-emerald-400/90"];
+  const colors = ["bg-error", "bg-warning", "bg-[var(--info)]", "bg-success"];
   const active = colors[score];
 
   return (
@@ -134,12 +134,12 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
             key={segment}
             className={cn(
               "h-1 flex-1 rounded-full transition-colors duration-300",
-              score > segment ? active : "bg-white/10",
+              score > segment ? active : "bg-[var(--surface-raised)]",
             )}
           />
         ))}
       </div>
-      <span className="text-xs text-white/45">{label}</span>
+      <span className="text-xs text-text-tertiary">{label}</span>
     </div>
   );
 }

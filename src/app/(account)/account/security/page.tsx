@@ -43,16 +43,16 @@ function PasswordCard() {
   }
 
   return (
-    <div className="glass-panel rounded-[28px] p-8">
+    <div className="panel p-5 sm:p-8">
       <h2 className="text-xl font-bold">Password</h2>
       <form className="mt-6 max-w-md space-y-4" onSubmit={handleSubmit}>
         {error ? (
-          <p role="alert" className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          <p role="alert" data-tone="error" className="status-alert">
             {error}
           </p>
         ) : null}
         {saved ? (
-          <p className="rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          <p data-tone="success" className="status-alert">
             Password updated.
           </p>
         ) : null}
@@ -63,7 +63,7 @@ function PasswordCard() {
           required
           value={currentPassword}
           onChange={(event) => setCurrentPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
         <input
           type="password"
@@ -72,7 +72,7 @@ function PasswordCard() {
           required
           value={newPassword}
           onChange={(event) => setNewPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
         <input
           type="password"
@@ -81,7 +81,7 @@ function PasswordCard() {
           required
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
         <button type="submit" disabled={saving} className="premium-button min-h-12 px-6 disabled:opacity-60">
           {saving ? "Updating…" : "Update password"}
@@ -117,17 +117,17 @@ function EmailCard() {
   }
 
   return (
-    <div className="glass-panel mt-6 rounded-[28px] p-8">
+    <div className="panel mt-6 p-5 sm:p-8">
       <h2 className="text-xl font-bold">Email</h2>
-      <p className="mt-1 text-sm text-white/45">Current: {user?.email}</p>
+      <p className="mt-1 text-sm text-text-tertiary">Current: {user?.email}</p>
       <form className="mt-6 max-w-md space-y-4" onSubmit={handleSubmit}>
         {error ? (
-          <p role="alert" className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          <p role="alert" data-tone="error" className="status-alert">
             {error}
           </p>
         ) : null}
         {saved ? (
-          <p className="rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          <p data-tone="success" className="status-alert">
             Email updated. Check your inbox to verify it.
           </p>
         ) : null}
@@ -138,7 +138,7 @@ function EmailCard() {
           required
           value={currentPassword}
           onChange={(event) => setCurrentPassword(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
         <input
           type="email"
@@ -147,7 +147,7 @@ function EmailCard() {
           required
           value={newEmail}
           onChange={(event) => setNewEmail(event.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/30 focus:border-fuchsia-400/40"
+          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
         />
         <button type="submit" disabled={saving} className="premium-button min-h-12 px-6 disabled:opacity-60">
           {saving ? "Updating…" : "Update email"}
@@ -161,7 +161,7 @@ export default function SecurityPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Security</h1>
-      <p className="mt-1 text-sm text-white/45">
+      <p className="mt-1 text-sm text-text-tertiary">
         Manage your password and email. Both require your current password.
       </p>
       <div className="mt-6">

@@ -252,11 +252,11 @@ function ProfilePageForUser() {
   if (!user) return null;
 
   return (
-    <div className="glass-panel rounded-[28px] p-5 sm:p-8">
+    <div>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Profile</h1>
-          <p className="mt-1 text-sm text-white/65">
+          <p className="mt-1 text-sm text-text-secondary">
             This is how you appear across YO Voice.
           </p>
         </div>
@@ -268,17 +268,17 @@ function ProfilePageForUser() {
         </Link>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-white/10 bg-white/[.02] p-4">
+      <div className="panel mt-6 flex flex-wrap items-center gap-4 p-4">
         <div className="min-w-0">
           <p className="break-all text-sm font-semibold text-white">
             {user.email}
           </p>
           {user.emailVerified ? (
-            <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
+            <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-success">
               <CheckCircle2 className="size-3.5" /> Email verified
             </p>
           ) : (
-            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-amber-300">
+            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-warning">
               <TriangleAlert className="size-3.5" />
               Not verified —{" "}
               <Link
@@ -294,7 +294,7 @@ function ProfilePageForUser() {
           <button
             type="button"
             onClick={() => signOut()}
-            className="focus-ring min-h-11 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
+            className="premium-button-secondary focus-ring shrink-0"
           >
             Log out
           </button>
@@ -307,7 +307,7 @@ function ProfilePageForUser() {
         <div>
           <label
             htmlFor="profile-email"
-            className="text-xs font-semibold uppercase tracking-wide text-white/65"
+            className="text-xs font-semibold uppercase tracking-wide text-text-secondary"
           >
             Email
           </label>
@@ -316,9 +316,9 @@ function ProfilePageForUser() {
             type="email"
             value={user.email ?? ""}
             disabled
-            className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[.02] px-4 py-3.5 text-white/50 outline-none"
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border bg-[var(--surface-muted)] px-4 py-3 text-text-tertiary outline-none"
           />
-          <p className="mt-1 text-xs text-white/65">
+          <p className="mt-1 text-xs text-text-secondary">
             Change your email from Security.
           </p>
         </div>
@@ -326,7 +326,7 @@ function ProfilePageForUser() {
         <div>
           <label
             htmlFor="profile-name"
-            className="text-xs font-semibold uppercase tracking-wide text-white/65"
+            className="text-xs font-semibold uppercase tracking-wide text-text-secondary"
           >
             Display name
           </label>
@@ -347,9 +347,9 @@ function ProfilePageForUser() {
               setDisplayName(event.target.value);
               setNotice(null);
             }}
-            className="focus-ring mt-2 w-full rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3.5 text-white outline-none placeholder:text-white/45 focus:border-fuchsia-400/60 read-only:cursor-not-allowed read-only:text-white/65 disabled:cursor-not-allowed disabled:opacity-55"
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)] read-only:cursor-not-allowed read-only:text-text-secondary disabled:cursor-not-allowed disabled:opacity-55"
           />
-          <p id="profile-name-help" className="mt-1.5 text-xs text-white/65">
+          <p id="profile-name-help" className="mt-1.5 text-xs text-text-secondary">
             2–120 visible characters. After a real change, the next one is
             available in 30 days.
           </p>
@@ -357,7 +357,7 @@ function ProfilePageForUser() {
             <p
               id="profile-name-error"
               role="alert"
-              className="mt-1.5 text-xs font-medium text-rose-300"
+              className="mt-1.5 text-xs font-medium text-error"
             >
               {inputError}
             </p>
@@ -391,17 +391,18 @@ function ProfilePageForUser() {
 }
 
 function ProfileNotice({ notice }: { notice: Notice }) {
-  const classes =
+  const tone =
     notice.kind === "success"
-      ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-200"
+      ? "success"
       : notice.kind === "warning"
-        ? "border-amber-400/25 bg-amber-500/10 text-amber-100"
-        : "border-rose-400/25 bg-rose-500/10 text-rose-200";
+        ? "warning"
+        : "error";
   return (
     <p
       role={notice.kind === "error" ? "alert" : "status"}
       aria-live="polite"
-      className={`rounded-2xl border px-4 py-3 text-sm ${classes}`}
+      data-tone={tone}
+      className="status-alert"
     >
       {notice.text}
     </p>
@@ -422,10 +423,10 @@ function DisplayNameAvailabilityCard({
       <div
         id="profile-name-availability"
         role="status"
-        className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-4 text-white/55"
+        className="status-alert"
       >
-        <RefreshCw className="mt-0.5 size-4 shrink-0 animate-spin" />
-        <p className="text-sm">Checking your name-change date with YO Voice…</p>
+        <RefreshCw className="animate-spin" aria-hidden="true" />
+        <p>Checking your name-change date with YO Voice…</p>
       </div>
     );
   }
@@ -435,12 +436,13 @@ function DisplayNameAvailabilityCard({
       <div
         id="profile-name-availability"
         role="alert"
-        className="flex items-start gap-3 rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100"
+        data-tone="error"
+        className="status-alert"
       >
-        <CloudOff className="mt-0.5 size-5 shrink-0" />
+        <CloudOff aria-hidden="true" />
         <div>
-          <p className="text-sm font-bold">Availability not verified</p>
-          <p className="mt-1 text-xs leading-relaxed text-rose-100/70">
+          <p className="font-bold">Availability not verified</p>
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
             {error ?? "YO Voice did not return valid profile metadata."}
           </p>
         </div>
@@ -453,30 +455,30 @@ function DisplayNameAvailabilityCard({
     <div
       id="profile-name-availability"
       role="status"
-      className={`rounded-2xl border p-4 ${
+      className={`rounded-[var(--radius-field)] border p-4 ${
         availability.stale
-          ? "border-amber-400/20 bg-amber-500/[.08]"
-          : "border-fuchsia-400/20 bg-fuchsia-500/[.07]"
+          ? "border-[color-mix(in_srgb,var(--warning)_38%,transparent)] bg-[var(--warning-surface)]"
+          : "border-border bg-[var(--surface)]"
       }`}
     >
       <div className="flex items-start gap-3">
         <Icon
           className={`mt-0.5 size-5 shrink-0 ${
-            availability.stale ? "text-amber-300" : "text-fuchsia-300"
+            availability.stale ? "text-warning" : "text-accent"
           }`}
         />
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-bold text-white">{availability.title}</p>
             {availability.stale ? (
-              <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-200">
+              <span className="badge badge-creator">
                 Cached — checking server
               </span>
             ) : null}
           </div>
           {availability.nextChangeAtMs !== null ? (
             <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-white">
-              <CalendarClock className="mt-0.5 size-4 shrink-0 text-fuchsia-300" />
+              <CalendarClock className="mt-0.5 size-4 shrink-0 text-accent" />
               <time
                 dateTime={new Date(
                   availability.nextChangeAtMs,
@@ -486,11 +488,11 @@ function DisplayNameAvailabilityCard({
               </time>
             </p>
           ) : (
-            <p className="mt-2 text-sm font-semibold text-emerald-300">
+            <p className="mt-2 text-sm font-semibold text-success">
               No previous display-name change is recorded.
             </p>
           )}
-          <p className="mt-1.5 text-xs leading-relaxed text-white/65">
+          <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
             {availability.description}
           </p>
         </div>

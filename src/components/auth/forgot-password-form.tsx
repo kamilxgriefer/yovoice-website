@@ -65,29 +65,30 @@ export function ForgotPasswordForm() {
       <div className="mt-8 space-y-4 text-center">
         <div
           aria-hidden="true"
-          className="mx-auto flex size-16 items-center justify-center rounded-full border border-fuchsia-300/25 bg-fuchsia-500/10 text-2xl"
+          className="icon-tile mx-auto size-14"
         >
-          ✉
+          <Mail className="size-6" strokeWidth={1.8} />
         </div>
         <h2 className="text-xl font-bold">Check your inbox</h2>
-        <p className="text-sm text-white/45">
+        <p className="text-sm text-text-tertiary">
           If an account exists for {email}, we&apos;ve sent instructions to
           reset your password.
         </p>
         {error ? (
           <p
             role="alert"
-            className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+            data-tone="error"
+            className="status-alert"
           >
             {error}
           </p>
         ) : null}
-        <p className="pt-2 text-sm text-white/45">Didn&apos;t receive it?</p>
+        <p className="pt-2 text-sm text-text-tertiary">Didn&apos;t receive it?</p>
         <button
           type="button"
           onClick={send}
           disabled={submitting || cooldown > 0}
-          className="min-h-13 w-full rounded-2xl border border-white/10 bg-white/[.04] text-sm font-semibold text-white/80 transition hover:bg-white/[.08] disabled:opacity-60"
+          className="premium-button-secondary focus-ring w-full disabled:opacity-60"
         >
           {submitting
             ? "Sending…"
@@ -97,7 +98,7 @@ export function ForgotPasswordForm() {
         </button>
         <Link
           href="/login"
-          className="premium-button min-h-13 inline-flex w-full items-center justify-center"
+          className="premium-button focus-ring w-full"
         >
           Back to log in
         </Link>
@@ -110,7 +111,8 @@ export function ForgotPasswordForm() {
       {error ? (
         <p
           role="alert"
-          className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+          data-tone="error"
+          className="status-alert"
         >
           {error}
         </p>
@@ -136,9 +138,9 @@ export function ForgotPasswordForm() {
         {submitting ? "Sending…" : "Send reset link"}
       </Button>
 
-      <p className="text-center text-sm text-white/45">
+      <p className="text-center text-sm text-text-tertiary">
         Remembered it?{" "}
-        <Link href="/login" className="font-semibold text-fuchsia-300 hover:text-white">
+        <Link href="/login" className="font-semibold link-accent">
           Log in
         </Link>
       </p>

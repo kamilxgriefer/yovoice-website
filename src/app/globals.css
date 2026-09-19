@@ -276,6 +276,11 @@ img { user-select: none; -webkit-user-drag: none; }
   color: #080711;
 }
 .roadmap-cta:hover { background: #fae8ff; color: #080711; }
+/* Inline text link in the accent. Unlayered for the same reason as
+   `.roadmap-cta`: the global `a { color: inherit }` above outranks any
+   colour utility on an anchor, so `text-accent` alone renders white. */
+.link-accent { color: var(--accent); transition: color .2s ease; }
+.link-accent:hover { color: var(--foreground); }
 
 /* Buttons — one geometry for all three emphases: 48 px, field radius,
    15 px / 600. Being unlayered, these declarations outrank the leftover
@@ -460,6 +465,66 @@ img { user-select: none; -webkit-user-drag: none; }
     grid-template-columns: 2.5rem minmax(0, 1fr);
     column-gap: 1rem;
     align-items: start;
+  }
+  /* Status alert on the semantic pairs, the same surface / hairline / ink
+     recipe as `.release-status[data-status]`. The tone's glyph is painted by
+     `::before` from `currentColor`, so every alert carries an icon next to
+     its text without an extra element, and colour is never the only signal.
+     Block-level on purpose: messages with inline links keep flowing as text.
+     An alert that renders its own leading <svg> suppresses the painted one. */
+  .status-alert {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-field);
+    background: var(--surface-muted);
+    color: var(--text-secondary);
+    padding: .75rem 1rem .75rem 2.75rem;
+    font-size: .875rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .status-alert::before {
+    content: "";
+    position: absolute;
+    top: .8125rem;
+    left: 1rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    background: currentColor;
+    -webkit-mask: var(--status-alert-glyph) center / contain no-repeat;
+    mask: var(--status-alert-glyph) center / contain no-repeat;
+  }
+  .status-alert:has(> svg:first-child) {
+    display: flex;
+    align-items: flex-start;
+    gap: .625rem;
+    padding-left: 1rem;
+  }
+  .status-alert:has(> svg:first-child)::before { display: none; }
+  .status-alert > svg:first-child { flex: none; width: 1.125rem; height: 1.125rem; margin-top: .0625rem; }
+  .status-alert[data-tone="error"] {
+    --status-alert-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5M12 16.5h.01'/%3E%3C/svg%3E");
+    border-color: color-mix(in srgb, var(--error) 38%, transparent);
+    background: var(--danger-surface);
+    color: var(--error);
+  }
+  .status-alert[data-tone="success"] {
+    --status-alert-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m8 12.5 2.7 2.7L16 9.5'/%3E%3C/svg%3E");
+    border-color: color-mix(in srgb, var(--success) 38%, transparent);
+    background: var(--success-surface);
+    color: var(--success);
+  }
+  .status-alert[data-tone="warning"] {
+    --status-alert-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z'/%3E%3Cpath d='M12 9v4M12 17h.01'/%3E%3C/svg%3E");
+    border-color: color-mix(in srgb, var(--warning) 38%, transparent);
+    background: var(--warning-surface);
+    color: var(--warning);
+  }
+  .status-alert[data-tone="info"] {
+    --status-alert-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5.5M12 7.5h.01'/%3E%3C/svg%3E");
+    border-color: color-mix(in srgb, var(--info) 38%, transparent);
+    background: var(--info-surface);
+    color: var(--info);
   }
 }
 

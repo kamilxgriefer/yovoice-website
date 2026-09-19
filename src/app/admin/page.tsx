@@ -398,7 +398,7 @@ export default function AdminPage() {
   return (
     <div>
       <SiteHeader />
-      <main id="main-content" className="min-h-screen bg-[#080711] px-5 pb-24 pt-32 sm:px-8 lg:px-12">
+      <main id="main-content" className="min-h-screen bg-[#080711] px-5 pb-24 pt-26 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl font-bold">Admin</h1>
           <p className="mt-2 text-sm text-white/55">

@@ -6,11 +6,11 @@
 
 export function SuccessCheckmark({ label = "Success" }: { label?: string }) {
   return (
-    <div className="mx-auto flex size-20 items-center justify-center">
+    <div className="mx-auto mt-6 flex size-20 items-center justify-center">
       <svg
         viewBox="0 0 80 80"
         fill="none"
-        className="size-20"
+        className="size-20 text-success"
         role="img"
         aria-label={label}
       >
@@ -19,13 +19,13 @@ export function SuccessCheckmark({ label = "Success" }: { label?: string }) {
           cy="40"
           r="36"
           className="origin-center animate-[verify-pop_0.4s_ease-out]"
-          stroke="url(#verify-ring)"
+          stroke="currentColor"
           strokeWidth="3"
         />
         <path
           d="M24 41 L35 52 L57 29"
           fill="none"
-          stroke="url(#verify-ring)"
+          stroke="currentColor"
           strokeWidth="4.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -36,12 +36,6 @@ export function SuccessCheckmark({ label = "Success" }: { label?: string }) {
             strokeDashoffset: 1,
           }}
         />
-        <defs>
-          <linearGradient id="verify-ring" x1="0" y1="0" x2="80" y2="80">
-            <stop offset="0%" stopColor="#e879f9" />
-            <stop offset="100%" stopColor="#7c3aed" />
-          </linearGradient>
-        </defs>
       </svg>
       <style>{`
         @keyframes verify-pop {
@@ -61,11 +55,11 @@ export function SuccessCheckmark({ label = "Success" }: { label?: string }) {
 
 export function ErrorGlyph() {
   return (
-    <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-rose-500/10">
+    <div className="mx-auto mt-6 flex size-20 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] text-error">
       <svg viewBox="0 0 24 24" fill="none" className="size-9" aria-hidden="true">
         <path
           d="M12 8v5m0 3.5h.01M10.29 3.86 1.82 18a1.5 1.5 0 0 0 1.29 2.25h17.78A1.5 1.5 0 0 0 22.18 18L13.71 3.86a1.5 1.5 0 0 0-2.6 0Z"
-          stroke="#fb7185"
+          stroke="currentColor"
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -77,6 +71,6 @@ export function ErrorGlyph() {
 
 export function LoadingSpinner() {
   return (
-    <div className="mx-auto mt-4 size-10 animate-spin rounded-full border-2 border-white/10 border-t-fuchsia-400" />
+    <div className="mx-auto mt-4 size-10 animate-spin rounded-full border-2 border-border border-t-[var(--accent)]" />
   );
 }

@@ -30,7 +30,7 @@ import { getFirebaseAuth } from "@/lib/firebase/config";
 export default function RecoverEmailPage() {
   return (
     <Suspense
-      fallback={<p className="mt-8 text-center text-sm text-white/45">Loading…</p>}
+      fallback={<p className="mt-8 text-center text-sm text-text-tertiary">Loading…</p>}
     >
       <RecoverEmailContent />
     </Suspense>
@@ -80,10 +80,10 @@ function RecoverEmailContent() {
     return (
       <>
         <ErrorGlyph />
-        <h1 className="mt-6 text-center text-3xl font-bold">
+        <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
           That link is incomplete
         </h1>
-        <p className="mt-2 text-center text-sm text-white/45">
+        <p className="mt-2 text-center text-sm text-text-tertiary">
           Open the link from your email again, or contact support if this
           keeps happening.
         </p>
@@ -102,7 +102,7 @@ function RecoverEmailContent() {
       return (
         <>
           <LoadingSpinner />
-          <p className="mt-6 text-center text-sm text-white/45">
+          <p className="mt-6 text-center text-sm text-text-tertiary">
             Confirming your request…
           </p>
         </>
@@ -112,10 +112,10 @@ function RecoverEmailContent() {
       return (
         <>
           <ErrorGlyph />
-          <h1 className="mt-6 text-center text-3xl font-bold">
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
             {phase.expired ? "This link has expired" : "This link is no longer valid"}
           </h1>
-          <p className="mt-2 text-center text-sm text-white/45">
+          <p className="mt-2 text-center text-sm text-text-tertiary">
             {phase.expired
               ? "For your security these links only work for a limited time. If you still need to undo an email change, contact support."
               : "It may have already been used. If you still need help with your account email, contact support."}
@@ -128,7 +128,7 @@ function RecoverEmailContent() {
           </Link>
           <Link
             href="/login"
-            className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+            className="mt-6 block text-center text-sm link-accent"
           >
             Back to log in
           </Link>
@@ -139,8 +139,8 @@ function RecoverEmailContent() {
       return (
         <>
           <SuccessCheckmark label="Email updated" />
-          <h1 className="mt-6 text-center text-3xl font-bold">Email updated</h1>
-          <p className="mt-2 text-center text-sm text-white/45">
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">Email updated</h1>
+          <p className="mt-2 text-center text-sm text-text-tertiary">
             {phase.email
               ? `${phase.email} is now the email for your YO Voice account.`
               : "Your YO Voice account email has been updated."}
@@ -158,8 +158,8 @@ function RecoverEmailContent() {
       return (
         <>
           <SuccessCheckmark label="Email restored" />
-          <h1 className="mt-6 text-center text-3xl font-bold">Email restored</h1>
-          <p className="mt-2 text-center text-sm text-white/45">
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">Email restored</h1>
+          <p className="mt-2 text-center text-sm text-text-tertiary">
             {phase.email
               ? `Your account email is back to ${phase.email}.`
               : "Your original account email has been restored."}{" "}
@@ -174,7 +174,7 @@ function RecoverEmailContent() {
           </Link>
           <Link
             href="/login"
-            className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+            className="mt-6 block text-center text-sm link-accent"
           >
             Back to log in
           </Link>

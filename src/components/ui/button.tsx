@@ -31,8 +31,9 @@ const sizeClass: Record<NonNullable<CommonProps["size"]>, string> = {
   lg: "min-h-14 px-8 text-base",
 };
 
-/** Site-wide button primitive matching the UI asset pack: pill radius,
- * glass sheen, spring hover-lift, GPU-only motion (transform/opacity). Pass
+/** Site-wide button primitive. The look comes from the unlayered
+ * `.premium-button*` classes in globals.css (solid fill, 12 px radius,
+ * 48 px, 600); this adds only GPU-only motion (transform/opacity). Pass
  * `href` for a link-styled-as-button, omit it for a real `<button>`. */
 type NativeButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
@@ -61,7 +62,7 @@ export function Button({
     <>
       {isLoading ? (
         <motion.span
-          className="size-4 rounded-full border-2 border-white/30 border-t-white"
+          className="size-4 rounded-full border-2 border-[color-mix(in_srgb,currentColor_30%,transparent)] border-t-current"
           animate={{ rotate: 360 }}
           transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }}
         />

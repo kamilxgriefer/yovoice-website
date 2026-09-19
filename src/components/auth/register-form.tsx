@@ -70,7 +70,8 @@ export function RegisterForm() {
       {error ? (
         <p
           role="alert"
-          className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+          data-tone="error"
+          className="status-alert"
         >
           {error}
         </p>
@@ -145,7 +146,7 @@ export function RegisterForm() {
         {submitting ? "Creating account…" : "Create account"}
       </Button>
 
-      <p className="text-center text-sm text-white/65">
+      <p className="text-center text-sm text-text-secondary">
         Already have an account?{" "}
         <Link
           href={
@@ -153,7 +154,7 @@ export function RegisterForm() {
               ? `/login?redirect=${encodeURIComponent(searchParams.get("redirect")!)}`
               : "/login"
           }
-          className="font-semibold text-fuchsia-300 hover:text-white"
+          className="font-semibold link-accent"
         >
           Log in
         </Link>

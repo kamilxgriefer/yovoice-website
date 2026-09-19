@@ -143,14 +143,14 @@ export default function NotificationsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Notifications</h1>
-      <p className="mt-1 text-sm text-white/45">
+      <p className="mt-1 text-sm text-text-tertiary">
         Choose which activity sends you a push notification. In-app activity
         is always recorded in your notification center regardless of these
         settings.
       </p>
 
-      <div className="glass-panel mt-6 flex items-center gap-4 rounded-[28px] p-6">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/30 to-fuchsia-500/20 text-fuchsia-200">
+      <div className="panel mt-6 flex flex-wrap items-center gap-4 p-5 sm:p-6">
+        <div className="icon-tile">
           {permission === "granted" ? (
             <BellRing className="size-5" aria-hidden="true" />
           ) : (
@@ -161,7 +161,7 @@ export default function NotificationsPage() {
           <p className="text-sm font-semibold text-white">
             Browser notifications
           </p>
-          <p className="mt-0.5 text-xs text-white/45">
+          <p className="mt-0.5 text-xs text-text-tertiary">
             {permission === "unsupported" &&
               "Not supported in this browser."}
             {permission === "granted" && "Enabled for this browser."}
@@ -174,7 +174,7 @@ export default function NotificationsPage() {
           <button
             type="button"
             onClick={requestPermission}
-            className="premium-button min-h-10 shrink-0 px-4 text-xs"
+            className="premium-button shrink-0"
           >
             Enable
           </button>
@@ -182,7 +182,7 @@ export default function NotificationsPage() {
       </div>
 
       {!creatorAudienceVisible ? (
-        <p className="mt-4 rounded-2xl border border-sky-300/15 bg-sky-300/[0.04] px-4 py-3 text-xs leading-5 text-white/60">
+        <p data-tone="info" className="status-alert mt-4">
           Follower alerts appear only when the server marks a Premium Creator
           profile as age-verified and explicitly opted in to public audience
           visibility.
@@ -193,7 +193,7 @@ export default function NotificationsPage() {
         {GROUPS.filter((group) => !group.creatorOnly || creatorAudienceVisible).map((group) => (
           <div key={group.title}>
             <h2 className="text-sm font-bold text-white">{group.title}</h2>
-            <div className="glass-panel mt-2 divide-y divide-white/10 rounded-[24px]">
+            <div className="panel mt-2 divide-y divide-[var(--border)]">
               {group.types.map(({ id, label }) => {
                 const enabled = preferences[id] !== false;
                 return (
@@ -201,7 +201,7 @@ export default function NotificationsPage() {
                     key={id}
                     className="flex items-center justify-between gap-4 px-5 py-4"
                   >
-                    <span className="text-sm font-medium text-white/85">
+                    <span className="text-sm font-medium text-text-secondary">
                       {label}
                     </span>
                     <button
@@ -215,7 +215,7 @@ export default function NotificationsPage() {
                     >
                       <span
                         aria-hidden="true"
-                        className={`absolute left-0 top-2.5 h-6 w-11 rounded-full transition ${enabled ? "bg-fuchsia-500" : "bg-white/15"}`}
+                        className={`absolute left-0 top-2.5 h-6 w-11 rounded-full transition ${enabled ? "bg-[var(--primary)]" : "border border-border-strong bg-[var(--surface-raised)]"}`}
                       >
                         <span className={`absolute top-0.5 size-5 rounded-full bg-white transition ${enabled ? "left-[22px]" : "left-0.5"}`} />
                       </span>

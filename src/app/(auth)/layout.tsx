@@ -6,6 +6,24 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const highlights = [
+  { icon: AudioLines, label: "Voice-first by design" },
+  { icon: ShieldCheck, label: "Protected account hand-off" },
+  { icon: Sparkles, label: "Dark and Pearl, one system" },
+];
+
+/**
+ * One surface for all seven auth pages, including the mail-action pages
+ * people open from their inbox on a cold device.
+ *
+ * Desktop: a single bordered surface split into a 560 px brand panel and a
+ * form pane whose column is 400 px. Phone: no card at all — logo, wordmark
+ * and the form sit straight on the page background.
+ *
+ * The brand line is a <p> styled as a heading on purpose: the page's only
+ * <h1> belongs to the form (the panel is `hidden lg:flex`, so a heading here
+ * gave desktop two H1s).
+ */
 export default function AuthLayout({
   children,
 }: {
@@ -14,52 +32,54 @@ export default function AuthLayout({
   return (
     <main
       id="main-content"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080711] px-3 py-6 sm:px-8 sm:py-10 lg:py-16"
+      className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-8 lg:py-16"
     >
-      <div className="absolute left-[-14%] top-[-18%] size-[620px] rounded-full bg-[#7b2ff7]/16 blur-[170px]" />
-      <div className="absolute bottom-[-26%] right-[-12%] size-[620px] rounded-full bg-[#d986ff]/10 blur-[180px]" />
+      <div className="grid w-full max-w-[400px] lg:max-w-[1040px] lg:grid-cols-[minmax(0,560px)_minmax(0,480px)] lg:overflow-hidden lg:rounded-[var(--radius-card)] lg:border lg:border-border">
+        <section
+          aria-label="About YO Voice accounts"
+          className="relative hidden min-h-[640px] overflow-hidden border-r border-border bg-[#120a22] p-12 lg:flex lg:flex-col"
+        >
+          {/* Three hairline rings: the panel's only decoration. */}
+          <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0">
+            {[520, 400, 280].map((size) => (
+              <span
+                key={size}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color-mix(in_srgb,var(--accent)_16%,transparent)]"
+                style={{ width: size, height: size }}
+              />
+            ))}
+          </div>
 
-      <div className="relative grid w-full max-w-6xl overflow-hidden rounded-[36px] border border-[var(--border)] bg-[var(--surface-muted)] shadow-[0_40px_140px_rgba(0,0,0,.48)] lg:grid-cols-[1.05fr_.95fr]">
-        <section className="relative hidden min-h-[680px] overflow-hidden border-r border-[var(--border)] bg-[linear-gradient(145deg,#21192b,#130a22_58%,#080711)] p-12 lg:flex lg:flex-col">
-          <div className="absolute right-[-22%] top-[8%] size-[460px] rounded-full bg-[#7b2ff7]/22 blur-[120px]" />
           <div className="relative">
             <BrandLockup className="w-fit" />
-            <p className="mt-24 text-xs font-black uppercase tracking-[.24em] text-[#d986ff]">
-              Voice Relay
-            </p>
-            <h1 className="mt-5 max-w-lg text-5xl font-black leading-[1.03] tracking-[-.05em] text-white">
+            <p className="eyebrow mt-20">Voice Relay</p>
+            <p className="mt-4 max-w-md font-[family-name:var(--font-display)] text-[40px] font-extrabold leading-[1.08] tracking-[-.025em] text-white">
               One identity.
-              <span className="text-gradient text-gradient-descender-safe block">
-                Every conversation.
-              </span>
-            </h1>
-            <p className="mt-6 max-w-md text-base leading-8 text-white/65">
+              <span className="block text-accent">Every conversation.</span>
+            </p>
+            <p className="mt-5 max-w-md text-base leading-[1.6] text-text-secondary">
               Enter the same YO Voice account used for Chats, Moments, Servers
               and your public Voice identity.
             </p>
           </div>
 
-          <div className="relative mt-auto grid gap-3">
-            {[
-              { icon: AudioLines, label: "Voice-first by design" },
-              { icon: ShieldCheck, label: "Protected account hand-off" },
-              { icon: Sparkles, label: "Dark and Pearl, one system" },
-            ].map(({ icon: Icon, label }) => (
-              <div
+          <ul className="relative mt-auto grid gap-4">
+            {highlights.map(({ icon: Icon, label }) => (
+              <li
                 key={label}
-                className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[.04] px-4 py-3 text-sm font-bold text-white/75"
+                className="flex items-center gap-3 text-sm font-semibold text-text-secondary"
               >
-                <span className="flex size-9 items-center justify-center rounded-xl bg-[#7b2ff7]/20 text-[#d986ff]">
-                  <Icon className="size-4" aria-hidden="true" />
+                <span className="icon-tile">
+                  <Icon className="size-5" strokeWidth={1.8} aria-hidden="true" />
                 </span>
                 {label}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
-        <section className="flex min-h-[620px] items-center bg-[linear-gradient(180deg,#17121f,#100d18)] p-3 sm:p-10 lg:p-12">
-          <div className="mx-auto w-full max-w-md rounded-[30px] border border-white/10 bg-[#17121f]/88 p-4 shadow-[0_28px_80px_rgba(0,0,0,.28)] backdrop-blur-xl sm:p-8">
+        <section className="flex items-center lg:bg-[var(--surface)] lg:px-10 lg:py-12">
+          <div className="mx-auto w-full max-w-[400px]">
             <BrandLockup className="mx-auto w-fit lg:hidden" />
             {children}
           </div>

@@ -33,9 +33,9 @@ export function Input({
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "className">) {
   const statusIcon =
     state === "error" ? (
-      <XCircle className="size-5 text-rose-400" />
+      <XCircle className="size-5 text-error" strokeWidth={1.8} />
     ) : state === "success" ? (
-      <CheckCircle2 className="size-5 text-emerald-400" />
+      <CheckCircle2 className="size-5 text-success" strokeWidth={1.8} />
     ) : null;
 
   return (
@@ -62,7 +62,7 @@ export function Input({
         ) : null}
       </div>
       {state === "error" && errorMessage ? (
-        <p role="alert" className="mt-1.5 text-xs text-rose-300">
+        <p role="alert" className="mt-1.5 text-xs text-error">
           {errorMessage}
         </p>
       ) : null}

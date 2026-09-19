@@ -34,7 +34,7 @@ const AUTO_OPEN_APP_DELAY_MS = 6000;
 export default function VerifyEmailPage() {
   return (
     <Suspense
-      fallback={<p className="mt-8 text-center text-sm text-white/45">Loading…</p>}
+      fallback={<p className="mt-8 text-center text-sm text-text-tertiary">Loading…</p>}
     >
       <VerifyEmailPageContent />
     </Suspense>
@@ -93,7 +93,7 @@ function ActionCodeHandler({ oobCode }: { oobCode: string }) {
     return (
       <>
         <LoadingSpinner />
-        <p className="mt-6 text-center text-sm text-white/45">
+        <p className="mt-6 text-center text-sm text-text-tertiary">
           Confirming your email…
         </p>
       </>
@@ -104,10 +104,10 @@ function ActionCodeHandler({ oobCode }: { oobCode: string }) {
     return (
       <>
         <ErrorGlyph />
-        <h1 className="mt-6 text-center text-3xl font-bold">
+        <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
           Link no longer valid
         </h1>
-        <p className="mt-2 text-center text-sm text-white/45">{error}</p>
+        <p className="mt-2 text-center text-sm text-text-tertiary">{error}</p>
         <Link
           href="/verify-email"
           className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
@@ -237,7 +237,7 @@ function VerifyEmailPrompt() {
     return (
       <>
         <LoadingSpinner />
-        <p className="mt-6 text-center text-sm text-white/45">Loading…</p>
+        <p className="mt-6 text-center text-sm text-text-tertiary">Loading…</p>
       </>
     );
   }
@@ -248,11 +248,12 @@ function VerifyEmailPrompt() {
 
   return (
     <>
-      <h1 className="mt-8 text-center text-3xl font-bold">Verify your email</h1>
+      <h1 className="mt-8 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">Verify your email</h1>
       {sendState === "failed" ? (
         <div
           role="alert"
-          className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+          data-tone="error"
+          className="status-alert mt-6"
         >
           <p className="font-semibold">The confirmation email was not sent.</p>
           <p className="mt-1">
@@ -261,7 +262,7 @@ function VerifyEmailPrompt() {
           </p>
         </div>
       ) : (
-        <p className="mt-2 text-center text-sm text-white/45">
+        <p className="mt-2 text-center text-sm text-text-tertiary">
           We sent a confirmation link to {user.email}. Open it to verify your
           account.
         </p>
@@ -270,13 +271,14 @@ function VerifyEmailPrompt() {
       {sendError ? (
         <p
           role="alert"
-          className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+          data-tone="error"
+          className="status-alert mt-6"
         >
           {sendError}
         </p>
       ) : null}
       {sent && !sendError ? (
-        <p className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-center text-sm text-emerald-200">
+        <p data-tone="success" className="status-alert mt-6">
           Verification email sent.
         </p>
       ) : null}
@@ -299,12 +301,12 @@ function VerifyEmailPrompt() {
         type="button"
         onClick={handleCheckNow}
         disabled={checking}
-        className="mt-3 min-h-13 w-full rounded-2xl border border-white/10 bg-white/[.04] text-sm font-semibold text-white/80 transition hover:bg-white/[.08] disabled:opacity-60"
+        className="premium-button-secondary focus-ring mt-3 w-full disabled:opacity-60"
       >
         {checking ? "Checking…" : "I have verified my email"}
       </button>
 
-      <Link href="/" className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white">
+      <Link href="/" className="mt-6 block text-center text-sm link-accent">
         Return to homepage
       </Link>
     </>
@@ -341,8 +343,8 @@ function VerifiedSuccess({ email }: { email: string | null }) {
   return (
     <>
       <SuccessCheckmark label="Verified" />
-      <h1 className="mt-6 text-center text-3xl font-bold">You&apos;re verified</h1>
-      <p className="mt-2 text-center text-sm text-white/45">
+      <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">You&apos;re verified</h1>
+      <p className="mt-2 text-center text-sm text-text-tertiary">
         {email ? `${email} is confirmed.` : "Your email is confirmed."}{" "}
         You&apos;re all set.
       </p>
@@ -357,7 +359,7 @@ function VerifiedSuccess({ email }: { email: string | null }) {
 
       <Link
         href="/account/profile"
-        className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+        className="mt-6 block text-center text-sm link-accent"
       >
         Go to your account instead
       </Link>

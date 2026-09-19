@@ -32,8 +32,8 @@ export default function AccountLayout({
 
   if (loading || !user) {
     return (
-      <main id="main-content" className="flex min-h-screen items-center justify-center bg-[#080711]">
-        <p className="text-sm text-white/45">Loading…</p>
+      <main id="main-content" className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-text-tertiary">Loading…</p>
       </main>
     );
   }
@@ -41,7 +41,7 @@ export default function AccountLayout({
   return (
     <div>
       <SiteHeader />
-      <main id="main-content" className="min-h-screen bg-[#080711] px-5 pb-24 pt-32 sm:px-8 lg:px-12">
+      <main id="main-content" className="min-h-screen px-5 pb-24 pt-26 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <VerifyEmailBanner />
 
@@ -56,19 +56,19 @@ export default function AccountLayout({
                     key={href}
                     href={href}
                     aria-current={active ? "page" : undefined}
-                    className={`focus-ring flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                      danger ? "mt-2 " : ""
+                    className={`focus-ring flex min-h-12 items-center gap-3 rounded-[var(--radius-field)] border px-3 text-sm font-semibold transition ${
+                      danger ? "mt-3 " : ""
                     }${
-                      active
-                        ? danger
-                          ? "bg-rose-500/15 text-rose-100"
-                          : "bg-fuchsia-500/15 text-white"
-                        : danger
-                          ? "text-rose-200/75 hover:bg-rose-500/10 hover:text-rose-100"
-                          : "text-white/55 hover:bg-white/[.04] hover:text-white"
+                      danger
+                        ? active
+                          ? "border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] text-error"
+                          : "border-transparent bg-[var(--danger-surface)] text-error hover:border-[color-mix(in_srgb,var(--error)_38%,transparent)]"
+                        : active
+                          ? "border-border bg-[var(--surface)] text-white"
+                          : "border-transparent text-text-secondary hover:bg-[var(--surface)] hover:text-white"
                     }`}
                   >
-                    <Icon className="size-4" />
+                    <Icon className="size-5 shrink-0" strokeWidth={1.8} aria-hidden="true" />
                     {label}
                   </Link>
                 );
@@ -76,9 +76,9 @@ export default function AccountLayout({
               <button
                 type="button"
                 onClick={() => signOut()}
-                className="mt-4 flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-white/55 transition hover:bg-white/[.04] hover:text-rose-300"
+                className="focus-ring mt-3 flex min-h-12 items-center gap-3 rounded-[var(--radius-field)] border border-transparent px-3 text-left text-sm font-semibold text-text-secondary transition hover:bg-[var(--surface)] hover:text-white"
               >
-                <LogOut className="size-4" />
+                <LogOut className="size-5 shrink-0" strokeWidth={1.8} aria-hidden="true" />
                 Sign out
               </button>
             </nav>

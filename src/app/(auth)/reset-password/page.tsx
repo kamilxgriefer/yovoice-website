@@ -37,7 +37,7 @@ import { getFirebaseAuth } from "@/lib/firebase/config";
 export default function ResetPasswordPage() {
   return (
     <Suspense
-      fallback={<p className="mt-8 text-center text-sm text-white/45">Loading…</p>}
+      fallback={<p className="mt-8 text-center text-sm text-text-tertiary">Loading…</p>}
     >
       <ResetPasswordContent />
     </Suspense>
@@ -54,10 +54,10 @@ function ResetPasswordContent() {
     return (
       <>
         <ErrorGlyph />
-        <h1 className="mt-6 text-center text-3xl font-bold">
+        <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
           That link is incomplete
         </h1>
-        <p className="mt-2 text-center text-sm text-white/45">
+        <p className="mt-2 text-center text-sm text-text-tertiary">
           Open the reset link from your email, or request a new one and
           we&apos;ll send it right over.
         </p>
@@ -69,7 +69,7 @@ function ResetPasswordContent() {
         </Link>
         <Link
           href="/login"
-          className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+          className="mt-6 block text-center text-sm link-accent"
         >
           Back to log in
         </Link>
@@ -113,7 +113,7 @@ function ResetPasswordFlow({
       return (
         <>
           <LoadingSpinner />
-          <p className="mt-6 text-center text-sm text-white/45">
+          <p className="mt-6 text-center text-sm text-text-tertiary">
             Checking your reset link…
           </p>
         </>
@@ -123,10 +123,10 @@ function ResetPasswordFlow({
       return (
         <>
           <ErrorGlyph />
-          <h1 className="mt-6 text-center text-3xl font-bold">
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
             Connection trouble
           </h1>
-          <p className="mt-2 text-center text-sm text-white/45">
+          <p className="mt-2 text-center text-sm text-text-tertiary">
             We couldn&apos;t reach YO Voice to check your link. Make sure
             you&apos;re online, then try again.
           </p>
@@ -149,8 +149,8 @@ function ResetPasswordFlow({
       return (
         <>
           <ErrorGlyph />
-          <h1 className="mt-6 text-center text-3xl font-bold">{phase.title}</h1>
-          <p className="mt-2 text-center text-sm text-white/45">{phase.body}</p>
+          <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">{phase.title}</h1>
+          <p className="mt-2 text-center text-sm text-text-tertiary">{phase.body}</p>
           <Link
             href="/forgot-password"
             className="premium-button min-h-13 mt-8 flex w-full items-center justify-center"
@@ -159,7 +159,7 @@ function ResetPasswordFlow({
           </Link>
           <Link
             href="/login"
-            className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+            className="mt-6 block text-center text-sm link-accent"
           >
             Back to log in
           </Link>
@@ -232,19 +232,20 @@ function NewPasswordForm({
 
   return (
     <>
-      <h1 className="mt-8 text-center text-3xl font-bold">
+      <h1 className="mt-8 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">
         Create a new password
       </h1>
-      <p className="mt-2 text-center text-sm text-white/45">
+      <p className="mt-2 text-center text-sm text-text-tertiary">
         Choose a strong password for{" "}
-        <span className="font-semibold text-white/70">{email}</span>.
+        <span className="font-semibold text-text-secondary">{email}</span>.
       </p>
 
       <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
         {submitError ? (
           <p
             role="alert"
-            className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"
+            data-tone="error"
+            className="status-alert"
           >
             {submitError}
           </p>
@@ -263,7 +264,7 @@ function NewPasswordForm({
             disabled={submitting}
           />
           <PasswordStrengthMeter password={password} />
-          <p className="mt-2 text-xs text-white/35">
+          <p className="mt-2 text-xs text-text-tertiary">
             At least {MIN_PASSWORD_LENGTH} characters. Longer passphrases with a
             mix of characters are stronger.
           </p>
@@ -293,7 +294,7 @@ function NewPasswordForm({
 
       <Link
         href="/login"
-        className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+        className="mt-6 block text-center text-sm link-accent"
       >
         Back to log in
       </Link>
@@ -311,8 +312,8 @@ function ResetSuccess({ continueUrl }: { continueUrl: string | null }) {
   return (
     <>
       <SuccessCheckmark label="Password updated" />
-      <h1 className="mt-6 text-center text-3xl font-bold">Password updated</h1>
-      <p className="mt-2 text-center text-sm text-white/45">
+      <h1 className="mt-6 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">Password updated</h1>
+      <p className="mt-2 text-center text-sm text-text-tertiary">
         Your YO Voice password has been changed successfully. Log in with
         your new password to continue.
       </p>
@@ -327,7 +328,7 @@ function ResetSuccess({ continueUrl }: { continueUrl: string | null }) {
       {continueUrl ? (
         <a
           href={continueUrl}
-          className="mt-6 block text-center text-sm text-fuchsia-300 hover:text-white"
+          className="mt-6 block text-center text-sm link-accent"
         >
           Take me back to where I was
         </a>
