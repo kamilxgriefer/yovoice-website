@@ -74,16 +74,20 @@ src/
 - [x] Email Verification (sent on register, resend from `/verify-email`;
       Google and Apple accounts arrive verified and skip it)
 
-All backed by Firebase Authentication (email/password, Google, Apple),
-shared with the Flutter app via the `auth.yovoice.app` custom auth domain —
-one account works everywhere. Provider set-up and the owner's console steps:
+All backed by Firebase Authentication (email/password, Google, Apple) on
+the Flutter app's project (`yovoice-ec54a`) — one account works everywhere.
+Google and Apple popups finish on Firebase's own handler,
+`https://yovoice-ec54a.firebaseapp.com/__/auth/handler` (the SDK `authDomain`
+is derived from the project id; `auth.yovoice.app` is not a registered Google
+redirect URI). Provider set-up and the owner's console steps:
 `docs/security/security-notes.md`, "Sign-in providers".
 
 ## User Portal (`/account/*`)
 
 - [x] Profile (display name)
 - [x] Security (change password, change email — both require
-      re-authentication)
+      re-authentication; a Google- or Apple-only account, which has no
+      password, is told so and given the support route for an email change)
 - [x] Devices & Sessions (current-session info only; a full multi-device
       registry needs backend work — see Known Limitations)
 - [ ] Notifications (placeholder — needs a Firestore preferences schema)
@@ -126,7 +130,7 @@ account pages, and the actual app.
 | Variable | Purpose |
 |---|---|
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Web SDK config |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | `auth.yovoice.app` — the shared custom auth domain |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | **No longer read** (since 2026-09-24). The SDK's `authDomain` is always `<PROJECT_ID>.firebaseapp.com` (`src/lib/firebase/auth-domain.ts`): Google rejects `auth.yovoice.app/__/auth/handler` with `redirect_uri_mismatch`. A value left in Vercel is ignored and can be deleted. |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | `yovoice-ec54a` |
 | `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase Web SDK config |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase Web SDK config |

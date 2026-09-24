@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Mail } from "lucide-react";
@@ -11,13 +11,17 @@ import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TotpChallengeForm } from "@/components/auth/totp-challenge-form";
-import { SocialSignIn } from "@/components/auth/social-sign-in";
+import {
+  SocialSignIn,
+  useSocialSignInBusy,
+} from "@/components/auth/social-sign-in";
 import { AuthFold, AuthFoldAway } from "@/components/auth/auth-fold";
 import {
   markAuthModeSwitch,
   shouldPlayAuthModeSwitch,
 } from "@/components/auth/auth-mode-motion";
 import { authModeHref } from "@/lib/auth/auth-mode";
+import type { SocialProvider } from "@/lib/auth/social-sign-in";
 import type { TotpSignInChallenge } from "@/lib/auth/totp-sign-in";
 
 export function LoginForm() {
@@ -32,10 +36,17 @@ export function LoginForm() {
   const [totpChallenge, setTotpChallenge] =
     useState<TotpSignInChallenge | null>(null);
   // Which first factor the second-factor step follows: a Google or Apple
-  // sign-in has no password to go back to.
-  const [challengeAfterSocial, setChallengeAfterSocial] = useState(false);
-  // A Google or Apple window is open: the password submit waits.
-  const [socialBusy, setSocialBusy] = useState(false);
+  // sign-in has no password to go back to, and "Back" returns focus to the
+  // control that started it.
+  const [challengeFrom, setChallengeFrom] = useState<"password" | SocialProvider>(
+    "password",
+  );
+  const leftChallenge = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  // A Google or Apple window is open (possibly started on Create account):
+  // the password submit waits.
+  const socialBusy = useSocialSignInBusy();
   // Arrived from Create account: fold its extra rows away and unfold ours.
   // Once only — returning from the second-factor step shows the plain form.
   const [switched, setSwitched] = useState(shouldPlayAuthModeSwitch);
@@ -44,11 +55,26 @@ export function LoginForm() {
     router.replace(resolveAuthRedirect(searchParams.get("redirect")));
   }
 
-  function openSocialChallenge(challenge: TotpSignInChallenge) {
+  function openSocialChallenge(challenge: TotpSignInChallenge, provider: SocialProvider) {
     setSwitched(false);
-    setChallengeAfterSocial(true);
+    setChallengeFrom(provider);
     setTotpChallenge(challenge);
   }
+
+  // Back from the second-factor step: focus returns to the (now empty)
+  // password field, or to the Google / Apple button that led there, rather
+  // than falling to the page.
+  useEffect(() => {
+    if (totpChallenge || !leftChallenge.current) return;
+    leftChallenge.current = false;
+    if (challengeFrom === "password") {
+      passwordRef.current?.focus();
+    } else {
+      formRef.current
+        ?.querySelector<HTMLElement>(`[data-provider="${challengeFrom}"]`)
+        ?.focus();
+    }
+  }, [totpChallenge, challengeFrom]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,7 +85,7 @@ export function LoginForm() {
       const result = await signIn(email, password);
       if (result.status === "totp-required") {
         setSwitched(false);
-        setChallengeAfterSocial(false);
+        setChallengeFrom("password");
         setTotpChallenge(result.challenge);
         setPassword("");
         setSubmitting(false);
@@ -83,8 +109,9 @@ export function LoginForm() {
       <div data-auth-challenge>
         <TotpChallengeForm
           challenge={totpChallenge}
-          cancelLabel={challengeAfterSocial ? "Back" : undefined}
+          cancelLabel={challengeFrom === "password" ? undefined : "Back"}
           onCancel={() => {
+            leftChallenge.current = true;
             setTotpChallenge(null);
             setError(null);
           }}
@@ -95,15 +122,14 @@ export function LoginForm() {
   }
 
   return (
-    <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
+    <form className="mt-8 space-y-4" ref={formRef} onSubmit={handleSubmit} noValidate>
       {/* Identical at the top of the register form, so switching modes never
-          moves it (see SocialSignIn). */}
+          moves it (see SocialSignIn). A completed Google / Apple sign-in is
+          sent on by the page's RedirectIfAuthenticated, not by this form. */}
       <SocialSignIn
         locked={submitting}
-        onBusyChange={setSocialBusy}
         onError={setError}
         onTotpRequired={openSocialChallenge}
-        onSignedIn={finishSignIn}
       />
 
       {error ? (
@@ -139,6 +165,7 @@ export function LoginForm() {
           Password
         </label>
         <Input
+          inputRef={passwordRef}
           id="login-password"
           type="password"
           autoComplete="current-password"

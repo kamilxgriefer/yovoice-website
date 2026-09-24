@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Mail, ShieldAlert } from "lucide-react";
 
+import { SUPPORT_MAILBOX } from "@/content/account-deletion";
 import { useAuth } from "@/hooks/use-auth";
+import { hasPasswordSignIn } from "@/lib/account/account-deletion";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import {
+  SOCIAL_PROVIDER_NAME,
+  socialProvidersOf,
+} from "@/lib/auth/social-sign-in";
 
 function PasswordCard() {
   const { changePassword } = useAuth();
@@ -157,7 +164,79 @@ function EmailCard() {
   );
 }
 
+/**
+ * What an account without a password sees (it signs in only with "Continue
+ * with Google / Apple"). Both forms above reauthenticate with the current
+ * password, which such an account does not have, so they could never
+ * succeed; the app has no password or email change either. Mirrors the
+ * deletion page's ProviderAccountPanel: say why, and name the route that
+ * works.
+ */
+function ProviderAccountPanel({ providerNames }: { providerNames: string[] }) {
+  const { user } = useAuth();
+  const providers =
+    providerNames.length > 0 ? providerNames.join(" or ") : "Google or Apple";
+  return (
+    <section
+      aria-labelledby="security-provider-heading"
+      className="panel p-5 sm:p-8"
+    >
+      <h2
+        id="security-provider-heading"
+        className="flex items-center gap-2 text-xl font-bold"
+      >
+        <ShieldAlert className="size-5 shrink-0 text-warning" aria-hidden="true" />
+        This account has no YO Voice password
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
+        It signs in with {providers}, so there is no YO Voice password to
+        change here. Your {providers} password is changed with {providers}.
+      </p>
+      {user?.email ? (
+        <p className="mt-3 text-sm leading-6 text-text-secondary">
+          Email on this account:{" "}
+          <span className="break-all font-semibold text-white">{user.email}</span>
+        </p>
+      ) : null}
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-text-secondary">
+        Changing that address here needs a YO Voice password as well. To move
+        the account to another address, write to us from this one.
+      </p>
+      <a
+        href={`mailto:${SUPPORT_MAILBOX}?subject=${encodeURIComponent("Change the email on my YO Voice account")}`}
+        className="premium-button focus-ring mt-5"
+      >
+        <Mail className="size-4" aria-hidden="true" />
+        Email {SUPPORT_MAILBOX}
+      </a>
+    </section>
+  );
+}
+
 export default function SecurityPage() {
+  const { user } = useAuth();
+  // The account layout renders its own loading state and redirects a signed
+  // out visitor, so there is nothing to show here until a user exists.
+  if (!user) return null;
+
+  if (!hasPasswordSignIn(user.providerData)) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold">Security</h1>
+        <p className="mt-1 text-sm text-text-tertiary">
+          How this account signs in.
+        </p>
+        <div className="mt-6">
+          <ProviderAccountPanel
+            providerNames={socialProvidersOf(user.providerData).map(
+              (provider) => SOCIAL_PROVIDER_NAME[provider],
+            )}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Security</h1>

@@ -16,8 +16,8 @@ with Google" and "Continue with Apple", then "or with email". Behaviour
 mirrors the app's `AuthService` on the web: Google is a popup with
 `prompt=select_account`; Apple is a popup for `apple.com` with the `email` and
 `name` scopes, gated by the app's `createAuthUri` availability probe (fails
-closed; not configured = disabled "Coming soon", unconfirmed = "Try again",
-which probes again). A first sign-in bootstraps `users/{uid}` with the same
+closed; not configured = "Coming soon", unconfirmed = "Couldn't check — try
+again", which probes again). A first sign-in bootstraps `users/{uid}` with the same
 rule-safe `planUserProfileBootstrap` transaction as email registration
 (non-fatal, reported to the console); the page's signed-in redirect is held
 until that write settles. An account with an authenticator gets the TOTP step
@@ -41,17 +41,85 @@ step after Google on both pages, the "account exists", "popup blocked" and
 inside the plan only, redirect held until it settled). Real Google / Apple
 OAuth cannot be completed in that environment and was not exercised.
 
-Owner steps (consoles, not code): Firebase Authorized domains must list
-`yovoice.app` and `www.yovoice.app`; the Google provider enabled; the Apple
-provider enabled with Services ID `app.yovoice.web` returning to
-`https://auth.yovoice.app/__/auth/handler`.
+### Production pass (same day)
 
-Known gaps this makes reachable: `/account/security` still offers only
-password-based "change password / change email" forms, which a Google- or
-Apple-only account cannot satisfy (the deletion page already has an honest
-panel for such accounts; security needs the same). At 200 % text-only zoom
-on phone widths the email and password inputs (not the new block) still
-force a horizontal scroll.
+- **Popup handler domain.** Google rejects
+  `https://auth.yovoice.app/__/auth/handler` with `redirect_uri_mismatch`
+  (checked live through `createAuthUri`; the app hit the same bug and moved,
+  ADR-068 in the app repository). The SDK's `authDomain` is now derived from
+  the project id, `<projectId>.firebaseapp.com`
+  (`src/lib/firebase/auth-domain.ts`), so production needs no Vercel edit and
+  `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` is no longer read (not required by
+  `isFirebaseConfigured` either; every other key still is). The Report-Only
+  CSP `frame-src` allows `https://yovoice-ec54a.firebaseapp.com` (the SDK's
+  `/__/auth/iframe`); `auth.yovoice.app`, which the page no longer loads
+  anything from, left the policy. Password sign-in and emailed action links
+  never used the client `authDomain`.
+- **Keyboard and screen readers.** The buttons are `aria-disabled`, never
+  `disabled`, so focus stays on the pressed button through the popup and
+  after it closes, and "Coming soon" is reachable with Tab. A polite status
+  region says "Waiting for Google…", "Checking whether Apple sign-in is
+  available…", "Google sign-in cancelled." and "Signed in with Google.
+  Continuing…"; errors stay in the form's alert. The status is a second line
+  under the name (≥ 4.5:1 when dimmed: recoloured, not faded), and the
+  spinner is an open arc that keeps its shape in forced colours and stops
+  under reduced motion, with the words carrying the state. "Back" from the
+  second-factor step returns focus to the button (or password field) that
+  led there.
+- **Honest wording.** Apple's unconfirmed state says what failed:
+  "Couldn't check — try again"; the pending state says "Checking…".
+- **One attempt per tab** (`src/lib/auth/social-sign-in-flow.ts`). Switching
+  Log in ↔ Create account while a window is open keeps the new form's block
+  busy and its email submit off; the outcome (second factor, error,
+  cancellation) lands on the form on screen, and a completed sign-in is
+  navigated once, by that page's `RedirectIfAuthenticated`, when the
+  profile-write hold is released. Forms no longer navigate after Google or
+  Apple themselves.
+- **320 px.** Both lines fit inside 48 px, so nothing moves when the Apple
+  check answers (the "Coming soon" button used to grow to 56 px).
+- **`/account/security`** shows a Google- or Apple-only account an honest
+  panel (no YO Voice password; email change via support) instead of forms it
+  could never complete, like `/account/delete`.
+- **Pre-registered addresses**: the decision to rely on Firebase's
+  authoritative-provider takeover of unverified password accounts, and its
+  limits, is in `docs/security/security-notes.md`.
+- New node tests: the Apple availability cache and probe (10), the per-tab
+  flow and the derived auth domain (13), and the block's accessibility,
+  wording and security-page contracts.
+
+Verified with `npm run lint`, `npx tsc --noEmit`, `npm test` (258 tests) and
+`npm run build`, then on the production build (dummy `.env.local` with the
+production project id, so the derived handler is the real one) with
+Playwright at 1440, 834, 390 and 320 px: the Google and Apple windows open on
+`https://yovoice-ec54a.firebaseapp.com/__/auth/handler` and the SDK frames
+`…firebaseapp.com/__/auth/iframe`; keyboard Tab + Enter keeps focus on the
+button while the window is open and after it is closed, with "Waiting for
+Google…" and then "Google sign-in cancelled." announced; every Apple state at
+every width is 48 px, focusable, named, and ≥ 4.5:1; the fields do not move
+when the probe answers (12 of 12 combinations); the switch keeps email,
+password and submit at the same Y at t=0 in both directions (24 of 24 runs);
+a switch mid-popup keeps the new form busy and delivers the second factor,
+the error or the sign-in there, with exactly one router navigation; forced
+colours and reduced motion as above; `/account/security` for a Google-only
+and a password account. Real Google / Apple OAuth cannot be completed in that
+environment (firebaseapp.com, apis.google.com, gstatic and appleid are
+blocked by its egress proxy): the popup plumbing was stubbed.
+
+Owner steps (consoles, not code): Firebase Authorized domains must list
+`yovoice.app` and `www.yovoice.app`; the Google provider enabled (its OAuth
+client already accepts the `firebaseapp.com` handler); the Apple provider
+enabled with Services ID `app.yovoice.web`, whose return URL is the Firebase
+callback `https://yovoice-ec54a.firebaseapp.com/__/auth/handler` the app
+already registered. `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` can be deleted from
+Vercel. A real new-account and returning-account sign-in with each provider
+on production remains the release evidence.
+
+Known gaps: at 200 % text-only zoom on phone widths the email and password
+inputs (not the new block) still force a horizontal scroll. On `/login` a
+password sign-in (and a completed second factor) still calls
+`router.replace` twice for the same destination, once from the form and once
+from `RedirectIfAuthenticated`; it predates this work and lands on the same
+page.
 
 ## Auth switch (September 2026)
 

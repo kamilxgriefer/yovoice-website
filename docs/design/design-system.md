@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-24 (auth switch; Continue with Google / Apple)
+Last reviewed: 2026-09-24 (auth switch; Continue with Google / Apple, accessibility pass)
 
 ## Source of truth
 
@@ -169,15 +169,32 @@ mail-action and recovery pages keep the accounts panel with its three rings.
   provider mark, then the divider "or with email" in sentence case (hairline
   either side, `--text-tertiary`; not an all-caps eyebrow). The form's alert
   sits under the block, above the first field, so a social or a password
-  error appears next to what caused it. While a provider window is open its
-  button shows the spinner in place of the mark, and the other button and
-  the email submit are disabled. Apple mirrors the app's availability probe:
-  a spinner while it runs, "Coming soon" (disabled) when the provider is not
-  configured, "Try again" (enabled, probes again on press) when the probe
-  could not confirm it. The status is a small pill beside the name, not a
-  second line, so the button stays 48 px and nothing below moves when the
-  probe answers (measured one line at 390 px and up; at 320 px "Coming
-  soon" wraps and that button grows to 56 px).
+  error appears next to what caused it. A status or progress is a second,
+  smaller line under the name (12 px / 600, as in the app), not a pill: the
+  social buttons use 4 px block padding so both lines sit inside the 48 px
+  minimum at every width down to 320 px, and nothing below moves when the
+  probe answers or an attempt starts. While a provider window is open its
+  button shows an arc spinner in place of the mark and "Waiting for
+  Google…" (or Apple); the other button and the email submit wait. Apple
+  mirrors the app's availability probe: "Checking…" with the spinner while it
+  runs, "Coming soon" when the provider is not configured, "Couldn't check —
+  try again" (probes again on press) when the probe could not confirm it.
+- **Unavailable, not disabled.** The two buttons are never `disabled`: an
+  unavailable one is `aria-disabled` (the pointer passes through it), so
+  keyboard focus stays on the button that was pressed while its window is
+  open and after it closes, and "Coming soon" stays reachable with Tab. A
+  dimmed button is recoloured, never faded: border `--border`, name
+  `--text-secondary` (8.7:1), second line `--text-tertiary` (5.7:1), mark at
+  60 %. The button whose window is open keeps full colour. In forced colours
+  a dimmed button is `GrayText`, and the spinner is an open arc, so it keeps
+  its shape where every border takes one system colour; under reduced motion
+  it stops turning and the words carry the state.
+- **What is spoken.** A polite status region in the block says "Waiting for
+  Google…", "Checking whether Apple sign-in is available…", "Google sign-in
+  cancelled." and "Signed in with Google. Continuing…"; errors go to the
+  form's alert like every other form error. Leaving the second-factor step
+  ("Back", "Back to password") returns focus to the button or the password
+  field that led there.
 
 ## Legal hygiene
 

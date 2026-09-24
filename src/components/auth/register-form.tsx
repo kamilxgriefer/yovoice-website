@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Mail, User } from "lucide-react";
@@ -9,9 +9,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
 import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 import { verifyEmailPathAfterRegistration } from "@/lib/auth/registration-flow";
+import type { SocialProvider } from "@/lib/auth/social-sign-in";
 import type { TotpSignInChallenge } from "@/lib/auth/totp-sign-in";
 import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
-import { SocialSignIn } from "@/components/auth/social-sign-in";
+import {
+  SocialSignIn,
+  useSocialSignInBusy,
+} from "@/components/auth/social-sign-in";
 import { TotpChallengeForm } from "@/components/auth/totp-challenge-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,23 +44,41 @@ export function RegisterForm() {
   // Arrived from Log in: fold its Forgot password row away and unfold ours.
   // Once only — returning from the second-factor step shows the plain form.
   const [switched, setSwitched] = useState(shouldPlayAuthModeSwitch);
-  // A Google or Apple window is open: the email sign-up waits.
-  const [socialBusy, setSocialBusy] = useState(false);
+  // A Google or Apple window is open (possibly started on Log in): the
+  // email sign-up waits.
+  const socialBusy = useSocialSignInBusy();
   // "Continue with Google / Apple" reached an existing account that has an
   // authenticator: its second factor is owed here, as on Log in.
   const [totpChallenge, setTotpChallenge] =
     useState<TotpSignInChallenge | null>(null);
+  // The button that led to the second-factor step, for focus on "Back".
+  const [challengeFrom, setChallengeFrom] = useState<SocialProvider>("google");
+  const leftChallenge = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Google and Apple accounts arrive verified by their provider, so they skip
-  // /verify-email and go where a login would.
+  // /verify-email and go where a login would. A plain Google / Apple sign-in
+  // is sent there by RedirectIfAuthenticated; this is for the second-factor
+  // step, where that guard is not mounted.
   function finishSignIn() {
     router.replace(resolveAuthRedirect(searchParams.get("redirect")));
   }
 
-  function openSocialChallenge(challenge: TotpSignInChallenge) {
+  function openSocialChallenge(challenge: TotpSignInChallenge, provider: SocialProvider) {
     setSwitched(false);
+    setChallengeFrom(provider);
     setTotpChallenge(challenge);
   }
+
+  // Back from the second-factor step: focus returns to the Google / Apple
+  // button that led there rather than falling to the page.
+  useEffect(() => {
+    if (totpChallenge || !leftChallenge.current) return;
+    leftChallenge.current = false;
+    formRef.current
+      ?.querySelector<HTMLElement>(`[data-provider="${challengeFrom}"]`)
+      ?.focus();
+  }, [totpChallenge, challengeFrom]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -105,6 +127,7 @@ export function RegisterForm() {
           challenge={totpChallenge}
           cancelLabel="Back"
           onCancel={() => {
+            leftChallenge.current = true;
             setTotpChallenge(null);
             setError(null);
           }}
@@ -115,16 +138,15 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
+    <form className="mt-8 space-y-4" ref={formRef} onSubmit={handleSubmit} noValidate>
       <RedirectIfAuthenticated suspended={registrationStarted} />
       {/* Identical at the top of the login form, so switching modes never
-          moves it (see SocialSignIn). */}
+          moves it (see SocialSignIn). A completed Google / Apple sign-in is
+          sent on by the RedirectIfAuthenticated above, not by this form. */}
       <SocialSignIn
         locked={submitting}
-        onBusyChange={setSocialBusy}
         onError={setError}
         onTotpRequired={openSocialChallenge}
-        onSignedIn={finishSignIn}
       />
 
       {error ? (

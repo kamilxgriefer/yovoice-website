@@ -8,19 +8,28 @@ import {
 } from "firebase/auth";
 import { type Firestore, getFirestore } from "firebase/firestore";
 
+import { firebaseAuthDomain } from "@/lib/firebase/auth-domain";
+
+const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  // Always `<projectId>.firebaseapp.com`: Google rejects the branded
+  // auth.yovoice.app handler with redirect_uri_mismatch, and the app moved
+  // off it for the same reason. Why, and what that does not affect:
+  // src/lib/firebase/auth-domain.ts. NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN is no
+  // longer read, so a stale value in Vercel cannot bring the error back.
+  authDomain: firebaseAuthDomain(projectId),
+  projectId,
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+// authDomain is not listed: it is derived from projectId, which is.
 const requiredFirebaseConfig = [
   firebaseConfig.apiKey,
-  firebaseConfig.authDomain,
   firebaseConfig.projectId,
   firebaseConfig.storageBucket,
   firebaseConfig.messagingSenderId,

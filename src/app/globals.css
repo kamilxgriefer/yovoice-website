@@ -632,20 +632,40 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 
 /* "Continue with Google / Apple" (SocialSignIn), the same block at the top of
-   both forms. The Apple button's second label ("Coming soon", "Try again")
-   sits beside the name, not under it, so the button stays 48 px and the
-   fields below never move when the availability probe answers. */
-.social-status {
-  display: inline-block;
-  margin-inline-start: .5rem;
-  padding: .125rem .5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+   both forms. A status ("Checking…", "Coming soon", "Couldn't check — try
+   again") or the running attempt ("Waiting for Google…") is a second, smaller
+   line under the name, as in the app. The tighter block padding lets both
+   lines sit inside the 48 px minimum at every width down to 320 px, so the
+   fields below never move when the availability probe answers or an attempt
+   starts. */
+.social-button { padding-block: .25rem; }
+.social-button__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  text-align: center;
+}
+.social-button__detail {
+  margin-top: .125rem;
   font-size: .75rem;
   font-weight: 600;
   line-height: 1.2;
   color: var(--text-secondary);
-  vertical-align: .0625rem;
+}
+/* Unavailable buttons are `aria-disabled`, not `disabled`, so they keep
+   keyboard focus; the pointer passes through them. Dimming recolours rather
+   than fading the whole button, so every line stays above 4.5:1 on the
+   surface (name 8.7:1, second line 5.7:1). */
+.social-button[aria-disabled="true"] { pointer-events: none; }
+.social-button[data-dimmed] { border-color: var(--border); color: var(--text-secondary); }
+.social-button[data-dimmed] .social-button__detail { color: var(--text-tertiary); }
+.social-button[data-dimmed] > svg { opacity: .6; }
+.social-spinner { animation: social-spin .8s linear infinite; }
+@keyframes social-spin { to { transform: rotate(1turn); } }
+@media (forced-colors: active) {
+  .social-button[data-dimmed],
+  .social-button[data-dimmed] .social-button__detail { color: GrayText; border-color: GrayText; }
 }
 /* "or with email": a hairline either side, sentence case (no all-caps
    eyebrow here). */

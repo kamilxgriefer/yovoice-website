@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -9,31 +15,51 @@ import { getSocialAuthErrorMessage } from "@/lib/auth/auth-errors";
 import {
   getAppleSignInAvailability,
   peekAppleSignInAvailability,
+  subscribeAppleSignInAvailability,
 } from "@/lib/auth/apple-availability";
-import { holdSignedInRedirect } from "@/lib/auth/signed-in-redirect-hold";
 import {
+  claimSocialSignInOutcomes,
+  getSocialSignInFlow,
+  getSocialSignInFlowOnServer,
+  startSocialSignIn,
+  subscribeSocialSignInFlow,
+} from "@/lib/auth/social-sign-in-flow";
+import {
+  SOCIAL_ANNOUNCEMENT,
   SOCIAL_BUTTON_LABEL,
   SOCIAL_PROVIDER_NAME,
   SocialProviderUnavailableError,
   appleButtonState,
-  type AppleSignInAvailability,
+  socialProgressLabel,
   type SocialProvider,
 } from "@/lib/auth/social-sign-in";
 import type { TotpSignInChallenge } from "@/lib/auth/totp-sign-in";
-import { cn } from "@/lib/utils/cn";
 
 type SocialSignInProps = {
   /** The email form is submitting, so neither provider may start. */
   locked: boolean;
-  /** True while a provider window is open or its account is being finished;
-   * the form keeps its own submit button off meanwhile. */
-  onBusyChange: (busy: boolean) => void;
   /** A message for the form's alert, or `null` to clear it. */
   onError: (message: string | null) => void;
   /** The account has an authenticator: the form shows the TOTP step. */
-  onTotpRequired: (challenge: TotpSignInChallenge) => void;
-  onSignedIn: () => void;
+  onTotpRequired: (challenge: TotpSignInChallenge, provider: SocialProvider) => void;
 };
+
+const noAppleAnswerOnServer = () => null;
+
+/** The tab's running Google / Apple attempt (social-sign-in-flow.ts). */
+function useSocialSignInFlow() {
+  return useSyncExternalStore(
+    subscribeSocialSignInFlow,
+    getSocialSignInFlow,
+    getSocialSignInFlowOnServer,
+  );
+}
+
+/** True while a Google or Apple attempt runs anywhere in this tab, including
+ * one started on the other auth form: the email form waits meanwhile. */
+export function useSocialSignInBusy(): boolean {
+  return useSocialSignInFlow() !== null;
+}
 
 /**
  * "Continue with Google" and "Continue with Apple", then "or with email".
@@ -43,105 +69,144 @@ type SocialSignInProps = {
  * the choreography they had without it. A first Google or Apple sign-in
  * creates the account, so both pages offer the same two actions, as the app
  * does.
+ *
+ * The buttons are never `disabled`: an unavailable one is `aria-disabled`, so
+ * a keyboard visitor's focus stays on the button they pressed while the
+ * provider's window is open and after it closes, and "Coming soon" stays
+ * reachable with Tab. Progress ("Waiting for Google…", "cancelled") is spoken
+ * through a polite status region; errors go to the form's alert, like every
+ * other form error.
+ *
+ * The attempt itself belongs to the tab (social-sign-in-flow.ts), so switching
+ * mode while a window is open keeps the new form's block busy, and the
+ * outcome lands on whichever form is on screen when it arrives. A completed
+ * sign-in navigates through the page's RedirectIfAuthenticated, once.
  */
-export function SocialSignIn({
-  locked,
-  onBusyChange,
-  onError,
-  onTotpRequired,
-  onSignedIn,
-}: SocialSignInProps) {
+export function SocialSignIn({ locked, onError, onTotpRequired }: SocialSignInProps) {
   const { signInWithProvider } = useAuth();
-  const [pending, setPending] = useState<SocialProvider | null>(null);
-  const [apple, setApple] = useState<AppleSignInAvailability | null>(
+  const flow = useSocialSignInFlow();
+  const apple = useSyncExternalStore(
+    subscribeAppleSignInAvailability,
     peekAppleSignInAvailability,
+    noAppleAnswerOnServer,
   );
-  const inFlight = useRef(false);
-  const mounted = useRef(false);
+  const [announcement, setAnnouncement] = useState("");
+
+  // The outcome handler is registered once per mount; it reads the form's
+  // current callbacks through this ref.
+  const callbacks = useRef({ onError, onTotpRequired });
+  useEffect(() => {
+    callbacks.current = { onError, onTotpRequired };
+  });
 
   useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
+    // First mount in the tab: ask Firebase whether Apple can start. Later
+    // mounts draw the kept answer at once (apple-availability-cache.ts).
+    if (peekAppleSignInAvailability() === null) void getAppleSignInAvailability();
   }, []);
 
-  useEffect(() => {
-    if (apple !== null) return;
-    let active = true;
-    void getAppleSignInAvailability().then((availability) => {
-      if (active) setApple(availability);
-    });
-    return () => {
-      active = false;
-    };
-  }, [apple]);
-
-  async function continueWith(provider: SocialProvider) {
-    if (inFlight.current || locked) return;
-    inFlight.current = true;
-    onError(null);
-    setPending(provider);
-    onBusyChange(true);
-    // Keeps the page's "already signed in" redirect off until a new account's
-    // profile is written, even if the visitor switches mode meanwhile.
-    const release = holdSignedInRedirect();
-    let signedIn = false;
-    try {
-      if (provider === "apple" && apple !== "available") {
-        // "Try again": ask Firebase once more before opening Apple's window.
-        const availability = await getAppleSignInAvailability();
-        if (mounted.current) setApple(availability);
-        if (availability !== "available") {
-          throw new SocialProviderUnavailableError(provider);
+  useEffect(
+    () =>
+      claimSocialSignInOutcomes((provider, outcome) => {
+        switch (outcome.kind) {
+          case "signed-in":
+            // RedirectIfAuthenticated navigates as soon as the flow lets go
+            // of the redirect hold, right after this.
+            setAnnouncement(SOCIAL_ANNOUNCEMENT.signedIn(provider));
+            return;
+          case "totp-required":
+            // The code field takes focus and names itself.
+            setAnnouncement("");
+            callbacks.current.onTotpRequired(outcome.challenge, provider);
+            return;
+          case "failed": {
+            const message = getSocialAuthErrorMessage(
+              outcome.error,
+              SOCIAL_PROVIDER_NAME[provider],
+            );
+            if (message === null) {
+              // The visitor closed the window: nothing went wrong.
+              setAnnouncement(SOCIAL_ANNOUNCEMENT.cancelled(provider));
+            } else {
+              setAnnouncement("");
+              callbacks.current.onError(message);
+            }
+          }
         }
-      }
-      // Nothing is awaited before this on the usual path, so the provider's
-      // window opens inside the click and pop-up blockers let it through.
-      const result = await signInWithProvider(provider);
-      if (result.status === "totp-required") {
-        onTotpRequired(result.challenge);
-      } else {
-        signedIn = true;
-        onSignedIn();
-      }
-    } catch (error) {
-      onError(getSocialAuthErrorMessage(error, SOCIAL_PROVIDER_NAME[provider]));
-    } finally {
-      release();
-      inFlight.current = false;
-      // A completed sign-in keeps its spinner while the page navigates away,
-      // like the password form's "Signing in…".
-      if (!signedIn) {
-        if (mounted.current) setPending(null);
-        onBusyChange(false);
-      }
-    }
+      }),
+    [],
+  );
+
+  const appleButton = appleButtonState(apple);
+
+  function continueWith(provider: SocialProvider) {
+    if (locked || flow !== null) return;
+    if (provider === "apple" && appleButton.unavailable) return;
+    const reprobe = provider === "apple" && appleButton.reprobes;
+    const started = startSocialSignIn(
+      provider,
+      reprobe ? "checking" : "waiting",
+      async (setStep) => {
+        if (reprobe) {
+          // "Couldn't check — try again": ask Firebase once more before
+          // opening Apple's window.
+          const availability = await getAppleSignInAvailability();
+          if (availability !== "available") {
+            throw new SocialProviderUnavailableError(provider);
+          }
+          setStep("waiting");
+          setAnnouncement(SOCIAL_ANNOUNCEMENT.waiting(provider));
+        }
+        // Nothing is awaited before this on the usual path, so the provider's
+        // window opens inside the click and pop-up blockers let it through.
+        return signInWithProvider(provider);
+      },
+    );
+    if (!started) return;
+    onError(null);
+    setAnnouncement(
+      reprobe ? SOCIAL_ANNOUNCEMENT.checking(provider) : SOCIAL_ANNOUNCEMENT.waiting(provider),
+    );
   }
 
-  const busy = pending !== null;
-  const appleButton = appleButtonState(apple);
+  function buttonFor(provider: SocialProvider, mark: ReactNode) {
+    const running = flow?.provider === provider ? flow : null;
+    const probing = provider === "apple" && appleButton.pending;
+    const unavailable =
+      locked || flow !== null || (provider === "apple" && appleButton.unavailable);
+    return (
+      <SocialButton
+        provider={provider}
+        mark={mark}
+        spinning={running !== null || probing}
+        unavailable={unavailable}
+        // The button whose window is open keeps full colour.
+        dimmed={unavailable && running === null}
+        // While its attempt runs the button says what it is waiting for; the
+        // status region speaks that, so it stays out of the button's name.
+        detail={
+          running
+            ? socialProgressLabel(provider, running.step)
+            : provider === "apple"
+              ? appleButton.status
+              : null
+        }
+        detailInName={running === null}
+        onPress={continueWith}
+      />
+    );
+  }
 
   return (
     <div>
       <div className="grid gap-3">
-        <SocialButton
-          provider="google"
-          mark={<GoogleMark className="size-5 shrink-0" />}
-          loading={pending === "google"}
-          disabled={locked || busy}
-          onPress={continueWith}
-        />
-        <SocialButton
-          provider="apple"
-          mark={<AppleMark className="size-5 shrink-0" />}
-          loading={pending === "apple" || appleButton.pending}
-          disabled={locked || busy || appleButton.disabled}
-          status={appleButton.status}
-          onPress={continueWith}
-        />
+        {buttonFor("google", <GoogleMark className="size-5 shrink-0" />)}
+        {buttonFor("apple", <AppleMark className="size-5 shrink-0" />)}
       </div>
       <p className="auth-divider">or with email</p>
+      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {announcement}
+      </p>
     </div>
   );
 }
@@ -149,39 +214,79 @@ export function SocialSignIn({
 function SocialButton({
   provider,
   mark,
-  loading,
-  disabled,
-  status = null,
+  spinning,
+  unavailable,
+  dimmed,
+  detail,
+  detailInName,
   onPress,
 }: {
   provider: SocialProvider;
   mark: ReactNode;
-  loading: boolean;
-  disabled: boolean;
-  status?: string | null;
+  /** Its own attempt runs, or (Apple) its availability is being checked. */
+  spinning: boolean;
+  /** Pressing it does nothing right now. */
+  unavailable: boolean;
+  dimmed: boolean;
+  /** The second line: a status or what it is waiting for. */
+  detail: string | null;
+  detailInName: boolean;
   onPress: (provider: SocialProvider) => void;
 }) {
   return (
     <Button
       type="button"
       variant="secondary"
-      icon={mark}
-      isLoading={loading}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
+      icon={spinning ? <SocialSpinner /> : mark}
+      aria-disabled={unavailable || undefined}
+      aria-busy={spinning || undefined}
       data-provider={provider}
-      onClick={() => onPress(provider)}
-      // A loading button keeps the primitive's own dimming; any other
-      // unavailable one reads as off and ignores the pointer.
-      className={cn("w-full", !loading && "disabled:pointer-events-none disabled:opacity-60")}
+      data-dimmed={dimmed ? "" : undefined}
+      onClick={() => {
+        if (!unavailable) onPress(provider);
+      }}
+      className="social-button w-full"
     >
-      {SOCIAL_BUTTON_LABEL[provider]}
-      {status ? (
-        <>
-          <span className="sr-only">, </span>
-          <span className="social-status">{status}</span>
-        </>
-      ) : null}
+      <span className="social-button__text">
+        <span>{SOCIAL_BUTTON_LABEL[provider]}</span>
+        {detail ? (
+          <>
+            {detailInName ? <span className="sr-only">, </span> : null}
+            <span
+              className="social-button__detail"
+              aria-hidden={detailInName ? undefined : true}
+            >
+              {detail}
+            </span>
+          </>
+        ) : null}
+      </span>
     </Button>
+  );
+}
+
+/** An open arc rather than a ring with one coloured side: it keeps its shape
+ * in forced colours (where every border takes the same system colour), and it
+ * simply stops turning under reduced motion (globals.css). The button's second
+ * line says in words what it is waiting for. */
+function SocialSpinner() {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      viewBox="0 0 20 20"
+      className="social-spinner size-5 shrink-0"
+    >
+      <circle
+        cx="10"
+        cy="10"
+        r="7.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+        strokeDasharray="33 14.2"
+      />
+    </svg>
   );
 }

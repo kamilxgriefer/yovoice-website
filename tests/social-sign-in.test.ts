@@ -5,12 +5,16 @@ import { describe, test } from "node:test";
 import {
   APPLE_PROVIDER_ID,
   APPLE_SCOPES,
+  APPLE_STATUS,
   GOOGLE_CUSTOM_PARAMETERS,
+  SOCIAL_ANNOUNCEMENT,
   SOCIAL_BUTTON_LABEL,
   SocialProviderUnavailableError,
   appleButtonState,
   appleProviderProbeRequest,
   parseAppleProviderProbeResponse,
+  socialProgressLabel,
+  socialProvidersOf,
 } from "../src/lib/auth/social-sign-in.ts";
 import {
   getAuthErrorMessage,
@@ -28,7 +32,7 @@ const read = (path: string) =>
   readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
 const appleAuthUri =
-  "https://appleid.apple.com/auth/authorize?response_type=code&client_id=app.yovoice.web&redirect_uri=https://auth.yovoice.app/__/auth/handler&scope=email+name&response_mode=form_post";
+  "https://appleid.apple.com/auth/authorize?response_type=code&client_id=app.yovoice.web&redirect_uri=https://yovoice-ec54a.firebaseapp.com/__/auth/handler&scope=email+name&response_mode=form_post";
 
 describe("the Apple availability probe mirrors the app's parser", () => {
   test("an Apple authorisation URL for apple.com is available", () => {
@@ -94,11 +98,38 @@ describe("the Apple availability probe mirrors the app's parser", () => {
     }
   });
 
-  test("the Apple button follows the app: pending, Coming soon, Try again, ready", () => {
-    assert.deepEqual(appleButtonState(null), { pending: true, disabled: true, status: null, reprobes: false });
-    assert.deepEqual(appleButtonState("notConfigured"), { pending: false, disabled: true, status: "Coming soon", reprobes: false });
-    assert.deepEqual(appleButtonState("temporarilyUnavailable"), { pending: false, disabled: false, status: "Try again", reprobes: true });
-    assert.deepEqual(appleButtonState("available"), { pending: false, disabled: false, status: null, reprobes: false });
+  test("the Apple button follows the app: checking, Coming soon, couldn't check, ready", () => {
+    assert.deepEqual(appleButtonState(null), { pending: true, unavailable: true, status: "Checking…", reprobes: false });
+    assert.deepEqual(appleButtonState("notConfigured"), { pending: false, unavailable: true, status: "Coming soon", reprobes: false });
+    assert.deepEqual(appleButtonState("temporarilyUnavailable"), {
+      pending: false,
+      unavailable: false,
+      status: "Couldn't check — try again",
+      reprobes: true,
+    });
+    assert.deepEqual(appleButtonState("available"), { pending: false, unavailable: false, status: null, reprobes: false });
+  });
+
+  test("every state says why in words, and a failed check says what failed", () => {
+    // Before anything was pressed, "Try again" alone would blame the visitor.
+    assert.match(APPLE_STATUS.temporarilyUnavailable, /^Couldn't check/);
+    for (const status of Object.values(APPLE_STATUS)) assert.ok(status.length > 0);
+    assert.equal(socialProgressLabel("google", "waiting"), "Waiting for Google…");
+    assert.equal(socialProgressLabel("apple", "waiting"), "Waiting for Apple…");
+    assert.equal(socialProgressLabel("apple", "checking"), "Checking…");
+    assert.equal(socialProgressLabel("google", "signed-in"), "Continuing…");
+    assert.equal(SOCIAL_ANNOUNCEMENT.waiting("google"), "Waiting for Google…");
+    assert.equal(SOCIAL_ANNOUNCEMENT.cancelled("google"), "Google sign-in cancelled.");
+    assert.equal(SOCIAL_ANNOUNCEMENT.checking("apple"), "Checking whether Apple sign-in is available…");
+    assert.equal(SOCIAL_ANNOUNCEMENT.signedIn("apple"), "Signed in with Apple. Continuing…");
+  });
+
+  test("an account's Google and Apple identities are read from its providerData", () => {
+    assert.deepEqual(socialProvidersOf([{ providerId: "google.com" }]), ["google"]);
+    assert.deepEqual(socialProvidersOf([{ providerId: "apple.com" }, { providerId: "google.com" }]), ["google", "apple"]);
+    assert.deepEqual(socialProvidersOf([{ providerId: "password" }, { providerId: "github.com" }]), []);
+    assert.deepEqual(socialProvidersOf(null), []);
+    assert.deepEqual(socialProvidersOf(undefined), []);
   });
 
   test("providers use the app's parameters and the brands' own labels", () => {
@@ -207,17 +238,23 @@ describe("a social sign-in holds the signed-in redirect until its profile is wri
     );
   });
 
-  test("the redirect consults the hold and the flow releases it only when finished", () => {
+  test("the redirect consults the hold, and the block starts attempts only through the tab's flow", () => {
     const guard = read("src/components/auth/redirect-if-authenticated.tsx");
     assert.match(guard, /useSyncExternalStore\(\s*subscribeSignedInRedirectHold,\s*isSignedInRedirectHeld,\s*isSignedInRedirectHeldOnServer,?\s*\)/);
     assert.match(guard, /const suspended = suspendedByForm \|\| heldBySocialSignIn;/);
 
+    // The hold itself is taken and released by social-sign-in-flow.ts
+    // (behaviour: tests/social-sign-in-flow.test.ts). The block never
+    // navigates: RedirectIfAuthenticated does, once, when the hold goes.
     const block = read("src/components/auth/social-sign-in.tsx");
-    const hold = block.indexOf("const release = holdSignedInRedirect()");
-    const signIn = block.indexOf("await signInWithProvider(provider)");
-    const released = block.indexOf("release();");
-    assert.ok(hold > 0 && signIn > hold && released > signIn, "hold, sign in (with profile bootstrap), then release");
-    assert.match(block.slice(block.indexOf("} finally {")), /^\} finally \{\s*release\(\);/);
+    assert.match(block, /startSocialSignIn\(/);
+    assert.match(block, /claimSocialSignInOutcomes\(/);
+    assert.doesNotMatch(block, /holdSignedInRedirect|useRouter|router\.|location\./);
+    const attempt = block.slice(block.indexOf("async (setStep) => {"), block.indexOf("if (!started) return;"));
+    assert.match(attempt, /return signInWithProvider\(provider\);/);
+    // On the usual path nothing is awaited before the popup.
+    assert.equal(attempt.match(/await /g)?.length, 1);
+    assert.ok(attempt.indexOf("if (reprobe) {") < attempt.indexOf("await "));
   });
 });
 
@@ -239,19 +276,32 @@ describe("both auth forms offer the same Google and Apple block", () => {
     });
     assert.equal(blocks[0], blocks[1]);
     assert.match(blocks[0], /onTotpRequired=\{openSocialChallenge\}/);
-    assert.match(blocks[0], /onSignedIn=\{finishSignIn\}/);
+    assert.match(blocks[0], /onError=\{setError\}/);
+    // A completed sign-in is sent on by RedirectIfAuthenticated with the
+    // current page's ?redirect=, never by the form that started it.
+    assert.doesNotMatch(blocks[0], /onSignedIn|onBusyChange/);
   });
 
   test("each form handles a second factor owed after Google or Apple", () => {
     for (const path of forms) {
       const source = read(path);
       assert.match(source, /<div data-auth-challenge>\s*<TotpChallengeForm/, path);
-      assert.match(source, /function openSocialChallenge\(challenge: TotpSignInChallenge\) \{[\s\S]*?setTotpChallenge\(challenge\);/, path);
+      assert.match(
+        source,
+        /function openSocialChallenge\(challenge: TotpSignInChallenge, provider: SocialProvider\) \{[\s\S]*?setChallengeFrom\(provider\);[\s\S]*?setTotpChallenge\(challenge\);/,
+        path,
+      );
       assert.match(source, /onComplete=\{finishSignIn\}/, path);
       assert.match(source, /router\.replace\(resolveAuthRedirect\(searchParams\.get\("redirect"\)\)\)/, path);
-      // The password flow waits while a provider window is open.
+      // The password flow waits while a provider window is open, including
+      // one opened on the other form before a switch.
+      assert.match(source, /const socialBusy = useSocialSignInBusy\(\);/, path);
       assert.match(source, /disabled=\{submitting \|\| socialBusy\}/, path);
       assert.match(source, /if \(socialBusy\) return;/, path);
+      // "Back" from the second-factor step puts focus back on the control
+      // that led there instead of dropping it to the page.
+      assert.match(source, /onCancel=\{\(\) => \{\s*leftChallenge\.current = true;/, path);
+      assert.match(source, /querySelector<HTMLElement>\(`\[data-provider="\$\{challengeFrom\}"\]`\)\s*\?\.focus\(\)/, path);
     }
     // Social accounts skip /verify-email: only the email sign-up goes there.
     const register = read("src/components/auth/register-form.tsx");
@@ -289,5 +339,53 @@ describe("both auth forms offer the same Google and Apple block", () => {
     const marks = read("src/components/auth/provider-marks.tsx");
     for (const colour of ["#4285F4", "#34A853", "#FBBC05", "#EA4335"]) assert.match(marks, new RegExp(colour));
     assert.match(read("docs/design/design-system.md"), /Continue with Google/);
+  });
+});
+
+describe("the Google / Apple block keeps focus and says what is happening", () => {
+  const block = read("src/components/auth/social-sign-in.tsx");
+  const css = read("src/app/globals.css");
+
+  test("an unavailable button is aria-disabled, never disabled, so focus stays on it", () => {
+    const button = block.slice(block.indexOf("function SocialButton("), block.indexOf("function SocialSpinner("));
+    assert.match(button, /aria-disabled=\{unavailable \|\| undefined\}/);
+    assert.match(button, /aria-busy=\{spinning \|\| undefined\}/);
+    assert.doesNotMatch(button, /(?<![-\w])disabled=\{|isLoading=/);
+    assert.match(button, /onClick=\{\(\) => \{\s*if \(!unavailable\) onPress\(provider\);\s*\}\}/);
+    assert.match(css, /\.social-button\[aria-disabled="true"\] \{ pointer-events: none; \}/);
+  });
+
+  test("progress is spoken by a polite status region; errors stay with the form's alert", () => {
+    assert.match(block, /<p role="status" aria-live="polite" aria-atomic="true" className="sr-only">\s*\{announcement\}\s*<\/p>/);
+    assert.match(block, /setAnnouncement\(SOCIAL_ANNOUNCEMENT\.cancelled\(provider\)\)/);
+    assert.match(block, /setAnnouncement\(\s*reprobe \? SOCIAL_ANNOUNCEMENT\.checking\(provider\) : SOCIAL_ANNOUNCEMENT\.waiting\(provider\),?\s*\)/);
+    assert.match(block, /callbacks\.current\.onError\(message\)/);
+  });
+
+  test("the status is a second line that stays readable when the button is off", () => {
+    // Dimming recolours instead of fading the button (3.9:1 before).
+    assert.match(css, /\.social-button\[data-dimmed\] \.social-button__detail \{ color: var\(--text-tertiary\); \}/);
+    assert.doesNotMatch(block, /opacity-60/);
+    // Two lines fit inside the 48 px minimum, so nothing below moves.
+    assert.match(css, /\.social-button \{ padding-block: \.25rem; \}/);
+  });
+
+  test("the spinner is an arc that survives forced colours and stops under reduced motion", () => {
+    const spinner = block.slice(block.indexOf("function SocialSpinner("));
+    assert.match(spinner, /stroke="currentColor"/);
+    assert.match(spinner, /strokeDasharray=/);
+    assert.match(css, /@media \(forced-colors: active\) \{\s*\.social-button\[data-dimmed\],/);
+    assert.match(css, /prefers-reduced-motion: reduce\) \{\s*html \{ scroll-behavior: auto; \}\s*\*,\*::before,\*::after \{ animation-duration: \.01ms !important;/);
+  });
+});
+
+describe("an account without a password is told so on /account/security", () => {
+  test("the password and email forms are only offered to a password account", () => {
+    const page = read("src/app/(account)/account/security/page.tsx");
+    assert.match(page, /if \(!hasPasswordSignIn\(user\.providerData\)\) \{[\s\S]*?<ProviderAccountPanel/);
+    assert.match(page, /This account has no YO Voice password/);
+    assert.match(page, /mailto:\$\{SUPPORT_MAILBOX\}/);
+    const panel = page.slice(page.indexOf("function ProviderAccountPanel("), page.indexOf("export default function SecurityPage"));
+    assert.doesNotMatch(panel, /<input|<form/);
   });
 });

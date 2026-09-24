@@ -37,9 +37,23 @@ test("every route receives the shared low-risk security baseline", async () => {
     headers.get("content-security-policy-report-only") ?? "",
     /frame-ancestors 'none'/,
   );
-  assert.match(
+  // Google / Apple popups finish on the Firebase handler domain, never on
+  // auth.yovoice.app (src/lib/firebase/auth-domain.ts); the SDK frames its
+  // /__/auth/iframe, so frame-src must allow it.
+  const directives = new Map(
+    (headers.get("content-security-policy-report-only") ?? "")
+      .split(";")
+      .map((directive) => directive.trim().split(/\s+/))
+      .map(([name, ...sources]) => [name, sources] as const),
+  );
+  assert.ok(
+    directives.get("frame-src")?.includes("https://yovoice-ec54a.firebaseapp.com"),
+    "frame-src allows the Firebase auth handler iframe",
+  );
+  assert.ok(directives.get("script-src")?.includes("https://apis.google.com"));
+  assert.doesNotMatch(
     headers.get("content-security-policy-report-only") ?? "",
-    /https:\/\/auth\.yovoice\.app/,
+    /auth\.yovoice\.app/,
   );
   assert.doesNotMatch(
     headers.get("content-security-policy-report-only") ?? "",

@@ -111,32 +111,85 @@ export function parseAppleProviderProbeResponse(
   return "temporarilyUnavailable";
 }
 
+export const APPLE_STATUS = Object.freeze({
+  checking: "Checking…",
+  notConfigured: "Coming soon",
+  // Says what failed (the check, not the visitor) and what pressing does.
+  temporarilyUnavailable: "Couldn't check — try again",
+} as const);
+
 export type AppleButtonState = {
-  /** The probe has not answered yet: disabled, with a spinner. */
+  /** The probe has not answered yet: a spinner in place of the mark. */
   pending: boolean;
-  /** Pressing the button does nothing (probe pending or not configured). */
-  disabled: boolean;
-  /** Second, smaller label next to the provider name. */
-  status: "Coming soon" | "Try again" | null;
+  /** Pressing the button does nothing (probe pending or not configured). It
+   * stays focusable (`aria-disabled`), so its status is still read out. */
+  unavailable: boolean;
+  /** Second, smaller line under the provider name; part of the button's
+   * accessible name. */
+  status: (typeof APPLE_STATUS)[keyof typeof APPLE_STATUS] | null;
   /** Pressing the button probes again before opening the popup. */
   reprobes: boolean;
 };
 
 /** The Apple button for each probe outcome, as the app's `_ProviderSection`
- * draws it. `null` means the probe is still running. */
+ * draws it (with the app's second line). `null` means the probe is still
+ * running. */
 export function appleButtonState(
   availability: AppleSignInAvailability | null,
 ): AppleButtonState {
   switch (availability) {
     case null:
-      return { pending: true, disabled: true, status: null, reprobes: false };
+      return { pending: true, unavailable: true, status: APPLE_STATUS.checking, reprobes: false };
     case "notConfigured":
-      return { pending: false, disabled: true, status: "Coming soon", reprobes: false };
+      return { pending: false, unavailable: true, status: APPLE_STATUS.notConfigured, reprobes: false };
     case "temporarilyUnavailable":
-      return { pending: false, disabled: false, status: "Try again", reprobes: true };
+      return { pending: false, unavailable: false, status: APPLE_STATUS.temporarilyUnavailable, reprobes: true };
     case "available":
-      return { pending: false, disabled: false, status: null, reprobes: false };
+      return { pending: false, unavailable: false, status: null, reprobes: false };
   }
+}
+
+/** The busy button's second line while an attempt runs (shown, and spoken
+ * through the block's polite status region rather than the button's name). */
+export function socialProgressLabel(
+  provider: SocialProvider,
+  step: "checking" | "waiting" | "signed-in",
+): string {
+  switch (step) {
+    case "checking":
+      return APPLE_STATUS.checking;
+    case "waiting":
+      return `Waiting for ${SOCIAL_PROVIDER_NAME[provider]}…`;
+    case "signed-in":
+      return "Continuing…";
+  }
+}
+
+/** What the block's polite status region says as an attempt moves on. Errors
+ * are not here: they go to the form's alert, like every other form error. */
+export const SOCIAL_ANNOUNCEMENT = Object.freeze({
+  checking: (provider: SocialProvider) =>
+    `Checking whether ${SOCIAL_PROVIDER_NAME[provider]} sign-in is available…`,
+  waiting: (provider: SocialProvider) => `Waiting for ${SOCIAL_PROVIDER_NAME[provider]}…`,
+  cancelled: (provider: SocialProvider) => `${SOCIAL_PROVIDER_NAME[provider]} sign-in cancelled.`,
+  signedIn: (provider: SocialProvider) =>
+    `Signed in with ${SOCIAL_PROVIDER_NAME[provider]}. Continuing…`,
+});
+
+const SOCIAL_PROVIDER_BY_FIREBASE_ID: Readonly<Record<string, SocialProvider>> = {
+  "google.com": "google",
+  [APPLE_PROVIDER_ID]: "apple",
+};
+
+/** The Google / Apple identities linked to an account (Firebase
+ * `providerData`), in button order. */
+export function socialProvidersOf(
+  providerData: readonly { providerId: string }[] | null | undefined,
+): SocialProvider[] {
+  const linked = new Set(
+    (providerData ?? []).map((entry) => SOCIAL_PROVIDER_BY_FIREBASE_ID[entry.providerId]),
+  );
+  return SOCIAL_PROVIDERS.filter((provider) => linked.has(provider));
 }
 
 /** Thrown when a re-probe still cannot confirm Apple; worded by
