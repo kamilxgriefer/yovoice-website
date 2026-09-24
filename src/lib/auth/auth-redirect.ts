@@ -97,9 +97,12 @@ export function resolveAuthRedirect(redirectParam: string | null): string {
     if (
       resolved.origin === "https://relative.invalid" &&
       !redirectParam.includes("\\") &&
-      resolved.pathname.startsWith("/")
+      resolved.pathname.startsWith("/") &&
+      !resolved.pathname.startsWith("//")
     ) {
-      return redirectParam;
+      // The parsed form, not the raw input: dot segments are collapsed here
+      // rather than trusted to the router.
+      return resolved.pathname + resolved.search + resolved.hash;
     }
   }
   return ACCOUNT_ENTRY_PATH;

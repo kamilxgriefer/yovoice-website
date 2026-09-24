@@ -12,7 +12,7 @@ const MESSAGES: Record<string, string> = {
   "auth/user-disabled": "This account has been disabled.",
   "auth/invalid-verification-code": "That authenticator code is not valid. Try the current code.",
   "auth/code-expired": "That authenticator code expired. Enter the new code from your app.",
-  "auth/session-expired": "This sign-in attempt expired. Return to password and sign in again.",
+  "auth/session-expired": "This sign-in attempt expired. Go back and sign in again.",
   "auth/multi-factor-info-not-found": "That authenticator is no longer enrolled. Sign in again.",
   "auth/unsupported-second-factor": "This account uses a second-factor method that is not supported on the website.",
   "auth/invalid-totp-challenge": "Enter a valid 6-digit code for an authenticator enrolled on this account.",
@@ -55,6 +55,9 @@ export function getSocialAuthErrorMessage(
   if (code && SOCIAL_CANCELLATION_CODES.has(code)) return null;
   if (code === "auth/popup-blocked") {
     return `Your browser blocked the ${providerName} sign-in window. Allow pop-ups for yovoice.app and try again.`;
+  }
+  if (code === "auth/web-storage-unsupported") {
+    return `Your browser settings block what ${providerName} sign-in needs. Sign in with email, or allow cookies and site data for yovoice.app and try again.`;
   }
   if (code === "auth/account-exists-with-different-credential") {
     return "This email already has a YO Voice account. Log in with its password, or with the option you used to create it.";

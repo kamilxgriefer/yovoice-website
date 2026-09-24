@@ -200,7 +200,10 @@ function ProviderAccountPanel({ providerNames }: { providerNames: string[] }) {
       ) : null}
       <p className="mt-3 max-w-2xl text-sm leading-6 text-text-secondary">
         Changing that address here needs a YO Voice password as well. To move
-        the account to another address, write to us from this one.
+        the account to another address, contact us: we confirm the request
+        with you before changing anything. If this is an Apple private relay
+        address, write from the address it forwards to and quote the address
+        above.
       </p>
       <a
         href={`mailto:${SUPPORT_MAILBOX}?subject=${encodeURIComponent("Change the email on my YO Voice account")}`}

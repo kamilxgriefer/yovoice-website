@@ -28,6 +28,7 @@ import {
   SOCIAL_ANNOUNCEMENT,
   SOCIAL_BUTTON_LABEL,
   SOCIAL_PROVIDER_NAME,
+  SocialProviderReadyError,
   SocialProviderUnavailableError,
   appleButtonState,
   socialProgressLabel,
@@ -120,6 +121,10 @@ export function SocialSignIn({ locked, onError, onTotpRequired }: SocialSignInPr
             callbacks.current.onTotpRequired(outcome.challenge, provider);
             return;
           case "failed": {
+            if (outcome.error instanceof SocialProviderReadyError) {
+              setAnnouncement(SOCIAL_ANNOUNCEMENT.ready(provider));
+              return;
+            }
             const message = getSocialAuthErrorMessage(
               outcome.error,
               SOCIAL_PROVIDER_NAME[provider],
@@ -146,7 +151,7 @@ export function SocialSignIn({ locked, onError, onTotpRequired }: SocialSignInPr
     const started = startSocialSignIn(
       provider,
       reprobe ? "checking" : "waiting",
-      async (setStep) => {
+      async () => {
         if (reprobe) {
           // "Couldn't check — try again": ask Firebase once more before
           // opening Apple's window.
@@ -154,8 +159,10 @@ export function SocialSignIn({ locked, onError, onTotpRequired }: SocialSignInPr
           if (availability !== "available") {
             throw new SocialProviderUnavailableError(provider);
           }
-          setStep("waiting");
-          setAnnouncement(SOCIAL_ANNOUNCEMENT.waiting(provider));
+          // Available now, but this click has waited on the network, so a
+          // window opened from here would be blocked. The button redraws as
+          // available; the next press opens Apple straight away.
+          throw new SocialProviderReadyError(provider);
         }
         // Nothing is awaited before this on the usual path, so the provider's
         // window opens inside the click and pop-up blockers let it through.

@@ -172,6 +172,8 @@ export const SOCIAL_ANNOUNCEMENT = Object.freeze({
     `Checking whether ${SOCIAL_PROVIDER_NAME[provider]} sign-in is available…`,
   waiting: (provider: SocialProvider) => `Waiting for ${SOCIAL_PROVIDER_NAME[provider]}…`,
   cancelled: (provider: SocialProvider) => `${SOCIAL_PROVIDER_NAME[provider]} sign-in cancelled.`,
+  ready: (provider: SocialProvider) =>
+    `${SOCIAL_PROVIDER_NAME[provider]} sign-in is available. Press Continue with ${SOCIAL_PROVIDER_NAME[provider]} again.`,
   signedIn: (provider: SocialProvider) =>
     `Signed in with ${SOCIAL_PROVIDER_NAME[provider]}. Continuing…`,
 });
@@ -194,6 +196,20 @@ export function socialProvidersOf(
 
 /** Thrown when a re-probe still cannot confirm Apple; worded by
  * `getSocialAuthErrorMessage` as "not available right now". */
+/** A re-check found the provider available. The attempt ends here instead of
+ * opening the provider's window: after a network wait the click no longer
+ * counts as a user gesture, so browsers would block the pop-up. */
+export class SocialProviderReadyError extends Error {
+  readonly code = "yovoice/provider-ready";
+  readonly provider: SocialProvider;
+
+  constructor(provider: SocialProvider) {
+    super(`${SOCIAL_PROVIDER_NAME[provider]} sign-in is available.`);
+    this.provider = provider;
+    this.name = "SocialProviderReadyError";
+  }
+}
+
 export class SocialProviderUnavailableError extends Error {
   readonly code = "auth/provider-unavailable";
 

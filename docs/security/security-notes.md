@@ -158,20 +158,30 @@ its own and never offers "multiple accounts per email".
   every email registration, here and in the app, sends a verification email
   and lands on `/verify-email`. The takeover protection above applies in that
   window only; a verified password is treated as the address owner's.
-- Apple is not authoritative (its addresses can be private relays), so an
-  Apple sign-in for an address that already has an account is refused with
-  `auth/account-exists-with-different-credential`; the form tells the visitor
-  to use the password or the method they created the account with. The same
-  applies to Google for addresses Google is not authoritative for.
-- Residual risk, accepted: whatever the pre-registrant wrote under that
-  account before the takeover (for example a display name in `users/{uid}`)
-  stays with it, and this repository does not rely on Firebase ending a
-  session the pre-registrant already holds. An owner who follows the
-  verification link of an account they did not create verifies the
-  pre-registrant's password, which Google sign-in then no longer replaces. If
-  either ever needs closing, it belongs server-side (for example revoking the
-  account's refresh tokens when a password credential is unlinked), not in
-  this website.
+- Which providers take over an unverified password account follows
+  Firebase's trusted-provider rules, not this website: Google for
+  `@gmail.com` / `@googlemail.com` addresses, and Apple (reproduced in the
+  Auth emulator on 2026-09-24). For other Google addresses (for example
+  Workspace domains) expect `auth/account-exists-with-different-credential`;
+  the form then tells the visitor to use the password or the method they
+  created the account with, and the owner recovers through Forgot password.
+  Confirm both behaviours on production with owner-controlled test accounts.
+- **Residual risk (pre-existing on the whole platform, not introduced here —
+  the app has offered Google and Apple on the same project since ADR-068):**
+  Firebase does not end a session the pre-registrant already holds. In the
+  Auth emulator the pre-registrant's refresh token kept working after the
+  owner's Google (and Apple) sign-in took the account over, and the refreshed
+  ID token carried `email_verified: true` — which `firestore.rules`
+  `isVerified()` treats as a verified member (messaging, friend requests,
+  creation). That is persistent access to the owner's account, not just a
+  leftover display name. An owner who follows the verification link of an
+  account they did not create also verifies the pre-registrant's password,
+  which Google sign-in then no longer replaces. Closing it needs a
+  server-side change in the app repository (for example a
+  `beforeUserSignedIn` blocking function that revokes the account's refresh
+  tokens when a federated sign-in replaces an unverified password
+  credential, or a short TTL for unverified password accounts). Until then
+  the owner accepts this risk knowingly; it is tracked as a follow-up.
 
 Owner configuration (Firebase / Google / Apple consoles; nothing in this
 repository can change it):

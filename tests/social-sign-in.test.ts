@@ -250,7 +250,8 @@ describe("a social sign-in holds the signed-in redirect until its profile is wri
     assert.match(block, /startSocialSignIn\(/);
     assert.match(block, /claimSocialSignInOutcomes\(/);
     assert.doesNotMatch(block, /holdSignedInRedirect|useRouter|router\.|location\./);
-    const attempt = block.slice(block.indexOf("async (setStep) => {"), block.indexOf("if (!started) return;"));
+    const attempt = block.slice(block.indexOf("async () => {"), block.indexOf("if (!started) return;"));
+    assert.ok(block.indexOf("async () => {") > 0, "the attempt callback moved");
     assert.match(attempt, /return signInWithProvider\(provider\);/);
     // On the usual path nothing is awaited before the popup.
     assert.equal(attempt.match(/await /g)?.length, 1);
@@ -387,5 +388,40 @@ describe("an account without a password is told so on /account/security", () => 
     assert.match(page, /mailto:\$\{SUPPORT_MAILBOX\}/);
     const panel = page.slice(page.indexOf("function ProviderAccountPanel("), page.indexOf("export default function SecurityPage"));
     assert.doesNotMatch(panel, /<input|<form/);
+  });
+});
+
+describe("release hardening (2026-09-24)", () => {
+  test("a browser that blocks provider storage gets an honest message", async () => {
+    const { getSocialAuthErrorMessage } = await import("../src/lib/auth/auth-errors.ts");
+    const message = getSocialAuthErrorMessage({ code: "auth/web-storage-unsupported" }, "Google");
+    assert.match(message ?? "", /Your browser settings block what Google sign-in needs/);
+  });
+
+  test("the expired-attempt message does not assume a password sign-in", async () => {
+    const { getAuthErrorMessage } = await import("../src/lib/auth/auth-errors.ts");
+    assert.equal(
+      getAuthErrorMessage({ code: "auth/session-expired" }),
+      "This sign-in attempt expired. Go back and sign in again.",
+    );
+  });
+
+  test("a successful Apple re-check asks for a fresh press instead of opening a late window", async () => {
+    const { SOCIAL_ANNOUNCEMENT, SocialProviderReadyError } = await import("../src/lib/auth/social-sign-in.ts");
+    assert.equal(
+      SOCIAL_ANNOUNCEMENT.ready("apple"),
+      "Apple sign-in is available. Press Continue with Apple again.",
+    );
+    assert.equal(new SocialProviderReadyError("apple").code, "yovoice/provider-ready");
+    const view = readFileSync(new URL("../src/components/auth/social-sign-in.tsx", import.meta.url), "utf8");
+    assert.match(view, /throw new SocialProviderReadyError\(provider\)/);
+    assert.match(view, /instanceof SocialProviderReadyError/);
+  });
+
+  test("redirects come back parsed, and dot segments cannot smuggle a second slash", async () => {
+    const { resolveAuthRedirect, ACCOUNT_ENTRY_PATH } = await import("../src/lib/auth/auth-redirect.ts");
+    assert.equal(resolveAuthRedirect("/a/../download?plan=yearly#top"), "/download?plan=yearly#top");
+    assert.equal(resolveAuthRedirect("/.//evil.com"), ACCOUNT_ENTRY_PATH);
+    assert.equal(resolveAuthRedirect("/premium/manage"), "/premium/manage");
   });
 });
