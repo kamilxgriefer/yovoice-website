@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -6,6 +5,7 @@ import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/auth/login-form";
 import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 import { APP_ENTRY_PATH, isAppLaunchRedirect } from "@/lib/auth/auth-redirect";
+import { AUTH_MODE_VOICE } from "@/lib/auth/auth-mode";
 
 export const metadata: Metadata = {
   title: "Log in",
@@ -23,14 +23,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <>
-      <h1 className="mt-8 text-center text-[28px] font-extrabold leading-tight tracking-[-.02em]">Welcome back</h1>
-      <p className="mt-2 text-center text-sm text-text-tertiary">
-        Sign in to continue to your downloads and account.
-      </p>
-      <Suspense>
-        <RedirectIfAuthenticated />
-        <LoginForm />
-      </Suspense>
+      {/* The layout says this title and note aloud (large, animated,
+          decorative); the heading of record stays here for assistive
+          technology and the document outline. */}
+      <h1 className="sr-only">{AUTH_MODE_VOICE.login.heading}</h1>
+      <p className="sr-only">{AUTH_MODE_VOICE.login.note}</p>
+      {/* No <Suspense> here: this page is dynamic, and a new, empty boundary
+          would show nothing while the form's code loads on the first switch
+          from Create account. Without it the router keeps the previous form
+          on screen until this one is ready. */}
+      <RedirectIfAuthenticated />
+      <LoginForm />
       <Link
         href="/"
         className="mt-6 block text-center text-sm link-accent"

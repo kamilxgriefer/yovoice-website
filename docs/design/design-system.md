@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-19 (Slim redesign)
+Last reviewed: 2026-09-24 (auth switch)
 
 ## Source of truth
 
@@ -49,7 +49,9 @@ The `@theme inline` block at the top of `globals.css` maps Tailwind's
 token itself instead of a copied hex. The old glass and glow compositing
 tokens are gone: no card, button, badge or ring glows. Two effects remain on
 purpose: the fixed header's `backdrop-blur`, which keeps its links legible
-over scrolled content, and the hero's single corner glow (see below).
+over scrolled content, and the hero's single corner glow (see below). The auth
+switch adds a transient per-letter blur while its title changes (see "Auth
+switch").
 
 ## Components and shape
 
@@ -109,7 +111,51 @@ over scrolled content, and the hero's single corner glow (see below).
   section title 40 px desktop / 30 px phone, 800, `-0.025em`; copy 16 px / 1.6
   in `--text-secondary`. One `<h1>` per page.
 - Motion (framer-motion) is reserved for the hero rotators, the hero CTA spring
-  and the menu. Use Tailwind v4's `motion-reduce:` variant.
+  and the menu. Use Tailwind v4's `motion-reduce:` variant. The one other
+  motion moment is the auth switch below; it uses CSS and the Web Animations
+  API, not framer-motion.
+
+## Auth switch (Log in / Create account)
+
+The owner-approved exception to "no decoration" and "motion is reserved"
+(September 2026). It applies to `/login` and `/register` only; the five
+mail-action and recovery pages keep the accounts panel with its three rings.
+
+- **Stage.** The desktop brand panel shows the page's title said large
+  (`.auth-spoken--stage`, Inter 800, up to 64 px, two lines for both titles)
+  with the page's note under it, and a stylised waveform of that phrase (a
+  hand-authored loudness contour) along the bottom edge. The waveform
+  (`.auth-wave`, bars graded from `--accent` to `--primary`) is the panel's
+  one ornament, in place of the rings, and the one gradient besides the
+  body's. Below `lg` the same title, note and a 56 px waveform sit above the
+  form. The title sizes against its column (container units), so enlarged
+  text shrinks it rather than clipping it.
+- **One size for every letter.** The title never varies weight or size per
+  letter, at rest or in motion; only opacity, blur and the word's vertical
+  position animate. Letters are inline spans so kerning is identical to a
+  plain text run. The loudness contour of the phrase (`AUTH_MODE_VOICE` in
+  `src/lib/auth/auth-mode.ts`) drives only the waveform.
+- **Headings.** The visible title and note are decorative (`aria-hidden`,
+  and the stage is not a named region); each page keeps its single `<h1>` and
+  note as `sr-only` text from the same copy constants.
+- **Switch.** `Log in | Create account` is a `<nav>` of two links with
+  `aria-current="page"`, drawn as a segmented control whose pill slides. It
+  keeps `?redirect=` (`authModeHref`). In forced-colours mode the current
+  option is drawn in `Highlight`. It is hidden during the second-factor step,
+  whose only way out is "Back to password".
+- **Transition.** About one second, once per switch, nothing loops: the old
+  title blurs out while the new one arrives letter by letter; a front travels
+  across the waveform, each bar ducking and springing slightly past its new
+  height; rows that belong to one mode unfold (`AuthFold`) while the previous
+  form's rows fold away (`AuthFoldAway`), so the email and password fields and
+  the submit button start exactly where they were. The two pages have no
+  `<Suspense>` around their forms, so the router keeps the old form on screen
+  until the new one is ready instead of showing an empty boundary. The
+  choreography plays once per switch (not again after the second-factor
+  step). With `prefers-reduced-motion` the change is immediate: no fold, no
+  label entrance, no pill or note transition.
+- While the switch is on screen the auth column is pinned to the top
+  (`.auth-shell`, `.auth-pane`) so the taller form never re-centres the page.
 
 ## Legal hygiene
 

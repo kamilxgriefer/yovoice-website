@@ -493,6 +493,147 @@ img { user-select: none; -webkit-user-drag: none; }
   }
 }
 
+/* ---------- Auth: Log in <-> Create account ----------
+   The one motion moment of the auth surface (docs/design/design-system.md,
+   "Auth switch"): transform/opacity/blur, a colour transition and one-shot
+   row folds (grid rows / height). Nothing loops. */
+
+/* While the switch is on screen the column is pinned to the top, so the
+   shared fields keep their place when the taller form arrives. */
+@media (max-width: 1023.98px) {
+  .auth-shell:has([data-auth-switch]) { align-items: flex-start; }
+}
+@media (min-width: 1024px) {
+  .auth-pane:has([data-auth-switch]) { align-items: flex-start; }
+}
+
+.auth-switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1.5rem;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+}
+@media (min-width: 1024px) { .auth-switch { margin-top: 0; } }
+.auth-switch__pill {
+  position: absolute;
+  inset-block: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  transition: transform .52s cubic-bezier(.2,.8,.2,1);
+}
+.auth-switch[data-mode="register"] .auth-switch__pill { transform: translateX(100%); }
+.auth-switch__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: .75rem;
+  border-radius: var(--radius-pill);
+  font-size: .9375rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-tertiary);
+  transition: color .3s ease;
+}
+.auth-switch__option:hover,
+.auth-switch__option[aria-current="page"] { color: var(--foreground); }
+/* The second-factor step is not a mode: leaving it through the switch would
+   drop the pending challenge, so only "Back to password" leads out. */
+.auth-pane:has([data-auth-challenge]) .auth-switch { display: none; }
+@media (forced-colors: active) {
+  .auth-switch__pill { forced-color-adjust: none; background: Highlight; box-shadow: none; }
+  .auth-switch__option[aria-current="page"] { forced-color-adjust: none; color: HighlightText; }
+}
+
+/* The spoken title: one family, one weight, one size for every letter. The
+   frame is a size container so the title shrinks with its column instead of
+   being clipped when the visitor enlarges text (200 % and more). */
+.auth-title-frame { container-type: inline-size; }
+.auth-spoken {
+  display: grid;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  letter-spacing: -.026em;
+  line-height: 1.02;
+  color: var(--foreground);
+}
+.auth-spoken__phrase { grid-area: 1 / 1; }
+.auth-spoken__word { display: inline-block; white-space: nowrap; }
+/* Narrow enough that both titles break onto two lines, so the note below
+   never moves when the title changes. 21cqi keeps "Welcome" (about 4.5 em)
+   inside the column at any text size. */
+.auth-spoken--stage { font-size: min(4rem, 21cqi); max-width: 5.5em; }
+.auth-spoken--compact { font-size: min(clamp(2.25rem, 10vw, 3rem), 19cqi); }
+
+.auth-notes { display: grid; }
+.auth-notes__note {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.auth-notes__note[data-active] { opacity: 1; transform: none; transition-delay: .18s; }
+
+/* The waveform: the auth stage's one ornament, in place of the rings, and
+   the documented exception to "one page gradient" (design-system.md). */
+.auth-wave {
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.auth-wave__bar {
+  flex: 1 1 0;
+  height: 100%;
+  margin-inline: 1.5px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--accent), var(--primary));
+  opacity: .9;
+  transform-origin: bottom;
+}
+
+/* Mode-only form rows (AuthFold / AuthFoldAway). They own their spacing, so
+   the form's `space-y-4` margin is cancelled and a folded row takes none. */
+.auth-fold { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr; margin-block: 0; }
+.auth-fold__body { min-height: 0; }
+.auth-fold__content { padding-bottom: 1rem; }
+.auth-fold[data-unfolding] { animation: auth-fold-in .52s cubic-bezier(.2,.8,.2,1) both; }
+.auth-fold[data-unfolding] > .auth-fold__body { overflow: hidden; }
+@keyframes auth-fold-in {
+  from { grid-template-rows: 0fr; opacity: 0; }
+  to { grid-template-rows: 1fr; opacity: 1; }
+}
+.auth-fold-away { margin-block: 0; animation: auth-fold-away .52s cubic-bezier(.2,.8,.2,1) both; }
+/* One input row (.glass-field min-height + the row gap) / the Forgot row
+   (its line box follows the body's 1.5 line height, not the 12 px link:
+   24 px + the row gap). */
+.auth-fold-away[data-size="field"] { --auth-fold-from: calc(3.25rem + 1rem); }
+.auth-fold-away[data-size="link"] { --auth-fold-from: 2.5rem; }
+@keyframes auth-fold-away {
+  from { height: var(--auth-fold-from); }
+  to { height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The forms skip their fold choreography entirely (shouldPlayAuthModeSwitch);
+     these keep the switch itself immediate. */
+  .auth-switch__pill, .auth-notes__note { transition: none; }
+}
+
+.auth-label { display: inline-block; }
+.auth-label[data-entering] { animation: auth-label-in .42s cubic-bezier(.2,.8,.2,1) .16s both; }
+@keyframes auth-label-in {
+  from { opacity: 0; transform: translateY(.6em); }
+  to { opacity: 1; transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *,*::before,*::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

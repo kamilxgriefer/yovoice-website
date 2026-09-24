@@ -11,6 +11,12 @@ import { verifyEmailPathAfterRegistration } from "@/lib/auth/registration-flow";
 import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AuthFold, AuthFoldAway } from "@/components/auth/auth-fold";
+import {
+  markAuthModeSwitch,
+  shouldPlayAuthModeSwitch,
+} from "@/components/auth/auth-mode-motion";
+import { authModeHref } from "@/lib/auth/auth-mode";
 
 export function RegisterForm() {
   const { signUp } = useAuth();
@@ -27,6 +33,8 @@ export function RegisterForm() {
   // account in before signUp resolves; without this the signed-in redirect
   // would unmount the form and lose the verification-email outcome.
   const [registrationStarted, setRegistrationStarted] = useState(false);
+  // Arrived from Log in: fold its Forgot password row away and unfold ours.
+  const [switched] = useState(shouldPlayAuthModeSwitch);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -77,7 +85,7 @@ export function RegisterForm() {
         </p>
       ) : null}
 
-      <div>
+      <AuthFold enter={switched}>
         <label htmlFor="register-name" className="sr-only">
           Display name
         </label>
@@ -91,7 +99,7 @@ export function RegisterForm() {
           onChange={(event) => setDisplayName(event.target.value)}
           icon={<User className="size-[18px]" />}
         />
-      </div>
+      </AuthFold>
 
       <div>
         <label htmlFor="register-email" className="sr-only">
@@ -125,7 +133,9 @@ export function RegisterForm() {
         />
       </div>
 
-      <div>
+      {switched ? <AuthFoldAway size="link" /> : null}
+
+      <AuthFold enter={switched}>
         <label htmlFor="register-confirm-password" className="sr-only">
           Confirm password
         </label>
@@ -140,21 +150,20 @@ export function RegisterForm() {
           icon={<Lock className="size-[18px]" />}
           state={confirmPassword && password !== confirmPassword ? "error" : "default"}
         />
-      </div>
+      </AuthFold>
 
       <Button type="submit" isLoading={submitting} className="w-full">
-        {submitting ? "Creating account…" : "Create account"}
+        <span className="auth-label" data-entering={switched ? "" : undefined}>
+          {submitting ? "Creating account…" : "Create account"}
+        </span>
       </Button>
 
       <p className="text-center text-sm text-text-secondary">
         Already have an account?{" "}
         <Link
-          href={
-            searchParams.get("redirect")
-              ? `/login?redirect=${encodeURIComponent(searchParams.get("redirect")!)}`
-              : "/login"
-          }
+          href={authModeHref("login", searchParams.get("redirect"))}
           className="font-semibold link-accent"
+          onNavigate={markAuthModeSwitch}
         >
           Log in
         </Link>

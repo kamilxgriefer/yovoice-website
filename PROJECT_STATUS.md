@@ -1,6 +1,6 @@
 # YO Voice Website — Project Status
 
-_Last updated: September 19, 2026_
+_Last updated: September 24, 2026_
 
 ## Summary
 
@@ -8,6 +8,19 @@ The marketing website at yovoice.app is now feature-complete: every page
 referenced from navigation or the footer exists, has real content, and
 every link/CTA resolves to something real. This document tracks what
 changed in this pass and what's intentionally deferred.
+
+## Auth switch (September 2026)
+
+`/login` and `/register` now share one animated surface: the page title said
+large in the brand panel with a stylised waveform of that phrase, and a `Log in |
+Create account` switch. Switching modes blurs the old title out, says the new
+one letter by letter at one even size, runs a front across the waveform and
+unfolds only the rows that differ, so shared fields never jump. The other auth
+pages are unchanged. Rules and the documented exception:
+`docs/design/design-system.md`, "Auth switch". Verified with `npm run lint`,
+`npx tsc --noEmit`, `npm test`, `npm run build` and screenshots plus seeked
+animation frames at 1440, 834 and 390 px; real sign-in is not exercised by
+that local check (dummy Firebase config).
 
 ## Slim redesign (September 2026, branch `slim/website`)
 

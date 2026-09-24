@@ -11,6 +11,12 @@ import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TotpChallengeForm } from "@/components/auth/totp-challenge-form";
+import { AuthFold, AuthFoldAway } from "@/components/auth/auth-fold";
+import {
+  markAuthModeSwitch,
+  shouldPlayAuthModeSwitch,
+} from "@/components/auth/auth-mode-motion";
+import { authModeHref } from "@/lib/auth/auth-mode";
 import type { TotpSignInChallenge } from "@/lib/auth/totp-sign-in";
 
 export function LoginForm() {
@@ -24,6 +30,9 @@ export function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const [totpChallenge, setTotpChallenge] =
     useState<TotpSignInChallenge | null>(null);
+  // Arrived from Create account: fold its extra rows away and unfold ours.
+  // Once only — returning from the second-factor step shows the plain form.
+  const [switched, setSwitched] = useState(shouldPlayAuthModeSwitch);
 
   function finishSignIn() {
     router.replace(resolveAuthRedirect(searchParams.get("redirect")));
@@ -36,6 +45,7 @@ export function LoginForm() {
     try {
       const result = await signIn(email, password);
       if (result.status === "totp-required") {
+        setSwitched(false);
         setTotpChallenge(result.challenge);
         setPassword("");
         setSubmitting(false);
@@ -52,15 +62,20 @@ export function LoginForm() {
   }
 
   if (totpChallenge) {
+    // `data-auth-challenge` hides the layout's mode switch: leaving mid-way
+    // would silently drop the pending second factor. "Back to password" is
+    // the way out.
     return (
-      <TotpChallengeForm
-        challenge={totpChallenge}
-        onCancel={() => {
-          setTotpChallenge(null);
-          setError(null);
-        }}
-        onComplete={finishSignIn}
-      />
+      <div data-auth-challenge>
+        <TotpChallengeForm
+          challenge={totpChallenge}
+          onCancel={() => {
+            setTotpChallenge(null);
+            setError(null);
+          }}
+          onComplete={finishSignIn}
+        />
+      </div>
     );
   }
 
@@ -75,6 +90,8 @@ export function LoginForm() {
           {error}
         </p>
       ) : null}
+
+      {switched ? <AuthFoldAway size="field" /> : null}
 
       <div>
         <label htmlFor="login-email" className="sr-only">
@@ -108,28 +125,31 @@ export function LoginForm() {
         />
       </div>
 
-      <div className="text-right">
-        <Link
-          href="/forgot-password"
-          className="text-xs font-semibold link-accent"
-        >
-          Forgot password?
-        </Link>
-      </div>
+      {switched ? <AuthFoldAway size="field" /> : null}
+
+      <AuthFold enter={switched}>
+        <div className="text-right">
+          <Link
+            href="/forgot-password"
+            className="text-xs font-semibold link-accent"
+          >
+            Forgot password?
+          </Link>
+        </div>
+      </AuthFold>
 
       <Button type="submit" isLoading={submitting} className="w-full">
-        {submitting ? "Signing in…" : "Log in"}
+        <span className="auth-label" data-entering={switched ? "" : undefined}>
+          {submitting ? "Signing in…" : "Log in"}
+        </span>
       </Button>
 
       <p className="text-center text-sm text-text-secondary">
         Don&apos;t have an account?{" "}
         <Link
-          href={
-            searchParams.get("redirect")
-              ? `/register?redirect=${encodeURIComponent(searchParams.get("redirect")!)}`
-              : "/register"
-          }
+          href={authModeHref("register", searchParams.get("redirect"))}
           className="font-semibold link-accent"
+          onNavigate={markAuthModeSwitch}
         >
           Create account
         </Link>
