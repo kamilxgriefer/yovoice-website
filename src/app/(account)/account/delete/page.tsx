@@ -121,10 +121,10 @@ function Consequences() {
 }
 
 /**
- * Google and Apple accounts cannot sign in on this website at all
- * (src/providers/auth-provider.tsx is email/password only), so this panel is
- * defensive: it is what a linked-provider session would see rather than a
- * password form it could never satisfy.
+ * What a Google- or Apple-only account sees ("Continue with Google / Apple"
+ * on /login and /register): reauthentication here is by password only, so it
+ * gets the app or the email route rather than a password form it could never
+ * satisfy.
  */
 function ProviderAccountPanel() {
   return (

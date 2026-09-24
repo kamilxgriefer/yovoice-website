@@ -9,17 +9,22 @@ import {
 } from "react";
 import {
   EmailAuthProvider,
+  GoogleAuthProvider,
+  OAuthProvider,
   createUserWithEmailAndPassword,
+  getAdditionalUserInfo,
   onAuthStateChanged,
   reauthenticateWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
   updateEmail,
   updatePassword,
   updateProfile,
   type User,
+  type UserCredential,
 } from "firebase/auth";
 import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
 
@@ -44,7 +49,15 @@ import {
   createFirebaseTotpSignInChallenge,
   isMultiFactorRequiredError,
   type EmailPasswordSignInResult,
+  type SignInResult,
 } from "@/lib/auth/totp-sign-in";
+import {
+  APPLE_PROVIDER_ID,
+  APPLE_SCOPES,
+  GOOGLE_CUSTOM_PARAMETERS,
+  SOCIAL_PROVIDER_NAME,
+  type SocialProvider,
+} from "@/lib/auth/social-sign-in";
 
 // Bootstraps users/{uid} with the same seed the app's
 // ProfileService.ensureProfile() writes, restricted to the keys the app's
@@ -72,6 +85,42 @@ async function ensureUserProfile(user: User, displayName: string) {
   });
 }
 
+/**
+ * The app's `_createSocialUserProfileIfNeeded`: only a first sign-in writes
+ * users/{uid}, with the same rule-safe bootstrap as email registration (the
+ * name comes from the provider, then the email's local part). Firebase has
+ * already signed the account in, so a refused write never undoes that: it is
+ * reported, and the app completes a missing profile on first open. Never
+ * rejects.
+ */
+function createSocialUserProfileIfNeeded(
+  credential: UserCredential,
+  provider: SocialProvider,
+): Promise<void> {
+  if (!getAdditionalUserInfo(credential)?.isNewUser) return Promise.resolve();
+  return ensureUserProfile(
+    credential.user,
+    credential.user.displayName ?? "",
+  ).catch((error: unknown) => {
+    console.error(
+      `YO Voice ${SOCIAL_PROVIDER_NAME[provider]} sign-in: the account was created but its profile could not be written; the app completes it on first open.`,
+      error,
+    );
+  });
+}
+
+/** The same provider set-up as the app's AuthService on the web. */
+function createSocialAuthProvider(provider: SocialProvider) {
+  if (provider === "google") {
+    const google = new GoogleAuthProvider();
+    google.setCustomParameters({ ...GOOGLE_CUSTOM_PARAMETERS });
+    return google;
+  }
+  const apple = new OAuthProvider(APPLE_PROVIDER_ID);
+  for (const scope of APPLE_SCOPES) apple.addScope(scope);
+  return apple;
+}
+
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
@@ -79,6 +128,12 @@ type AuthContextValue = {
     email: string,
     password: string,
   ) => Promise<EmailPasswordSignInResult>;
+  /** "Continue with Google / Apple" in a popup. A first sign-in creates the
+   * account; its users/{uid} profile is bootstrapped before this resolves, and
+   * a refused profile write is reported to the console but never fails the
+   * sign-in (the app completes a missing profile on first open). Throws the
+   * Firebase error otherwise, including the popup being closed. */
+  signInWithProvider: (provider: SocialProvider) => Promise<SignInResult>;
   /** Throws only when the account could not be created. Once it exists, the
    * result says whether the verification email was sent. */
   signUp: (
@@ -149,6 +204,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const auth = getFirebaseAuth();
         try {
           await signInWithEmailAndPassword(auth, email, password);
+          return { status: "signed-in" };
+        } catch (error) {
+          if (!isMultiFactorRequiredError(error)) throw error;
+          return {
+            status: "totp-required",
+            challenge: createFirebaseTotpSignInChallenge(auth, error),
+          };
+        }
+      },
+      signInWithProvider: async (provider) => {
+        const auth = getFirebaseAuth();
+        try {
+          // First, with nothing awaited before it: browsers only let the page
+          // open the provider's window while the click is still fresh.
+          const credential = await signInWithPopup(
+            auth,
+            createSocialAuthProvider(provider),
+          );
+          await createSocialUserProfileIfNeeded(credential, provider);
           return { status: "signed-in" };
         } catch (error) {
           if (!isMultiFactorRequiredError(error)) throw error;

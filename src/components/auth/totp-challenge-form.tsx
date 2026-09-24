@@ -23,12 +23,16 @@ type TotpChallengeFormProps = {
   challenge: TotpSignInChallenge;
   onCancel: () => void;
   onComplete: () => void;
+  /** The way out. "Back to password" after a password sign-in; a Google or
+   * Apple sign-in has no password to go back to. */
+  cancelLabel?: string;
 };
 
 export function TotpChallengeForm({
   challenge,
   onCancel,
   onComplete,
+  cancelLabel = "Back to password",
 }: TotpChallengeFormProps) {
   const descriptionId = useId();
   const errorId = useId();
@@ -76,7 +80,7 @@ export function TotpChallengeForm({
         className="focus-ring -ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold text-text-secondary transition hover:text-white"
       >
         <ArrowLeft className="size-4" aria-hidden />
-        Back to password
+        {cancelLabel}
       </button>
 
       <div className="mt-5">

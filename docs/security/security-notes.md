@@ -1,6 +1,6 @@
 # Website security notes
 
-Last reviewed: 2026-09-01
+Last reviewed: 2026-09-24 (sign-in providers)
 
 ## Dependency baseline
 
@@ -68,3 +68,58 @@ Stripe account/payment hand-offs require production violation telemetry before
 `Content-Security-Policy-Report-Only` can safely become
 `Content-Security-Policy`. This staging choice is a release gate, not a claim
 that CSP enforcement is already active.
+
+## Sign-in providers
+
+`/login` and `/register` sign in with email and password, Google or Apple,
+all through Firebase Authentication on the shared project, mirroring the
+app's `AuthService` on the web:
+
+- **Google**: `GoogleAuthProvider` with `prompt=select_account`,
+  `signInWithPopup`.
+- **Apple**: `OAuthProvider('apple.com')` with the `email` and `name` scopes,
+  `signInWithPopup`, gated by the same probe the app uses (`POST
+  identitytoolkit.googleapis.com/v1/accounts:createAuthUri` for `apple.com`
+  with this page's origin as `continueUri`, parsed by
+  `parseAppleProviderProbeResponse` in `src/lib/auth/social-sign-in.ts`).
+  The probe fails closed: only an https `appleid.apple.com` authorisation URL
+  for `apple.com` enables the button; `OPERATION_NOT_ALLOWED` shows it
+  disabled as "Coming soon"; anything else (network, quota, an origin
+  Firebase does not accept, which answers `INVALID_CONTINUE_URI`) shows
+  "Try again", which probes again before opening Apple's window.
+- Popups only, as the app does on the web; there is no `signInWithRedirect`
+  path. The popup is the first thing awaited after the click, so pop-up
+  blockers let it through (the one exception is Apple's "Try again", which
+  probes before opening; a browser that then blocks the window gets the
+  "allow pop-ups" message, and the next press opens it directly).
+- A second factor is enforced the same way as for passwords: a
+  `multi-factor-auth-required` result leads to the TOTP challenge on either
+  page; SMS is never offered.
+- A first sign-in (`getAdditionalUserInfo(result).isNewUser`) writes
+  `users/{uid}` through the same `planUserProfileBootstrap` transaction as
+  email registration, so it can only write keys inside the app's
+  `userCreateAllowed` / owner-update allowlists. A refused write is logged
+  and does not undo the sign-in; the app completes a missing profile on first
+  open. The page's "already signed in" redirect is held
+  (`src/lib/auth/signed-in-redirect-hold.ts`) until that write settles, so
+  the `/app` hand-off (a full-page `location.replace`) cannot cut it off.
+- The Report-Only CSP above already names every host these flows use
+  (`*.googleapis.com`, `auth.yovoice.app`, `accounts.google.com`,
+  `appleid.apple.com`, `apis.google.com`).
+
+Owner configuration (Firebase / Apple consoles; nothing in this repository
+can change it):
+
+1. Firebase Console > Authentication > Settings > Authorized domains lists
+   `yovoice.app` and `www.yovoice.app` (a Vercel preview origin is not
+   listed, so provider sign-in fails there by design: Google reports "not
+   available right now", Apple shows "Try again"). On 2026-09-24 the
+   production `createAuthUri` accepted both origins as `continueUri` and
+   rejected an unlisted one, which indicates they are listed; confirm in the
+   console.
+2. Google provider enabled (Authentication > Sign-in method).
+3. Apple provider enabled with the Services ID `app.yovoice.web`, whose
+   Return URLs include `https://auth.yovoice.app/__/auth/handler` — the
+   handler of the website's `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`. If that
+   variable ever points elsewhere, that domain's `/__/auth/handler` must be
+   added in Apple's console as well.

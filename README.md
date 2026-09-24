@@ -68,12 +68,16 @@ src/
 
 - [x] Sign In
 - [x] Register
+- [x] Continue with Google / Continue with Apple on both (popup; Apple is
+      "Coming soon" when the provider is not configured)
 - [x] Password Recovery
-- [x] Email Verification (sent on register, resend from `/verify-email`)
+- [x] Email Verification (sent on register, resend from `/verify-email`;
+      Google and Apple accounts arrive verified and skip it)
 
-All backed by Firebase Authentication (email/password), shared with the
-Flutter app via the `auth.yovoice.app` custom auth domain — one account
-works everywhere.
+All backed by Firebase Authentication (email/password, Google, Apple),
+shared with the Flutter app via the `auth.yovoice.app` custom auth domain —
+one account works everywhere. Provider set-up and the owner's console steps:
+`docs/security/security-notes.md`, "Sign-in providers".
 
 ## User Portal (`/account/*`)
 

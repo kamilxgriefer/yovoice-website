@@ -11,6 +11,7 @@ import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TotpChallengeForm } from "@/components/auth/totp-challenge-form";
+import { SocialSignIn } from "@/components/auth/social-sign-in";
 import { AuthFold, AuthFoldAway } from "@/components/auth/auth-fold";
 import {
   markAuthModeSwitch,
@@ -30,6 +31,11 @@ export function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const [totpChallenge, setTotpChallenge] =
     useState<TotpSignInChallenge | null>(null);
+  // Which first factor the second-factor step follows: a Google or Apple
+  // sign-in has no password to go back to.
+  const [challengeAfterSocial, setChallengeAfterSocial] = useState(false);
+  // A Google or Apple window is open: the password submit waits.
+  const [socialBusy, setSocialBusy] = useState(false);
   // Arrived from Create account: fold its extra rows away and unfold ours.
   // Once only — returning from the second-factor step shows the plain form.
   const [switched, setSwitched] = useState(shouldPlayAuthModeSwitch);
@@ -38,14 +44,22 @@ export function LoginForm() {
     router.replace(resolveAuthRedirect(searchParams.get("redirect")));
   }
 
+  function openSocialChallenge(challenge: TotpSignInChallenge) {
+    setSwitched(false);
+    setChallengeAfterSocial(true);
+    setTotpChallenge(challenge);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (socialBusy) return;
     setError(null);
     setSubmitting(true);
     try {
       const result = await signIn(email, password);
       if (result.status === "totp-required") {
         setSwitched(false);
+        setChallengeAfterSocial(false);
         setTotpChallenge(result.challenge);
         setPassword("");
         setSubmitting(false);
@@ -63,12 +77,13 @@ export function LoginForm() {
 
   if (totpChallenge) {
     // `data-auth-challenge` hides the layout's mode switch: leaving mid-way
-    // would silently drop the pending second factor. "Back to password" is
-    // the way out.
+    // would silently drop the pending second factor. "Back to password" (or
+    // "Back", after Google or Apple) is the way out.
     return (
       <div data-auth-challenge>
         <TotpChallengeForm
           challenge={totpChallenge}
+          cancelLabel={challengeAfterSocial ? "Back" : undefined}
           onCancel={() => {
             setTotpChallenge(null);
             setError(null);
@@ -81,6 +96,16 @@ export function LoginForm() {
 
   return (
     <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
+      {/* Identical at the top of the register form, so switching modes never
+          moves it (see SocialSignIn). */}
+      <SocialSignIn
+        locked={submitting}
+        onBusyChange={setSocialBusy}
+        onError={setError}
+        onTotpRequired={openSocialChallenge}
+        onSignedIn={finishSignIn}
+      />
+
       {error ? (
         <p
           role="alert"
@@ -138,7 +163,12 @@ export function LoginForm() {
         </div>
       </AuthFold>
 
-      <Button type="submit" isLoading={submitting} className="w-full">
+      <Button
+        type="submit"
+        isLoading={submitting}
+        disabled={submitting || socialBusy}
+        className={socialBusy ? "w-full opacity-60" : "w-full"}
+      >
         <span className="auth-label" data-entering={switched ? "" : undefined}>
           {submitting ? "Signing in…" : "Log in"}
         </span>

@@ -505,6 +505,16 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 @media (min-width: 1024px) {
   .auth-pane:has([data-auth-switch]) { align-items: flex-start; }
+  /* Desktop pins the whole card too. Since the Google / Apple block made
+     both forms taller than the brand panel's 640 px minimum, the card's
+     height follows the form, and a centred card would drift by half the
+     difference while the rows unfold. The offset centres the taller form
+     (Create account, about 46.5rem at rest); if that estimate drifts, the
+     pair only sits a little off-centre, it never moves during a switch. */
+  .auth-shell:has([data-auth-switch]) {
+    align-items: flex-start;
+    padding-top: max(4rem, calc((100svh - 46.5rem) / 2));
+  }
 }
 
 .auth-switch {
@@ -619,6 +629,41 @@ img { user-select: none; -webkit-user-drag: none; }
 @keyframes auth-fold-away {
   from { height: var(--auth-fold-from); }
   to { height: 0; }
+}
+
+/* "Continue with Google / Apple" (SocialSignIn), the same block at the top of
+   both forms. The Apple button's second label ("Coming soon", "Try again")
+   sits beside the name, not under it, so the button stays 48 px and the
+   fields below never move when the availability probe answers. */
+.social-status {
+  display: inline-block;
+  margin-inline-start: .5rem;
+  padding: .125rem .5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  vertical-align: .0625rem;
+}
+/* "or with email": a hairline either side, sentence case (no all-caps
+   eyebrow here). */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 1rem;
+  font-size: .8125rem;
+  line-height: 1.25rem;
+  color: var(--text-tertiary);
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1 1 0;
+  min-width: 1rem;
+  border-top: 1px solid var(--border);
 }
 
 @media (prefers-reduced-motion: reduce) {

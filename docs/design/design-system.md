@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-24 (auth switch)
+Last reviewed: 2026-09-24 (auth switch; Continue with Google / Apple)
 
 ## Source of truth
 
@@ -142,7 +142,8 @@ mail-action and recovery pages keep the accounts panel with its three rings.
   `aria-current="page"`, drawn as a segmented control whose pill slides. It
   keeps `?redirect=` (`authModeHref`). In forced-colours mode the current
   option is drawn in `Highlight`. It is hidden during the second-factor step,
-  whose only way out is "Back to password".
+  whose only way out is "Back to password" ("Back" when the step follows
+  Google or Apple).
 - **Transition.** About one second, once per switch, nothing loops: the old
   title blurs out while the new one arrives letter by letter; a front travels
   across the waveform, each bar ducking and springing slightly past its new
@@ -156,6 +157,27 @@ mail-action and recovery pages keep the accounts panel with its three rings.
   label entrance, no pill or note transition.
 - While the switch is on screen the auth column is pinned to the top
   (`.auth-shell`, `.auth-pane`) so the taller form never re-centres the page.
+  On desktop the whole card is pinned too, at an offset that centres the
+  taller Create account card: with the Google / Apple block both forms are
+  taller than the brand panel's 640 px minimum, so a centred card would drift
+  by half the height difference while the rows unfold.
+- **Google / Apple block.** `SocialSignIn` sits first in both forms,
+  rendered identically (same props, same probe state from a per-tab cache),
+  so the switch never moves it and the fold choreography below it is
+  unchanged: two full-width `.premium-button-secondary` buttons (48 px, 12 px
+  apart), "Continue with Google" and "Continue with Apple", each with its
+  provider mark, then the divider "or with email" in sentence case (hairline
+  either side, `--text-tertiary`; not an all-caps eyebrow). The form's alert
+  sits under the block, above the first field, so a social or a password
+  error appears next to what caused it. While a provider window is open its
+  button shows the spinner in place of the mark, and the other button and
+  the email submit are disabled. Apple mirrors the app's availability probe:
+  a spinner while it runs, "Coming soon" (disabled) when the provider is not
+  configured, "Try again" (enabled, probes again on press) when the probe
+  could not confirm it. The status is a small pill beside the name, not a
+  second line, so the button stays 48 px and nothing below moves when the
+  probe answers (measured one line at 390 px and up; at 320 px "Coming
+  soon" wraps and that button grows to 56 px).
 
 ## Legal hygiene
 
@@ -167,6 +189,15 @@ mail-action and recovery pages keep the accounts panel with its three rings.
   Instagram link to @yovoice.app and the matching `sameAs` entry, where the
   label names the service the link goes to) and historical release-ledger
   text in `src/content/product-updates.ts`, which is a factual record.
+- Provider sign-in buttons (2026-09-24). "Continue with Google" and
+  "Continue with Apple" on `/login` and `/register` carry the provider's own
+  mark because Google's and Apple's branding rules require it on a button
+  that signs in with them: the four-colour Google "G" unaltered (the app's
+  `assets/icons/icon_google_g.svg`) and the Apple glyph in the label colour
+  (`src/components/auth/provider-marks.tsx`). The label names the provider
+  in one of the wordings both allow, and the two buttons are the same size
+  and emphasis. The marks appear nowhere else: not in copy, feature lists,
+  illustrations or any other control.
 - App previews are captions on real captures; they never invent member names,
   counts or online states (see below).
 

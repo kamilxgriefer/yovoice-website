@@ -17,9 +17,13 @@ export type TotpSignInChallenge = {
   resolve: (factorUid: string, oneTimePassword: string) => Promise<void>;
 };
 
-export type EmailPasswordSignInResult =
+/** Outcome of a first-factor sign-in (password, Google or Apple): done, or a
+ * TOTP second factor is still owed. */
+export type SignInResult =
   | { status: "signed-in" }
   | { status: "totp-required"; challenge: TotpSignInChallenge };
+
+export type EmailPasswordSignInResult = SignInResult;
 
 export const TOTP_CHALLENGE_A11Y = Object.freeze({
   codeLabel: "6-digit authenticator code",

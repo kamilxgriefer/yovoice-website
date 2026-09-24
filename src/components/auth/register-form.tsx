@@ -7,8 +7,12 @@ import { Lock, Mail, User } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import { resolveAuthRedirect } from "@/lib/auth/auth-redirect";
 import { verifyEmailPathAfterRegistration } from "@/lib/auth/registration-flow";
+import type { TotpSignInChallenge } from "@/lib/auth/totp-sign-in";
 import { RedirectIfAuthenticated } from "@/components/auth/redirect-if-authenticated";
+import { SocialSignIn } from "@/components/auth/social-sign-in";
+import { TotpChallengeForm } from "@/components/auth/totp-challenge-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthFold, AuthFoldAway } from "@/components/auth/auth-fold";
@@ -34,10 +38,29 @@ export function RegisterForm() {
   // would unmount the form and lose the verification-email outcome.
   const [registrationStarted, setRegistrationStarted] = useState(false);
   // Arrived from Log in: fold its Forgot password row away and unfold ours.
-  const [switched] = useState(shouldPlayAuthModeSwitch);
+  // Once only — returning from the second-factor step shows the plain form.
+  const [switched, setSwitched] = useState(shouldPlayAuthModeSwitch);
+  // A Google or Apple window is open: the email sign-up waits.
+  const [socialBusy, setSocialBusy] = useState(false);
+  // "Continue with Google / Apple" reached an existing account that has an
+  // authenticator: its second factor is owed here, as on Log in.
+  const [totpChallenge, setTotpChallenge] =
+    useState<TotpSignInChallenge | null>(null);
+
+  // Google and Apple accounts arrive verified by their provider, so they skip
+  // /verify-email and go where a login would.
+  function finishSignIn() {
+    router.replace(resolveAuthRedirect(searchParams.get("redirect")));
+  }
+
+  function openSocialChallenge(challenge: TotpSignInChallenge) {
+    setSwitched(false);
+    setTotpChallenge(challenge);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (socialBusy) return;
     setError(null);
 
     if (password.length < 8) {
@@ -72,9 +95,38 @@ export function RegisterForm() {
     }
   }
 
+  if (totpChallenge) {
+    // As on Log in: `data-auth-challenge` hides the layout's mode switch,
+    // which would silently drop the pending second factor; "Back" is the way
+    // out.
+    return (
+      <div data-auth-challenge>
+        <TotpChallengeForm
+          challenge={totpChallenge}
+          cancelLabel="Back"
+          onCancel={() => {
+            setTotpChallenge(null);
+            setError(null);
+          }}
+          onComplete={finishSignIn}
+        />
+      </div>
+    );
+  }
+
   return (
     <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
       <RedirectIfAuthenticated suspended={registrationStarted} />
+      {/* Identical at the top of the login form, so switching modes never
+          moves it (see SocialSignIn). */}
+      <SocialSignIn
+        locked={submitting}
+        onBusyChange={setSocialBusy}
+        onError={setError}
+        onTotpRequired={openSocialChallenge}
+        onSignedIn={finishSignIn}
+      />
+
       {error ? (
         <p
           role="alert"
@@ -152,7 +204,12 @@ export function RegisterForm() {
         />
       </AuthFold>
 
-      <Button type="submit" isLoading={submitting} className="w-full">
+      <Button
+        type="submit"
+        isLoading={submitting}
+        disabled={submitting || socialBusy}
+        className={socialBusy ? "w-full opacity-60" : "w-full"}
+      >
         <span className="auth-label" data-entering={switched ? "" : undefined}>
           {submitting ? "Creating account…" : "Create account"}
         </span>
