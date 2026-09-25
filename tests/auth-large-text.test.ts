@@ -82,3 +82,23 @@ test("the phone waveform and the skip link fit a page-zoomed phone", async () =>
   assert.match(skip, /max-width: calc\(100% - 2rem\);/);
   assert.match(skip, /overflow-wrap: anywhere;/);
 });
+
+test("the switch radii stop at their default half-heights, so a wrapped label stays inside the pill", async () => {
+  const css = await read("src/app/globals.css");
+  // 54 px track and 44 px options at default text: the capped radius is the
+  // same full pill there, and a rounded rectangle once the labels wrap (a
+  // 999 px radius turned the tall pill into an oval that left glyphs out).
+  assert.match(rule(css, ".auth-switch"), /border-radius: min\(var\(--radius-pill\), 27px\);/);
+  assert.match(rule(css, ".auth-switch__pill"), /border-radius: min\(var\(--radius-pill\), 22px\);/);
+  assert.match(rule(css, ".auth-switch__option"), /border-radius: min\(var\(--radius-pill\), 22px\);/);
+});
+
+test("the 'or with email' divider keeps whole words at 300 % text", async () => {
+  const css = await read("src/app/globals.css");
+  const divider = rule(css, ".auth-divider");
+  assert.match(divider, /gap: min\(\.75rem, 12px\);/);
+  // break-word, not the pane's `anywhere`: the text's minimum width stays a
+  // whole word, so the hairlines can never squeeze it to one letter a line.
+  assert.match(divider, /overflow-wrap: break-word;/);
+  assert.match(rule(css, ".auth-divider::before,\n.auth-divider::after"), /min-width: min\(1rem, 16px\);/);
+});
