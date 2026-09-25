@@ -143,9 +143,9 @@ test("the homepage does not present the retired Rooms and Clubs as current produ
 test("the homepage does not invite the public into the closed tester programme", async () => {
   const components = await homepageComponentSources();
 
-  // /download has no enrolment path: every action it offers is "See Build N
-  // status", "Check releases", "Launch web app" or "Source on GitHub", and it
-  // states availability as "our existing internal testers". A homepage CTA
+  // /download has no enrolment path: every action it offers is "See the
+  // <version> release", "Launch web app" or "Source on GitHub", and it states
+  // availability as "our existing internal testers". A homepage CTA
   // that invites a visitor to join testing therefore points at a door that
   // does not exist.
   const enrolment =

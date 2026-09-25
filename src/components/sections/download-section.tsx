@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
+import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone, type LucideIcon } from "lucide-react";
 
 import { currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
-
-const REPO_RELEASES_URL = "https://github.com/kamilxgriefer/yovoice/releases";
 
 /**
  * The way in. Every sentence here is pinned by `tests/product-updates.test.ts`
@@ -12,9 +10,20 @@ const REPO_RELEASES_URL = "https://github.com/kamilxgriefer/yovoice/releases";
  * yet" appears exactly twice — so this pass changed the surface only: no
  * bloom behind the section, panels instead of glass, icon tiles instead of
  * gradient squares, and the accent instead of fuchsia on the links.
+ *
+ * The desktop cards carry no action: there are no desktop installers and no
+ * published GitHub releases, and the Web card already links to the web app.
  */
+type PlatformCard = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  href?: string;
+  action?: string;
+};
+
 export function DownloadSection() {
-  const platforms = [
+  const platforms: PlatformCard[] = [
     {
       icon: Smartphone,
       title: "Mobile",
@@ -26,15 +35,11 @@ export function DownloadSection() {
       icon: Monitor,
       title: "Windows",
       description: "Desktop installers are not available yet. On Windows, use the web app in a modern browser.",
-      href: REPO_RELEASES_URL,
-      action: "Check releases",
     },
     {
       icon: Laptop,
       title: "macOS",
       description: "Desktop installers are not available yet. On a Mac, use the web app in a modern browser.",
-      href: REPO_RELEASES_URL,
-      action: "Check releases",
     },
     {
       icon: Globe2,
@@ -66,9 +71,11 @@ export function DownloadSection() {
               <span className="icon-tile"><Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
               <h3 className="mt-4 text-lg font-bold text-[var(--foreground)]">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)] md:min-h-20">{description}</p>
-              <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold link-accent">
-                {action}<ArrowRight className="size-4"/>
-              </Link>
+              {href && action ? (
+                <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold link-accent">
+                  {action}<ArrowRight className="size-4"/>
+                </Link>
+              ) : null}
             </article>
           ))}
         </div>

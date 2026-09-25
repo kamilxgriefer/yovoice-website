@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { HeroSection } from "@/components/hero/hero-section";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -17,6 +19,15 @@ import { ServersWelcome } from "@/components/servers/servers-welcome";
  * /download. Nothing that was corrected for truthfulness was softened in the
  * move — it was relocated, not rewritten.
  */
+/**
+ * The homepage's own canonical. It lives here, not in the root layout, so the
+ * routes that set no alternates (/login, /app, /account/*, not-found and so
+ * on) do not inherit a canonical that calls them copies of the homepage.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 export default function HomePage() {
   return (
     <div>

@@ -44,6 +44,7 @@ import {
   type PremiumBillingContext,
   type PremiumPaymentMethod,
 } from "@/lib/premium/billing";
+import type { LocalizedBillingPlan } from "@/lib/premium/billing-contract";
 
 const CHECKOUT_CONFIRMATION_TIMEOUT_MS = 15_000;
 
@@ -60,22 +61,168 @@ const CHECKOUT_CONFIRMATION_TIMEOUT_MS = 15_000;
  * Standard prices remain visible when billing is unavailable. That fallback
  * is display-only: a purchase can start only after the callable returns a
  * valid context with checkoutAvailable=true.
+ *
+ * PremiumPlansContent reads ?plan= and ?checkout=, so the page bails out of
+ * static rendering at this Suspense boundary. Its fallback is therefore what
+ * the server HTML contains: the heading, the standard prices (display-only,
+ * with no plan buttons) and the #included list that /#premium links to. The
+ * interactive content, which picks between plan cards, the checkout
+ * confirmation and the Premium status card, replaces it on the client.
  */
 export function PremiumPlansView() {
   return (
-    <Suspense fallback={<PremiumPlansLoadingState />}>
+    <Suspense fallback={<PremiumPlansStaticPreview />}>
       <PremiumPlansContent />
     </Suspense>
   );
 }
 
-function PremiumPlansLoadingState() {
+type DisplayPlan = PremiumPlan & {
+  price: string;
+  period: string;
+  equivalent?: string;
+  savings?: string;
+};
+
+function toDisplayPlans(localizedPlans: LocalizedBillingPlan[]): DisplayPlan[] {
+  return localizedPlans.map((localized) => {
+    const copy = premiumPlanCopy.find((plan) => plan.id === localized.id)!;
+    return {
+      ...copy,
+      price: localized.formattedPrice,
+      period: `/ ${localized.interval}`,
+      equivalent: localized.formattedEquivalent
+        ? `${localized.formattedEquivalent} / month`
+        : undefined,
+      savings:
+        localized.savingsPercent > 0
+          ? localized.id === "yearly" && localized.savingsPercent >= 16
+            ? `2 months free · Save ${localized.savingsPercent}%`
+            : `Save ${localized.savingsPercent}%`
+          : undefined,
+    };
+  });
+}
+
+/** Server-rendered, hook-free view of the page: no purchase can start here. */
+function PremiumPlansStaticPreview() {
+  const displayPlans = toDisplayPlans(premiumFallbackBillingPlans);
   return (
-    <div className="mx-auto flex min-h-[62vh] max-w-[900px] items-center justify-center px-5">
-      <div role="status" aria-live="polite">
-        <div className="size-9 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--accent)]" aria-hidden />
-        <span className="sr-only">Loading Premium plans</span>
+    <div className="relative mx-auto w-full max-w-[900px] px-5 pb-24 pt-28 sm:px-8">
+      <PremiumPlansIntro />
+      <div className="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2">
+        {displayPlans.map((plan) => (
+          <article
+            key={plan.id}
+            className={`panel relative p-7 text-left ${
+              plan.highlight ? "border-[var(--primary)]!" : ""
+            }`}
+          >
+            <PlanCardDetails plan={plan} localizedAtCheckout={false} />
+          </article>
+        ))}
       </div>
+      <PremiumIncludedSection />
+    </div>
+  );
+}
+
+function PremiumPlansIntro() {
+  return (
+    <div className="mx-auto max-w-xl text-center">
+      <PremiumBadge />
+      <h1 className="mt-5 font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem]">
+        Choose <span className="text-[var(--accent)]">your plan</span>
+      </h1>
+      <p className="mt-4 text-base leading-[1.6] text-[var(--text-secondary)]">
+        Premium is €6 monthly or €60 yearly. The yearly subscription includes
+        two months free; BLIK is prepaid and never renews automatically.
+      </p>
+    </div>
+  );
+}
+
+function PlanCardDetails({
+  plan,
+  localizedAtCheckout,
+}: {
+  plan: DisplayPlan;
+  localizedAtCheckout: boolean;
+}) {
+  return (
+    <>
+      {plan.highlight ? (
+        <span className="absolute -top-3.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-[var(--primary)] px-3.5 py-1.5 text-[11px] font-bold text-white">
+          <Crown className="size-3" aria-hidden />
+          Best value
+        </span>
+      ) : null}
+      <p className="eyebrow">
+        {plan.name}
+      </p>
+      <p className="mt-3 text-4xl font-bold text-white">
+        {plan.price}
+        <span className="text-base font-semibold text-[var(--text-secondary)]">
+          {" "}
+          {plan.period}
+        </span>
+      </p>
+      {localizedAtCheckout ? (
+        <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
+          Base price · final local currency at checkout
+        </p>
+      ) : null}
+      {plan.equivalent ? (
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">{plan.equivalent}</p>
+      ) : null}
+      {plan.savings ? (
+        <span className="badge badge-verified mt-3">
+          {plan.savings}
+        </span>
+      ) : null}
+      <ul className="mt-5 space-y-2 border-t border-[var(--border)] pt-5">
+        {premiumPlanChecklist.map((item) => (
+          <li key={item} className="flex items-center gap-2.5">
+            <Check
+              className={`size-3.5 shrink-0 ${
+                plan.highlight ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"
+              }`}
+              aria-hidden
+            />
+            <span className="text-[13px] text-[var(--text-secondary)]">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function PremiumIncludedSection() {
+  return (
+    <div id="included" className="mx-auto mt-16 max-w-xl scroll-mt-24">
+      <h2 className="text-base font-bold text-[var(--foreground)]">
+        Everything Premium includes:
+      </h2>
+      <ul className="panel mt-4 space-y-1 px-5 py-3">
+        {premiumIncludedFeatures.map((feature, index) => {
+          const Icon = includedIcons[index] ?? Sparkles;
+          return (
+            <li key={feature} className="flex items-center gap-3.5 py-2.5">
+              <Icon className="size-5 shrink-0 text-[var(--accent)]" strokeWidth={1.8} aria-hidden />
+              <span className="text-sm font-medium leading-6 text-[var(--foreground)]">
+                {feature}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-8 text-center text-xs leading-5 text-[var(--text-secondary)]">
+        Recurring subscriptions can be cancelled any time. Prepaid BLIK
+        access ends automatically. Everything essential on YO Voice stays
+        free — Chats, Friends, Voice Moments and the current web experience.
+        Free can own up to 5 Servers and Premium up to 30; everyone can join
+        without a limit. The server enforces these allowances.
+      </p>
     </div>
   );
 }
@@ -119,6 +266,16 @@ function PremiumPlansContent() {
       return isPremiumPlanId(fromUrl) ? fromUrl : null;
     },
   );
+
+  // A direct load of /premium#included scrolls to the server-rendered list in
+  // the Suspense fallback. This content replaces that subtree and adds the
+  // plan buttons above the list, so the browser's scroll position no longer
+  // points at it. Re-align once, on mount; later shifts keep the same node,
+  // which the browser's scroll anchoring follows.
+  useEffect(() => {
+    if (window.location.hash !== "#included") return;
+    document.getElementById("included")?.scrollIntoView({ block: "start" });
+  }, []);
 
   const loadBilling = useCallback(() => {
     setBillingRequestLoading(true);
@@ -218,38 +375,13 @@ function PremiumPlansContent() {
     );
   }
 
-  const displayPlans = (
-    billing?.plans ?? premiumFallbackBillingPlans
-  ).map((localized) => {
-    const copy = premiumPlanCopy.find((plan) => plan.id === localized.id)!;
-    return {
-      ...copy,
-      price: localized.formattedPrice,
-      period: `/ ${localized.interval}`,
-      equivalent: localized.formattedEquivalent
-        ? `${localized.formattedEquivalent} / month`
-        : undefined,
-      savings:
-        localized.savingsPercent > 0
-          ? localized.id === "yearly" && localized.savingsPercent >= 16
-            ? `2 months free · Save ${localized.savingsPercent}%`
-            : `Save ${localized.savingsPercent}%`
-          : undefined,
-    };
-  });
+  const displayPlans = toDisplayPlans(
+    billing?.plans ?? premiumFallbackBillingPlans,
+  );
 
   return (
     <div className="relative mx-auto w-full max-w-[900px] px-5 pb-24 pt-28 sm:px-8">
-      <div className="mx-auto max-w-xl text-center">
-        <PremiumBadge />
-        <h1 className="mt-5 font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem]">
-          Choose <span className="text-[var(--accent)]">your plan</span>
-        </h1>
-        <p className="mt-4 text-base leading-[1.6] text-[var(--text-secondary)]">
-          Premium is €6 monthly or €60 yearly. The yearly subscription includes
-          two months free; BLIK is prepaid and never renews automatically.
-        </p>
-      </div>
+      <PremiumPlansIntro />
 
       {searchParams.get("checkout") === "cancelled" ? (
         <div
@@ -307,48 +439,10 @@ function PremiumPlansContent() {
                 : "hover:border-[var(--border-strong)]!"
             } ${selectedPlan === plan.id ? "ring-2 ring-[var(--accent)]" : ""}`}
           >
-            {plan.highlight ? (
-              <span className="absolute -top-3.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-[var(--primary)] px-3.5 py-1.5 text-[11px] font-bold text-white">
-                <Crown className="size-3" aria-hidden />
-                Best value
-              </span>
-            ) : null}
-            <p className="eyebrow">
-              {plan.name}
-            </p>
-            <p className="mt-3 text-4xl font-bold text-white">
-              {plan.price}
-              <span className="text-base font-semibold text-[var(--text-secondary)]">
-                {" "}
-                {plan.period}
-              </span>
-            </p>
-            {billing?.localizedAtCheckout ? (
-              <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
-                Base price · final local currency at checkout
-              </p>
-            ) : null}
-            {plan.equivalent ? (
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">{plan.equivalent}</p>
-            ) : null}
-            {plan.savings ? (
-              <span className="badge badge-verified mt-3">
-                {plan.savings}
-              </span>
-            ) : null}
-            <ul className="mt-5 space-y-2 border-t border-[var(--border)] pt-5">
-              {premiumPlanChecklist.map((item) => (
-                <li key={item} className="flex items-center gap-2.5">
-                  <Check
-                    className={`size-3.5 shrink-0 ${
-                      plan.highlight ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"
-                    }`}
-                    aria-hidden
-                  />
-                  <span className="text-[13px] text-[var(--text-secondary)]">{item}</span>
-                </li>
-              ))}
-            </ul>
+            <PlanCardDetails
+              plan={plan}
+              localizedAtCheckout={billing?.localizedAtCheckout === true}
+            />
             <span className="premium-button mt-6 w-full">
               {authLoading ? "Checking your account…" : plan.cta}
               <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
@@ -381,31 +475,7 @@ function PremiumPlansContent() {
         </div>
       ) : null}
 
-      <div id="included" className="mx-auto mt-16 max-w-xl scroll-mt-24">
-        <h2 className="text-base font-bold text-[var(--foreground)]">
-          Everything Premium includes:
-        </h2>
-        <ul className="panel mt-4 space-y-1 px-5 py-3">
-          {premiumIncludedFeatures.map((feature, index) => {
-            const Icon = includedIcons[index] ?? Sparkles;
-            return (
-              <li key={feature} className="flex items-center gap-3.5 py-2.5">
-                <Icon className="size-5 shrink-0 text-[var(--accent)]" strokeWidth={1.8} aria-hidden />
-                <span className="text-sm font-medium leading-6 text-[var(--foreground)]">
-                  {feature}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="mt-8 text-center text-xs leading-5 text-[var(--text-secondary)]">
-          Recurring subscriptions can be cancelled any time. Prepaid BLIK
-          access ends automatically. Everything essential on YO Voice stays
-          free — Chats, Friends, Voice Moments and the current web experience.
-          Free can own up to 5 Servers and Premium up to 30; everyone can join
-          without a limit. The server enforces these allowances.
-        </p>
-      </div>
+      <PremiumIncludedSection />
     </div>
   );
 }
@@ -429,14 +499,7 @@ function CheckoutBoundary({
   billing: PremiumBillingContext | null;
   billingError: string | null;
   billingLoading: boolean;
-  displayPlans: Array<
-    PremiumPlan & {
-      price: string;
-      period: string;
-      equivalent?: string;
-      savings?: string;
-    }
-  >;
+  displayPlans: DisplayPlan[];
   accountIdentity: string | null | undefined;
   authLoading: boolean;
   emailVerified: boolean;

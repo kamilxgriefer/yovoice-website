@@ -43,41 +43,23 @@ export function LiveStats() {
   const state = usePublicStats();
   if (state.status !== "fresh") return null;
 
-  const { activeAccounts: accounts, existingRooms: rooms } = state.stats;
+  // Only the account figure is shown. The publisher's `existingRooms` counts
+  // every document in `rooms`: ended legacy Rooms plus the voice-channel
+  // documents that Servers create. It is neither a count of Rooms nor of
+  // Servers, so no label for it would be true. It returns only as a real
+  // Servers figure, once the publisher provides one.
+  const { activeAccounts: accounts } = state.stats;
+  if (accounts <= 0) return null;
 
-  const showAccounts = accounts > 0;
-  const showRooms = rooms > 0;
-
-  if (!showAccounts && !showRooms) return null;
-
+  // Left-aligned from lg upwards, where the hero column itself is.
   return (
     <motion.div
       initial={false}
-      className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-[var(--text-tertiary)]"
+      className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[13px] text-[var(--text-tertiary)] lg:justify-start"
     >
-      {showAccounts && (
-        <span>
-          {format(accounts)} {accounts === 1 ? "account" : "accounts"}
-        </span>
-      )}
-
-      {showAccounts && showRooms && (
-        <span aria-hidden="true" className="text-[var(--border-strong)]">
-          ·
-        </span>
-      )}
-
-      {/* The published field is `existingRooms` and that backend name is
-          unchanged, but "Rooms" is a retired product name, so the label uses
-          the wording the verified-totals section already applied to this same
-          field: "voice spaces that currently exist across the platform". The
-          measurement, the freshness rule and the refusal to render an absent
-          or stale number are untouched. */}
-      {showRooms && (
-        <span>
-          {format(rooms)} voice {rooms === 1 ? "space" : "spaces"} on YO Voice
-        </span>
-      )}
+      <span>
+        {format(accounts)} {accounts === 1 ? "account" : "accounts"} on YO Voice
+      </span>
     </motion.div>
   );
 }

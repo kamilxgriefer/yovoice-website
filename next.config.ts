@@ -78,12 +78,22 @@ const nextConfig: NextConfig = {
       })),
     ];
   },
+  // www.yovoice.app served a byte-identical copy of the site. Send it to the
+  // apex instead, keeping the path and query. The same redirect can also be
+  // set on the www domain in the Vercel project (Settings, Domains).
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.yovoice.app" }],
+        destination: "https://yovoice.app/:path*",
+        permanent: true,
+      },
+    ];
+  },
   images: {
-    // The hero's center logo (yovoice-mark-glow.png) is the page's single
-    // most important image — it's rendered at full quality (100) rather
-    // than Next's default 75 so the "must always remain perfectly sharp"
-    // requirement actually holds after compression.
-    qualities: [75, 100],
+    // No component sets a quality prop, so only Next's default is allowed.
+    qualities: [75],
   },
 };
 

@@ -269,7 +269,12 @@ test("download surfaces never describe desktop apps that do not exist", async ()
     readFile("src/components/download/platform-selector.tsx", "utf8"),
   ]);
   assert.equal(section.match(/Desktop installers are not available yet/g)?.length, 2);
-  assert.equal(selector.match(/Desktop installer not started/g)?.length, 2);
+  assert.equal(selector.match(/Desktop installers are not available yet/g)?.length, 2);
+  // The repository has no published releases, so no card may send visitors
+  // to an empty GitHub Releases page.
+  for (const source of [section, selector]) {
+    assert.doesNotMatch(source, /\/releases\b|Check releases/);
+  }
 });
 
 test("server type tabs keep subtitles whole, step numbers readable, the heading unsqueezed and focus unclipped", async () => {

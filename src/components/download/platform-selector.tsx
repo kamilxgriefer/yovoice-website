@@ -1,12 +1,22 @@
 import Link from "next/link";
-import { ArrowRight, Code2, Globe2, Laptop, Monitor, Smartphone } from "lucide-react";
+import { ArrowRight, Code2, Globe2, Laptop, Monitor, Smartphone, type LucideIcon } from "lucide-react";
 
 import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 const REPO_URL = "https://github.com/kamilxgriefer/yovoice";
 
-const cards = [
+type PlatformCard = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  status: string;
+  /** Desktop cards have no action: there are no installers and no published releases. */
+  href?: string;
+  action?: string;
+};
+
+const cards: readonly PlatformCard[] = [
   {
     icon: Smartphone,
     title: "Mobile",
@@ -18,18 +28,14 @@ const cards = [
   {
     icon: Monitor,
     title: "Windows",
-    description: "Desktop installer not started.",
+    description: "Desktop installers are not available yet.",
     status: "Until then, use the web app in a modern browser.",
-    href: `${REPO_URL}/releases`,
-    action: "Check releases",
   },
   {
     icon: Laptop,
     title: "macOS",
-    description: "Desktop installer not started.",
+    description: "Desktop installers are not available yet.",
     status: "Until then, use the web app in a modern browser.",
-    href: `${REPO_URL}/releases`,
-    action: "Check releases",
   },
   {
     icon: Globe2,
@@ -39,7 +45,7 @@ const cards = [
     href: APP_ENTRY_PATH,
     action: "Launch web app",
   },
-] as const;
+];
 
 /** Post-login platform grid — the single source of truth for "where can I get YO Voice" links. */
 export function PlatformSelector() {
@@ -54,14 +60,16 @@ export function PlatformSelector() {
             <h2 className="mt-5 text-lg font-bold text-[var(--foreground)]">{title}</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
             <p className="mt-3 text-xs font-semibold leading-5 text-[var(--accent)]">{status}</p>
-            <a
-              href={href}
-              target={href.startsWith("http") ? "_blank" : undefined}
-              rel={href.startsWith("http") ? "noreferrer" : undefined}
-              className="link-accent focus-ring mt-auto inline-flex min-h-11 items-center gap-2 self-start pt-4 text-sm font-semibold"
-            >
-              {action} <ArrowRight className="size-4" aria-hidden="true" />
-            </a>
+            {href && action ? (
+              <a
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noreferrer" : undefined}
+                className="link-accent focus-ring mt-auto inline-flex min-h-11 items-center gap-2 self-start pt-4 text-sm font-semibold"
+              >
+                {action} <ArrowRight className="size-4" aria-hidden="true" />
+              </a>
+            ) : null}
           </article>
         ))}
       </div>

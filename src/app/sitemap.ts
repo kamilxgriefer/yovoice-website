@@ -54,6 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/terms", release300Pass],
     ["/delete-account", release300Pass],
     ["/premium", release300Pass],
+    ["/status", release300Pass],
     ["/download", release300Pass],
   ]);
 
