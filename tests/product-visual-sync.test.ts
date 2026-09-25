@@ -175,18 +175,26 @@ test("the release spotlight on /updates features the confirmed current build wit
   );
 });
 
-test("the real Servers screenshot and product frame both preserve the Hub", async () => {
+test("the Servers hero shows the English 3.0.0 server picker, labelled with its source", async () => {
   const landing = await readFile(
     "src/components/servers/servers-landing.tsx",
     "utf8",
   );
 
-  await access("public/screenshots/build-26/servers-desktop.jpg");
-  assert.match(landing, /screenshots\/build-26\/servers-desktop\.jpg/);
-  assert.match(landing, /real Hub and five choices/i);
+  // The site is English, so its Servers frame is the English capture; the
+  // Polish Build 26 frame stays on disk for the ledger but is not shown here.
+  await access("public/screenshots/build-35/create-server-desktop.webp");
+  assert.match(landing, /screenshots\/build-35\/create-server-desktop\.webp/);
+  assert.doesNotMatch(landing, /screenshots\/build-26\/servers-desktop\.jpg/);
+  assert.match(landing, /width=\{1440\}\s+height=\{800\}/);
+  assert.match(
+    landing,
+    /five choices: For friends, For a community, For a podcast, For family and For a company/,
+  );
   assert.match(landing, /familiar\s+YO Voice Hub stays in place/i);
-  assert.match(landing, /Build 26 fixture-fed capture from source d1c036b7/i);
-  assert.match(landing, /Captured in Build 26/);
+  assert.match(landing, /YO Voice 3\.0\.0 capture from app commit 87a2f996/i);
+  assert.match(landing, /English by the app&apos;s preview harness on sample data/i);
+  assert.match(landing, /Captured in YO Voice 3\.0\.0/);
   assert.doesNotMatch(landing, /unchanged in Build 27|reused for Build 27/i);
   assert.match(landing, /no live account or server\s+connection/i);
   assert.doesNotMatch(landing, /CSS mockup|concept render/i);

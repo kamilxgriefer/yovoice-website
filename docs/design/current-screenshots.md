@@ -124,3 +124,46 @@ daec39d985fee004a21cf85d7a51c250addb1a41101f5bb115db1102b617f0cf  workspace-phon
 - **Yeels has no capture.** Its media is a fixture still that draws
   "Fixture still · no decoder" on screen.
 - **Servers / Chats / Moments have no large-screen capture** — see above.
+
+## Servers page hero — `public/screenshots/build-35/create-server-desktop.webp`
+
+The `/servers` hero used the Polish Build 26 frame
+`build-26/servers-desktop.jpg` on an English site. It was replaced
+(2026-09-25) by an English capture of the same surface — the server-type
+picker, "Create your server." with all five kinds — from the released app.
+
+- **App repository** `yovoice` at `87a2f9968bcbd481502ca6dc384b267d11f65281`
+  (`pubspec.yaml` `version: 3.0.0+35`), from a scratch copy of that tree; the
+  app worktree was never modified.
+- **Harness** `lib/dev/redesign_preview.dart`, **unmodified**, built with
+  `flutter build web --debug -t lib/dev/redesign_preview.dart`
+  `--dart-define=YO_PREVIEW_LOCALE=en --dart-define=YO_PREVIEW_THEME=dark`
+  `--dart-define=YO_PREVIEW_TAB=servers --dart-define=YO_PREVIEW_STATE=populated`
+  (Flutter 3.44.6). Release and profile builds render a grey error screen:
+  the harness's mock plugin platforms refuse to run without assertions.
+- **Capture** headless Chromium (Playwright) at a 1440 x 800 CSS-px viewport,
+  device scale factor 1, dark colour scheme. The harness opened on Servers,
+  and its own **Create server** button was clicked, which pushes the
+  production `CreateServerScreen` exactly as `MainShell` does. Every request
+  that was not to the local server was aborted (Firebase JS SDK, Google
+  sign-in client, font CDN); CanvasKit was answered from the build's own
+  `canvaskit/` folder. No account, no network.
+- **The Polish-fixture trap did not apply.** The picker draws only localized
+  UI strings (`server_localized_copy.dart`), no fixture names, so no fixture
+  translation was needed. In 3.0.0 the picker is a full-window route (back
+  arrow and "YO Voice" app bar) at every width, so the desktop sidebar is
+  not in the frame — unlike the Build 26 frame, which showed it.
+- Encoded with `cwebp -q 82 -m 6`: 1440 x 800, 45.2 KB. Published under a new
+  path so the image optimizer's href-keyed cache cannot serve the old frame.
+  `build-26/servers-desktop.jpg` stays on disk; it is no longer rendered.
+
+```
+8731f4d3a8f1e7275fa8d9e0be35fd5c793d742838571233e6cf1fa1c0738c4e  create-server-desktop.webp
+```
+
+Checked by opening it: the back arrow and "YO Voice", "YOUR SPACE STARTS
+HERE", "Create your server.", "Who are you creating a place for? Choose a
+starting point. Then make it your own.", then For friends, For a community,
+For a podcast, For family and For a company, each with its two features and
+Choose, and "One server. Many channels. Your character." Every string is
+English.
