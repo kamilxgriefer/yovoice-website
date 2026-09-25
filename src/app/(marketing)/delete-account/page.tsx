@@ -175,7 +175,7 @@ export default function DeleteAccountPage() {
         <DeletionRequestBanner />
       </Suspense>
       <LegalDocument
-        updatedOn="September 25, 2026"
+        updatedOn="September 26, 2026"
         intro="This page is for anyone who wants their YO Voice account and data removed — you do not need to be signed in to read it, and you do not need an app to ask."
         sections={sections}
       />

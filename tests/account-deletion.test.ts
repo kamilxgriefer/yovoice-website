@@ -194,6 +194,19 @@ describe("the public /delete-account page", () => {
     assert.match(text, /How we check that the account is yours/);
   });
 
+  test("the removal list includes in-app bug reports and their screenshots", () => {
+    // "Report a bug" (app build 36): account deletion removes the person's
+    // reports and screenshots, and the public page, the account page and the
+    // privacy policy all render this one list.
+    assert.match(
+      DELETION_REMOVES.join("\n"),
+      /^The bug reports you sent from the app, and any screenshots attached to them\.$/m,
+    );
+    assert.match(publicPage, /updatedOn="September 26, 2026"/);
+    assert.doesNotMatch(copyBlob(false), /GitHub/i);
+    assert.doesNotMatch(copyBlob(true), /GitHub/i);
+  });
+
   test("the request confirmation cannot appear while deletion is by hand", () => {
     const banner = source("../src/components/legal/deletion-request-banner.tsx");
     assert.match(banner, /if \(!SELF_SERVICE_DELETION_LIVE\) return null;/);

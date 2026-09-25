@@ -214,6 +214,18 @@ const sections: LegalSection[] = [
           id together with the outcome — never the contents of a message.
         </p>
         <p>
+          <strong>Bug reports.</strong> If you choose &quot;Report a bug&quot;
+          in the app, we receive the description you write, your YO Voice
+          account ID, and technical details about the app and device: app
+          version and build, platform and operating-system version, language,
+          theme, screen size and text size, and the name of the screen you were
+          on. If you choose to attach a screenshot, we also receive that image,
+          which may show anything that was on your screen, including other
+          people&apos;s names, photos or messages; you see it full size and
+          decide before it is sent. A bug report never collects your messages or
+          calls, except what is visible in a screenshot you choose to attach.
+        </p>
+        <p>
           <strong>What we do not collect.</strong> YO Voice contains no
           advertising and no ads SDK, and does not use the Android advertising
           identifier — the permission needed to read it is not in the app. There
@@ -239,6 +251,7 @@ const sections: LegalSection[] = [
         <li>To rank the YO Moments feed, so something you have already watched is not shown to you again.</li>
         <li>To detect and prevent abuse: rate limits, reports, blocks and mutes, and moderation of content that breaks our Terms.</li>
         <li>To keep the service reliable and to debug failures, using crash logs and diagnostics.</li>
+        <li>To investigate and fix problems you report to us.</li>
       </ul>
     ),
   },
@@ -281,6 +294,15 @@ const sections: LegalSection[] = [
             device-attestation check on iPhone, iPad and Mac.
           </li>
         </ul>
+        <p>
+          <strong>Bug reports</strong> are stored in Google Firebase and read
+          only by the YO Voice owner in our internal tools. No notification
+          about a report is sent to any other service today. If we switch on
+          report notifications, <strong>Resend</strong> may send our team a
+          short notice containing only the report&apos;s reference number, the
+          app version, the platform and the name of the screen — never your
+          description, your screenshot or your account ID.
+        </p>
         <p>
           GIFs offered in the app today are first-party animations that ship
           inside the app itself — searching for one never sends your search text
@@ -371,6 +393,15 @@ const sections: LegalSection[] = [
           Crash logs and diagnostics sit in Firebase Crashlytics and Google
           Cloud Logging and are kept under those services&apos; own retention
           settings.
+        </p>
+        <p>
+          Bug reports are kept for up to 180 days and screenshots attached to
+          them for up to 90 days, then deleted automatically. We can delete a
+          report or its screenshot sooner if you ask at{" "}
+          <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. If we
+          switch on the report notifications described in section 5, those
+          short notices stay in our team mailbox under its own retention; they
+          contain no description, screenshot or account ID.
         </p>
         <p>
           What happens when an account is deleted — what goes, what we keep and
@@ -586,7 +617,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="September 25, 2026"
+        updatedOn="September 26, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

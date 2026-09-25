@@ -192,10 +192,43 @@ test("the in-product choices list matches the controls that exist", () => {
   assert.match(privacy, /two-factor authentication with an authenticator app/);
 });
 
+test("in-app bug reports are disclosed in every section they touch", () => {
+  // Build 36's "Report a bug" may only go live once this page describes it
+  // (nb-integrate docs/SECURITY.md, "Privacy policy text for
+  // yovoice.app/privacy"). Section 3: what a report collects.
+  assert.match(privacy, /Bug reports\. If you choose "Report a bug" in the app, we receive the description you write, your YO Voice account ID/);
+  assert.match(privacy, /app version and build, platform and operating-system version, language, theme, screen size and text size, and the name of the screen you were on/);
+  assert.match(privacy, /including other people's names, photos or messages; you see it full size and decide before it is sent/);
+  assert.match(privacy, /A bug report never collects your messages or calls, except what is visible in a screenshot you choose to attach/);
+  // Section 4: why.
+  assert.match(privacy, /To investigate and fix problems you report to us\./);
+  // Section 5: who processes it. Only Firebase holds reports today; no alert
+  // channel is on, so Resend is described conditionally and never with the
+  // description, screenshot or account ID.
+  assert.match(privacy, /Bug reports are stored in Google Firebase and read only by the YO Voice owner/);
+  assert.match(privacy, /No notification about a report is sent to any other service today/);
+  assert.match(privacy, /If we switch on report notifications, Resend may send our team a short notice containing only the report's reference number, the app version, the platform and the name of the screen — never your description, your screenshot or your account ID/);
+  assert.doesNotMatch(privacy, /When a report arrives, Resend/);
+  // Section 8: retention.
+  assert.match(privacy, /Bug reports are kept for up to 180 days and screenshots attached to them for up to 90 days, then deleted automatically/);
+  // Section 9: deletion renders DELETION_REMOVES, which carries the line.
+  assert.ok(
+    DELETION_REMOVES.includes(
+      "The bug reports you sent from the app, and any screenshots attached to them.",
+    ),
+  );
+});
+
+test("the GitHub alert route is off, so the policy never names it", () => {
+  assert.doesNotMatch(privacy, /GitHub/i);
+  assert.doesNotMatch(privacy, /project tracker/i);
+  assert.doesNotMatch(privacy, /\bissue in our\b/i);
+});
+
 test("the document is dated for this revision", () => {
   const source = readFileSync(
     new URL("../src/app/(marketing)/privacy/page.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(source, /updatedOn="September 25, 2026"/);
+  assert.match(source, /updatedOn="September 26, 2026"/);
 });

@@ -117,6 +117,7 @@ export const DELETION_REMOVES: readonly string[] = [
   "Your friends, followers, the people you follow, your blocks and mutes — including the matching entry held on the other person's side.",
   "Your record of which Voice Moments and Yeels you played, your notifications, your push notification tokens and your device records.",
   "Your achievement progress and titles, your counters, your presence and last-seen, and your public website showcase consent.",
+  "The bug reports you sent from the app, and any screenshots attached to them.",
   "Your name and photo inside every Server you were a member of, so the membership that remains carries nothing about you.",
   "The name shown on a Server you own. The Server itself keeps running under an anonymous owner until we transfer or close it — tell us in your request if you want it closed.",
 ];
