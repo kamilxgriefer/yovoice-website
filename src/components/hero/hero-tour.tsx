@@ -70,7 +70,7 @@ export const heroPrompts = [
   },
   {
     screen: "home",
-    text: "Follow the voices you enjoy, add friends, and know where to meet again.",
+    text: "Add the friends you enjoy hearing, and always know where to meet again.",
   },
   {
     screen: "servers",
