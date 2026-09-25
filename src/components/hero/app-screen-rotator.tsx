@@ -1,65 +1,61 @@
 "use client";
 
-import { useEffect, useId, useState, useSyncExternalStore } from "react";
+import { useId } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Pause, Play } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+import { useHeroTour } from "@/components/hero/hero-tour";
 
 /**
- * The hero's device frames, showing the app as it is today.
+ * The hero's device frames, showing the app as it is today: YO Voice 3.0.0,
+ * the Slim redesign that testers have had since 19 September 2026.
  *
- * Every frame in `appScreens` is a real screenshot of the current build's own
- * widgets, captured from the app repository's preview harness on a spare
- * simulator with fixture data — not a CSS drawing of remembered UI. That
- * distinction is the whole point of this component: the illustration it
- * replaced still drew a navigation dock with a centre logo and no Servers
- * destination, which the shipped app has not had for some time.
+ * Every frame in `appScreens` is a real screenshot of the released build's own
+ * widgets, rendered by the app repository's preview harness from sample
+ * fixtures (no account, no network) — not a CSS drawing of remembered UI.
+ * Provenance, including how each frame was made, is in
+ * docs/design/current-screenshots.md.
  *
- * The four tabs are the app's own first four destinations, Servers among them,
- * and they advance by themselves — the rotation the hero had before, now
- * carrying the interface rather than only a sentence. WCAG 2.2.2 is met the
- * same way the prompt rotator meets it: hover and focus pause it, choosing a
- * tab by hand stops it for good, a visible labelled control toggles it, and
+ * The four tabs are the app's own first four destinations, Servers among them.
+ * They advance with the hero's one tour clock (`hero-tour.tsx`), so the phone
+ * always shows the screen the welcome sentence beside it describes. WCAG 2.2.2
+ * is met by that tour: hover and focus pause it, choosing a tab by hand stops
+ * it for good, the one visible Pause control toggles it, and
  * `prefers-reduced-motion` means it never starts.
  */
-// A hydration flag that never changes: the server snapshot is false and the client snapshot is true.
-const subscribeToNothing = () => () => {};
-
 export const appScreens = [
   {
     id: "home",
     label: "Home",
-    phone: "/screenshots/current/home-phone.webp",
-    alt: "YO Voice Home on a phone: a greeting, a Your people avatar row, a Here and now card with Create server and Friends actions, and the servers you belong to above the navigation dock.",
-    caption: "Home opens on your people and the servers you are already in.",
+    phone: "/screenshots/current/home-phone-slim.webp",
+    alt: "YO Voice Home on a phone: the YO Voice logo and a greeting, a Your people row with friends and their Voice Moments, a Live now card for a live Stage channel, and Here and now with one of your servers, above the navigation dock.",
+    caption: "Home opens on your people and what is live right now.",
   },
   {
     id: "servers",
     label: "Servers",
-    phone: "/screenshots/current/servers-phone.webp",
-    alt: "The Servers directory on a phone: a Create server action above a list of servers, each showing its name, its kind and a one-line description.",
+    phone: "/screenshots/current/servers-phone-slim.webp",
+    alt: "Servers on a phone: a Create server button above a compact list of five servers, one of each kind — For friends, For a podcast, For a community, For family and For a company — each with its member count and a one-line description.",
     caption: "Servers keep each circle together, with voice and text channels inside.",
   },
   {
     id: "chats",
     label: "Chats",
-    phone: "/screenshots/current/chats-phone.webp",
-    alt: "Chats on a phone: a search field, Add friend and New message actions, and a list of private conversations with unread counts.",
+    phone: "/screenshots/current/chats-phone-slim.webp",
+    alt: "Chats on a phone: a search field, Add friend and New message beside a row of friends, and a list of private conversations with unread counts, one of them a voice message.",
     caption: "Chats carry the private thread when nobody is talking live.",
   },
   {
     id: "moments",
     label: "Moments",
-    phone: "/screenshots/current/moments-phone.webp",
-    alt: "YO Moments on a phone: the Voice and Yeels switch above a feed of short voice posts from people you follow.",
+    phone: "/screenshots/current/moments-phone-slim.webp",
+    alt: "YO Moments on a phone: the Voice and Yeels switch, the Discover filter selected beside Following and Most engaged, and a feed of short Voice Moments with play, like, comment and Reply with voice.",
     caption: "Moments and Yeels hold the short stuff in between.",
   },
 ] as const;
 
-const ROTATION_INTERVAL_MS = 5200;
-
 /**
- * Type for the tab and pause labels, carried on a `<span>` rather than on the
+ * Type for the tab labels, carried on a `<span>` rather than on the
  * `<button>` itself.
  *
  * `src/app/globals.css` resets buttons with an unlayered `button { font:
@@ -76,47 +72,27 @@ const CONTROL_LABEL = "text-[11px] font-bold leading-none";
 const PHONE_WIDTH = 1206;
 const PHONE_HEIGHT = 2622;
 /**
- * The same app on a large screen. Only Home was captured at desktop width, so
+ * The same app on a large screen: Home in the desktop layout, with the
+ * navigation rail. Only Home is shown at desktop width here, so
  * this frame does not follow the tabs — it is a fixed, honest second view of
  * the product rather than a picture that would imply a screen nobody
  * photographed. Its alt is empty because the phone beside it carries the
  * description; a second reading of the same UI would only repeat itself.
  */
 const DESKTOP = {
-  src: "/screenshots/current/home-desktop.webp",
+  src: "/screenshots/current/home-desktop-slim.webp",
   width: 2064,
   height: 1548,
 } as const;
 
 export function AppScreenRotator() {
-  // framer-motion resolves the reduced-motion preference during the first render, so
-  // gating on it before hydration makes the server and client markup disagree (React #418).
-  const prefersReducedMotion = useReducedMotion();
-  const hydrated = useSyncExternalStore(subscribeToNothing, () => true, () => false);
-  const reduceMotion = hydrated && prefersReducedMotion === true;
+  // The step, the pause state and the reduced-motion gate belong to the
+  // hero's one tour (`hero-tour.tsx`): the phone shows the screen that the
+  // welcome sentence beside it describes, and the one Pause control in that
+  // sentence's row stops both.
+  const { screenId, reduceMotion, selectScreen, setInteractionPaused } = useHeroTour();
   const panelId = useId();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [interactionPaused, setInteractionPaused] = useState(false);
-
-  const autoRotationPaused = paused || interactionPaused || reduceMotion === true;
-  const active = appScreens[activeIndex];
-
-  /** Choosing a tab by hand is a deliberate stop, not a nudge. */
-  function selectScreen(index: number) {
-    setActiveIndex(index);
-    setPaused(true);
-  }
-
-  useEffect(() => {
-    if (autoRotationPaused) return;
-
-    const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % appScreens.length);
-    }, ROTATION_INTERVAL_MS);
-
-    return () => window.clearInterval(timer);
-  }, [autoRotationPaused]);
+  const active = appScreens.find((screen) => screen.id === screenId) ?? appScreens[0];
 
   return (
     <div
@@ -196,36 +172,20 @@ export function AppScreenRotator() {
       {/* The tabs. They name the app's own destinations, so the rotation is
           also a map of where Servers sits in the product. */}
       <div className="relative z-10 mt-5 flex flex-wrap items-center justify-center gap-1.5 lg:justify-start">
-        {reduceMotion !== true && (
-          <button
-            type="button"
-            onClick={() => setPaused((current) => !current)}
-            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-white/55 transition hover:bg-white/[.04] hover:text-white/80 motion-reduce:transition-none"
-            aria-label={paused ? "Play the app screen tour" : "Pause the app screen tour"}
-          >
-            {paused ? (
-              <Play className="size-3" aria-hidden="true" />
-            ) : (
-              <Pause className="size-3" aria-hidden="true" />
-            )}
-            <span className={CONTROL_LABEL}>{paused ? "Play" : "Pause"}</span>
-          </button>
-        )}
-
         <div
           className="flex flex-wrap items-center gap-1 rounded-full border border-white/[.08] bg-white/[.025] p-1"
           role="group"
           aria-label="Choose an app screen"
         >
-          {appScreens.map((screen, index) => (
+          {appScreens.map((screen) => (
             <button
               key={screen.id}
               type="button"
-              onClick={() => selectScreen(index)}
-              aria-current={index === activeIndex ? "true" : undefined}
+              onClick={() => selectScreen(screen.id)}
+              aria-current={screen.id === active.id ? "true" : undefined}
               aria-controls={panelId}
               className={`focus-ring inline-flex min-h-11 items-center rounded-full px-2.5 transition motion-reduce:transition-none sm:px-3.5 ${
-                index === activeIndex
+                screen.id === active.id
                   ? "bg-white/[.12] text-white"
                   : "text-white/55 hover:bg-white/[.06] hover:text-white"
               }`}

@@ -2,46 +2,54 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
-const build26ScreenshotPaths = [
-  "public/screenshots/build-26/home-desktop.jpg",
-  "public/screenshots/build-26/chats-desktop.jpg",
-  "public/screenshots/build-26/friends-desktop.jpg",
-  "public/screenshots/build-26/servers-desktop.jpg",
-  "public/screenshots/build-26/yeels-desktop.jpg",
+// The /updates walkthrough shows YO Voice 3.0.0 (34) desktop captures
+// (2026-09-25, work items W09/W10). They replaced four Polish Build 26 frames;
+// the Yeels frame was removed rather than recaptured, because the preview
+// harness can only draw a placeholder still for Yeel media.
+const walkthroughScreenshotPaths = [
+  "public/screenshots/current/home-wide-slim.webp",
+  "public/screenshots/current/chats-wide-slim.webp",
+  "public/screenshots/current/friends-wide-slim.webp",
 ] as const;
 
-test("tester-build experience shows only labelled Build 26 captures", async () => {
+test("the /updates walkthrough shows only labelled 3.0.0 captures", async () => {
   const experience = await readFile(
     "src/components/sections/tester-build-experience.tsx",
     "utf8",
   );
 
-  for (const path of build26ScreenshotPaths) {
+  for (const path of walkthroughScreenshotPaths) {
     await access(path);
-    const assetPath = path.replace("public", "");
-    assert.ok(
-      experience.includes(assetPath) || assetPath.endsWith("servers-desktop.jpg"),
-      path,
-    );
+    assert.ok(experience.includes(path.replace("public", "")), path);
   }
+  // Every image the walkthrough references is one of those three.
+  const referenced = [...experience.matchAll(/"(\/screenshots\/[^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(
+    referenced.sort(),
+    walkthroughScreenshotPaths.map((path) => path.replace("public", "")).sort(),
+  );
 
-  for (const label of ["Home", "Chats", "Friends", "Yeels"]) {
-    assert.match(experience, new RegExp(`label: "${label}"`), label);
-  }
+  const labels = [...experience.matchAll(/label: "([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(labels, ["Home", "Chats", "Friends"]);
 
-  assert.match(experience, /Build 26 fixture-fed capture from source d1c036b7/i);
-  assert.match(experience, /real desktop Hub|real Hub/i);
-  // The captures are Build 26; the heading must say so rather than present
-  // them as the current tester build, which it names separately.
-  assert.match(experience, /Captured in Build 26/);
-  assert.match(experience, /Current tester build \{currentRelease\.version\}/);
+  // Labelled with the version they were captured in, and nothing older.
+  assert.match(experience, /Interface walkthrough · YO Voice 3\.0\.0/);
+  assert.match(experience, /Captured in YO Voice 3\.0\.0 \(34\)/);
+  assert.match(experience, /app source f71a2ae2, rendered in English by the app&apos;s preview harness on sample data/);
+  assert.doesNotMatch(experience, /Build 26|d1c036b7|fixture-fed|Hub preserved|real desktop Hub|real Hub/i);
+  assert.doesNotMatch(experience, /label: "Yeels"|id: "yeels"|yeels-desktop|Clapperboard|dragNote/);
+  // Never a later build than the one captured.
+  assert.doesNotMatch(experience, /3\.0\.0 \(35\)|3\.0\.1|3\.1\.0|GIPHY/);
   assert.doesNotMatch(experience, /Build \{currentRelease\.buildNumber\} experience/);
-  // Nothing records that Build 27 left these surfaces unchanged.
-  assert.doesNotMatch(experience, /unchanged in Build 27|reused for Build 27/i);
   assert.doesNotMatch(experience, /active users|people online/i);
+
+  // The Build 26 frames are gone from disk, not merely unreferenced.
+  for (const retired of ["home", "chats", "friends", "servers", "yeels"]) {
+    await assert.rejects(() => access(`public/screenshots/build-26/${retired}-desktop.jpg`), retired);
+  }
 });
 
-test("tester-build experience keeps the four surfaces keyboard accessible", async () => {
+test("tester-build experience keeps the three surfaces keyboard accessible", async () => {
   const experience = await readFile(
     "src/components/sections/tester-build-experience.tsx",
     "utf8",
@@ -65,27 +73,23 @@ test("tester-build experience keeps the four surfaces keyboard accessible", asyn
   assert.match(experience, /ArrowRight/);
   assert.match(experience, /Home/);
   assert.match(experience, /End/);
+  // The counter follows the list, so it cannot claim a fourth surface.
+  assert.match(experience, /0\{index \+ 1\} \/ 0\{surfaces\.length\}/);
 });
 
-test("Chats, Friends and Yeels copy matches the tester-build interface boundary", async () => {
+test("Chats and Friends copy matches what the 3.0.0 frames show", async () => {
   const experience = await readFile(
     "src/components/sections/tester-build-experience.tsx",
     "utf8",
   );
 
-  assert.match(experience, /Add Friend beside New Message/i);
-  assert.match(experience, /responsive full-screen viewer/i);
-  assert.match(
-    experience,
-    /call setup and recovery changes are being exercised by internal testers/i,
-  );
+  assert.match(experience, /Add friend and New message/i);
   assert.match(experience, /All, Online, Requests and Blocked/i);
-  assert.match(experience, /same YO Moments language as Voice/i);
-  assert.match(
-    experience,
-    /text and link overlays that can be moved before publishing/i,
-  );
-  assert.match(experience, /Controls avoid covering the centre of the media/i);
+  // Friends has no rail row in 3.0.0; the app keeps More lit, and the alt
+  // says so instead of claiming a Friends item that does not exist.
+  assert.match(experience, /the navigation rail with More selected/);
+  // The pre-3.0.0 Chats claim that no frame shows any more.
+  assert.doesNotMatch(experience, /call setup and recovery changes are being exercised by internal testers/i);
   assert.match(
     experience,
     /Premium Creator profile after age verification and explicit opt-in/i,
@@ -182,7 +186,7 @@ test("the Servers hero shows the English 3.0.0 server picker, labelled with its 
   );
 
   // The site is English, so its Servers frame is the English capture; the
-  // Polish Build 26 frame stays on disk for the ledger but is not shown here.
+  // Polish Build 26 frame was removed from disk on 2026-09-25.
   await access("public/screenshots/build-35/create-server-desktop.webp");
   assert.match(landing, /screenshots\/build-35\/create-server-desktop\.webp/);
   assert.doesNotMatch(landing, /screenshots\/build-26\/servers-desktop\.jpg/);

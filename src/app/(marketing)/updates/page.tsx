@@ -114,7 +114,8 @@ export default function UpdatesPage() {
           a build-by-build interface walkthrough are release-ledger content,
           not a welcome. The spotlight reads the current tester build from
           current-release.ts; the walkthrough's captures are labelled with the
-          build they were taken in (Build 26) and never claim a later one. */}
+          release they were taken in (the Slim redesign) and never claim a
+          later one. */}
       <LatestReleaseSpotlight />
       <TesterBuildExperience />
 

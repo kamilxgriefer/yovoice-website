@@ -1,129 +1,160 @@
 # Current-UI captures — `public/screenshots/current/`
 
-Provenance for the screenshots the homepage renders. This file deliberately
-lives outside `public/`: `tests/servers-landing.test.ts` fails if any `.md`
-appears under `public/screenshots`, because provenance is for us, not for
-visitors.
+Provenance for the screenshots the homepage and /updates render. This file
+deliberately lives outside `public/`: `tests/servers-landing.test.ts` fails if
+any `.md` appears under `public/screenshots`, because provenance is for us,
+not for visitors.
 
-## Where they come from
+## YO Voice 3.0.0 recapture (2026-09-25)
 
-- **App repository** `yovoice` at `3a4696e3f1fa2480c5694b346eb89022e1420ab4`.
-  The built bundle reports `CFBundleShortVersionString 2.0.0`,
-  `CFBundleVersion 30`.
-- **Harness** `lib/dev/redesign_preview.dart`, built with
-  `flutter build ios --simulator --debug`
-  `--dart-define=YO_PREVIEW_LOCALE=en --dart-define=YO_PREVIEW_STATE=populated`.
-  The harness feeds the production Home / Servers / Chats / Moments widgets
-  from in-memory fixtures. No sign-in, no network, no writes.
-- **Devices** — the two **spare** simulators only: iPhone 17
-  `D27EA9A8-DCE1-480D-871A-2282E43EB835` for the phone frames, and iPad Pro
-  13-inch (M5) `E54667C2-8824-4DDD-A1F8-737C0293C5F9`, rotated to landscape,
-  for the large-screen frame. The owner's signed-in simulators (iPhone 17 Pro
-  `9EA1726B…`, iPad Pro 11-inch `6AD8FC6E…`) were never installed to or
-  driven. Captured with `xcrun simctl io <udid> screenshot`, status bar pinned
-  via `simctl status_bar override` so no real clock, carrier or battery state
-  is shown.
+Every frame below shows **YO Voice 3.0.0 (34), the Slim redesign**, which
+testers have had since 19 September 2026. They replace the 2.0.0 (30) frames
+of 2026-09-17 (hero, Servers section) and the Polish Build 26 frames of the
+/updates walkthrough (audit items W07, W09, W10).
 
-### The English fixture set (2026-09-17)
+### Where they come from
 
-The harness hard-codes Polish fixture strings that do not follow
-`YO_PREVIEW_LOCALE`, so an earlier capture round put "Weekendowa ekipa" and
-"Masz chwilę na rozmowę?" on an English marketing site. For this round the
-harness fixtures were translated to English **in a scratch copy of the file**,
-the build was run, and `lib/dev/redesign_preview.dart` was then restored
-byte-for-byte (verified by SHA-256) — the app repository carries none of it.
-The same scratch change added three more fixture servers so the Servers
-directory shows all five kinds, and implemented `watchServer`, `watchMyRole`,
-`watchModerators` and `watchChannels` on the preview repository so the real
-`ServerWorkspaceScreen` mounts.
+- **App source** `yovoice` at `f71a2ae2` — the commit every 3.0.0 (34) store
+  and web build was made from (`pubspec.yaml` `version: 3.0.0+34`). The tree
+  was exported with `git archive f71a2ae2` over an rsync'd **scratch copy** of
+  the capture worktree (`tmp/app-capture`, main `87a2f996`); files added after
+  f71a2ae2 were removed from the copy. Between the two commits `lib/` differs
+  only in the sound files and the push-notification sound profile, so nothing
+  visible changes. The app worktree was never modified: a SHA-256 manifest of
+  all 2983 of its files was taken before and compared after (identical).
+- **Harness** `lib/dev/redesign_preview.dart`, built with Flutter 3.44.6:
+  `flutter build web --debug -t lib/dev/redesign_preview.dart`
+  `--dart-define=YO_PREVIEW_LOCALE=en --dart-define=YO_PREVIEW_THEME=dark`
+  `--dart-define=YO_PREVIEW_STATE=populated --dart-define=YO_PREVIEW_TAB=home`.
+  Release and profile builds render a grey error screen, so it is a debug
+  build. The harness feeds the production Home / Servers / Chats / Friends /
+  Moments widgets and the production `DesktopSidebar` from in-memory
+  fixtures. No sign-in, no network, no writes.
+- **Scratch-only harness changes** (the patch is in
+  `yovoice-evidence/2026-09-25/website-fix/captures/redesign_preview.scratch.patch`;
+  the original file is SHA-256 `e7c4923b…c225e`, identical at f71a2ae2 and
+  87a2f996):
+  - the Polish fixture strings (people, chat messages, captions, server and
+    channel names, descriptions) translated to natural English with neutral
+    sample names — Alex, Maya, Leo, Ada, Sam, Nina, Tom — because the
+    fixtures do not follow `YO_PREVIEW_LOCALE`;
+  - three more fixture servers (Book club, Family table, North Studio) so the
+    Servers list shows all five kinds;
+  - two capture hooks: `?tab=` picks the opening tab without a tap (a tap on
+    a callback would show a "Preview callback" snackbar), and `?inset=59,34`
+    gives the phone frames an iPhone's safe areas, which a browser does not
+    report. Nothing in a production widget was changed.
+- **Capture**: served from `127.0.0.1`, driven by headless Chromium
+  (Playwright 1.62) in a dark colour scheme. Every request that was not to
+  the local server was aborted (Firebase JS SDK, Google sign-in, Roboto);
+  CanvasKit was answered from the build's own `canvaskit/` folder, and the
+  engine's Noto Color Emoji request from the copy that ships inside the
+  Flutter SDK, so the greeting's wave renders without leaving the machine.
+  The browser ran in `Europe/London` with a fixed clock (2026-09-19,
+  19:30 local), so the desktop rail's world-clock card shows a parked
+  "7:30 PM London" rather than the capturing machine's zone and time, and
+  the "since" times are fixed relative to it.
+  - Phone frames: 402 x 874 CSS px at 3x (iPhone 17 size) — 1206 x 2622.
+  - Hero large-screen frame: 1600 x 1200 at 1.29x — 2064 x 1548. At 1600 px
+    the Your people row fits, including "Add friends".
+  - /updates walkthrough: 1440 x 900 at 1.5x — 2160 x 1350, one frame per
+    tab. Exactly one rail item is lit in each: Home, Chats, and More for
+    Friends. Friends has no rail row in 3.0.0 and the production shell
+    (`MainShell.desktopNavItemForSlot`) keeps More lit while it is open; the
+    harness maps it the same way, so the frame shows what a tester sees.
+- **Servers-section frame** (`workspace-phone-slim.webp`): the harness cannot
+  mount a server's workspace, so it comes from a scratch widget test modelled
+  on `test/slim_servers_capture.dart`, switched to `Locale('en')`, English
+  server names and each template channel's `englishName`, rendered at
+  402 x 874 with the same safe areas, dark theme, 3x, after tapping the real
+  `server-open-channels` button. The PNG was cropped to the Channels sheet's
+  own top edge (the first 458 rows removed), leaving 1206 x 2164. The test
+  file is in the same evidence folder.
 
-**If these captures are ever regenerated, that fixture work has to be redone**,
-or the frames come back partly Polish and the Servers directory comes back
-with two cards over empty space.
-
-### Why the large-screen frame comes from an iPad
-
-`MainShell.desktopBreakpoint` is 1100. An iPad Pro 13-inch in landscape is
-1376 pt wide, so it renders the same `DesktopSidebar` + `DesktopHome` code
-path the web app uses above that width — it is the desktop layout, captured
-without a second toolchain. `simctl` writes the portrait framebuffer, so the
-PNG was rotated with `sips -r 90` before conversion. The simulator was put in
-dark appearance (`simctl ui … appearance dark`) first, because the harness
-follows the system theme and the site is dark.
-
-Only **Home** exists at large-screen width: the iPad could not be driven to
-its other tabs (the simulator-control tool needs a per-device grant that was
-not available, and the Simulator app had no windows for AppleScript to click).
-The hero therefore shows this one capture as a fixed second view rather than
-switching it per tab — see the assertion in `tests/homepage-welcome.test.ts`
-that pins `desktopRefs` to `["home"]`.
+Encoded with `cwebp -q 80 -m 6` and published under new `-slim` names:
+Next's image optimizer keys its cache on the href, width, quality and mime
+type, never on the source bytes, so a new picture at an old path would keep
+serving the old transform.
 
 ## The files
 
-| File | Surface | Size | Pixels |
-| --- | --- | --- | --- |
-| `home-phone.webp` | Home | 98.7 KB | 1206 x 2622 |
-| `servers-phone.webp` | Servers directory, all five kinds | 67.1 KB | 1206 x 2622 |
-| `chats-phone.webp` | Chats | 70.6 KB | 1206 x 2622 |
-| `moments-phone.webp` | YO Moments (Voice) | 72.3 KB | 1206 x 2622 |
-| `workspace-phone-v2.webp` | A server's channel list | 28.0 KB | 1206 x 2160 |
-| `home-desktop.webp` | Home, desktop layout | 96.7 KB | 2064 x 1548 |
-
-All are WebP at quality 80–82, well inside the 300 KB per-frame budget.
-
-`workspace-phone-v2.webp` is the one frame that is not 1206 x 2622. It was
-captured while the channel-list sheet was still presenting, so the Servers
-screen behind it was sliced across the top of the image — status bar,
-“‹ Servers”, and a half-row of the directory, with the sheet's drag handle
-over the cut. It is cropped to the sheet's own top edge (the first 462 rows
-removed, leaving 1206 x 2160). The sheet's rounded top corners fall well
-inside the frame's 148 px corner mask, so no wedge shows in the render.
-
-It is published under a new name rather than overwriting the old file.
-`ImageOptimizerCache.getCacheKey` hashes the href, width, quality and mime
-type and never the source bytes, so an edited file at an unchanged path is
-served from the previous transform until the cache TTL lapses — which is
-exactly what happened on the first verification run here, where the page
-still rendered the uncropped frame after the bytes on disk were correct.
+| File | Where | Surface | Size | Pixels |
+| --- | --- | --- | --- | --- |
+| `home-phone-slim.webp` | hero | Home | 81.4 KB | 1206 x 2622 |
+| `servers-phone-slim.webp` | hero | Servers, all five kinds | 65.1 KB | 1206 x 2622 |
+| `chats-phone-slim.webp` | hero | Chats | 61.4 KB | 1206 x 2622 |
+| `moments-phone-slim.webp` | hero | YO Moments (Voice, Discover) | 65.1 KB | 1206 x 2622 |
+| `home-desktop-slim.webp` | hero | Home, desktop layout | 83.8 KB | 2064 x 1548 |
+| `workspace-phone-slim.webp` | Servers section | a server's Channels sheet | 37.8 KB | 1206 x 2164 |
+| `home-wide-slim.webp` | /updates | Home, desktop layout | 83.2 KB | 2160 x 1350 |
+| `chats-wide-slim.webp` | /updates | Chats, desktop layout | 60.7 KB | 2160 x 1350 |
+| `friends-wide-slim.webp` | /updates | Friends, desktop layout | 54.4 KB | 2160 x 1350 |
 
 ```
-47034c87d927bb7369dc4ec194e642b8a3b6cd738b422fcc0d2f92d167d81580  chats-phone.webp
-48809d8e8bbaf0bb4d0a0aa548e6fca9161716ed98259f3a9e559a76a720a89f  home-desktop.webp
-371827288ccf1a5403ad616f061c277d84bc2f687eaaf677e5d3906c9f44d584  home-phone.webp
-c45be3b69689e1d3ee5a26b1fc455f23b609cd3e6550ba6050d0c258d2694d2c  moments-phone.webp
-d7fde94e2b96a34d77293f70607288643db67326df5160eae7e8d6d10af8fb86  servers-phone.webp
-daec39d985fee004a21cf85d7a51c250addb1a41101f5bb115db1102b617f0cf  workspace-phone-v2.webp
+077e1c216a930b642b3225b1d0ad1f4359fb1db59b77116e11673a4fe3eb556d  chats-phone-slim.webp
+7207dc7660f93d76e9dd0add825e34c45f96b4d32bdf729a7487e85f1f48561b  chats-wide-slim.webp
+42d31558a393fc7d1bed99c97dc4e8081f19a9a7b690d23eae4085b65bc09a6f  friends-wide-slim.webp
+5bc2061c04c9a4d66aaca1b9a796a6ea9844fe89f14ccc4b99965f28fd47ec5a  home-desktop-slim.webp
+97fff3457fb2156bf73c4746e614d72e4abf17009f6e90119f341008b6b6f9c6  home-phone-slim.webp
+67e37f71722b2949a7c021974da7cebc5f71b49ffe35720ca7a5d57199b17248  home-wide-slim.webp
+d9f7e481dbdd43fbf5e2d6eaa10fecd7ab5ccde6f45979e8b84b09af8e3aa9c7  moments-phone-slim.webp
+6066da247747dd99f5c2b1c43d90cd36403bd8525cbb748f3708ede02cdeb2ad  servers-phone-slim.webp
+7a8b04bdd3fa7eea3852658b152c01abaedd6cd006061190c44a46976d371fee  workspace-phone-slim.webp
 ```
+
+The 2.0.0 (30) files (`home-phone.webp`, `servers-phone.webp`,
+`chats-phone.webp`, `moments-phone.webp`, `home-desktop.webp`,
+`workspace-phone-v2.webp`) and every file in `public/screenshots/build-26/`
+were deleted in the same change.
 
 ## What the frames show, checked by opening each one
 
-- The mobile dock is the bead-and-socket bar with five destinations —
-  **Home / Servers / Chats / Moments / More**. There is **no centre logo
-  button**, which is the defect the owner reported in the old hero mockup.
-- The large-screen rail reads YO Voice, Home, Servers, Chats, Moments, then
-  CREATE (Create Server, Create Voice Moment), then MORE.
-- Home: greeting, "Your people", "Here and now", Create server / Friends,
-  "In your servers", and a "Got a minute? Record a Voice Moment" card.
-- Servers: a Create server action above all five kinds — For friends,
-  For a podcast, For a community, For family, For a company.
-- The server channel list: "Private server · 8 people", Invite, a TEXT group
-  (general, plans) and a VOICE group (Lounge, Late night), then Add channel.
-  After the crop this frame shows the settled sheet only, with nothing of the
-  screen behind it.
-- Chats: search, Add friend / New message, unread badges.
-- Moments: the Voice / Yeels switch over Discover / Following / Most engaged.
-- No "rooms", no "Open conversation" card, no Clubs, no orbits, no "Heart of
-  the Community" in any frame. Every string is English.
+Every visible string is English; there is no debug text, no snackbar, and no
+real person's name or data.
+
+- **Phone dock**: the 3.0.0 bead-and-socket dock — Home, Servers, Chats,
+  Moments and More — with the selected destination
+  raised and labelled.
+- **Home (phone)**: the YO Voice logo row, "Hi, Alex" with a wave and "Good
+  to see you again!", the bell and avatar, Your people (You, Ada, Leo, Maya,
+  Nina, with Voice Moment durations), Live now (a LIVE Stage card, "Live
+  studio · Voice studio · Stage"), and Here and now with the Weekend crew
+  server, whose card continues under the dock as the list scrolls.
+- **Servers (phone)**: "Servers" and Create server over a compact list —
+  Weekend crew (For friends · 8 people), Voice studio (For a podcast · 126),
+  Book club (For a community · 184), Family table (For family · 6), North
+  Studio (For a company · 23) — each with a one-line description.
+- **Chats (phone)**: "Chats — Private conversations with your friends.",
+  search, a row with Add friend, New message, Maya and Leo, and Messages:
+  Maya (2 unread), Leo (a long message the app ends with an ellipsis), Ada
+  (voice message, 1 unread).
+- **Moments (phone)**: Voice / Yeels with Voice selected, Discover selected
+  beside Following and Most engaged, a rail of voices, and Voice Moment
+  cards with play, like, comment, Share and Reply with voice.
+- **Channels sheet (Servers section)**: the server rail (W, B, F, L, N), then
+  Weekend crew, "Private server · 12 people", Invite, TEXT (general, memes),
+  VOICE (Lounge and Gaming, both LIVE), ORGANISATION (Events, Rules), Add
+  channel.
+- **Desktop layout (hero, /updates)**: the rail reads YO Voice and the bell,
+  Home, Servers, Chats (2), Moments, CREATE (Create Server, Create Voice
+  Moment), MORE (More), then the parked world clock and the profile card
+  (Alex, USER, @alex). Home adds Got a minute? / Record a Voice Moment and
+  Your recent chats; that row is a carousel and, as in the app, the third
+  card peeks in at the right edge. The hero frame also shows In your servers.
+  Chats and Friends show the same content as on the phone, plus Friends'
+  All / Online / Requests / Blocked, "6 friends · 4 online" and a message
+  button on each row.
 
 ## Known gaps
 
-- **The channel's own content is not captured.** Opening a text channel in the
-  harness reaches `ClubChatService`, which has no fake, so the message list
-  renders "Something went wrong". Only the channel *list* is used on the site;
-  the error frame was never saved under `public/`.
 - **Yeels has no capture.** Its media is a fixture still that draws
-  "Fixture still · no decoder" on screen.
-- **Servers / Chats / Moments have no large-screen capture** — see above.
+  "Fixture still · no decoder" on screen, so the /updates walkthrough no
+  longer has a Yeels tab. A truthful Yeels frame needs real media from a
+  signed-in test account; that is the owner's call.
+- **A channel's own content is not captured.** Only the channel list is used.
+- **Servers / Chats / Moments are not shown at desktop width in the hero** —
+  it keeps one fixed large-screen view (Home), pinned by
+  `tests/homepage-welcome.test.ts` (`desktopRefs` equals `["home"]`).
 
 ## Servers page hero — `public/screenshots/build-35/create-server-desktop.webp`
 
@@ -155,7 +186,8 @@ picker, "Create your server." with all five kinds — from the released app.
   not in the frame — unlike the Build 26 frame, which showed it.
 - Encoded with `cwebp -q 82 -m 6`: 1440 x 800, 45.2 KB. Published under a new
   path so the image optimizer's href-keyed cache cannot serve the old frame.
-  `build-26/servers-desktop.jpg` stays on disk; it is no longer rendered.
+  `build-26/servers-desktop.jpg` was deleted on 2026-09-25 with the rest of
+  the Build 26 folder.
 
 ```
 8731f4d3a8f1e7275fa8d9e0be35fd5c793d742838571233e6cf1fa1c0738c4e  create-server-desktop.webp

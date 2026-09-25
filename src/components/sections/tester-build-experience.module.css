@@ -30,7 +30,6 @@
 .copy li { display: flex; align-items: flex-start; gap: 9px; color: var(--foreground); font-size: .875rem; line-height: 1.5; }
 .copy li svg { margin-top: 2px; flex: none; color: var(--accent); }
 .copy > a { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; margin-top: 24px; color: var(--accent); font-size: .875rem; font-weight: 600; }
-.dragNote { display: inline-flex; width: fit-content; min-height: 36px; align-items: center; gap: 8px; margin-top: 20px; border: 1px solid color-mix(in srgb, var(--info) 38%, transparent); border-radius: var(--radius-pill); padding: 7px 12px; color: var(--info); font-size: .8125rem; font-weight: 600; }
 
 .visual { display: flex; min-width: 0; flex-direction: column; align-self: center; margin: 28px 28px 28px 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-field); background: var(--background); box-shadow: none; }
 .visual img { display: block; width: 100%; height: auto; }
