@@ -6,16 +6,27 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import {
   ArrowRight,
   Check,
-  Clapperboard,
   House,
   MessageCircle,
-  Move,
   UserPlus,
 } from "lucide-react";
 
-import { currentRelease } from "@/content/current-release";
 import styles from "./tester-build-experience.module.css";
 
+/**
+ * The /updates interface walkthrough: three desktop-layout captures of
+ * YO Voice 3.0.0 (34), the Slim redesign testers have had since 19 September
+ * 2026. Each was rendered by the app's own preview harness from the released
+ * source (f71a2ae2) in English, on sample data, with no account and no
+ * network; docs/design/current-screenshots.md records how.
+ *
+ * Exactly one rail item is lit in each frame. Friends has no rail row of its
+ * own in 3.0.0 — the app keeps More lit while it is open, as MainShell does —
+ * so the Friends frame shows More selected, which is what a tester sees.
+ *
+ * Yeels is deliberately absent: the harness can only draw a placeholder still
+ * for Yeel media, so there is no truthful Yeels capture to show.
+ */
 const surfaces = [
   {
     id: "home",
@@ -23,21 +34,21 @@ const surfaces = [
     icon: House,
     title: "Home starts with your people.",
     description:
-      "Friends, recent Chats, a Voice Moment shortcut and a clear server-first invitation share one calm starting point. The familiar Hub remains the navigation foundation.",
-    details: ["Friends stay visible at the top", "Recent private Chats are one step away", "Server creation replaces the old room entry"],
-    image: "/screenshots/build-26/home-desktop.jpg",
-    alt: "Build 26 capture of the YO Voice Home screen: the real desktop Hub, friends, Servers, Voice Moment and recent Chats.",
+      "Friends and their Voice Moments sit at the top, a Live now card shows which channel is live, and your recent Chats and servers are one step away — with a shortcut to record a Voice Moment beside them.",
+    details: ["Your people, with their latest Voice Moments", "Live now shows the channel that is live", "Recent Chats and your servers on the same page"],
+    image: "/screenshots/current/home-wide-slim.webp",
+    alt: "YO Voice 3.0.0 Home in the desktop layout: the navigation rail with Home selected, a greeting, a Your people row, a Live now card, Here and now with a server, a Got a minute? prompt to record a Voice Moment, and Your recent chats.",
   },
   {
     id: "chats",
     label: "Chats",
     icon: MessageCircle,
-    title: "Private conversation is easier to enter.",
+    title: "Private conversation is easy to enter.",
     description:
-      "Chats now places Add Friend beside New Message, keeps search and active contacts close, and gives shared photos or video a responsive full-screen viewer. Call setup and recovery changes are being exercised by internal testers.",
-    details: ["A visible Add Friend route into Friends", "Full-screen private photo and video viewing", "Clearer send, retry and call recovery states"],
-    image: "/screenshots/build-26/chats-desktop.jpg",
-    alt: "Build 26 capture of the YO Voice Chats screen: the real Hub, search, Add Friend, New Message and recent conversations.",
+      "Chats opens with search, then one row that starts with Add friend and New message and carries on through your friends, then your private conversations with unread counts, voice messages included.",
+    details: ["Add friend beside New message", "Your friends one tap from a new conversation", "Unread counts on every conversation"],
+    image: "/screenshots/current/chats-wide-slim.webp",
+    alt: "YO Voice 3.0.0 Chats in the desktop layout: the navigation rail with Chats selected, a search field, Add friend and New message at the start of a row of friends, and a Messages list with unread counts.",
   },
   {
     id: "friends",
@@ -45,21 +56,10 @@ const surfaces = [
     icon: UserPlus,
     title: "Finding someone has a clear place.",
     description:
-      "The redesigned Friends view separates adding new people from filtering the friends you already have, with direct tabs for online friends, requests and blocked accounts.",
-    details: ["One primary Add Friend action", "Search explains who it filters", "All, Online, Requests and Blocked stay distinct"],
-    image: "/screenshots/build-26/friends-desktop.jpg",
-    alt: "Build 26 capture of the YO Voice Friends screen: Add Friend, search and the All, Online, Requests and Blocked tabs.",
-  },
-  {
-    id: "yeels",
-    label: "Yeels",
-    icon: Clapperboard,
-    title: "The media gets the space first.",
-    description:
-      "Yeels uses the same YO Moments language as Voice while keeping the photo or video readable. Creation supports text and link overlays that can be moved before publishing; user-supplied audio must be owned or licensed.",
-    details: ["Voice and Yeels share one visual system", "Controls avoid covering the centre of the media", "Text and links can be positioned before publishing"],
-    image: "/screenshots/build-26/yeels-desktop.jpg",
-    alt: "Build 26 capture of the YO Voice Yeels screen: the real Hub, a media-first Yeel, creator details and conversation panel.",
+      "Friends separates adding someone new from filtering the friends you already have, with direct filters for All, Online, Requests and Blocked, and a message button on every row.",
+    details: ["One primary Add friend action", "Search explains who it filters", "All, Online, Requests and Blocked stay distinct"],
+    image: "/screenshots/current/friends-wide-slim.webp",
+    alt: "YO Voice 3.0.0 Friends in the desktop layout: the navigation rail with More selected, an Add friend button, the All, Online, Requests and Blocked filters, a search field for current friends, and a list of six friends with their status.",
   },
 ] as const;
 
@@ -90,16 +90,16 @@ export function TesterBuildExperience() {
   return (
     <section className={styles.section} aria-labelledby="tester-build-experience-heading">
       <div className={styles.heading}>
-        <p>Interface walkthrough · Build 26 captures</p>
+        <p>Interface walkthrough · YO Voice 3.0.0</p>
         <h2 id="tester-build-experience-heading">One visual language, wherever you go.</h2>
         <div>
-          <span>Captured in Build 26</span>
-          <span>Current tester build {currentRelease.version}</span>
-          <span>Hub preserved</span>
+          <span>Captured in YO Voice 3.0.0 (34)</span>
+          <span>The Slim redesign</span>
+          <span>Desktop layout</span>
         </div>
       </div>
 
-      <div className={styles.tabs} role="tablist" aria-label="App areas captured in Build 26">
+      <div className={styles.tabs} role="tablist" aria-label="App areas captured in YO Voice 3.0.0">
         {surfaces.map((surface, index) => {
           const Icon = surface.icon;
           return (
@@ -136,20 +136,19 @@ export function TesterBuildExperience() {
           {index === selectedIndex ? (
             <>
               <div className={styles.copy}>
-                <p className={styles.counter}>0{index + 1} / 04</p>
+                <p className={styles.counter}>0{index + 1} / 0{surfaces.length}</p>
                 <h3>{selected.title}</h3>
                 <p>{selected.description}</p>
                 <ul role="list">
                   {selected.details.map((detail) => <li key={detail}><Check size={17} aria-hidden="true" />{detail}</li>)}
                 </ul>
-                {selected.id === "yeels" ? <span className={styles.dragNote}><Move size={16} aria-hidden="true" />Position overlays before publishing</span> : null}
                 <Link href="/features">Explore the full feature set <ArrowRight size={17} aria-hidden="true" /></Link>
               </div>
 
               <figure className={styles.visual}>
-                <Image src={selected.image} alt={selected.alt} width={1440} height={634} sizes="(max-width: 900px) 100vw, 62vw" />
+                <Image src={selected.image} alt={selected.alt} width={2160} height={1350} sizes="(max-width: 980px) 100vw, 62vw" />
                 <figcaption>
-                  Build 26 fixture-fed capture from source d1c036b7; sample names and content, with no live account data.
+                  YO Voice 3.0.0 (34), app source f71a2ae2, rendered in English by the app&apos;s preview harness on sample data; no live account or network.
                 </figcaption>
               </figure>
             </>

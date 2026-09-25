@@ -1,5 +1,14 @@
 # Build 26 screenshot provenance
 
+> **Retired 2026-09-25.** None of these images is on the site any more, and
+> all five files were deleted from `public/screenshots/build-26/`. They showed
+> the Polish pre-3.0.0 interface on an English site: the /updates walkthrough
+> now uses English YO Voice 3.0.0 (34) captures (Home, Chats, Friends), the
+> /servers hero uses an English 3.0.0 capture, and the Yeels frame — which
+> only ever showed the preview harness's placeholder still — was removed
+> without a replacement. See `current-screenshots.md`. This record is kept
+> as history.
+
 This record covers the images in `public/screenshots/build-26/`. It lives in
 `docs/` rather than beside the images so that it is not served as a public
 file.

@@ -13,6 +13,9 @@ import test from "node:test";
  */
 
 const ROTATOR = "src/components/hero/hero-prompt-rotator.tsx";
+// The hero's one clock (owner decision W27, 2026-09-25): the welcome sentence
+// and the phone frames read the same step and share one Pause control.
+const TOUR = "src/components/hero/hero-tour.tsx";
 
 function withoutComments(source: string): string {
   return source
@@ -193,34 +196,68 @@ test("the hero's in-page links point at sections the homepage actually renders",
 });
 
 test("the hero keeps self-advancing tabs, which is what the owner asked to have back", async () => {
-  const rotator = await readFile(ROTATOR, "utf8");
+  const tour = await readFile(TOUR, "utf8");
 
   // A real interval, not a static list: the tabs change by themselves.
-  assert.match(rotator, /window\.setInterval\(/);
-  assert.match(rotator, /ROTATION_INTERVAL_MS/);
-  assert.match(rotator, /const ROTATION_INTERVAL_MS = \d+;/);
-  assert.match(rotator, /setActiveIndex\(\(current\) => \(current \+ 1\) % heroPrompts\.length\)/);
+  assert.match(tour, /window\.setInterval\(/);
+  assert.match(tour, /ROTATION_INTERVAL_MS/);
+  assert.match(tour, /const ROTATION_INTERVAL_MS = \d+;/);
+  assert.match(tour, /setActiveIndex\(\(current\) => \(current \+ 1\) % heroPrompts\.length\)/);
   // And it is cleaned up, so a remount cannot leave two timers running.
-  assert.match(rotator, /return \(\) => window\.clearInterval\(timer\);/);
+  assert.match(tour, /return \(\) => window\.clearInterval\(timer\);/);
+});
+
+test("W27: one clock and one Pause control drive both hero carousels", async () => {
+  const [tour, prompts, screens, hero] = await Promise.all([
+    readFile(TOUR, "utf8"),
+    readFile(ROTATOR, "utf8"),
+    readFile("src/components/hero/app-screen-rotator.tsx", "utf8"),
+    readFile("src/components/hero/hero-section.tsx", "utf8"),
+  ]);
+
+  // Exactly one timer in the hero, and it lives in the tour.
+  assert.equal((tour.match(/window\.setInterval\(/g) ?? []).length, 1);
+  for (const carousel of [prompts, screens]) {
+    assert.doesNotMatch(carousel, /setInterval|ROTATION_INTERVAL_MS|useState\(/);
+    assert.match(carousel, /useHeroTour\(\)/);
+  }
+  // Both carousels sit inside the one provider.
+  const open = hero.indexOf("<HeroTourProvider>");
+  const close = hero.indexOf("</HeroTourProvider>");
+  assert.ok(open > -1 && close > open, "the hero wraps its carousels in HeroTourProvider");
+  for (const element of ["<HeroPromptRotator />", "<AppScreenRotator />"]) {
+    const at = hero.indexOf(element);
+    assert.ok(at > open && at < close, `${element} is inside the tour`);
+  }
+
+  // One Pause control on the page, and it names what it stops.
+  assert.match(prompts, /aria-label=\{paused \? "Play the welcome tour" : "Pause the welcome tour"\}/);
+  assert.doesNotMatch(withoutComments(screens), /\bPause\b|\bPlay\b|setPaused|togglePaused/);
+  assert.doesNotMatch(prompts, /Pause welcome messages|Pause the app screen tour/);
+
+  // The phone shows the screen the sentence names: the tour derives the
+  // screen from the prompt, and the rotator renders that screen.
+  assert.match(tour, /screenId: heroPrompts\[activeIndex\]\.screen/);
+  assert.match(screens, /appScreens\.find\(\(screen\) => screen\.id === screenId\)/);
 });
 
 test("WCAG 2.2.2: the rotation stops for reduced motion, hover, focus and a visible control", async () => {
-  const rotator = await readFile(ROTATOR, "utf8");
+  const [tour, rotator] = await Promise.all([readFile(TOUR, "utf8"), readFile(ROTATOR, "utf8")]);
 
   // prefers-reduced-motion: no auto-rotation at all.
-  assert.match(rotator, /useReducedMotion/);
+  assert.match(tour, /useReducedMotion/);
   // Hydration-safe: the preference only takes effect after mount (server and client first render agree).
-  assert.match(rotator, /const prefersReducedMotion = useReducedMotion\(\);/);
-  assert.match(rotator, /const hydrated = useSyncExternalStore\(subscribeToNothing, \(\) => true, \(\) => false\);/);
-  assert.match(rotator, /const reduceMotion = hydrated && prefersReducedMotion === true;/);
+  assert.match(tour, /const prefersReducedMotion = useReducedMotion\(\);/);
+  assert.match(tour, /const hydrated = useSyncExternalStore\(subscribeToNothing, \(\) => true, \(\) => false\);/);
+  assert.match(tour, /const reduceMotion = hydrated && prefersReducedMotion === true;/);
   assert.match(
-    rotator,
+    tour,
     /const autoRotationPaused =\s*paused \|\| interactionPaused \|\| reduceMotion === true;/,
   );
   // The effect is the only thing that advances the prompt, and it refuses to
   // start while paused — and it re-runs when that changes.
-  assert.match(rotator, /if \(autoRotationPaused\) return;/);
-  assert.match(rotator, /\}, \[autoRotationPaused\]\);/);
+  assert.match(tour, /if \(autoRotationPaused\) return;/);
+  assert.match(tour, /\}, \[autoRotationPaused\]\);/);
 
   // Pause on hover, and on keyboard focus entering the control group.
   assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\(true\)\}/);
@@ -235,8 +272,9 @@ test("WCAG 2.2.2: the rotation stops for reduced motion, hover, focus and a visi
   );
 
   // A visible, labelled pause/resume control that stops the rotation for good.
-  assert.match(rotator, /onClick=\{\(\) => setPaused\(\(current\) => !current\)\}/);
-  assert.match(rotator, /aria-label=\{paused \? "Play welcome messages" : "Pause welcome messages"\}/);
+  assert.match(tour, /togglePaused: \(\) => setPaused\(\(current\) => !current\)/);
+  assert.match(rotator, /onClick=\{togglePaused\}/);
+  assert.match(rotator, /aria-label=\{paused \? "Play the welcome tour" : "Pause the welcome tour"\}/);
   assert.match(rotator, /\{paused \? "Play" : "Pause"\}/);
 
   // Manual selection is keyboard-operable at a 44px target with a visible ring.
@@ -257,9 +295,9 @@ test("the rotating sentence is announced once, not re-read on every rotation", a
 });
 
 test("the hero's rotating copy is true today", async () => {
-  const rotator = await readFile(ROTATOR, "utf8");
-  const prompts = withoutComments(rotator).slice(
-    withoutComments(rotator).indexOf("export const heroPrompts"),
+  const tour = await readFile(TOUR, "utf8");
+  const prompts = withoutComments(tour).slice(
+    withoutComments(tour).indexOf("export const heroPrompts"),
   );
   const block = prompts.slice(0, prompts.indexOf("] as const;"));
 
@@ -272,7 +310,17 @@ test("the hero's rotating copy is true today", async () => {
   }
   // The counter in the control group is rendered from the list length, so the
   // list has to stay long enough to be worth rotating.
-  assert.ok(block.split("\n").filter((line) => line.trim().startsWith('"')).length >= 5);
+  const lines = block.split("\n").filter((line) => line.trim().startsWith('text: "'));
+  assert.ok(lines.length >= 5);
+  // Every line names the captured screen that shows what it describes, and
+  // every captured screen has at least one line, so choosing it by hand has
+  // a sentence to show.
+  const screens = [...block.matchAll(/screen: "([a-z]+)"/g)].map((m) => m[1]);
+  assert.equal(screens.length, lines.length);
+  for (const id of ["home", "servers", "chats", "moments"]) {
+    assert.ok(screens.includes(id), `no welcome line stands beside the ${id} screen`);
+  }
+  assert.deepEqual([...new Set(screens)].sort(), ["chats", "home", "moments", "servers"]);
 });
 
 // ---------------------------------------------------------------------------
@@ -338,49 +386,48 @@ test("the rotating tabs are the app's own destinations, with Servers among them"
   // claim a screen it has no picture of.
   const ids = [...rotator.matchAll(/id: "([^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(ids, ["home", "servers", "chats", "moments"]);
+  // The 3.0.0 recapture (2026-09-25) is published under "-slim" names:
+  // Next's image optimizer keys its cache on the href, so a new picture at
+  // an old path would keep serving the old transform.
   for (const id of ids) {
-    assert.ok(rotator.includes(`/screenshots/current/${id}-phone.webp`), `${id} phone`);
+    assert.ok(rotator.includes(`/screenshots/current/${id}-phone-slim.webp`), `${id} phone`);
   }
 
   // Only Home exists as a large-screen capture, so the large-screen frame is
   // fixed rather than switching with the tabs. A per-tab desktop image would
   // have to invent three screens nobody photographed, and this assertion is
   // what stops that from being reintroduced quietly.
-  const desktopRefs = [...rotator.matchAll(/\/screenshots\/current\/([a-z-]+)-desktop\.webp/g)]
+  const desktopRefs = [...rotator.matchAll(/\/screenshots\/current\/([a-z]+)-desktop(?:-slim)?\.webp/g)]
     .map((m) => m[1]);
   assert.deepEqual(desktopRefs, ["home"]);
   assert.doesNotMatch(rotator, /active\.desktop/);
 });
 
-test("the device frames advance by themselves and clean their timer up", async () => {
-  const rotator = await readFile(ROTATOR_SCREENS, "utf8");
+test("the device frames advance with the hero's one clock", async () => {
+  const [rotator, tour] = await Promise.all([
+    readFile(ROTATOR_SCREENS, "utf8"),
+    readFile(TOUR, "utf8"),
+  ]);
 
-  assert.match(rotator, /const ROTATION_INTERVAL_MS = \d+;/);
-  assert.match(rotator, /window\.setInterval\(/);
-  assert.match(
-    rotator,
-    /setActiveIndex\(\(current\) => \(current \+ 1\) % appScreens\.length\)/,
-  );
-  assert.match(rotator, /return \(\) => window\.clearInterval\(timer\);/);
+  // The frames have no timer of their own any more: they follow the tour,
+  // whose single interval is pinned (and cleaned up) above.
+  assert.doesNotMatch(rotator, /setInterval/);
+  assert.match(rotator, /const \{ screenId, reduceMotion, selectScreen, setInteractionPaused \} = useHeroTour\(\);/);
+  assert.match(tour, /return \(\) => window\.clearInterval\(timer\);/);
 });
 
 test("WCAG 2.2.2: the device frames stop for reduced motion, hover, focus and by hand", async () => {
-  const rotator = await readFile(ROTATOR_SCREENS, "utf8");
+  const [rotator, tour] = await Promise.all([
+    readFile(ROTATOR_SCREENS, "utf8"),
+    readFile(TOUR, "utf8"),
+  ]);
 
-  // No auto-rotation at all under prefers-reduced-motion.
-  // Hydration-safe: the preference only takes effect after mount (server and client first render agree).
-  assert.match(rotator, /const prefersReducedMotion = useReducedMotion\(\);/);
-  assert.match(rotator, /const hydrated = useSyncExternalStore\(subscribeToNothing, \(\) => true, \(\) => false\);/);
-  assert.match(rotator, /const reduceMotion = hydrated && prefersReducedMotion === true;/);
-  assert.match(
-    rotator,
-    /const autoRotationPaused =\s*paused \|\| interactionPaused \|\| reduceMotion === true;/,
-  );
-  assert.match(rotator, /if \(autoRotationPaused\) return;/);
-  assert.match(rotator, /\}, \[autoRotationPaused\]\);/);
+  // Reduced motion, hydration safety and the paused gate are the tour's, and
+  // pinned in the prompt test above; the frames only read reduceMotion.
+  assert.match(rotator, /initial=\{reduceMotion \? false :/);
 
-  // Hover and keyboard focus pause it, and focus is only released when it
-  // leaves the frames entirely.
+  // Hover and keyboard focus pause the whole tour, and focus is only
+  // released when it leaves the frames entirely.
   assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\(true\)\}/);
   assert.match(rotator, /onMouseLeave=\{\(\) => setInteractionPaused\(false\)\}/);
   assert.match(rotator, /onFocusCapture=\{\(\) => setInteractionPaused\(true\)\}/);
@@ -390,18 +437,8 @@ test("WCAG 2.2.2: the device frames stop for reduced motion, hover, focus and by
   );
 
   // Choosing a tab by hand is a deliberate stop, not a pause that resumes.
-  assert.match(
-    rotator,
-    /function selectScreen\(index: number\) \{\s*setActiveIndex\(index\);\s*setPaused\(true\);/,
-  );
-
-  // And a visible, labelled control toggles it.
-  assert.match(rotator, /onClick=\{\(\) => setPaused\(\(current\) => !current\)\}/);
-  assert.match(
-    rotator,
-    /aria-label=\{paused \? "Play the app screen tour" : "Pause the app screen tour"\}/,
-  );
-  assert.match(rotator, /\{paused \? "Play" : "Pause"\}/);
+  assert.match(rotator, /onClick=\{\(\) => selectScreen\(screen\.id\)\}/);
+  assert.match(tour, /selectScreen: \(id\) => \{[\s\S]*?setPaused\(true\);/);
 
   // Every control is a 44px keyboard target with a visible ring.
   assert.match(rotator, /focus-ring/);
@@ -435,12 +472,17 @@ test("the hero controls keep their own type size through the button reset", asyn
   // element, which the reset does not match.
   assert.match(rotator, /const CONTROL_LABEL = "text-\[11px\] font-bold[^"]*";/);
   assert.match(rotator, /<span className=\{CONTROL_LABEL\}>\{screen\.label\}<\/span>/);
-  assert.match(rotator, /<span className=\{CONTROL_LABEL\}>\{paused \? "Play" : "Pause"\}<\/span>/);
+  // The tour's one Pause lives in the welcome row; its label is on a span too.
+  const prompts = await readFile(ROTATOR, "utf8");
+  assert.match(prompts, /<span className="text-\[11px\] font-bold leading-none">\{paused \? "Play" : "Pause"\}<\/span>/);
 
   // And no type utility is left on the buttons themselves, where it would be
   // silently discarded and read as if it were doing something.
-  const buttonClasses = rotator.match(/className=[{"`]{1,2}[^"`{}]*focus-ring[^"`{}]*/g) ?? [];
-  assert.ok(buttonClasses.length >= 2, "the rotator's controls were found");
+  const buttonClasses = [
+    ...(rotator.match(/className=[{"`]{1,2}[^"`{}]*focus-ring[^"`{}]*/g) ?? []),
+    ...(prompts.match(/className=[{"`]{1,2}[^"`{}]*focus-ring[^"`{}]*/g) ?? []),
+  ];
+  assert.ok(buttonClasses.length >= 4, "the hero's controls were found");
   for (const cls of buttonClasses) {
     assert.doesNotMatch(cls, /text-\[\d+px\]/);
     assert.doesNotMatch(cls, /font-(?:bold|semibold|black|medium)/);

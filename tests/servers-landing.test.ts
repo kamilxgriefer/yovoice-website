@@ -381,7 +381,7 @@ test("screenshot provenance stays out of the publicly served folder", async () =
   // Everything under public/ is served from the site root, so screenshot
   // provenance notes live in docs/design instead.
   const screenshotFiles = await readdir("public/screenshots", { recursive: true });
-  assert.ok(screenshotFiles.some((file) => file.endsWith("servers-desktop.jpg")));
+  assert.ok(screenshotFiles.some((file) => file.endsWith(".webp")), "the captures were found");
   assert.deepEqual(screenshotFiles.filter((file) => /\.(?:md|mdx)$/i.test(file)), []);
   const provenance = await readFile("docs/design/build-26-screenshots.md", "utf8");
   assert.match(provenance, /source revision `d1c036b7`/);

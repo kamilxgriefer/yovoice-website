@@ -45,16 +45,16 @@ export function ServersWelcome() {
             </p>
           </div>
 
-          {/* The channel list as the app actually draws it: a server's own
-              text and voice channels, its member count, and the Invite action
-              a private server opens with. The cards below name the starter
-              channels per template; this is what they look like inside.
+          {/* The channel list as the 3.0.0 app draws it on a phone: the
+              Channels sheet, with the server rail down its left edge, the
+              server's name, privacy and member count, the Invite action, and
+              its text, voice and organisation channels, live voice channels
+              marked LIVE. The cards below name the starter channels per
+              template; this is what they look like inside.
 
-              The frame is trimmed to the settled sheet. The capture caught the
-              channel list still presenting, so the Servers screen behind it was
-              sliced across the top of the image — the crop starts at the sheet's
-              own top edge, which is why the height here is not the 2622 px of
-              the other phone frames.
+              The frame is trimmed to the sheet's own top edge, so the dimmed
+              workspace behind it is not in the picture — which is why the
+              height here is not the 2622 px of the other phone frames.
 
               The file carries a new name rather than replacing the old one in
               place. Next's image optimizer keys its cache on the href, width,
@@ -66,13 +66,13 @@ export function ServersWelcome() {
             <div className="rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface)] p-1.5">
               <div
                 className="relative overflow-hidden rounded-[10px] bg-[var(--surface-sunken)]"
-                style={{ aspectRatio: "1206 / 2160" }}
+                style={{ aspectRatio: "1206 / 2164" }}
               >
                 <Image
-                  src="/screenshots/current/workspace-phone-v2.webp"
-                  alt="A server's channel list on a phone: the server name, Private server with its member count, an Invite action, then a TEXT group with general and plans and a VOICE group with Lounge and Late night, above Add channel."
+                  src="/screenshots/current/workspace-phone-slim.webp"
+                  alt="A server's Channels sheet on a phone: a rail of the account's servers down the left edge, then the server name, Private server with its member count, an Invite action, a TEXT group with general and memes, a VOICE group with Lounge and Gaming both marked LIVE, an ORGANISATION group with Events and Rules, and Add channel."
                   width={1206}
-                  height={2160}
+                  height={2164}
                   sizes="(max-width: 1024px) 70vw, 272px"
                   className="size-full object-cover object-top"
                 />
