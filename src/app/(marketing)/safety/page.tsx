@@ -15,7 +15,7 @@ const tools = [
     icon: UserCog,
     title: "Conversation and content moderation",
     description:
-      "Supported live-voice and content surfaces provide host, moderator and reporting controls. Server actions in the tester build remain behind the backend release gate.",
+      "Supported live-voice and content surfaces provide host, moderator and reporting controls. Server owners and admins can assign roles, remove members and ban members.",
   },
   {
     icon: Ban,

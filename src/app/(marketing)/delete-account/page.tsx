@@ -18,7 +18,8 @@ import {
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Delete your YO Voice account",
+  title: "Delete your account",
+  socialTitle: "Delete your YO Voice account",
   description:
     "How to delete your YO Voice account, what deletion removes, what we keep and why, and how long it takes.",
   path: "/delete-account",
@@ -174,7 +175,7 @@ export default function DeleteAccountPage() {
         <DeletionRequestBanner />
       </Suspense>
       <LegalDocument
-        updatedOn="September 18, 2026"
+        updatedOn="September 25, 2026"
         intro="This page is for anyone who wants their YO Voice account and data removed — you do not need to be signed in to read it, and you do not need an app to ask."
         sections={sections}
       />

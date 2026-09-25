@@ -14,7 +14,8 @@ const channels = [
     icon: HelpCircle,
     title: "General & support",
     description: "Questions, feedback or something not working right.",
-    email: "hello@yovoice.app",
+    // The support address the app shows in Settings, Contact support.
+    email: "support@yovoice.app",
   },
   {
     icon: ShieldAlert,

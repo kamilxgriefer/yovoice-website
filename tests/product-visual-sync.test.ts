@@ -104,8 +104,10 @@ test("feature copy keeps current capabilities and release gates honest", async (
   );
 
   assert.match(features, /Friends, Community, Podcast, Family or Company/i);
-  // Servers opened to every signed-in account with Build 30 (app ADR-197).
-  assert.match(features, /open to every signed-in account since Build 30/i);
+  // Servers opened to every signed-in account on 16 September 2026 (app
+  // ADR-197). Visitors get the date, not an internal build number.
+  assert.match(features, /open to every signed-in account since 16 September 2026/i);
+  assert.doesNotMatch(features, /since Build \d+/i);
   assert.match(features, /on a private Server invites stay with its admins and moderators/i);
   assert.doesNotMatch(features, /sending invites and using its voice/i);
   assert.doesNotMatch(features, /backend release gate/i);
@@ -118,7 +120,7 @@ test("feature copy keeps current capabilities and release gates honest", async (
   );
   assert.match(features, /Public audience visibility is derived by the server/i);
   // GIFs shipped in Build 30 as a first-party catalogue of sixteen originals.
-  assert.match(features, /Sixteen original YO Voice GIF animations ship in the app and can be sent in private Chats since Build 30/i);
+  assert.match(features, /Sixteen original YO Voice GIF animations ship in the app and can be sent in private Chats\./i);
   assert.doesNotMatch(features, /not available in any build|Build 27 candidate/i);
   assert.doesNotMatch(features, /GIPHY|Android session continuity|Velvet Prism/i);
   assert.doesNotMatch(features, /Build 27 (?:is|are) available/i);
@@ -138,40 +140,33 @@ test("the release spotlight on /updates features the confirmed current build wit
     "utf8",
   );
 
-  for (const label of [
-    "Five Server types",
-    "Hub preserved",
-    "Chats & media",
-    "Friends",
-    "Yeels media-first",
-    "Calls under test",
-  ]) {
-    assert.ok(spotlight.includes(label), label);
+  // The six areas of the 3.0.0 English release notes; the first tab is
+  // "Home", the English app label.
+  for (const label of ["Home", "Servers", "Chats", "YO Moments", "Profile", "Sign-in"]) {
+    assert.match(spotlight, new RegExp(`title: "${label}"`), label);
   }
+  assert.doesNotMatch(spotlight, /Hub preserved|title: "Start"/);
 
   assert.match(spotlight, /mobile-build-\$\{currentRelease\.buildNumber\}-internal-testing/);
-  assert.match(spotlight, /Build \{currentRelease\.buildNumber\} is available through Google Play Internal\s+Testing, both TestFlight groups and the web app at app\.yovoice\.app/i);
+  // Availability comes from current-release.ts, which says "TestFlight" and
+  // not "both TestFlight groups" for build 34.
+  assert.match(spotlight, /\{currentReleaseAvailability\}/);
+  assert.doesNotMatch(spotlight, /both TestFlight groups/i);
+  assert.match(spotlight, /YO Voice \{currentRelease\.version\} brings one calmer design/);
+  assert.match(spotlight, /in Dark and Pearl/);
   assert.match(spotlight, /See Build \{currentRelease\.buildNumber\} tester release/);
   assert.doesNotMatch(spotlight, /Build 2\d\b/);
-  assert.match(spotlight, /nextReleaseCandidateStatus/);
+  assert.doesNotMatch(spotlight, /nextReleaseCandidate/);
   assert.match(
     spotlight,
-    /internal tester release, not\s+a public App Store or Google Play release/i,
+    /internal\s+tester release, not a public App Store or Google Play release/i,
   );
-  assert.match(spotlight, /Servers are open to every signed-in account/i);
-  assert.match(spotlight, /Podcast\s+recording remains disabled/i);
-  // Build 32's Delete account screen ships while server-side processing is
-  // switched off, so the spotlight names the e-mail route instead of claiming
-  // an in-app deletion.
-  assert.match(
-    spotlight,
-    /Delete account screen that offers the e-mail route until the\s+server-side processing switches on/i,
-  );
+  assert.match(spotlight, /Servers are open to every signed-in\s+account/i);
+  assert.match(spotlight, /Podcast recording remains disabled/i);
   assert.doesNotMatch(spotlight, /you can (?:now )?delete your account|processed within/i);
-  assert.match(spotlight, /members of public Servers can invite friends/i);
   assert.doesNotMatch(
     spotlight,
-    /matching web release is live|available to everyone|publicly available|GIPHY|Build 27 is available/i,
+    /matching web release is live|available to everyone|publicly available|GIPHY|Build 27 is available|3\.0\.1|3\.1\.0|\b35\b/i,
   );
 });
 
@@ -191,11 +186,32 @@ test("the Servers hero shows the English 3.0.0 server picker, labelled with its 
     landing,
     /five choices: For friends, For a community, For a podcast, For family and For a company/,
   );
-  assert.match(landing, /familiar\s+YO Voice Hub stays in place/i);
+  // "Hub" is an internal component name; visitors get the 3.0.0 wording.
+  assert.doesNotMatch(landing, /\bHub\b|Rooms destination/);
+  assert.match(landing, /server rail beside the channels/);
   assert.match(landing, /YO Voice 3\.0\.0 capture from app commit 87a2f996/i);
   assert.match(landing, /English by the app&apos;s preview harness on sample data/i);
   assert.match(landing, /Captured in YO Voice 3\.0\.0/);
   assert.doesNotMatch(landing, /unchanged in Build 27|reused for Build 27/i);
   assert.match(landing, /no live account or server\s+connection/i);
   assert.doesNotMatch(landing, /CSS mockup|concept render/i);
+});
+
+test("no visitor page describes Servers as gated or switched off", async () => {
+  // Servers have been open to every signed-in account since 16 September 2026
+  // (app ADR-197); only Podcast recording is still off.
+  for (const file of [
+    "src/components/servers/servers-welcome.tsx",
+    "src/components/sections/welcome-features.tsx",
+    "src/app/(marketing)/community/page.tsx",
+    "src/app/(marketing)/safety/page.tsx",
+    "src/app/(marketing)/help-center/page.tsx",
+    "src/components/premium/premium-plans-view.tsx",
+  ]) {
+    assert.doesNotMatch(
+      await readFile(file, "utf8"),
+      /backend release gate|not switched on yet|activation (?:remains |is )?gated|activation boundary|remains gated/i,
+      file,
+    );
+  }
 });

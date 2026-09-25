@@ -17,14 +17,15 @@ const social: {
 } = {
   github: "https://github.com/kamilxgriefer",
   instagram: "https://www.instagram.com/yovoice.app/",
-  email: "mailto:hello@yovoice.app",
+  // The support address the app itself shows (Settings, Contact support).
+  email: "mailto:support@yovoice.app",
 };
 
 export const siteConfig = {
   name: "YO Voice",
   tagline: "Be You.",
   description:
-    "Your people. Your space. Your voice. Explore the Servers interface, refreshed Home, Chats, Friends and media-first Yeels in internal testing.",
+    "Your people. Your space. Your voice. A calmer new design for Home, Servers, Chats and YO Moments, in testing now and on the web at app.yovoice.app.",
   url: "https://yovoice.app",
   navigation: [
     { label: "Features", href: "/features" },

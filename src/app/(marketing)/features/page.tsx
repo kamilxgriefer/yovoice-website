@@ -22,7 +22,7 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 export const metadata = createPageMetadata({
   title: "Features",
   description:
-    "Explore the Servers interface, refreshed Home, Chats, Friends, YO Moments and media-first Yeels in YO Voice internal testing.",
+    "Explore the new YO Voice design: Home, Servers, Chats, Friends and YO Moments, with Voice Moments and full-screen Yeels, in testing now and on the web at app.yovoice.app.",
   path: "/features",
 });
 
@@ -31,7 +31,7 @@ const features = [
     icon: LayoutGrid,
     title: "Servers · open to every signed-in account",
     description:
-      "Choose Friends, Community, Podcast, Family or Company from one compact selector. Creating a Server, joining one and using its voice and text channels have been open to every signed-in account since Build 30. On a public Server any member can invite friends; on a private Server invites stay with its admins and moderators. Podcast recording remains disabled.",
+      "Choose Friends, Community, Podcast, Family or Company from one compact selector. Creating a Server, joining one and using its voice and text channels have been open to every signed-in account since 16 September 2026. On a public Server any member can invite friends; on a private Server invites stay with its admins and moderators. Podcast recording remains disabled.",
   },
   {
     icon: MessageCircle,
@@ -61,7 +61,7 @@ const features = [
     icon: Sparkles,
     title: "YO Voice Originals",
     description:
-      "Sixteen original YO Voice GIF animations ship in the app and can be sent in private Chats since Build 30. They are a first-party catalogue; no third-party GIF provider is connected.",
+      "Sixteen original YO Voice GIF animations ship in the app and can be sent in private Chats. They are a first-party catalogue; no third-party GIF provider is connected.",
   },
   {
     icon: PhoneCall,

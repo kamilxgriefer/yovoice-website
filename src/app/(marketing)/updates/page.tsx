@@ -21,11 +21,7 @@ import {
   type ProductUpdateStatus,
 } from "@/content/product-updates";
 import { createPageMetadata } from "@/lib/seo/metadata";
-import {
-  currentRelease,
-  currentReleaseAvailability,
-  nextReleaseCandidateStatus,
-} from "@/content/current-release";
+import { currentRelease } from "@/content/current-release";
 
 export const metadata = createPageMetadata({
   title: "Updates",
@@ -77,6 +73,10 @@ const earlierUpdates = productUpdates.filter(
   (update) => update.updatedOn < "2026-09-01",
 );
 const releaseWaveRange = formatReleaseWaveRange(currentWave);
+const currentReleaseSlug = `mobile-build-${currentRelease.buildNumber}-internal-testing`;
+const currentReleaseUpdate = productUpdates.find(
+  (update) => update.slug === currentReleaseSlug,
+);
 
 export default function UpdatesPage() {
   return (
@@ -84,28 +84,28 @@ export default function UpdatesPage() {
       <PageHero
         compact
         eyebrow="Updates"
-        title="What changed — and where it really stands"
-        description="A release-truth ledger for the current YO Voice experience: verified production work, tester builds, rollout-ready changes and items that still have a boundary to clear."
+        title="What's new in YO Voice"
+        description="Every update with its date, and every tester build with its version: what is live, what our testers have, and what is still switched off."
       >
         <Link
-          href={`#mobile-build-${currentRelease.buildNumber}-internal-testing`}
-          className="focus-ring mx-auto mt-6 inline-flex min-h-11 max-w-full items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] py-1.5 pl-1.5 pr-4 text-left transition hover:border-[var(--accent)]"
+          href={`#${currentReleaseSlug}`}
+          className="focus-ring mx-auto mt-6 inline-flex min-h-11 max-w-full items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-1.5 text-left transition hover:border-[var(--accent)]"
         >
-          <span className="flex h-7 min-w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] px-2 text-[13px] font-extrabold tabular-nums text-white">
-            {currentRelease.buildNumber}
-          </span>
           <span className="min-w-0 text-[13px] font-semibold text-[var(--foreground)] sm:text-sm">
-            Build {currentRelease.buildNumber} · internal testing
+            YO Voice {currentRelease.version} · {currentRelease.stage}
           </span>
           <ArrowRight className="size-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
         </Link>
       </PageHero>
 
       <aside aria-labelledby="servers-development-heading" className="panel mx-auto mb-10 w-[calc(100%-40px)] max-w-6xl p-6 sm:w-[calc(100%-64px)] sm:p-8">
-        <p className="eyebrow">Build {currentRelease.buildNumber} · {currentRelease.stage} · September 19, 2026</p>
-        <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-[-.025em] text-[var(--foreground)]">A new home for every circle</h2>
+        <p className="eyebrow">
+          Servers
+          {currentReleaseUpdate ? <> · {formatLedgerDate(currentReleaseUpdate.updatedOn)}</> : null}
+        </p>
+        <h2 id="servers-development-heading" className="mt-3 text-2xl font-bold tracking-[-.025em] text-[var(--foreground)]">A new look, the same circles</h2>
         <p className="mt-3 max-w-3xl text-base leading-[1.6] text-[var(--text-secondary)]">
-          YO Voice {currentRelease.version}: {currentReleaseAvailability} Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account, with the established Hub preserved. Podcast recording remains disabled, and this is not a public App Store or Google Play release. {nextReleaseCandidateStatus}
+          Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account. In the new design they sit in a compact list, with a server rail beside the channels. Podcast recording remains disabled.
         </p>
         <Link href="/servers" className="link-accent focus-ring mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold">Explore the Servers interface <ArrowRight className="size-4" aria-hidden="true" /></Link>
       </aside>
@@ -162,7 +162,7 @@ export default function UpdatesPage() {
                 Current release wave
               </p>
               <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
-                {releaseWaveRange} · source, tests and rollout truth
+                {releaseWaveRange} · newest first
               </p>
             </div>
             <span className="hidden min-h-8 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 text-[13px] font-semibold text-[var(--text-secondary)] sm:inline-flex">
@@ -172,11 +172,11 @@ export default function UpdatesPage() {
           </div>
 
           <ol className="mt-5 space-y-4">
-            {currentWave.map((update, index) => (
+            {currentWave.map((update) => (
               <UpdateCard
                 key={update.slug}
                 update={update}
-                featured={index === 0}
+                featured={update.slug === currentReleaseSlug}
               />
             ))}
           </ol>
@@ -270,12 +270,7 @@ function UpdateCard({
               Updated
             </span>
             <span className="mt-1 block">
-              {new Intl.DateTimeFormat("en-GB", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC",
-              }).format(new Date(`${update.updatedOn}T00:00:00Z`))}
+              {formatLedgerDate(update.updatedOn)}
             </span>
           </time>
           <div
@@ -333,6 +328,15 @@ function UpdateCard({
       </article>
     </li>
   );
+}
+
+function formatLedgerDate(isoDate: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${isoDate}T00:00:00Z`));
 }
 
 function formatReleaseWaveRange(updates: readonly ProductUpdate[]) {

@@ -159,10 +159,12 @@ const sections: LegalSection[] = [
           <p>
             There is no self-service account deletion in the app yet. To delete
             your account, email{" "}
-            <a href="mailto:support@yovoice.app">support@yovoice.app</a> with
+            <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a> with
             the subject &quot;Delete my YO Voice account&quot; — the Delete
-            account row in Settings opens that email for you — or write to{" "}
-            <a href="mailto:privacy@yovoice.app">privacy@yovoice.app</a>. We may
+            account screen in the app&apos;s Settings offers that email for
+            you.{" "}
+            <a href="mailto:support@yovoice.app">support@yovoice.app</a> also
+            reaches a person. We may
             need to verify your identity before acting. Deletion automatically
             removes your public profile, presence, public badges,
             member-directory entry and website-showcase consent; your private
@@ -201,7 +203,8 @@ const sections: LegalSection[] = [
     body: (
       <p>
         We may update these Terms as the product evolves. We&apos;ll update
-        the date below and, for material changes, make a reasonable effort
+        the &quot;last updated&quot; date at the top of this page and, for
+        material changes, make a reasonable effort
         to notify you. Continuing to use YO Voice after changes take effect
         means you accept the updated Terms.
       </p>
@@ -213,7 +216,7 @@ const sections: LegalSection[] = [
     body: (
       <p>
         Questions about these Terms? Email{" "}
-        <a href="mailto:hello@yovoice.app">hello@yovoice.app</a>.
+        <a href="mailto:support@yovoice.app">support@yovoice.app</a>.
       </p>
     ),
   },
@@ -228,7 +231,7 @@ export default function TermsPage() {
         description="The rules that keep YO Voice fair, safe and usable for everyone."
       />
       <LegalDocument
-        updatedOn="September 18, 2026"
+        updatedOn="September 25, 2026"
         intro="These Terms apply to yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

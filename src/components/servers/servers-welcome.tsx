@@ -18,9 +18,10 @@ import { serverTemplates } from "@/content/server-templates";
  * one rendered with the voice glyph, so the split can never drift from the
  * template list the /servers route renders from the same file.
  *
- * The boundary sentence stays, though. Describing Servers without saying that
- * creation and channel activity are not switched on yet would read as an
- * invitation to do something the backend gate still prevents.
+ * The boundary sentence stays, in words and without a build number: Servers
+ * have been open to every signed-in account since 16 September 2026 (app
+ * ADR-197), YO Voice itself is still in internal testing, and Podcast
+ * recording is the one piece still switched off.
  */
 export function ServersWelcome() {
   return (
@@ -137,9 +138,10 @@ export function ServersWelcome() {
 
         <div className="panel mt-8 flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <p className="max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
-            Servers are with our internal testers right now. Creating a server,
-            joining channels and Podcast recording are not switched on yet —
-            when they are, you will read it here first.
+            Every signed-in account can create a Server, join one, send
+            invites and use its voice and text channels. Podcast recording is
+            the one piece still switched off, and YO Voice itself is still in
+            internal testing.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/servers" className="premium-button-secondary focus-ring">

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | YO Voice",
   },
   description:
-    "Your people. Your space. Your voice. Servers, a refreshed Home, Chats, Friends and media-first Yeels are now in internal testing.",
+    "Your people. Your space. Your voice. A calmer new design for Home, Servers, Chats and YO Moments, in testing now and on the web at app.yovoice.app.",
   applicationName: "YO Voice",
   keywords: [
     "YO Voice",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "YO Voice — Be You",
     description:
-      "Servers, a refreshed Home, Chats, Friends and media-first Yeels are now in YO Voice internal testing.",
+      "A calmer new design for Home, Servers, Chats and YO Moments, in testing now and on the web at app.yovoice.app.",
     url: "https://yovoice.app",
     siteName: "YO Voice",
     type: "website",
@@ -49,13 +49,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "YO Voice — Be You",
     description:
-      "Servers, a refreshed Home, Chats, Friends and media-first Yeels are now in YO Voice internal testing.",
+      "A calmer new design for Home, Servers, Chats and YO Moments, in testing now and on the web at app.yovoice.app.",
     images: ["/opengraph-image"],
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  // No site-wide robots entry: index/follow is the default, and an explicit
+  // "index, follow" here was emitted next to Next's own "noindex" on 404s.
 };
 
 export default function RootLayout({

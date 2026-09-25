@@ -27,16 +27,16 @@ export function ServersLanding() {
             <span> every circle.</span>
           </h1>
           <p className={styles.heroDescription}>
-            Friends, Community, Podcast, Family and Company now share one
-            compact, responsive server-first interface, while the familiar
-            YO Voice Hub stays in place.
+            Friends, Community, Podcast, Family and Company share one compact
+            server list, with a server rail beside the channels, in one calmer
+            design in Dark and Pearl.
           </p>
           <div className={styles.heroActions}>
             <Link href="#server-types" className="premium-button">
               Explore five types <ArrowDown size={18} aria-hidden="true" />
             </Link>
             <Link href={`/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`} className="premium-button-secondary">
-              Build {currentRelease.buildNumber} status <ArrowRight size={18} aria-hidden="true" />
+              YO Voice {currentRelease.version} release <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
           <p className={styles.releaseNote}>
@@ -78,13 +78,13 @@ export function ServersLanding() {
           {[
             {
               icon: Layers3,
-              title: "Servers replace the old entry points",
-              text: "Home and the Hub lead into Servers, with the five-type selector included in the current tester build and the web app.",
+              title: "Servers are where your circles meet",
+              text: "Home lists your servers, and the five-type selector is in the current tester build and the web app.",
             },
             {
               icon: Users,
-              title: "The Hub keeps its shape",
-              text: "The established animated navigation remains the shared foundation on mobile and desktop; only the Rooms destination becomes Servers.",
+              title: "The navigation you know stays",
+              text: "The navigation stays where it was on mobile and desktop; a server rail beside the channels lets you switch servers without leaving the workspace.",
             },
             {
               icon: LockKeyholeOpen,

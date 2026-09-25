@@ -13,7 +13,7 @@ const cards = [
     description: "iOS and Android apps.",
     status: `YO Voice ${currentRelease.version}. ${currentReleaseAvailability}`,
     href: `/updates#mobile-build-${currentRelease.buildNumber}-internal-testing`,
-    action: `See Build ${currentRelease.buildNumber} status`,
+    action: `See the ${currentRelease.version} release`,
   },
   {
     icon: Monitor,

@@ -1,47 +1,51 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Clapperboard,
+  House,
+  LayoutGrid,
+  LogIn,
   MessageSquareMore,
-  PhoneCall,
   Sparkles,
-  Users,
+  UserRound,
 } from "lucide-react";
 
 import { FrameEchoIcon } from "@/components/brand/frame-echo-icon";
-import { currentRelease, nextReleaseCandidateStatus } from "@/content/current-release";
+import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
 import { productUpdates } from "@/content/product-updates";
 
+// The six areas of the current release, worded from the app's English
+// release notes (yovoice docs/Sessions/2026-09-19-slim-redesign.md). The
+// first tab is "Home", the English app label.
 const releaseScope = [
   {
-    icon: Sparkles,
-    title: "Five Server types",
-    description: "Friends, Community, Podcast, Family and Company, open to every signed-in account; members of public Servers can invite friends.",
+    icon: House,
+    title: "Home",
+    description: "The YO Voice logo in the greeting, your friends' Moments as a story rail, a Live now row showing channels that are live right now and since when, and your servers as a compact list.",
   },
   {
-    icon: FrameEchoIcon,
-    title: "Hub preserved",
-    description: "The established animated navigation remains the shared foundation.",
+    icon: LayoutGrid,
+    title: "Servers",
+    description: "A compact server list, and a server rail beside the channels so you can switch servers without leaving the workspace; on phones it sits in the Channels sheet.",
   },
   {
     icon: MessageSquareMore,
-    title: "Chats & media",
-    description: "Reactions work on photo and video messages, empty threads other people opened stay out of your list, and messages typed offline are sent when you are back online.",
+    title: "Chats",
+    description: "A slimmer conversation list that shows who is active, cleaner bubbles and date separators, and a lighter message bar.",
   },
   {
-    icon: Users,
-    title: "Friends",
-    description: "A clearer route to add, search and manage the people you know.",
+    icon: FrameEchoIcon,
+    title: "YO Moments",
+    description: "Voice and Yeels stay two separate formats, each with its own filters, and Yeels play full screen with the actions on the right.",
   },
   {
-    icon: Clapperboard,
-    title: "Yeels media-first",
-    description: "The publish button shows its stage, and a failed publish keeps your draft editable.",
+    icon: UserRound,
+    title: "Profile",
+    description: "A new header with stats and clear actions, on your own profile and your friends'.",
   },
   {
-    icon: PhoneCall,
-    title: "Calls under test",
-    description: "Call setup, teardown and retry corrections continue on tester devices.",
+    icon: LogIn,
+    title: "Sign-in",
+    description: "A calmer sign-in, sign-up and password reset.",
   },
 ] as const;
 
@@ -80,22 +84,17 @@ export function LatestReleaseSpotlight() {
             id="latest-release-heading"
             className="mt-5 max-w-xl font-[family-name:var(--font-display)] text-[1.875rem] font-extrabold leading-[1.1] tracking-[-.025em] text-[var(--foreground)] sm:text-[2.5rem]"
           >
-            One release.
+            A new look for the whole app.
             <span className="block text-[var(--accent)]">
-              One connected experience.
+              One calmer design.
             </span>
           </h2>
           <p className="mt-5 max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
-            Build {currentRelease.buildNumber} is available through Google Play Internal
-            Testing, both TestFlight groups and the web app at app.yovoice.app.
-            Profile photos and banners load everywhere and open fullscreen,
-            members of public Servers can invite friends, and Settings has a
-            Delete account screen that offers the e-mail route until the
-            server-side processing switches on.
-            Servers are open to every signed-in account and Podcast
-            recording remains disabled. This is an internal tester release, not
-            a public App Store or Google Play release.{" "}
-            {nextReleaseCandidateStatus}
+            YO Voice {currentRelease.version} brings one calmer design to Home,
+            Servers, Chats, YO Moments, Profile and sign-in, in Dark and Pearl.{" "}
+            {currentReleaseAvailability} Servers are open to every signed-in
+            account and Podcast recording remains disabled. This is an internal
+            tester release, not a public App Store or Google Play release.
           </p>
 
           <Link

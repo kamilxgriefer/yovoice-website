@@ -1,7 +1,7 @@
 import { CheckCircle2, CircleDashed, Loader2 } from "lucide-react";
 
 import { PageHero } from "@/components/marketing/page-hero";
-import { currentRelease, nextReleaseCandidateStatus } from "@/content/current-release";
+import { currentRelease } from "@/content/current-release";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -34,8 +34,8 @@ const columns = [
     icon: Loader2,
     accent: "text-[var(--accent)]",
     items: [
-      `YO Voice ${currentRelease.version} on Google Play Internal Testing, both TestFlight groups and the web app`,
-      nextReleaseCandidateStatus,
+      `YO Voice ${currentRelease.version} on Google Play Internal Testing, TestFlight and the web app`,
+      "A new look for the whole app, in Dark and Pearl: Home, Servers, Chats, YO Moments, Profile and sign-in",
       "Profile photos and banners load everywhere, and every avatar and banner opens a fullscreen preview",
       "Members of public Servers can invite friends; private Servers keep invites to admins and moderators",
       "A Delete account screen in Settings, which offers the e-mail route until the server-side processing switches on",
@@ -43,10 +43,6 @@ const columns = [
       "Chats keep messages typed offline and send them once you are back online",
       "Yeels publishing shows its stage, a failed publish keeps the draft editable, and web-recorder videos are no longer refused outright",
       "The Voice Moments feed tells a loading failure apart from an empty feed",
-      "Server-first Home with the established animated Hub preserved",
-      "Chats with Add Friend and responsive full-screen private media",
-      "Redesigned Friends search, filters and request routes",
-      "Unified Voice and media-first Yeels visual language",
       "Voice and video call setup, teardown and retry corrections",
       "Creator following gated by Premium, age verification and explicit opt-in",
     ],

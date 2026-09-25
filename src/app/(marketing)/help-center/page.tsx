@@ -39,7 +39,7 @@ const topics = [
     icon: Crown,
     title: "Servers",
     description:
-      "Understand the five server types, the internal-testing interface and the backend activation boundary.",
+      "Understand the five server types, what you can do in a Server today, and what is still switched off.",
     href: "/servers",
     linkLabel: "Explore Servers",
   },

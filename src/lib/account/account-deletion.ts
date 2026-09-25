@@ -131,9 +131,10 @@ export function getAccountDeletionConfirmation(
 }
 
 /**
- * Does this sign-in have a password to re-authenticate with? An account
- * created with Google or Apple does not, and cannot be deleted from the
- * website — the site supports email and password only (src/providers/auth-provider.tsx).
+ * Does this sign-in have a password to re-authenticate with? An account that
+ * signs in only with Google or Apple has no password, and website deletion
+ * re-authenticates by password only, so it gets the app or email route (see
+ * ProviderAccountPanel in src/app/(account)/account/delete/page.tsx).
  */
 export function hasPasswordSignIn(
   providerData: readonly { providerId: string }[] | null | undefined,

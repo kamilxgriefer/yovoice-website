@@ -11,20 +11,19 @@ import {
 /**
  * What YO Voice gives you, described the way the audited /features page
  * describes it. Each card names a surface that exists under its current
- * name, and the Servers card repeats the one boundary that matters to a
- * newcomer — the interface is in internal testing and the backend gate has
- * not been cleared — without turning the homepage into release notes.
+ * name, and the Servers card says what a newcomer can do with one — anyone
+ * signed in can create or join a Server — without turning the homepage into
+ * release notes.
  *
- * The descriptions are unchanged. What changed is that five boxes became
- * five rows: an icon tile, a title and the same sentence, in two columns on
- * a wide screen and one on a phone.
+ * Five rows: an icon tile, a title and one sentence, in two columns on a
+ * wide screen and one on a phone.
  */
 const features = [
   {
     icon: LayoutGrid,
     title: "Servers",
     description:
-      "Friends, Community, Podcast, Family and Company: five kinds of space, each with its own voice channels and chats. The interface is in internal testing; creation and channel activity stay behind the backend release gate.",
+      "Friends, Community, Podcast, Family and Company: five kinds of space, each with its own voice channels and chats. Anyone signed in can create or join one.",
   },
   {
     icon: MessageCircle,

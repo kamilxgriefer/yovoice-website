@@ -133,7 +133,21 @@ test("Premium and Updates do not turn a planned allowance into a paid or shipped
     readFile("src/app/(marketing)/faq/page.tsx", "utf8"),
   ]);
   assert.doesNotMatch(premium, /"Create Clubs"|"Create your own Clubs"/);
-  assert.match(premium, /Up to 30 Servers after launch/i);
+  // Servers are open (app ADR-197), so the allowance carries no launch
+  // qualifier anywhere Premium is sold.
+  assert.match(premium, /"Up to 30 Servers"/);
+  for (const file of [
+    "src/config/premium.ts",
+    "src/components/premium/premium-plans-view.tsx",
+    "src/components/sections/premium-section.tsx",
+    "src/app/(marketing)/premium/page.tsx",
+  ]) {
+    assert.doesNotMatch(
+      await readFile(file, "utf8"),
+      /after (?:Servers )?launch|once Servers launch|inactive while server backend activation is gated/i,
+      file,
+    );
+  }
   assert.match(premium, /Free includes 5 owned Servers/i);
   assert.match(premium, /Premium includes 30/i);
   assert.match(premium, /Joining stays unlimited for everyone/i);
@@ -142,11 +156,15 @@ test("Premium and Updates do not turn a planned allowance into a paid or shipped
   assert.match(faq, /Podcast recording is disabled in the current tester build/i);
   assert.match(faq, /Servers have been open to every signed-in account since 16 September 2026/i);
   assert.match(faq, /the server enforces these allowances/i);
-  assert.match(faq, /Yes, since Build 30\. The composer offers 16 original YO Voice GIF animations/i);
-  // The current build and the next candidate come from current-release.ts, so
-  // the answer cannot name a build the ledger has moved past.
+  assert.match(faq, /Yes\. The composer offers 16 original YO Voice GIF animations/i);
+  assert.doesNotMatch(faq, /since Build \d+/i);
+  // The current build comes from current-release.ts, so the answer cannot
+  // name a build the ledger has moved past, and no next step is announced.
   assert.match(faq, /\$\{currentRelease\.version\} is the current tester build/);
-  assert.match(faq, /\$\{nextReleaseCandidateStatus\}/);
+  assert.doesNotMatch(faq, /nextReleaseCandidate/);
+  // No Room or Club data was migrated, so the answer promises no carry-over.
+  assert.match(faq, /Rooms and Clubs were replaced by Servers on 13 September 2026/);
+  assert.doesNotMatch(faq, /carried over|data migration/i);
   assert.doesNotMatch(faq, /remains gated|backend gate is cleared|backend release gate|not presented as available|Build 27 is being prepared|gated backend|2\.0\.0 \(26\)/i);
   assert.doesNotMatch(`${faq}${updates}`, /GIPHY|Android session continuity|Build 27 (?:is|are) available/i);
 });

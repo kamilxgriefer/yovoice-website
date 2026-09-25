@@ -163,7 +163,8 @@ test("deletion promises only what the deployed trigger does", () => {
   // The Storage disclosure is the COMPLETE one: storage.rules has four
   // prefixes the sweep cannot reach, not two. Room covers and podcast
   // episodes are the other two (functions/account/stages.js).
-  assert.match(limits, /cover image you set on a voice room/);
+  assert.match(limits, /cover image you set on a live voice session/);
+  assert.doesNotMatch(limits, /\bvoice room\b/);
   assert.match(limits, /podcast episode published on a Server/);
 
   // The store-facing page may not make a categorical claim about everything
@@ -196,5 +197,5 @@ test("the document is dated for this revision", () => {
     new URL("../src/app/(marketing)/privacy/page.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(source, /updatedOn="September 18, 2026"/);
+  assert.match(source, /updatedOn="September 25, 2026"/);
 });

@@ -32,13 +32,64 @@ export type ProductUpdate = {
 // for history and is never presented as currently available.
 export const productUpdates: readonly ProductUpdate[] = [
   {
-    slug: "mobile-build-33-internal-testing",
+    // Website only (commits 00f8148, 0090580, 107bb00); the owner confirmed
+    // real Google and Apple sign-in on yovoice.app (yovoice
+    // docs/Sessions/2026-09-24-sounds-auth-website.md). The mobile sign-in
+    // screens are not part of this entry.
+    slug: "website-google-apple-sign-in",
+    updatedOn: "2026-09-24",
+    status: "live",
+    eyebrow: "Website · Sign in",
+    title: "Sign in to yovoice.app with Google or Apple",
+    summary:
+      "The website's Log in and Create account pages now offer Continue with Google and Continue with Apple. If your account uses two-factor authentication, the website asks for your authenticator code, just as the app does.",
+    highlights: [
+      "Continue with Google and Continue with Apple on Log in and Create account",
+      "A first Google or Apple sign-in creates your YO Voice account",
+      "Accounts with an authenticator app still ask for its code",
+    ],
+  },
+  {
+    // Built from app commit f71a2ae2 (release commit 176ec120 plus docs).
+    // Google Play internal testing published "34 (3.0.0)" at 20:52 CEST;
+    // TestFlight build 34 is in beta testing in the internal group (the
+    // external group's approval is not recorded yet, so the copy says
+    // "TestFlight" only); app.yovoice.app has served build 34 since 18:14Z.
+    // Evidence: yovoice-evidence/2026-09-19/release-3.0.0/{play,ios,web}.md
+    // and web-readback.txt. The softer web sounds were deployed on
+    // 2026-09-24 from main@32c9dd9 (Hosting run 36038221140) while
+    // version.json stayed 3.0.0 / 34; no phone build carries them yet.
+    slug: "mobile-build-34-internal-testing",
     updatedOn: "2026-09-19",
     status: "testing",
+    eyebrow: "3.0.0 · Internal testing",
+    title: "YO Voice 3.0.0 is a new look for the whole app",
+    summary:
+      "YO Voice 3.0.0 (34) brings one calmer design to the whole app, in Dark and Pearl. It is available to our existing testers: on Google Play Internal Testing (published 19 September 2026), in TestFlight, and in the web app at app.yovoice.app, which serves build 34. Since 24 September the web app also plays a new set of softer sounds. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
+    highlights: [
+      "Home: the YO Voice logo in the greeting, your friends' Moments as a story rail, a Live now row showing channels that are live right now and since when, and your servers as a compact list",
+      "Servers and Chats: a compact server list with a server rail beside the channels (on phones, in the Channels sheet), and a slimmer conversation list that shows who is active, with cleaner bubbles, date separators and a lighter message bar",
+      "YO Moments, Profile and sign-in: Voice and Yeels stay separate formats with their own filters, Yeels play full screen with the actions on the right, profiles get a new header with stats and clear actions, and sign-in, sign-up and password reset are calmer",
+    ],
+    release: {
+      version: "3.0.0 (34)",
+      stage: "Internal testing",
+      buildNumber: 34,
+    },
+  },
+  {
+    // Source revision 46d6b330; Google Play published at 12:21 CEST.
+    // Evidence: yovoice-evidence/2026-09-19/build33-2026-09-19.md and
+    // build33-play/play-readback.md. Play and the web moved to 3.0.0 (34) on
+    // the same day; the external TestFlight group has no recorded approval
+    // of 34 yet, so the superseding sentence names only Play and the web.
+    slug: "mobile-build-33-internal-testing",
+    updatedOn: "2026-09-19",
+    status: "superseded",
     eyebrow: "Build 33 · Internal testing",
     title: "Build 33 polishes photos, previews and large text",
     summary:
-      "YO Voice 2.0.0 (33), built from source revision 46d6b330, is available to our existing testers: on Google Play Internal Testing (published 19 September 2026 at 12:21 CEST), in both TestFlight groups — internal and YO Voice Beta Testers — and in the web app at app.yovoice.app, which serves build 33. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
+      "YO Voice 2.0.0 (33) reached our existing testers on 19 September 2026: Google Play Internal Testing, both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 33. This was an internal tester release, not a public App Store or Google Play release. YO Voice 3.0.0 (34) has since replaced it on Google Play Internal Testing and the web app.",
     highlights: [
       "Profile photos and banners load everywhere, even when the phone's clock is a few seconds off, and Settings and Creator Studio show your real photo",
       "Every avatar opens a fullscreen preview, banners open fullscreen too, and your own profile photo is tappable",
@@ -51,13 +102,14 @@ export const productUpdates: readonly ProductUpdate[] = [
     },
   },
   {
+    // Source revision a18fe789; Google Play published at 08:35 CEST.
     slug: "mobile-build-32-internal-testing",
     updatedOn: "2026-09-19",
     status: "superseded",
     eyebrow: "Build 32 · Internal testing",
     title: "Build 32 adds a Delete account screen and opens invites on public Servers",
     summary:
-      "YO Voice 2.0.0 (32), built from source revision a18fe789, reached our existing testers on 19 September 2026: Google Play Internal Testing (published at 08:35 CEST), both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 32. This was an internal tester release, not a public App Store or Google Play release. Build 33 has since superseded it as the newest build on every tester channel.",
+      "YO Voice 2.0.0 (32) reached our existing testers on 19 September 2026: Google Play Internal Testing, both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 32. This was an internal tester release, not a public App Store or Google Play release. Build 33 has since superseded it as the newest build on every tester channel.",
     highlights: [
       "Settings has a Delete account screen; the server-side processing switches on later, and until then the screen offers the e-mail route",
       "Members of public Servers can invite friends, while private Servers keep invites to admins and moderators",
@@ -70,13 +122,14 @@ export const productUpdates: readonly ProductUpdate[] = [
     },
   },
   {
+    // Source revision 98f9413c; Google Play published at 18:30 CEST.
     slug: "mobile-build-31-internal-testing",
     updatedOn: "2026-09-18",
     status: "superseded",
     eyebrow: "Build 31 · Internal testing",
     title: "Build 31 keeps chats moving when the network does not",
     summary:
-      "YO Voice 2.0.0 (31), built from source revision 98f9413c, is available to our existing testers: on Google Play Internal Testing (published 18 September 2026 at 18:30 CEST), in both TestFlight groups — internal and YO Voice Beta Testers — and in the web app at app.yovoice.app, which serves build 31. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
+      "YO Voice 2.0.0 (31) is available to our existing testers: on Google Play Internal Testing (published 18 September 2026), in both TestFlight groups — internal and YO Voice Beta Testers — and in the web app at app.yovoice.app, which serves build 31. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
     highlights: [
       "Chats: messages typed while offline are kept and sent once you are back online instead of running out of retries; Edit is offered only on text messages; the mute state shown is read from the conversation; opening a new chat retries safely instead of sending duplicate requests",
       "Yeels and Voice Moments: a failed publish no longer locks the draft, the publish button shows Preparing, Publishing and Finishing, web-recorder videos are no longer refused outright, and the Voice Moments feed tells a loading failure apart from an empty feed",
@@ -89,13 +142,14 @@ export const productUpdates: readonly ProductUpdate[] = [
     },
   },
   {
+    // Source revision 121973fc.
     slug: "mobile-build-30-internal-testing",
     updatedOn: "2026-09-17",
     status: "superseded",
     eyebrow: "Build 30 · Internal testing",
     title: "Build 30 opens Servers to everyone and repairs publishing and chats",
     summary:
-      "YO Voice 2.0.0 (30), built from source revision 121973fc, reached Google Play Internal Testing and both TestFlight groups on 17 September 2026, and the matching web release went live. Servers are open to every signed-in account by owner decision, and the former Rooms are retired. A two-day server-side outage that had blocked publishing Yeels and Voice Moments, the Voice Moments feed and starting new chats was repaired on 16 September 2026 and confirmed from a signed-in client the next day. Build 31 has since replaced Build 30 on every tester channel.",
+      "YO Voice 2.0.0 (30) reached Google Play Internal Testing and both TestFlight groups on 17 September 2026, and the matching web release went live. Servers are open to every signed-in account by owner decision, and the former Rooms are retired. A two-day server-side outage that had blocked publishing Yeels and Voice Moments, the Voice Moments feed and starting new chats was repaired on 16 September 2026 and confirmed from a signed-in client the next day. Build 31 has since replaced Build 30 on every tester channel.",
     highlights: [
       "Servers — Friends, Community, Podcast, Family and Company — are open to every signed-in account; Podcast recording stays disabled",
       "GIFs can be sent in private chats",
@@ -108,13 +162,14 @@ export const productUpdates: readonly ProductUpdate[] = [
     },
   },
   {
+    // Source revision d1c036b7.
     slug: "mobile-build-26-internal-testing",
     updatedOn: "2026-09-13",
     status: "superseded",
     eyebrow: "Build 26 · Internal testing",
     title: "Build 26 brings the server-first YO Voice together",
     summary:
-      "YO Voice 2.0.0 (26), built from source revision d1c036b7, is available to the existing 15-person Google Play Internal Testing list and the existing TestFlight internal group. This is an internal tester release, not a public App Store or Google Play release. The Servers interface is included, while server backend activation remains gated and Podcast recording remains disabled.",
+      "YO Voice 2.0.0 (26) is available to the existing Google Play Internal Testing list and the existing TestFlight internal group. This is an internal tester release, not a public App Store or Google Play release. The Servers interface is included, while server backend activation remains gated and Podcast recording remains disabled.",
     highlights: [
       "Servers replace the old Rooms destination with five starting points — Friends, Community, Podcast, Family and Company — while preserving the established animated Hub",
       "Home, Chats and Friends make people and private conversation easier to reach; shared private photos and videos now open in a responsive full-screen viewer",
@@ -152,9 +207,9 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Build 20 · Invited testing",
     title: "Build 20 brings YO Moments together",
     summary:
-      "YO Voice 1.0.0 (20) is available through Google Play Internal Testing for the existing 15-person tester list and TestFlight for the six-person external group plus the internal tester. Five external TestFlight installations are confirmed, and the matching web release is live. This remains invited testing, not a public App Store or Google Play release.",
+      "YO Voice 1.0.0 (20) is available through Google Play Internal Testing for the existing tester list and TestFlight for the external group plus the internal tester. Installations in the external TestFlight group are confirmed, and the matching web release is live. This remains invited testing, not a public App Store or Google Play release.",
     highlights: [
-      "YO Moments brings voice updates and the photo/video Reels MVP into one feed, with audience choices, reporting and owned or licensed audio uploads",
+      "YO Moments brings voice updates and the first photo and video Yeels into one feed, with audience choices, reporting and owned or licensed audio uploads",
       "Frame Echo Clean replaces the Moments navigation mark with a simple frame and play symbol, alongside original Velvet Prism sound cues and updated translations",
       "Chat, avatar, friendship and media recovery improvements are included; real-device media and mixed-version audio/video call acceptance continues",
     ],
@@ -167,11 +222,11 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "yo-moments-unified-feed",
     updatedOn: "2026-09-05",
-    status: "testing",
+    status: "superseded",
     eyebrow: "YO Moments",
     title: "One place for voice, photos and short videos",
     summary:
-      "The Build 20 experience brings Voice Moments and Reels into a unified YO Moments feed. Share a voice update or create with your own photo, video, text, links and audio, then choose the audience. This is a focused Reels MVP, not a licensed streaming-music catalog or a promise of Instagram feature parity.",
+      "The Build 20 experience brings Voice Moments and Yeels into a unified YO Moments feed. Share a voice update or create with your own photo, video, text, links and audio, then choose the audience. This is a focused first version of Yeels, not a licensed streaming-music catalog.",
     highlights: [
       "Clear loading, empty, error and playback-recovery states keep creation and browsing understandable",
       "Music must be owned or licensed by the uploader; Spotify and Apple Music tracks are not extracted into uploads",
@@ -181,7 +236,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "frame-echo-and-velvet-prism",
     updatedOn: "2026-09-05",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Navigation & sound",
     title: "A cleaner Moments mark, a quieter sound identity",
     summary:
@@ -199,11 +254,11 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Build 19 · Invited testing",
     title: "Build 19 is available to invited testers",
     summary:
-      "YO Voice 1.0.0 (19) is available on both private mobile testing channels: Google Play Internal Testing for 15 Android testers, and TestFlight for 7 external plus 1 internal tester. The internal TestFlight installation is confirmed. This is a tester release, not a public App Store or Google Play release.",
+      "YO Voice 1.0.0 (19) is available on both private mobile testing channels: Google Play Internal Testing for our Android testers, and TestFlight for the external and internal tester groups. The internal TestFlight installation is confirmed. This is a tester release, not a public App Store or Google Play release.",
     highlights: [
       "Chats and identity: organised photo, video and voice-note views, camera or library capture, reliable avatar refresh and bounded media recovery",
       "Live connection: mixed-version-safe private audio and video call negotiation plus repair work for publishing and playing Voice Moments",
-      "Creation and trust: a Reels MVP for user-supplied photo, video, text, links and licensed or owned audio, with short-lived media access and fail-safe compatibility",
+      "Creation and trust: a first version of Yeels for user-supplied photo, video, text, links and licensed or owned audio, with short-lived media access and fail-safe compatibility",
     ],
     release: {
       version: "1.0.0 (19)",
@@ -218,7 +273,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Mobile",
     title: "Build 18 is available to invited testers",
     summary:
-      "YO Voice 1.0.0 build 18 is now available through both private mobile testing channels. Android is active in Google Play Internal Testing for the permanent 14-person tester list. On Apple, the build is Testing in the one-person internal group and the six-person YO Voice Beta Testers external group, with automatic TestFlight notifications enabled.",
+      "YO Voice 1.0.0 build 18 is now available through both private mobile testing channels. Android is active in Google Play Internal Testing for the permanent tester list. On Apple, the build is Testing in the internal group and the YO Voice Beta Testers external group, with automatic TestFlight notifications enabled.",
     highlights: [
       "A complete Dark and Pearl pass across primary journeys and shared controls",
       "The sculpted navigation dock, compact live-room capsule and safer room-session transitions",
@@ -312,7 +367,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "website-product-sync",
     updatedOn: "2026-08-31",
-    status: "live",
+    status: "superseded",
     eyebrow: "Website",
     title: "The website now speaks the same visual language as the app",
     summary:
@@ -340,7 +395,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "dark-pearl-visual-system",
     updatedOn: "2026-08-31",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Design system",
     title: "Dark and Pearl now share one premium visual language",
     summary:
@@ -354,7 +409,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "sculpted-navigation-live-room",
     updatedOn: "2026-08-31",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Navigation",
     title: "The YO dock now flows naturally into your live room",
     summary:
@@ -382,7 +437,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "responsive-authentication-stage",
     updatedOn: "2026-08-31",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Account access",
     title: "Login and Registration now share one responsive stage",
     summary:
@@ -424,7 +479,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "moments-circle-focus",
     updatedOn: "2026-08-31",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Home",
     title: "Moments from your circle stays focused on voices",
     summary:
@@ -450,13 +505,14 @@ export const productUpdates: readonly ProductUpdate[] = [
     ],
   },
   {
+    // Source commit a67036b.
     slug: "direct-chat-reliability-build-11",
     updatedOn: "2026-08-28",
     status: "superseded",
     eyebrow: "Chats",
     title: "Build 11 makes private conversations fast and dependable",
     summary:
-      "YO Voice 1.0.0 build 11, built from source commit a67036b, is available to both permanent TestFlight groups and Google Play Internal Testing with a hardened message, media, notification and direct-call path.",
+      "YO Voice 1.0.0 build 11 is available to both permanent TestFlight groups and Google Play Internal Testing with a hardened message, media, notification and direct-call path.",
     highlights: [
       "Text appears immediately and resumes safely after a lost response or brief network outage",
       "Private photo and voice-message uploads survive restart and retry without duplicate messages",
@@ -464,17 +520,18 @@ export const productUpdates: readonly ProductUpdate[] = [
     ],
   },
   {
+    // Source commit 5f61c71.
     slug: "mobile-build-8-testing",
     updatedOn: "2026-08-28",
     status: "superseded",
     eyebrow: "Mobile",
     title: "Build 8 is available to Android and iOS testers",
     summary:
-      "YO Voice 1.0.0 build 8, built from source commit 5f61c71, is available on Google Play Internal Testing and TestFlight. It replaces the iOS builds that stopped at export-compliance verification.",
+      "YO Voice 1.0.0 build 8 is available on Google Play Internal Testing and TestFlight. It replaces the iOS builds that stopped at export-compliance verification.",
     highlights: [
       "Android build 8 is published to the persistent internal-testing list",
       "iOS build 8 passed export compliance and is attached to persistent tester groups",
-      "Source commit: 5f61c71; existing testers update through Google Play or TestFlight",
+      "Existing testers update through Google Play or TestFlight",
     ],
   },
   {
@@ -606,7 +663,7 @@ export const productUpdates: readonly ProductUpdate[] = [
   {
     slug: "velvet-prism-sound",
     updatedOn: "2026-08-27",
-    status: "testing",
+    status: "superseded",
     eyebrow: "Sound",
     title: "Velvet Prism replaces the retro-style app sounds",
     summary:

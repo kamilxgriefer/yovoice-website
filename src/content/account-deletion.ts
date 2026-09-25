@@ -41,10 +41,11 @@ export const SELF_SERVICE_DELETION_LIVE: boolean = false;
 export const PRIVACY_MAILBOX = "privacy@yovoice.app";
 
 /**
- * The older address the app's Settings row still opens. It keeps reaching a
- * human, so it stays published until the app ships the new row; a Play
- * reviewer comparing the app, the policy and this page has to find every
- * address that works.
+ * The support address. The app's Settings "Contact support" row shows and
+ * opens it (settings_screen.dart in 3.0.0), and it reaches a human, so the
+ * site publishes it wherever it offers support; a Play reviewer comparing the
+ * app, the policy and this page has to find every address that works. The
+ * app's Delete account screen writes to PRIVACY_MAILBOX instead.
  */
 export const SUPPORT_MAILBOX = "support@yovoice.app";
 
@@ -87,8 +88,8 @@ export function accountDeletionRoutes(
       id: "web",
       title: "On this website",
       detail: live
-        ? `Sign in and open ${ACCOUNT_DELETION_PATH}. You confirm your password, the page tells you exactly what happens, and the deletion starts when you confirm. If you signed up with Google or with Apple you cannot sign in here — the website supports email and password only — so use the app or write to us.`
-        : `Sign in and open ${ACCOUNT_DELETION_PATH}. The page sets out what deleting your account removes and what we keep, and sends your request to us. It cannot delete the account on its own yet. If you signed up with Google or with Apple you cannot sign in here — the website supports email and password only.`,
+        ? `Sign in and open ${ACCOUNT_DELETION_PATH}. You confirm your password, the page tells you exactly what happens, and the deletion starts when you confirm. If your account signs in only with Google or Apple, it has no password to confirm with, so delete it in the YO Voice app or write to us.`
+        : `Sign in and open ${ACCOUNT_DELETION_PATH}. The page sets out what deleting your account removes and what we keep, and sends your request to us. It cannot delete the account on its own yet. If your account signs in only with Google or Apple, you can still sign in here and send the request by email.`,
       selfService: live,
     },
     {
@@ -223,7 +224,7 @@ export const DELETION_LIMITS: readonly string[] = [
   "Deleting your account does not delete a message someone else wrote, or a Server that somebody else owns.",
   "A comment or a reaction you left on somebody else's Voice Moment or Yeel stays under their post. Ask us in the same email and we remove those by hand.",
   "A file you uploaded into a Server that somebody else owns — a Family memory, or a file in a Company channel — stays with that Server. Ask us and we remove it by hand.",
-  "A cover image you set on a voice room, and a podcast episode published on a Server, stay where they are: neither is filed under your account, so the automatic deletion cannot find them. Ask us in the same email and we remove them by hand.",
+  "A cover image you set on a live voice session, and a podcast episode published on a Server, stay where they are: neither is filed under your account, so the automatic deletion cannot find them. Ask us in the same email and we remove them by hand.",
   "A call record in a chat — who was on the call, when it started and ended — stays in the other person's chat.",
 ];
 

@@ -16,7 +16,7 @@ import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
   title: "Achievements",
-  description: "How the YO Voice achievement system works, tier by tier.",
+  description: "How the YO Voice achievement system works, milestone by milestone.",
   path: "/achievements",
 });
 
@@ -24,10 +24,10 @@ const tracks = [
   { icon: MessageSquare, title: "Messages", description: "Sent in private Chats and compatible community spaces." },
   { icon: UserPlus, title: "Creator audience", description: "Follower milestones for eligible, opted-in Creator profiles." },
   { icon: Mic2, title: "Voice minutes", description: "Time spent speaking in live voice conversations." },
-  { icon: Radio, title: "Voice activity", description: "Compatible participation and hosting activity from existing data." },
-  { icon: Users, title: "Communities", description: "Community membership progress preserved as Servers arrive." },
+  { icon: Radio, title: "Servers", description: "Servers you've created." },
+  { icon: Users, title: "Communities", description: "Communities you've joined." },
   { icon: Heart, title: "Friends", description: "Friend connections you've made." },
-  { icon: Sparkles, title: "Reactions", description: "Reactions you've given and received." },
+  { icon: Sparkles, title: "Reactions", description: "Reactions your messages and Moments receive." },
   { icon: Crown, title: "Host minutes", description: "Time spent hosting live voice conversations." },
   { icon: CalendarDays, title: "Active days", description: "Days you've shown up on YO Voice." },
   { icon: Activity, title: "Moments", description: "Voice Moments you've recorded and shared." },
@@ -48,7 +48,7 @@ export default function AchievementsPage() {
       <PageHero
         eyebrow="Achievements"
         title="Every voice leaves a mark."
-        description="Ten tracks, each with ten tiers from Common to Mythic — a real record of how you've shown up on YO Voice."
+        description="Ten tracks, each with ten milestones rated from Common to Mythic — a real record of how you've shown up on YO Voice."
       />
 
       <section className="px-5 pb-8 sm:px-8">
@@ -83,8 +83,7 @@ export default function AchievementsPage() {
             <p className="section-copy">
               Each track has ten milestones, from your first step to a
               10,000-strong feat. Progress is tracked automatically as you
-              use YO Voice. Some counters retain earlier internal data names so
-              existing progress is not discarded during the Servers transition.
+              use YO Voice.
             </p>
           </div>
           <ul className="mt-10 grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">

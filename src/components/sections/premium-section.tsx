@@ -39,8 +39,8 @@ export function PremiumSection() {
             <p className="mt-3 max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
               Premium adds Creator Studio and a distinctive Premium identity
               across YO Voice. Public following also requires age
-              confirmation and explicit opt-in. After Servers launch, Free can
-              own 5 Servers and Premium can own 30; joining stays unlimited.
+              confirmation and explicit opt-in. Free can own 5 Servers and
+              Premium can own 30; joining stays unlimited.
             </p>
 
             <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">

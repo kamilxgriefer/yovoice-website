@@ -1,10 +1,6 @@
 import { FaqAccordion, type FaqGroup } from "@/components/marketing/faq-accordion";
 import { PageHero } from "@/components/marketing/page-hero";
-import {
-  currentRelease,
-  currentReleaseAvailability,
-  nextReleaseCandidateStatus,
-} from "@/content/current-release";
+import { currentRelease, currentReleaseAvailability } from "@/content/current-release";
 import { SELF_SERVICE_DELETION_LIVE } from "@/content/account-deletion";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
@@ -26,7 +22,7 @@ const groups: FaqGroup[] = [
       {
         question: "Which mobile build can testers use?",
         answer:
-          `YO Voice ${currentRelease.version} is the current tester build. ${currentReleaseAvailability} ${nextReleaseCandidateStatus} None of this is a public App Store or Google Play release, and desktop installers are not published yet.`,
+          `YO Voice ${currentRelease.version} is the current tester build. ${currentReleaseAvailability} It is not a public App Store or Google Play release, and desktop installers are not published yet.`,
       },
       {
         question: "Do I need to verify my email?",
@@ -61,7 +57,7 @@ const groups: FaqGroup[] = [
       {
         question: "What happened to Rooms and Clubs from older versions?",
         answer:
-          "The current app interface uses Servers, and the old marketing /clubs address redirects to /servers. Servers are built over the existing data so identities, memberships, moderation and media history stay compatible; no production data migration is implied by the website redesign.",
+          "Rooms and Clubs were replaced by Servers on 13 September 2026. Any signed-in account can create a Server or join one, with voice and text channels inside. The old /clubs address now opens /servers.",
       },
     ],
   },
@@ -91,7 +87,7 @@ const groups: FaqGroup[] = [
       {
         question: "Can I use GIFs yet?",
         answer:
-          "Yes, since Build 30. The composer offers 16 original YO Voice GIF animations that you can send in private Chats. They are a first-party catalogue; no third-party GIF provider is connected.",
+          "Yes. The composer offers 16 original YO Voice GIF animations that you can send in private Chats. They are a first-party catalogue; no third-party GIF provider is connected.",
       },
       {
         question: "Are private voice and video calls guaranteed to be smooth?",
@@ -107,7 +103,7 @@ const groups: FaqGroup[] = [
         question: "Can I delete my account?",
         answer: SELF_SERVICE_DELETION_LIVE
           ? "Yes, yourself. In the app open Settings, then Account, then Delete account; on this website sign in and open yovoice.app/account/delete. Both confirm your password first, and deletion is permanent. An account created with Google or Apple sign-in is deleted from the app or by writing to privacy@yovoice.app. yovoice.app/delete-account lists what is removed, the short list we keep and the reason for each entry."
-          : "Yes, by email — there is no self-service account deletion in the app yet. Email support@yovoice.app with the subject \"Delete my YO Voice account\" (the Delete account row in Settings opens that email for you), or write to privacy@yovoice.app. We may need to verify your identity. Deletion automatically removes your public profile, presence, public badges, member-directory entry and website-showcase consent; your private account record is kept and marked as deleted, and your messages, uploaded media and other content are removed by hand on your request. yovoice.app/delete-account and the Privacy Policy set out exactly what is deleted and what is retained.",
+          : "Yes, by email — there is no self-service account deletion in the app yet. Email privacy@yovoice.app with the subject \"Delete my YO Voice account\"; the Delete account screen in the app's Settings offers that email for you. support@yovoice.app also reaches a person. We may need to verify your identity. Deletion automatically removes your public profile, presence, public badges, member-directory entry and website-showcase consent; your private account record is kept and marked as deleted, and your messages, uploaded media and other content are removed by hand on your request. yovoice.app/delete-account and the Privacy Policy set out exactly what is deleted and what is retained.",
       },
       {
         question: "Do you sell my data?",

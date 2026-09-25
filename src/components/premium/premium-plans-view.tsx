@@ -402,9 +402,8 @@ function PremiumPlansContent() {
           Recurring subscriptions can be cancelled any time. Prepaid BLIK
           access ends automatically. Everything essential on YO Voice stays
           free — Chats, Friends, Voice Moments and the current web experience.
-          After launch, Free can own up to 5 Servers and Premium can own up to
-          30; everyone can join without a limit. These allowances remain
-          inactive while server backend activation is gated.
+          Free can own up to 5 Servers and Premium up to 30; everyone can join
+          without a limit. The server enforces these allowances.
         </p>
       </div>
     </div>

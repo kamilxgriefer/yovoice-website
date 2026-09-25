@@ -23,7 +23,7 @@ const highlights = [
     icon: House,
     title: "Your people lead Home",
     description:
-      "Friends stay at the top, recent private Chats stay close, and a clear server invitation replaces the old room-heavy starting point.",
+      "Home shows your friends' Moments, the channels that are live right now and your servers, in one calmer design in Dark and Pearl.",
   },
   {
     icon: MessageCircle,
@@ -89,8 +89,8 @@ export default function CommunityPage() {
           <h2 className="text-2xl font-bold text-[var(--foreground)]">See where every circle can begin</h2>
           <p className="max-w-xl text-base leading-[1.6] text-[var(--text-secondary)]">
             The Servers selector covers Friends, Community, Podcast, Family
-            and Company. The interface is in internal testing while
-            server-backed activation remains gated.
+            and Company, and every signed-in account can create or join one.
+            Podcast recording remains disabled.
           </p>
           <Link href="/servers" className="premium-button focus-ring mt-2">
             Explore Servers <ArrowRight className="size-4" aria-hidden="true" />
