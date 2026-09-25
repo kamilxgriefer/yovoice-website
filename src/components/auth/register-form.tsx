@@ -159,70 +159,58 @@ export function RegisterForm() {
         </p>
       ) : null}
 
+      {/* Visible labels above the fields; the placeholder is only an example
+          (see Input). */}
       <AuthFold enter={switched}>
-        <label htmlFor="register-name" className="sr-only">
-          Display name
-        </label>
         <Input
           id="register-name"
+          label="Display name"
           type="text"
           autoComplete="name"
           required
-          placeholder="Display name"
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
           icon={<User className="size-[18px]" />}
         />
       </AuthFold>
 
-      <div>
-        <label htmlFor="register-email" className="sr-only">
-          Email address
-        </label>
-        <Input
-          id="register-email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="Email address"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          icon={<Mail className="size-[18px]" />}
-        />
-      </div>
+      <Input
+        id="register-email"
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        required
+        placeholder="you@example.com"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        icon={<Mail className="size-[18px]" />}
+      />
 
-      <div>
-        <label htmlFor="register-password" className="sr-only">
-          Password
-        </label>
-        <Input
-          id="register-password"
-          type="password"
-          autoComplete="new-password"
-          required
-          placeholder="Password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          icon={<Lock className="size-[18px]" />}
-        />
-      </div>
+      <Input
+        id="register-password"
+        label="Password"
+        type="password"
+        autoComplete="new-password"
+        required
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
+        icon={<Lock className="size-[18px]" />}
+      />
 
       {switched ? <AuthFoldAway size="link" /> : null}
 
       <AuthFold enter={switched}>
-        <label htmlFor="register-confirm-password" className="sr-only">
-          Confirm password
-        </label>
         <Input
           id="register-confirm-password"
+          label="Confirm password"
           type="password"
           autoComplete="new-password"
           required
-          placeholder="Confirm password"
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
           icon={<Lock className="size-[18px]" />}
           state={confirmPassword && password !== confirmPassword ? "error" : "default"}
+          errorMessage="Passwords don't match yet."
         />
       </AuthFold>
 

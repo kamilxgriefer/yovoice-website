@@ -133,12 +133,10 @@ export function TotpChallengeForm({
           )}
 
           <div>
-            <label htmlFor="totp-code" className="sr-only">
-              {TOTP_CHALLENGE_A11Y.codeLabel}
-            </label>
             <Input
               inputRef={inputRef}
               id="totp-code"
+              label={TOTP_CHALLENGE_A11Y.codeLabel}
               type="text"
               inputMode={TOTP_CHALLENGE_A11Y.inputMode}
               autoComplete={TOTP_CHALLENGE_A11Y.autoComplete}

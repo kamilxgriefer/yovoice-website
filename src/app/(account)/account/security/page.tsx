@@ -63,33 +63,48 @@ function PasswordCard() {
             Password updated.
           </p>
         ) : null}
-        <input
-          type="password"
-          autoComplete="current-password"
-          placeholder="Current password"
-          required
-          value={currentPassword}
-          onChange={(event) => setCurrentPassword(event.target.value)}
-          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
-        />
-        <input
-          type="password"
-          autoComplete="new-password"
-          placeholder="New password"
-          required
-          value={newPassword}
-          onChange={(event) => setNewPassword(event.target.value)}
-          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
-        />
-        <input
-          type="password"
-          autoComplete="new-password"
-          placeholder="Confirm new password"
-          required
-          value={confirmPassword}
-          onChange={(event) => setConfirmPassword(event.target.value)}
-          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
-        />
+        <div>
+          <label htmlFor="password-current" className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+            Current password
+          </label>
+          <input
+            id="password-current"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
+          />
+        </div>
+        <div>
+          <label htmlFor="password-new" className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+            New password
+          </label>
+          <input
+            id="password-new"
+            type="password"
+            autoComplete="new-password"
+            required
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
+          />
+        </div>
+        <div>
+          <label htmlFor="password-confirm" className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+            Confirm new password
+          </label>
+          <input
+            id="password-confirm"
+            type="password"
+            autoComplete="new-password"
+            required
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
+          />
+        </div>
         <button type="submit" disabled={saving} className="premium-button disabled:opacity-60">
           {saving ? "Updating…" : "Update password"}
         </button>
@@ -138,24 +153,35 @@ function EmailCard() {
             Email updated. Check your inbox to verify it.
           </p>
         ) : null}
-        <input
-          type="password"
-          autoComplete="current-password"
-          placeholder="Current password"
-          required
-          value={currentPassword}
-          onChange={(event) => setCurrentPassword(event.target.value)}
-          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
-        />
-        <input
-          type="email"
-          autoComplete="email"
-          placeholder="New email address"
-          required
-          value={newEmail}
-          onChange={(event) => setNewEmail(event.target.value)}
-          className="min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
-        />
+        <div>
+          <label htmlFor="email-current-password" className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+            Current password
+          </label>
+          <input
+            id="email-current-password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
+          />
+        </div>
+        <div>
+          <label htmlFor="email-new" className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
+            New email address
+          </label>
+          <input
+            id="email-new"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            required
+            value={newEmail}
+            onChange={(event) => setNewEmail(event.target.value)}
+            className="mt-2 min-h-[52px] w-full rounded-[var(--radius-field)] border border-border-strong bg-[var(--surface)] px-4 py-3 text-white outline-none placeholder:text-text-tertiary focus:border-[var(--focus)] focus:shadow-[0_0_0_1px_var(--focus)]"
+          />
+        </div>
         <button type="submit" disabled={saving} className="premium-button disabled:opacity-60">
           {saving ? "Updating…" : "Update email"}
         </button>

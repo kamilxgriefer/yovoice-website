@@ -255,7 +255,7 @@ function NewPasswordForm({
           <PasswordField
             id="new-password"
             label="New password"
-            placeholder="New password"
+            describedBy="new-password-hint"
             value={password}
             onChange={setPassword}
             autoFocus
@@ -264,7 +264,7 @@ function NewPasswordForm({
             disabled={submitting}
           />
           <PasswordStrengthMeter password={password} />
-          <p className="mt-2 text-xs text-text-tertiary">
+          <p id="new-password-hint" className="mt-2 text-xs text-text-tertiary">
             At least {MIN_PASSWORD_LENGTH} characters. Longer passphrases with a
             mix of characters are stronger.
           </p>
@@ -273,7 +273,6 @@ function NewPasswordForm({
         <PasswordField
           id="confirm-new-password"
           label="Confirm new password"
-          placeholder="Confirm new password"
           value={confirm}
           onChange={setConfirm}
           invalid={mismatch}

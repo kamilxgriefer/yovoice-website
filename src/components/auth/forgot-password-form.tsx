@@ -118,21 +118,17 @@ export function ForgotPasswordForm() {
         </p>
       ) : null}
 
-      <div>
-        <label htmlFor="forgot-email" className="sr-only">
-          Email address
-        </label>
-        <Input
-          id="forgot-email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="Email address"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          icon={<Mail className="size-[18px]" />}
-        />
-      </div>
+      <Input
+        id="forgot-email"
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        required
+        placeholder="you@example.com"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        icon={<Mail className="size-[18px]" />}
+      />
 
       <Button type="submit" isLoading={submitting} className="w-full">
         {submitting ? "Sending…" : "Send reset link"}

@@ -102,3 +102,32 @@ test("the 'or with email' divider keeps whole words at 300 % text", async () => 
   assert.match(divider, /overflow-wrap: break-word;/);
   assert.match(rule(css, ".auth-divider::before,\n.auth-divider::after"), /min-width: min\(1rem, 16px\);/);
 });
+
+test("the switch stacks instead of breaking 'Create account' inside a word", async () => {
+  const [css, view] = await Promise.all([
+    read("src/app/globals.css"),
+    read("src/components/auth/auth-mode-switch.tsx"),
+  ]);
+  // The frame around the <nav> is the size container the query measures.
+  assert.match(view, /<div className="auth-switch-frame">\s*<nav aria-label="Log in or create an account" data-auth-switch/);
+  // lh, not em: Chrome resolves em / rem in a container query without the
+  // browser's minimum font size, which still enlarges the labels.
+  assert.match(css, /\.auth-switch-frame \{ container: auth-switch \/ inline-size; line-height: 1\.5; \}/);
+  // Below two "account"s and their padding, the halves become rows and the
+  // pill slides down; at default text (178 px) no phone column is that narrow.
+  const query = css.match(/@container auth-switch \(width < calc\(5lh \+ 58px\)\) \{([\s\S]*?)\n\}/);
+  assert.ok(query, "missing the stacked-switch container query");
+  assert.match(query[1], /\.auth-switch \{ grid-template-columns: minmax\(0, 1fr\); grid-auto-rows: 1fr; \}/);
+  assert.match(query[1], /\.auth-switch__pill \{ width: calc\(100% - 8px\); height: calc\(50% - 4px\); inset-block: 4px auto; \}/);
+  assert.match(query[1], /\.auth-switch\[data-mode="register"\] \.auth-switch__pill \{ transform: translateY\(100%\); \}/);
+  // A stacked option spans the track, so "account" keeps its whole width.
+  assert.match(query[1], /\.auth-switch__option \{ padding-inline: 0; \}/);
+});
+
+test("a folding field row includes its visible label", async () => {
+  const css = await read("src/app/globals.css");
+  // Label line (13 px x 1.5) + its 8 px gap + the 52 px field + the row gap:
+  // the rows below travel from exactly where they were.
+  assert.match(css, /\.auth-fold-away\[data-size="field"\] \{ --auth-fold-from: calc\(\.8125rem \* 1\.5 \+ \.5rem \+ 3\.25rem \+ 1rem\); \}/);
+  assert.match(rule(css, ".field-label"), /margin-bottom: \.5rem;/);
+});

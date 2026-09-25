@@ -144,38 +144,31 @@ export function LoginForm() {
 
       {switched ? <AuthFoldAway size="field" /> : null}
 
-      <div>
-        <label htmlFor="login-email" className="sr-only">
-          Email address
-        </label>
-        <Input
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          required
-          placeholder="Email address"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          icon={<Mail className="size-[18px]" />}
-        />
-      </div>
+      {/* Visible labels above the fields; the placeholder is only an example
+          (see Input). */}
+      <Input
+        id="login-email"
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        required
+        placeholder="you@example.com"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        icon={<Mail className="size-[18px]" />}
+      />
 
-      <div>
-        <label htmlFor="login-password" className="sr-only">
-          Password
-        </label>
-        <Input
-          inputRef={passwordRef}
-          id="login-password"
-          type="password"
-          autoComplete="current-password"
-          required
-          placeholder="Password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          icon={<Lock className="size-[18px]" />}
-        />
-      </div>
+      <Input
+        inputRef={passwordRef}
+        id="login-password"
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        required
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
+        icon={<Lock className="size-[18px]" />}
+      />
 
       {switched ? <AuthFoldAway size="field" /> : null}
 

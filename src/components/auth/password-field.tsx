@@ -35,6 +35,11 @@ export function passwordStrength(password: string): {
 /**
  * A password input in the site's glass style with a show/hide toggle.
  *
+ * Its `label` is visible above the field, as on every <Input>; the
+ * placeholder is optional. `describedBy` names hint text the page renders
+ * elsewhere (the password rules under the strength meter), read before the
+ * error message.
+ *
  * Not built on <Input> because that component reserves the trailing slot
  * for its state icons; a password field needs that space for the
  * visibility toggle, which must be a real focusable button with an
@@ -46,6 +51,7 @@ export function PasswordField({
   value,
   onChange,
   placeholder,
+  describedBy,
   autoComplete = "new-password",
   autoFocus = false,
   invalid = false,
@@ -56,7 +62,8 @@ export function PasswordField({
   label: string;
   value: string;
   onChange: (value: string) => void;
-  placeholder: string;
+  placeholder?: string;
+  describedBy?: string;
   autoComplete?: string;
   autoFocus?: boolean;
   invalid?: boolean;
@@ -65,10 +72,14 @@ export function PasswordField({
 }) {
   const [visible, setVisible] = useState(false);
   const errorId = useId();
+  const describedByIds =
+    [describedBy, invalid && errorMessage ? errorId : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
     <div>
-      <label htmlFor={id} className="sr-only">
+      <label htmlFor={id} className="field-label">
         {label}
       </label>
       {/* Same slotted structure as Input: leading lock slot, flexible
@@ -92,7 +103,7 @@ export function PasswordField({
           required
           minLength={MIN_PASSWORD_LENGTH}
           aria-invalid={invalid}
-          aria-describedby={invalid && errorMessage ? errorId : undefined}
+          aria-describedby={describedByIds}
           data-state={invalid ? "error" : undefined}
         />
         <button

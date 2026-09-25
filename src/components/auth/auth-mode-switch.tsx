@@ -33,24 +33,28 @@ function SwitchWithRedirect({ mode }: { mode: AuthMode }) {
 }
 
 function SwitchView({ mode, redirect }: { mode: AuthMode; redirect: string | null }) {
+  // The frame is the size container that stacks the two options when the
+  // column is too narrow for "Create account" in half of it (globals.css).
   return (
-    <nav aria-label="Log in or create an account" data-auth-switch data-mode={mode} className="auth-switch">
-      <span aria-hidden="true" className="auth-switch__pill" />
-      {OPTIONS.map((option) => {
-        const current = option.mode === mode;
-        return (
-          <Link
-            key={option.mode}
-            href={authModeHref(option.mode, redirect)}
-            aria-current={current ? "page" : undefined}
-            className="auth-switch__option"
-            scroll={false}
-            onNavigate={current ? undefined : markAuthModeSwitch}
-          >
-            {option.label}
-          </Link>
-        );
-      })}
-    </nav>
+    <div className="auth-switch-frame">
+      <nav aria-label="Log in or create an account" data-auth-switch data-mode={mode} className="auth-switch">
+        <span aria-hidden="true" className="auth-switch__pill" />
+        {OPTIONS.map((option) => {
+          const current = option.mode === mode;
+          return (
+            <Link
+              key={option.mode}
+              href={authModeHref(option.mode, redirect)}
+              aria-current={current ? "page" : undefined}
+              className="auth-switch__option"
+              scroll={false}
+              onNavigate={current ? undefined : markAuthModeSwitch}
+            >
+              {option.label}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

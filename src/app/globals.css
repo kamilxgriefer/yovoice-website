@@ -411,6 +411,20 @@ img { user-select: none; -webkit-user-drag: none; }
   -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
   transition: background-color 100000s ease-in-out 0s;
 }
+/* The visible name of a field, above it (Input, PasswordField). A placeholder
+   is only an optional example: at 200 % text on a phone it is cut off inside
+   the field, and it disappears on the first keystroke (WCAG 1.3.1, 2.4.6,
+   3.3.2). Small and calm: 13 px / 600 in --text-secondary, sentence case like
+   the "or with email" divider, never an all-caps eyebrow. A unitless line
+   height, so a raised minimum font size never overlaps a wrapped label. */
+.field-label {
+  display: block;
+  margin-bottom: .5rem;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
 .prose-legal ul { list-style: disc; padding-left: 1.25rem; }
 .prose-legal ol { list-style: decimal; padding-left: 1.25rem; }
 .prose-legal li { margin-top: .4rem; }
@@ -524,11 +538,12 @@ img { user-select: none; -webkit-user-drag: none; }
      both forms taller than the brand panel's 640 px minimum, the card's
      height follows the form, and a centred card would drift by half the
      difference while the rows unfold. The offset centres the taller form
-     (Create account, about 46.5rem at rest); if that estimate drifts, the
-     pair only sits a little off-centre, it never moves during a switch. */
+     (Create account with its field labels, about 53.25rem at rest); if that
+     estimate drifts, the pair only sits a little off-centre, it never moves
+     during a switch. */
   .auth-shell:has([data-auth-switch]) {
     align-items: flex-start;
-    padding-top: max(4rem, calc((100svh - 46.5rem) / 2));
+    padding-top: max(4rem, calc((100svh - 53.25rem) / 2));
   }
 }
 
@@ -549,6 +564,12 @@ img { user-select: none; -webkit-user-drag: none; }
   background: var(--surface-sunken);
 }
 @media (min-width: 1024px) { .auth-switch { margin-top: 0; } }
+/* The switch's own width decides its layout: a size container, so the query
+   below compares the column with the text size rather than with the screen.
+   It measures in `lh` (1.5 x the font size, pinned here) because Chrome
+   resolves `em` / `rem` in a container query without the browser's minimum
+   font size, which enlarges the labels all the same. */
+.auth-switch-frame { container: auth-switch / inline-size; line-height: 1.5; }
 .auth-switch__pill {
   position: absolute;
   inset-block: 4px;
@@ -581,6 +602,22 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 .auth-switch__option:hover,
 .auth-switch__option[aria-current="page"] { color: var(--foreground); }
+/* Too narrow for "account" in half the track (about 200 % text or page zoom
+   on a 320 px phone, 300 % on 390 px): the two options stack and the pill
+   slides down instead of across, so no word is ever broken inside
+   ("Create acc-ount"). Two halves need 2 x the word (about 3.7 em at the
+   option's .9375 em; 7.5 em = 5 lh) + their 12 px padding + the 4 px track
+   padding and 1 px border either side; at default text that is 178 px, below
+   every phone column, so the row layout never changes there. A stacked option spans the
+   whole track and its label is centred, so it needs no side padding: that
+   keeps "account" whole down to a 320 px phone at 300 % page zoom (a 75 px
+   column). */
+@container auth-switch (width < calc(5lh + 58px)) {
+  .auth-switch { grid-template-columns: minmax(0, 1fr); grid-auto-rows: 1fr; }
+  .auth-switch__pill { width: calc(100% - 8px); height: calc(50% - 4px); inset-block: 4px auto; }
+  .auth-switch[data-mode="register"] .auth-switch__pill { transform: translateY(100%); }
+  .auth-switch__option { padding-inline: 0; }
+}
 /* The second-factor step is not a mode: leaving it through the switch would
    drop the pending challenge, so only "Back to password" leads out. */
 .auth-pane:has([data-auth-challenge]) .auth-switch { display: none; }
@@ -661,10 +698,10 @@ img { user-select: none; -webkit-user-drag: none; }
   to { grid-template-rows: 1fr; opacity: 1; }
 }
 .auth-fold-away { margin-block: 0; animation: auth-fold-away .52s cubic-bezier(.2,.8,.2,1) both; }
-/* One input row (.glass-field min-height + the row gap) / the Forgot row
-   (its line box follows the body's 1.5 line height, not the 12 px link:
-   24 px + the row gap). */
-.auth-fold-away[data-size="field"] { --auth-fold-from: calc(3.25rem + 1rem); }
+/* One input row (the .field-label line + its gap + the .glass-field
+   min-height + the row gap) / the Forgot row (its line box follows the
+   body's 1.5 line height, not the 12 px link: 24 px + the row gap). */
+.auth-fold-away[data-size="field"] { --auth-fold-from: calc(.8125rem * 1.5 + .5rem + 3.25rem + 1rem); }
 .auth-fold-away[data-size="link"] { --auth-fold-from: 2.5rem; }
 @keyframes auth-fold-away {
   from { height: var(--auth-fold-from); }

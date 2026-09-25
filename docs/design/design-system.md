@@ -72,6 +72,13 @@ switch").
 - Fields use `.glass-field` (52 px, `--surface`, `--border-strong` hairline,
   `--radius-field`, 2 px `--focus` ring without glow). Labels and helper text
   use `--text-secondary` / `--text-tertiary`, not translucent white.
+- Every field has a visible label above it, tied with `htmlFor`: on the auth
+  forms `Input` / `PasswordField` draw `.field-label` (13 px / 600,
+  `--text-secondary`, sentence case); the account pages keep their small
+  uppercase label. A placeholder is only an optional example
+  (`you@example.com`), never the field's only name: at 200 % text on a phone
+  it is cut off inside the field. Hints and errors are linked with
+  `aria-describedby`.
 - Chips (`.chip`, `.chip-active`) and badges (`.badge-*`) sit on the surface
   with a hairline; the active chip is solid `--primary`, the live badge is
   `--live` / `--on-live`.
@@ -139,7 +146,10 @@ mail-action and recovery pages keep the accounts panel with its three rings.
   and the stage is not a named region); each page keeps its single `<h1>` and
   note as `sr-only` text from the same copy constants.
 - **Switch.** `Log in | Create account` is a `<nav>` of two links with
-  `aria-current="page"`, drawn as a segmented control whose pill slides. It
+  `aria-current="page"`, drawn as a segmented control whose pill slides.
+  When the column is too narrow for "account" in half of it (200-300 % text
+  or page zoom on a phone) the options stack and the pill slides down, so no
+  word breaks inside. It
   keeps `?redirect=` (`authModeHref`). In forced-colours mode the current
   option is drawn in `Highlight`. It is hidden during the second-factor step,
   whose only way out is "Back to password" ("Back" when the step follows
