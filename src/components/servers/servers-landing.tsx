@@ -47,19 +47,20 @@ export function ServersLanding() {
 
         <figure className={styles.productFrame}>
           <div className={styles.frameTop} aria-hidden="true">
-            <span /><span>Captured in Build 26</span><span>d1c036b7</span>
+            <span /><span>Captured in YO Voice 3.0.0</span><span>87a2f996</span>
           </div>
           <Image
-            src="/screenshots/build-26/servers-desktop.jpg"
-            alt="Build 26 capture of the YO Voice Servers screen, showing the real Hub and five choices: Friends, Community, Podcast, Family and Company."
+            src="/screenshots/build-35/create-server-desktop.webp"
+            alt="YO Voice 3.0.0 capture of the Create your server screen in English at desktop width, showing five choices: For friends, For a community, For a podcast, For family and For a company."
             width={1440}
-            height={634}
+            height={800}
             preload
             sizes="(max-width: 900px) 100vw, 58vw"
           />
           <figcaption>
-            Build 26 fixture-fed capture from source d1c036b7. Sample profile
-            and content; no live account or server connection.
+            YO Voice 3.0.0 capture from app commit 87a2f996, rendered in
+            English by the app&apos;s preview harness on sample data, with
+            no live account or server connection.
           </figcaption>
         </figure>
       </section>

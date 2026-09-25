@@ -99,14 +99,14 @@ test("the welcome homepage, the server route and the updates ledger each keep th
   assert.doesNotMatch(home, /<ServersLanding\s*\/>/);
   assert.doesNotMatch(home, /<StatsSection\s*\/>/);
   assert.doesNotMatch(landing, /<PublicShowcaseGrid\s*\/>/);
-  assert.match(landing, /screenshots\/build-26\/servers-desktop\.jpg/);
-  assert.match(landing, /Build 26 fixture-fed capture from source d1c036b7/i);
+  assert.match(landing, /screenshots\/build-35\/create-server-desktop\.webp/);
+  assert.match(landing, /YO Voice 3\.0\.0 capture from app commit 87a2f996/i);
   assert.doesNotMatch(landing, /unchanged in Build 27/i);
   assert.match(landing, /\bpreload\b/);
   assert.doesNotMatch(landing, /\bpriority\b/);
-  // The Build 26 capture may stay only while it is labelled as such; the
+  // The capture is labelled with the app version it was taken from; the
   // status link and the boundary copy follow the release ledger instead.
-  assert.match(landing, /Captured in Build 26/);
+  assert.match(landing, /Captured in YO Voice 3\.0\.0/);
   assert.match(landing, /mobile-build-\$\{currentRelease\.buildNumber\}-internal-testing/);
   assert.match(landing, /open to every signed-in account since 16 September 2026/i);
   assert.match(landing, /Podcast recording is the one piece still switched off/i);
