@@ -45,7 +45,7 @@ export default function AccountLayout({
         <div className="mx-auto max-w-6xl">
           <VerifyEmailBanner />
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[240px_1fr]">
+          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr]">
             <nav aria-label="Account navigation" className="flex flex-col gap-1">
               {NAV.map((item) => {
                 const { href, label, icon: Icon } = item;

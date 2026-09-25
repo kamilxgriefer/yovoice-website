@@ -32,12 +32,12 @@ export default function AuthLayout({
       id="main-content"
       className="auth-shell flex min-h-screen items-center justify-center px-4 py-10 sm:px-8 lg:py-16"
     >
-      <div className="grid w-full max-w-[400px] lg:max-w-[1040px] lg:grid-cols-[minmax(0,560px)_minmax(0,480px)] lg:overflow-hidden lg:rounded-[var(--radius-card)] lg:border lg:border-border">
+      <div className="grid w-full max-w-[400px] grid-cols-1 lg:max-w-[1040px] lg:grid-cols-[minmax(0,560px)_minmax(0,480px)] lg:overflow-hidden lg:rounded-[var(--radius-card)] lg:border lg:border-border">
         <AuthStage />
 
         <section className="auth-pane flex items-center lg:bg-[var(--surface)] lg:px-10 lg:py-12">
           <div className="mx-auto w-full max-w-[400px]">
-            <BrandLockup className="mx-auto w-fit lg:hidden" />
+            <BrandLockup className="mx-auto w-fit flex-wrap justify-center lg:hidden" />
             <AuthVoiceHeader />
             <AuthModeSwitch />
             {children}
