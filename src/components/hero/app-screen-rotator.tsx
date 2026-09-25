@@ -67,7 +67,7 @@ export const appScreens = [
  * matches `button`, so a child element keeps its utilities. Moving these onto
  * the button again reopens both defects.
  */
-const CONTROL_LABEL = "text-[11px] font-bold leading-none";
+const CONTROL_LABEL = "text-[0.6875rem] font-bold leading-none";
 
 const PHONE_WIDTH = 1206;
 const PHONE_HEIGHT = 2622;
@@ -97,12 +97,12 @@ export function AppScreenRotator() {
   return (
     <div
       className="relative mx-auto w-full max-w-[560px]"
-      onMouseEnter={() => setInteractionPaused(true)}
-      onMouseLeave={() => setInteractionPaused(false)}
-      onFocusCapture={() => setInteractionPaused(true)}
+      onMouseEnter={() => setInteractionPaused("hoverScreens", true)}
+      onMouseLeave={() => setInteractionPaused("hoverScreens", false)}
+      onFocusCapture={() => setInteractionPaused("focusScreens", true)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) {
-          setInteractionPaused(false);
+          setInteractionPaused("focusScreens", false);
         }
       }}
     >
@@ -196,7 +196,7 @@ export function AppScreenRotator() {
         </div>
       </div>
 
-      <p className="relative z-10 mt-3 min-h-10 text-center text-[12px] leading-5 text-white/50 lg:text-left">
+      <p className="relative z-10 mt-3 min-h-10 text-center text-[0.75rem] leading-5 text-white/50 lg:text-left">
         {active.caption}
       </p>
     </div>

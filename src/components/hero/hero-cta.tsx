@@ -56,6 +56,10 @@ export function HeroPrimaryCta({ href, children }: { href: string; children: Rea
       style={magnetic.style}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98, y: 0 }}
+      // whileTap makes framer-motion give a non-focusable element
+      // tabindex="0", which put an unnamed DIV stop before each link. The link
+      // inside is the control; the wrapper stays out of the Tab order.
+      tabIndex={-1}
       transition={spring}
       className="w-full sm:w-auto"
     >
@@ -79,6 +83,10 @@ export function HeroSecondaryCta({ href, children }: { href: string; children: R
       style={magnetic.style}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98, y: 0 }}
+      // whileTap makes framer-motion give a non-focusable element
+      // tabindex="0", which put an unnamed DIV stop before each link. The link
+      // inside is the control; the wrapper stays out of the Tab order.
+      tabIndex={-1}
       transition={spring}
       className="w-full sm:w-auto"
     >

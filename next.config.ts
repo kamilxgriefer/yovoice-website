@@ -85,7 +85,9 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
-        has: [{ type: "host", value: "www.yovoice.app" }],
+        // `has` values are anchored regular expressions, so the dots are
+        // escaped: an unescaped "." would also match hosts like wwwxyovoice.app.
+        has: [{ type: "host", value: "www\\.yovoice\\.app" }],
         destination: "https://yovoice.app/:path*",
         permanent: true,
       },

@@ -47,10 +47,10 @@ export function ServersLanding() {
 
         <figure className={styles.productFrame}>
           <div className={styles.frameTop} aria-hidden="true">
-            <span /><span>Captured in YO Voice 3.0.0</span><span>87a2f996</span>
+            <span /><span>Captured in YO Voice 3.0.0</span><span />
           </div>
           <Image
-            src="/screenshots/build-35/create-server-desktop.webp"
+            src="/screenshots/current/create-server-desktop-slim.webp"
             alt="YO Voice 3.0.0 capture of the Create your server screen in English at desktop width, showing five choices: For friends, For a community, For a podcast, For family and For a company."
             width={1440}
             height={800}
@@ -58,8 +58,7 @@ export function ServersLanding() {
             sizes="(max-width: 900px) 100vw, 58vw"
           />
           <figcaption>
-            YO Voice 3.0.0 capture from app commit 87a2f996, rendered in
-            English by the app&apos;s preview harness on sample data, with
+            Sample content in the YO Voice app, shown in English, with
             no live account or server connection.
           </figcaption>
         </figure>

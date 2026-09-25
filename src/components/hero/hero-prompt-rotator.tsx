@@ -41,8 +41,8 @@ export function HeroPromptRotator() {
 
       <div
         className="flex min-h-[96px] items-start sm:min-h-[76px] lg:min-h-[92px]"
-        onMouseEnter={() => setInteractionPaused(true)}
-        onMouseLeave={() => setInteractionPaused(false)}
+        onMouseEnter={() => setInteractionPaused("hoverPrompt", true)}
+        onMouseLeave={() => setInteractionPaused("hoverPrompt", false)}
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.p
@@ -52,7 +52,7 @@ export function HeroPromptRotator() {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={reduceMotion ? undefined : { opacity: 0, y: -7, filter: "blur(3px)" }}
             transition={{ duration: reduceMotion ? 0 : 0.38, ease: [0.22, 1, 0.36, 1] }}
-            className="text-pretty text-[15px] leading-[1.7] text-white/60 sm:text-[17px] sm:leading-7"
+            className="text-pretty text-[0.9375rem] leading-[1.7] text-white/60 sm:text-[1.0625rem] sm:leading-7"
           >
             {heroPrompts[promptIndex].text}
           </motion.p>
@@ -63,12 +63,12 @@ export function HeroPromptRotator() {
         className="mt-1 flex flex-wrap items-center justify-center gap-1.5 lg:justify-start"
         role="group"
         aria-label="Choose a welcome message"
-        onMouseEnter={() => setInteractionPaused(true)}
-        onMouseLeave={() => setInteractionPaused(false)}
-        onFocusCapture={() => setInteractionPaused(true)}
+        onMouseEnter={() => setInteractionPaused("hoverPromptControls", true)}
+        onMouseLeave={() => setInteractionPaused("hoverPromptControls", false)}
+        onFocusCapture={() => setInteractionPaused("focusPromptControls", true)}
         onBlurCapture={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) {
-            setInteractionPaused(false);
+            setInteractionPaused("focusPromptControls", false);
           }
         }}
       >
@@ -88,7 +88,7 @@ export function HeroPromptRotator() {
             )}
             {/* On a span: the unlayered `button { font: inherit }` reset in
                 globals.css would discard type utilities on the button. */}
-            <span className="text-[11px] font-bold leading-none">{paused ? "Play" : "Pause"}</span>
+            <span className="text-[0.6875rem] font-bold leading-none">{paused ? "Play" : "Pause"}</span>
           </button>
         )}
 
@@ -102,7 +102,7 @@ export function HeroPromptRotator() {
             <ChevronLeft className="size-3.5" aria-hidden="true" />
           </button>
           <span
-            className="min-w-12 text-center text-[11px] font-bold tabular-nums tracking-[.12em] text-white/55"
+            className="min-w-12 text-center text-[0.6875rem] font-bold tabular-nums tracking-[.12em] text-white/55"
             aria-hidden="true"
           >
             {String(promptIndex + 1).padStart(2, "0")} / {String(heroPrompts.length).padStart(2, "0")}

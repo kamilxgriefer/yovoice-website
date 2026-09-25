@@ -15,9 +15,10 @@ const systems = [
   { name: "Email delivery", description: "Verification and password-reset email", monitored: false },
 ] as const;
 
-// The viewer's own clock, so the zone shown is the viewer's zone.
+// The viewer's own clock and zone (no timeZone option), written in English
+// like the rest of the page rather than in the browser's language.
 function checkTime(): string {
-  return new Date().toLocaleString(undefined, {
+  return new Date().toLocaleString("en-GB", {
     dateStyle: "medium",
     timeStyle: "long",
   });

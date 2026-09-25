@@ -182,8 +182,11 @@ test("the Servers hero shows the English 3.0.0 server picker, labelled with its 
 
   // The site is English, so its Servers frame is the English capture; the
   // Polish Build 26 frame was removed from disk on 2026-09-25.
-  await access("public/screenshots/build-35/create-server-desktop.webp");
-  assert.match(landing, /screenshots\/build-35\/create-server-desktop\.webp/);
+  // Published under a neutral path: build 35 was never uploaded to a store,
+  // so neither the path nor the caption may name it or its commit.
+  await access("public/screenshots/current/create-server-desktop-slim.webp");
+  assert.match(landing, /screenshots\/current\/create-server-desktop-slim\.webp/);
+  assert.doesNotMatch(landing, /build-35|\(35\)|87a2f996/);
   assert.doesNotMatch(landing, /screenshots\/build-26\/servers-desktop\.jpg/);
   assert.match(landing, /width=\{1440\}\s+height=\{800\}/);
   assert.match(
@@ -193,8 +196,8 @@ test("the Servers hero shows the English 3.0.0 server picker, labelled with its 
   // "Hub" is an internal component name; visitors get the 3.0.0 wording.
   assert.doesNotMatch(landing, /\bHub\b|Rooms destination/);
   assert.match(landing, /server rail beside the channels/);
-  assert.match(landing, /YO Voice 3\.0\.0 capture from app commit 87a2f996/i);
-  assert.match(landing, /English by the app&apos;s preview harness on sample data/i);
+  assert.match(landing, /Sample content in the YO Voice app, shown in English/);
+  assert.doesNotMatch(landing, /preview harness|fixture-fed/i);
   assert.match(landing, /Captured in YO Voice 3\.0\.0/);
   assert.doesNotMatch(landing, /unchanged in Build 27|reused for Build 27/i);
   assert.match(landing, /no live account or server\s+connection/i);

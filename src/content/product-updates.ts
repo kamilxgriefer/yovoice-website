@@ -109,7 +109,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Build 32 · Internal testing",
     title: "Build 32 adds a Delete account screen and opens invites on public Servers",
     summary:
-      "YO Voice 2.0.0 (32) reached our existing testers on 19 September 2026: Google Play Internal Testing, both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 32. This was an internal tester release, not a public App Store or Google Play release. Build 33 has since superseded it as the newest build on every tester channel.",
+      "YO Voice 2.0.0 (32) reached our existing testers on 19 September 2026: Google Play Internal Testing, both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 32. This was an internal tester release, not a public App Store or Google Play release. Build 33 has since superseded it.",
     highlights: [
       "Settings has a Delete account screen; the server-side processing switches on later, and until then the screen offers the e-mail route",
       "Members of public Servers can invite friends, while private Servers keep invites to admins and moderators",
@@ -129,7 +129,7 @@ export const productUpdates: readonly ProductUpdate[] = [
     eyebrow: "Build 31 · Internal testing",
     title: "Build 31 keeps chats moving when the network does not",
     summary:
-      "YO Voice 2.0.0 (31) is available to our existing testers: on Google Play Internal Testing (published 18 September 2026), in both TestFlight groups — internal and YO Voice Beta Testers — and in the web app at app.yovoice.app, which serves build 31. This is an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled.",
+      "YO Voice 2.0.0 (31) reached our existing testers on 18 September 2026: Google Play Internal Testing, both TestFlight groups — internal and YO Voice Beta Testers — and the web app at app.yovoice.app, which served build 31. This was an internal tester release, not a public App Store or Google Play release. Servers stay open to every signed-in account and Podcast recording remains disabled. Build 32 has since superseded it.",
     highlights: [
       "Chats: messages typed while offline are kept and sent once you are back online instead of running out of retries; Edit is offered only on text messages; the mute state shown is read from the conversation; opening a new chat retries safely instead of sending duplicate requests",
       "Yeels and Voice Moments: a failed publish no longer locks the draft, the publish button shows Preparing, Publishing and Finishing, web-recorder videos are no longer refused outright, and the Voice Moments feed tells a loading failure apart from an empty feed",

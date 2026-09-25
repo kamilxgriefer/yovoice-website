@@ -259,20 +259,32 @@ test("WCAG 2.2.2: the rotation stops for reduced motion, hover, focus and a visi
   assert.match(tour, /if \(autoRotationPaused\) return;/);
   assert.match(tour, /\}, \[autoRotationPaused\]\);/);
 
-  // Pause on hover, and on keyboard focus entering the control group.
-  assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\(true\)\}/);
-  assert.match(rotator, /onMouseLeave=\{\(\) => setInteractionPaused\(false\)\}/);
-  assert.match(rotator, /onFocusCapture=\{\(\) => setInteractionPaused\(true\)\}/);
+  // Pause on hover, and on keyboard focus entering the control group. Each
+  // zone holds its own reason, so the pointer leaving the sentence cannot
+  // release a pause that keyboard focus on the controls still holds.
+  assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\("hoverPrompt", true\)\}/);
+  assert.match(rotator, /onMouseLeave=\{\(\) => setInteractionPaused\("hoverPrompt", false\)\}/);
+  assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\("hoverPromptControls", true\)\}/);
+  assert.match(rotator, /onMouseLeave=\{\(\) => setInteractionPaused\("hoverPromptControls", false\)\}/);
+  assert.match(rotator, /onFocusCapture=\{\(\) => setInteractionPaused\("focusPromptControls", true\)\}/);
   assert.match(rotator, /onBlurCapture=/);
   // Focus must only be released when it leaves the group entirely, otherwise
   // tabbing between the controls would restart the rotation under the user.
   assert.match(
     rotator,
-    /if \(!event\.currentTarget\.contains\(event\.relatedTarget\)\) \{\s*setInteractionPaused\(false\);/,
+    /if \(!event\.currentTarget\.contains\(event\.relatedTarget\)\) \{\s*setInteractionPaused\("focusPromptControls", false\);/,
   );
+  // The tour pauses while any reason is held, never on one shared flag.
+  assert.match(tour, /const \[pauseReasons, setPauseReasons\] = useState<ReadonlySet<PauseReason>>/);
+  assert.match(tour, /const interactionPaused = pauseReasons\.size > 0;/);
+  assert.doesNotMatch(tour, /const \[interactionPaused, setInteractionPaused\] = useState/);
+  assert.doesNotMatch(rotator, /setInteractionPaused\((?:true|false)\)/);
 
-  // A visible, labelled pause/resume control that stops the rotation for good.
-  assert.match(tour, /togglePaused: \(\) => setPaused\(\(current\) => !current\)/);
+  // A visible, labelled pause/resume control that stops the rotation for
+  // good, and whose Play resumes it at once: it releases every hover and
+  // focus hold, including focus on the button itself.
+  assert.match(tour, /togglePaused: \(\) => \{\s*const next = !paused;\s*setPaused\(next\);/);
+  assert.match(tour, /if \(!next\) setPauseReasons\(new Set\(\)\);/);
   assert.match(rotator, /onClick=\{togglePaused\}/);
   assert.match(rotator, /aria-label=\{paused \? "Play the welcome tour" : "Pause the welcome tour"\}/);
   assert.match(rotator, /\{paused \? "Play" : "Pause"\}/);
@@ -428,13 +440,14 @@ test("WCAG 2.2.2: the device frames stop for reduced motion, hover, focus and by
 
   // Hover and keyboard focus pause the whole tour, and focus is only
   // released when it leaves the frames entirely.
-  assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\(true\)\}/);
-  assert.match(rotator, /onMouseLeave=\{\(\) => setInteractionPaused\(false\)\}/);
-  assert.match(rotator, /onFocusCapture=\{\(\) => setInteractionPaused\(true\)\}/);
+  assert.match(rotator, /onMouseEnter=\{\(\) => setInteractionPaused\("hoverScreens", true\)\}/);
+  assert.match(rotator, /onMouseLeave=\{\(\) => setInteractionPaused\("hoverScreens", false\)\}/);
+  assert.match(rotator, /onFocusCapture=\{\(\) => setInteractionPaused\("focusScreens", true\)\}/);
   assert.match(
     rotator,
-    /if \(!event\.currentTarget\.contains\(event\.relatedTarget\)\) \{\s*setInteractionPaused\(false\);/,
+    /if \(!event\.currentTarget\.contains\(event\.relatedTarget\)\) \{\s*setInteractionPaused\("focusScreens", false\);/,
   );
+  assert.doesNotMatch(rotator, /setInteractionPaused\((?:true|false)\)/);
 
   // Choosing a tab by hand is a deliberate stop, not a pause that resumes.
   assert.match(rotator, /onClick=\{\(\) => selectScreen\(screen\.id\)\}/);
@@ -470,11 +483,17 @@ test("the hero controls keep their own type size through the button reset", asyn
   // 11px/700 — enough to push it onto two rows on a phone and to strip the
   // weight that marks the selected tab. The labels therefore sit on a child
   // element, which the reset does not match.
-  assert.match(rotator, /const CONTROL_LABEL = "text-\[11px\] font-bold[^"]*";/);
+  // Sizes are in rem so the labels follow a visitor's larger default font
+  // size, as the headline beside them does (0.6875rem is 11px at 16px).
+  assert.match(rotator, /const CONTROL_LABEL = "text-\[0\.6875rem\] font-bold[^"]*";/);
   assert.match(rotator, /<span className=\{CONTROL_LABEL\}>\{screen\.label\}<\/span>/);
   // The tour's one Pause lives in the welcome row; its label is on a span too.
   const prompts = await readFile(ROTATOR, "utf8");
-  assert.match(prompts, /<span className="text-\[11px\] font-bold leading-none">\{paused \? "Play" : "Pause"\}<\/span>/);
+  assert.match(prompts, /<span className="text-\[0\.6875rem\] font-bold leading-none">\{paused \? "Play" : "Pause"\}<\/span>/);
+  // No hero-tour text is fixed in px, where it would ignore that setting.
+  for (const source of [rotator, prompts]) {
+    assert.doesNotMatch(withoutComments(source), /\btext-\[\d+px\]/);
+  }
 
   // And no type utility is left on the buttons themselves, where it would be
   // silently discarded and read as if it were doing something.
@@ -486,5 +505,18 @@ test("the hero controls keep their own type size through the button reset", asyn
   for (const cls of buttonClasses) {
     assert.doesNotMatch(cls, /text-\[\d+px\]/);
     assert.doesNotMatch(cls, /font-(?:bold|semibold|black|medium)/);
+  }
+});
+
+test("the hero CTAs are one Tab stop each, not an unnamed wrapper and a link", async () => {
+  const cta = await readFile("src/components/hero/hero-cta.tsx", "utf8");
+  // framer-motion gives a non-focusable element with whileTap tabindex="0"
+  // unless it already has one, so every whileTap wrapper opts out of the
+  // Tab order and the Link inside stays the only stop.
+  const wrappers = cta.match(/<motion\.div[\s\S]*?>/g) ?? [];
+  assert.equal(wrappers.length, 2);
+  for (const wrapper of wrappers) {
+    assert.match(wrapper, /whileTap=/);
+    assert.match(wrapper, /tabIndex=\{-1\}/);
   }
 });

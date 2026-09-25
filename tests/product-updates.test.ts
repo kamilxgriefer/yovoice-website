@@ -357,7 +357,8 @@ describe("product update ledger", () => {
     assert.match(release.summary, /both TestFlight groups/i);
     assert.match(release.summary, /app\.yovoice\.app, which served build 32/i);
     assert.match(release.summary, /not a public App Store or Google Play release/i);
-    assert.match(release.summary, /Build 33 has since superseded it/i);
+    assert.match(release.summary, /Build 33 has since superseded it\./i);
+    assert.doesNotMatch(release.summary, /newest build on every tester channel/i);
 
     const scope = release.highlights.join(" ");
     for (const capability of [
@@ -407,9 +408,13 @@ describe("product update ledger", () => {
     // Evidence: yovoice-evidence/2026-09-18/build31-play/play-readback.md,
     // build31-asc-*.json and build31-2026-09-18.md §Web.
     assert.match(release.summary, /Google Play Internal Testing/i);
-    assert.match(release.summary, /published 18 September 2026/i);
+    // Past tense, like Builds 32 and 33: the web app has served 3.0.0 (34)
+    // since 19 September, so no superseded entry may say what it "serves".
+    assert.match(release.summary, /reached our existing testers on 18 September 2026/i);
     assert.match(release.summary, /both TestFlight groups/i);
-    assert.match(release.summary, /web app at app\.yovoice\.app/i);
+    assert.match(release.summary, /web app at app\.yovoice\.app, which served build 31/i);
+    assert.doesNotMatch(release.summary, /which serves build 31|\bis available\b/i);
+    assert.match(release.summary, /Build 32 has since superseded it/i);
     assert.match(release.summary, /internal tester release/i);
     assert.match(release.summary, /not a public App Store or Google Play release/i);
     assert.match(release.summary, /Podcast recording remains disabled/i);

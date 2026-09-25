@@ -89,6 +89,7 @@ serving the old transform.
 | `home-wide-slim.webp` | /updates | Home, desktop layout | 83.2 KB | 2160 x 1350 |
 | `chats-wide-slim.webp` | /updates | Chats, desktop layout | 60.7 KB | 2160 x 1350 |
 | `friends-wide-slim.webp` | /updates | Friends, desktop layout | 54.4 KB | 2160 x 1350 |
+| `create-server-desktop-slim.webp` | /servers | Create your server (type picker) | 45.2 KB | 1440 x 800 |
 
 ```
 077e1c216a930b642b3225b1d0ad1f4359fb1db59b77116e11673a4fe3eb556d  chats-phone-slim.webp
@@ -156,41 +157,47 @@ real person's name or data.
   it keeps one fixed large-screen view (Home), pinned by
   `tests/homepage-welcome.test.ts` (`desktopRefs` equals `["home"]`).
 
-## Servers page hero — `public/screenshots/build-35/create-server-desktop.webp`
+## Servers page hero — `public/screenshots/current/create-server-desktop-slim.webp`
 
 The `/servers` hero used the Polish Build 26 frame
 `build-26/servers-desktop.jpg` on an English site. It was replaced
 (2026-09-25) by an English capture of the same surface — the server-type
-picker, "Create your server." with all five kinds — from the released app.
+picker, "Create your server." with all five kinds — as testers have it in
+YO Voice 3.0.0 (34).
 
-- **App repository** `yovoice` at `87a2f9968bcbd481502ca6dc384b267d11f65281`
-  (`pubspec.yaml` `version: 3.0.0+35`), from a scratch copy of that tree; the
-  app worktree was never modified.
-- **Harness** `lib/dev/redesign_preview.dart`, **unmodified**, built with
+- **App source** `yovoice` at `f71a2ae2`, the commit every 3.0.0 (34) store
+  and web build was made from — the same English scratch harness build as
+  the frames above (its `version.json` reads 3.0.0 / 34). The app worktree
+  was never modified.
+- **Harness** `lib/dev/redesign_preview.dart`, built with
   `flutter build web --debug -t lib/dev/redesign_preview.dart`
   `--dart-define=YO_PREVIEW_LOCALE=en --dart-define=YO_PREVIEW_THEME=dark`
-  `--dart-define=YO_PREVIEW_TAB=servers --dart-define=YO_PREVIEW_STATE=populated`
-  (Flutter 3.44.6). Release and profile builds render a grey error screen:
-  the harness's mock plugin platforms refuse to run without assertions.
+  `--dart-define=YO_PREVIEW_STATE=populated` (Flutter 3.44.6), opened with
+  `?tab=servers`. Release and profile builds render a grey error screen: the
+  harness's mock plugin platforms refuse to run without assertions.
 - **Capture** headless Chromium (Playwright) at a 1440 x 800 CSS-px viewport,
   device scale factor 1, dark colour scheme. The harness opened on Servers,
   and its own **Create server** button was clicked, which pushes the
   production `CreateServerScreen` exactly as `MainShell` does. Every request
   that was not to the local server was aborted (Firebase JS SDK, Google
   sign-in client, font CDN); CanvasKit was answered from the build's own
-  `canvaskit/` folder. No account, no network.
-- **The Polish-fixture trap did not apply.** The picker draws only localized
-  UI strings (`server_localized_copy.dart`), no fixture names, so no fixture
-  translation was needed. In 3.0.0 the picker is a full-window route (back
-  arrow and "YO Voice" app bar) at every width, so the desktop sidebar is
-  not in the frame — unlike the Build 26 frame, which showed it.
-- Encoded with `cwebp -q 82 -m 6`: 1440 x 800, 45.2 KB. Published under a new
-  path so the image optimizer's href-keyed cache cannot serve the old frame.
-  `build-26/servers-desktop.jpg` was deleted on 2026-09-25 with the rest of
-  the Build 26 folder.
+  `canvaskit/` folder. No account, no network. Script and raw PNG:
+  `yovoice-evidence/2026-09-25/website-fix/review-round/create-server/`.
+- **The Polish-fixture trap does not apply.** The picker draws only localized
+  UI strings (`server_localized_copy.dart`), no fixture names. In 3.0.0 the
+  picker is a full-window route (back arrow and "YO Voice" app bar) at every
+  width, so the desktop sidebar is not in the frame.
+- An earlier capture of this surface was taken from a later tree whose
+  `lib/` differs from `f71a2ae2` only in four sound and push-notification
+  files. The recapture from `f71a2ae2` encodes to the identical file (same
+  SHA-256 below), which confirms that nothing visible differs.
+- Encoded with `cwebp -q 82 -m 6`: 1440 x 800, 45.2 KB, under a new
+  `-slim` path so the image optimizer's href-keyed cache cannot serve an
+  older transform. `build-26/servers-desktop.jpg` was deleted on 2026-09-25
+  with the rest of the Build 26 folder.
 
 ```
-8731f4d3a8f1e7275fa8d9e0be35fd5c793d742838571233e6cf1fa1c0738c4e  create-server-desktop.webp
+8731f4d3a8f1e7275fa8d9e0be35fd5c793d742838571233e6cf1fa1c0738c4e  create-server-desktop-slim.webp
 ```
 
 Checked by opening it: the back arrow and "YO Voice", "YOUR SPACE STARTS

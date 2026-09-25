@@ -99,8 +99,8 @@ test("the welcome homepage, the server route and the updates ledger each keep th
   assert.doesNotMatch(home, /<ServersLanding\s*\/>/);
   assert.doesNotMatch(home, /<StatsSection\s*\/>/);
   assert.doesNotMatch(landing, /<PublicShowcaseGrid\s*\/>/);
-  assert.match(landing, /screenshots\/build-35\/create-server-desktop\.webp/);
-  assert.match(landing, /YO Voice 3\.0\.0 capture from app commit 87a2f996/i);
+  assert.match(landing, /screenshots\/current\/create-server-desktop-slim\.webp/);
+  assert.doesNotMatch(landing, /build-35|\(35\)|87a2f996/);
   assert.doesNotMatch(landing, /unchanged in Build 27/i);
   assert.match(landing, /\bpreload\b/);
   assert.doesNotMatch(landing, /\bpriority\b/);

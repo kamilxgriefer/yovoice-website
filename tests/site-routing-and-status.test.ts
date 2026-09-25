@@ -8,9 +8,16 @@ test("www.yovoice.app redirects permanently to the apex, keeping the path", asyn
   assert.equal(typeof nextConfig.redirects, "function");
   const redirects = await nextConfig.redirects!();
   const www = redirects.find((entry) =>
-    entry.has?.some((item) => item.type === "host" && item.value === "www.yovoice.app"),
+    entry.has?.some((item) => item.type === "host" && item.value === "www\\.yovoice\\.app"),
   );
   assert.ok(www, "missing the www host redirect");
+  // Next.js reads the host value as an anchored regular expression: it must
+  // match www.yovoice.app and nothing that merely resembles it.
+  const host = new RegExp(`^${www.has!.find((item) => item.type === "host")!.value}$`, "i");
+  assert.ok(host.test("www.yovoice.app"));
+  for (const other of ["wwwxyovoice.app", "www.yovoiceXapp", "yovoice.app", "app.yovoice.app"]) {
+    assert.ok(!host.test(other), `${other} must not be redirected`);
+  }
   assert.equal(www.source, "/:path*");
   assert.equal(www.destination, "https://yovoice.app/:path*");
   assert.equal("permanent" in www && www.permanent, true);
@@ -49,6 +56,8 @@ test("/status marks only the checked row as live and dates the check", async () 
   const source = await readFile("src/components/marketing/live-status.tsx", "utf8");
   assert.doesNotMatch(source, /: "ok";/, "no row is hard-coded as operational");
   assert.match(source, /Not monitored here/);
+  assert.match(source, /toLocaleString\("en-GB", \{/);
+  assert.doesNotMatch(source, /timeZone:/);
   assert.match(source, /dateStyle: "medium"/);
   assert.match(source, /timeStyle: "long"/);
   for (const link of [

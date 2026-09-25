@@ -25,6 +25,12 @@ import { useReducedMotion } from "framer-motion";
  * pauses the tour, the single visible Pause control stops it for good,
  * choosing a screen by hand stops it too, and `prefers-reduced-motion` means
  * it never starts.
+ *
+ * Each hover and focus zone holds its own pause reason, and the tour waits
+ * while any reason is held. One shared flag would let the pointer leaving
+ * one zone restart the tour while keyboard focus still sits in the other.
+ * Play is the authority: it releases every hover and focus reason, so the
+ * tour moves as soon as someone presses it, even with focus on the control.
  */
 // A hydration flag that never changes: the server snapshot is false and the client snapshot is true.
 const subscribeToNothing = () => () => {};
@@ -80,13 +86,21 @@ export const heroPrompts = [
 
 const ROTATION_INTERVAL_MS = 6200;
 
+/** Where a hover or focus pause comes from: each zone keeps its own. */
+export type PauseReason =
+  | "hoverPrompt"
+  | "hoverPromptControls"
+  | "focusPromptControls"
+  | "hoverScreens"
+  | "focusScreens";
+
 type HeroTour = {
   promptIndex: number;
   screenId: AppScreenId;
   paused: boolean;
   reduceMotion: boolean;
   togglePaused: () => void;
-  setInteractionPaused: (value: boolean) => void;
+  setInteractionPaused: (reason: PauseReason, value: boolean) => void;
   showPreviousPrompt: () => void;
   showNextPrompt: () => void;
   selectScreen: (id: AppScreenId) => void;
@@ -102,7 +116,8 @@ export function HeroTourProvider({ children }: { children: ReactNode }) {
   const reduceMotion = hydrated && prefersReducedMotion === true;
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [interactionPaused, setInteractionPaused] = useState(false);
+  const [pauseReasons, setPauseReasons] = useState<ReadonlySet<PauseReason>>(() => new Set());
+  const interactionPaused = pauseReasons.size > 0;
 
   const autoRotationPaused =
     paused || interactionPaused || reduceMotion === true;
@@ -122,8 +137,21 @@ export function HeroTourProvider({ children }: { children: ReactNode }) {
     screenId: heroPrompts[activeIndex].screen,
     paused,
     reduceMotion,
-    togglePaused: () => setPaused((current) => !current),
-    setInteractionPaused,
+    togglePaused: () => {
+      const next = !paused;
+      setPaused(next);
+      // Play means play now: drop the hover and focus holds, including the
+      // focus on this very button, so the tour resumes at once.
+      if (!next) setPauseReasons(new Set());
+    },
+    setInteractionPaused: (reason, value) =>
+      setPauseReasons((current) => {
+        if (current.has(reason) === value) return current;
+        const next = new Set(current);
+        if (value) next.add(reason);
+        else next.delete(reason);
+        return next;
+      }),
     showPreviousPrompt: () =>
       setActiveIndex((current) => (current === 0 ? heroPrompts.length - 1 : current - 1)),
     showNextPrompt: () => setActiveIndex((current) => (current + 1) % heroPrompts.length),
