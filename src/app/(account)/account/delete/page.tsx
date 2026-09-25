@@ -304,7 +304,7 @@ function DeleteAccountForm() {
   return (
     <section
       aria-labelledby="deletion-confirm-heading"
-      className="panel p-5 sm:p-8"
+      className="panel p-5 [overflow-wrap:anywhere] sm:p-8"
     >
       <h2 id="deletion-confirm-heading" className="text-lg font-bold text-white">
         Confirm it is you
@@ -372,7 +372,7 @@ function DeleteAccountForm() {
           type="submit"
           disabled={submitting}
           aria-busy={submitting}
-          className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] px-6 text-[15px] font-semibold text-error transition hover:bg-[color-mix(in_srgb,var(--danger-surface)_78%,var(--error))] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-field)] border border-[color-mix(in_srgb,var(--error)_38%,transparent)] bg-[var(--danger-surface)] px-[min(1.5rem,24px)] text-[15px] font-semibold text-error transition hover:bg-[color-mix(in_srgb,var(--danger-surface)_78%,var(--error))] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {submitting ? "Deleting your account…" : "Delete my account permanently"}
         </button>

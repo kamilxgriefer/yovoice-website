@@ -99,6 +99,13 @@ img { user-select: none; -webkit-user-drag: none; }
   background: #fff;
   color: #211629;
 }
+/* It sits at left-4; at 200-400 % text its one line runs past the right
+   edge. Wrap it only while it is shown: a wrapped, taller link would peek
+   out below its -6rem hiding offset. */
+.skip-link:focus {
+  max-width: calc(100% - 2rem);
+  overflow-wrap: anywhere;
+}
 ::selection { background: rgba(192,38,255,.4); color: white; }
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--background); }
@@ -356,7 +363,11 @@ img { user-select: none; -webkit-user-drag: none; }
   box-shadow: 0 0 0 1px var(--focus);
 }
 
-/* Fixed, predictable leading slot — the input can never start inside it. */
+/* Fixed, predictable leading slot — the input can never start inside it.
+   Large text (WCAG 1.4.4): the slots stop growing at their 16 px size
+   (44 / 48 px, the icons inside are 18-20 px) and give up to a quarter of
+   the field each on a very narrow column, so the text keeps the room. At
+   default text both min() terms resolve to exactly the old 2.75 / 3 rem. */
 .glass-field__icon,
 .glass-field__action {
   display: flex;
@@ -364,19 +375,23 @@ img { user-select: none; -webkit-user-drag: none; }
   align-items: center;
   justify-content: center;
   align-self: stretch;
-  width: 2.75rem;
+  width: min(2.75rem, 44px, 25%);
   color: var(--text-tertiary);
 }
-.glass-field__action { width: 3rem; }
+.glass-field__action { width: min(3rem, 48px, 25%); }
 
 .glass-field__input {
   flex: 1 1 auto;
   /* Long email addresses shrink the text, never the slots. */
   min-width: 0;
+  /* A percentage width makes the input "compressible": its default size=20
+     width no longer sets the field's min-content, which at large text
+     widened the whole auth column past the screen. */
+  width: 100%;
   align-self: stretch;
   border: 0;
   background: transparent;
-  padding: .9rem 1.1rem;
+  padding: .9rem min(1.1rem, 17.6px);
   color: var(--foreground);
   font: inherit;
   line-height: 1.25;
@@ -520,10 +535,16 @@ img { user-select: none; -webkit-user-drag: none; }
 .auth-switch {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, …): the two halves stay equal under the 50 % pill even when
+     "Create account" is wider than half the column at large text. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 1.5rem;
   padding: 4px;
-  border-radius: var(--radius-pill);
+  /* Capped at half the default 54 px height, so it is a full pill at default
+     text but stays a rounded rectangle that still encloses the pill when the
+     options wrap onto several lines at large text (a 999 px radius turned
+     the tall track into an oval the pill poked out of). */
+  border-radius: min(var(--radius-pill), 27px);
   border: 1px solid var(--border);
   background: var(--surface-sunken);
 }
@@ -533,7 +554,9 @@ img { user-select: none; -webkit-user-drag: none; }
   inset-block: 4px;
   left: 4px;
   width: calc(50% - 4px);
-  border-radius: var(--radius-pill);
+  /* Half the default 44 px height: a pill at default text, a rounded
+     rectangle that keeps every glyph of a wrapped label inside its fill. */
+  border-radius: min(var(--radius-pill), 22px);
   background: var(--surface-raised);
   box-shadow: inset 0 0 0 1px var(--border-strong);
   transition: transform .52s cubic-bezier(.2,.8,.2,1);
@@ -544,12 +567,15 @@ img { user-select: none; -webkit-user-drag: none; }
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
   min-height: 44px;
-  padding-inline: .75rem;
-  border-radius: var(--radius-pill);
+  padding-inline: min(.75rem, 12px);
+  border-radius: min(var(--radius-pill), 22px);
   font-size: .9375rem;
   font-weight: 600;
   text-align: center;
+  overflow-wrap: anywhere;
+  hyphens: auto;
   color: var(--text-tertiary);
   transition: color .3s ease;
 }
@@ -602,12 +628,26 @@ img { user-select: none; -webkit-user-drag: none; }
 .auth-wave__bar {
   flex: 1 1 0;
   height: 100%;
-  margin-inline: 1.5px;
+  /* 1.5 px down to the narrowest default column (288 px); below that (page
+     zoom 200-300 % on a phone) the gaps shrink with the wave instead of
+     pushing its 44 bars past the screen. */
+  margin-inline: min(1.5px, .53%);
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--accent), var(--primary));
   opacity: .9;
   transform-origin: bottom;
 }
+
+/* Large text on a phone (WCAG 1.4.4, design-system.md "reflow at 200 %"):
+   long words and e-mail addresses break instead of running off the screen,
+   and button labels may wrap. The padding stops growing at its 16 px size.
+   Scoped to the auth column so buttons in rows elsewhere never wrap mid-word;
+   at default text nothing here changes a pixel. */
+.auth-pane { overflow-wrap: anywhere; }
+.auth-pane :is(.premium-button, .premium-button-secondary, .premium-button-ghost) {
+  padding-inline: min(1.25rem, 20px);
+}
+.auth-pane :is(.premium-button, .premium-button-secondary, .premium-button-ghost) > * { min-width: 0; }
 
 /* Mode-only form rows (AuthFold / AuthFoldAway). They own their spacing, so
    the form's `space-y-4` margin is cancelled and a folded row takes none. */
@@ -668,11 +708,15 @@ img { user-select: none; -webkit-user-drag: none; }
   .social-button[data-dimmed] .social-button__detail { color: GrayText; border-color: GrayText; }
 }
 /* "or with email": a hairline either side, sentence case (no all-caps
-   eyebrow here). */
+   eyebrow here). The hairline chrome stops growing at its 16 px size and the
+   words break only between words (break-word, unlike the pane's `anywhere`,
+   keeps a whole word as the text's minimum width), so 300 % text on a phone
+   reads "or with / email" instead of one letter per line. */
 .auth-divider {
   display: flex;
   align-items: center;
-  gap: .75rem;
+  gap: min(.75rem, 12px);
+  overflow-wrap: break-word;
   margin-top: 1rem;
   font-size: .8125rem;
   line-height: 1.25rem;
@@ -682,7 +726,7 @@ img { user-select: none; -webkit-user-drag: none; }
 .auth-divider::after {
   content: "";
   flex: 1 1 0;
-  min-width: 1rem;
+  min-width: min(1rem, 16px);
   border-top: 1px solid var(--border);
 }
 
