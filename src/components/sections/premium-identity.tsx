@@ -1,7 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
-import { motion, useMotionValue, useTransform, type MotionValue } from "framer-motion";
+import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 import { Crown, Mic, Sparkles, Users, type LucideIcon } from "lucide-react";
 
 import { useCinema, useSceneProgress } from "@/components/animations/cinema";
@@ -14,10 +14,17 @@ import { useCinema, useSceneProgress } from "@/components/animations/cinema";
  * was. With it, the ring is the scene's protagonist: as the section rises
  * into view it grows from half its size while the whole group turns into
  * place, thin rings spread from the avatar like sound as you scroll, and the
- * crown and pills fly out from behind the ring to their places, one after the
- * other, like a lineup fanning out. Everything is transform and opacity on
- * decorative layers; the pills never fade, they emerge from behind the ring
- * at full strength, so their text reads wherever the visitor stops.
+ * crown and pills bud from the ring's rim and travel out to their places, one
+ * after the other, like a lineup fanning out. Everything is transform and
+ * opacity on decorative layers. The pills never fade and never pass behind
+ * the ring: each one grows as a whole from a point on the rim, above the
+ * ring, so wherever the visitor stops a pill is either not there yet or a
+ * complete label at full strength, never a word cut off by the ring.
+ *
+ * The crown and pills are ornament: the benefit cards under the section say
+ * the same things as real headings, so the satellites are hidden from
+ * assistive technology in both layouts rather than read out as a run-on
+ * "Creator Premium Identity Your identity".
  *
  * The box keeps the 320px-safe sizing: `w-full` with a 340px cap, so a
  * narrow viewport can never be forced wider than itself.
@@ -76,7 +83,7 @@ function IdentityStatic({ ring }: { ring: ReactNode }) {
       <div className={BOX}>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">{ring}</div>
         {SATELLITES.map((satellite) => (
-          <span key={satellite.key} className={satelliteClass(satellite)}>
+          <span key={satellite.key} aria-hidden="true" className={satelliteClass(satellite)}>
             <SatelliteContent satellite={satellite} />
           </span>
         ))}
@@ -133,16 +140,18 @@ function IdentityCinema({ ring }: { ring: ReactNode }) {
             ))}
           </div>
 
-          {SATELLITES.map((satellite, index) => (
-            <FlyingSatellite key={satellite.key} satellite={satellite} index={index} entry={entry} />
-          ))}
-
           <motion.div
-            className="absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{ scale: ringScale }}
           >
             {ring}
           </motion.div>
+
+          {/* After the ring, so they are drawn above it all the way out, as
+              they rest in the static layout. */}
+          {SATELLITES.map((satellite, index) => (
+            <FlyingSatellite key={satellite.key} satellite={satellite} index={index} entry={entry} />
+          ))}
         </motion.div>
       </div>
     </div>
@@ -189,6 +198,9 @@ function Ripple({
   );
 }
 
+/** Clear space between the ring's edge and a satellite's starting point, in px. */
+const RIM_GAP = 4;
+
 function FlyingSatellite({
   satellite,
   index,
@@ -199,51 +211,68 @@ function FlyingSatellite({
   entry: MotionValue<number>;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  // How far the satellite's centre sits from the ring's centre, measured
-  // from its resting place (offset* ignore transforms).
-  const dx = useMotionValue(0);
-  const dy = useMotionValue(0);
-  useCentreOffset(ref, dx, dy);
+  // The satellite's resting centre, from the ring's centre. State, not a
+  // motion value, so the path below is re-derived from it before the first
+  // paint whatever order the hooks run in (see `useHomeOffset`).
+  const home = useHomeOffset(ref);
 
   const start = 0.26 + index * 0.08;
-  const flight = useTransform(entry, (value) => easeOutCubic(clamp01((value - start) / 0.42)));
-  const x = useTransform([flight, dx], ([f, offset]: number[]) => offset * (1 - f));
-  const y = useTransform([flight, dy], ([f, offset]: number[]) => offset * (1 - f));
-  const scale = useTransform(flight, (f) => 0.5 + 0.5 * f);
-  // Hidden while still tucked behind the small ring, then fully opaque:
-  // the pill slides out from under the ring rather than fading in.
-  const opacity = useTransform(entry, (value) => (value >= start ? 1 : 0));
-  // The crown rests on the ring's edge, so it comes to the front once home.
-  const zIndex = useTransform(flight, (f) => (f > 0.92 ? 3 : 1));
+  const flightAt = (value: number) => easeOutCubic(clamp01((value - start) / 0.42));
+  // How far along the ray from the ring's centre to home the satellite's
+  // centre is, as a fraction of the way home: it leaves the rim of the ring
+  // (at the ring's size at that moment) and ends at 1, home.
+  const alongAt = (value: number) => {
+    const distance = Math.hypot(home.x, home.y);
+    if (distance === 0) return 1;
+    const rim = Math.min(distance, (RING / 2) * ringScaleAt(value) + RIM_GAP);
+    return (rim + (distance - rim) * flightAt(value)) / distance;
+  };
+  const x = useTransform(entry, (value) => home.x * (alongAt(value) - 1));
+  const y = useTransform(entry, (value) => home.y * (alongAt(value) - 1));
+  // It grows from nothing as it goes, so it is never cut: until its turn it
+  // is a point on the rim, then a whole, smaller copy of itself.
+  const scale = useTransform(entry, flightAt);
 
   return (
     <motion.span
       ref={ref}
+      aria-hidden="true"
       className={satelliteClass(satellite)}
-      style={{ x, y, scale, opacity, zIndex }}
+      style={{ x, y, scale }}
     >
       <SatelliteContent satellite={satellite} />
     </motion.span>
   );
 }
 
-function useCentreOffset(
-  ref: RefObject<HTMLElement | null>,
-  dx: MotionValue<number>,
-  dy: MotionValue<number>,
-) {
+const HOME = { x: 0, y: 0 };
+
+/**
+ * The element's resting centre relative to its offset parent's centre
+ * (offset* ignore transforms, so this is home wherever it is in flight).
+ *
+ * Measurements that feed a transform are React state: a motion value set in
+ * a layout effect only reaches a `useTransform` that subscribed before it,
+ * which depends on hook order, while a state update from a layout effect
+ * re-renders before paint and every transform is re-derived in that render.
+ * It changes only when the box or the satellite is resized.
+ */
+function useHomeOffset(ref: RefObject<HTMLElement | null>): { x: number; y: number } {
+  const [home, setHome] = useState(HOME);
   useLayoutEffect(() => {
     const node = ref.current;
     const parent = node?.offsetParent as HTMLElement | null | undefined;
     if (!node || !parent) return;
     const measure = () => {
-      dx.set(parent.offsetWidth / 2 - (node.offsetLeft + node.offsetWidth / 2));
-      dy.set(parent.offsetHeight / 2 - (node.offsetTop + node.offsetHeight / 2));
+      const x = node.offsetLeft + node.offsetWidth / 2 - parent.offsetWidth / 2;
+      const y = node.offsetTop + node.offsetHeight / 2 - parent.offsetHeight / 2;
+      setHome((current) => (current.x === x && current.y === y ? current : { x, y }));
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(parent);
     observer.observe(node);
     return () => observer.disconnect();
-  }, [ref, dx, dy]);
+  }, [ref]);
+  return home;
 }

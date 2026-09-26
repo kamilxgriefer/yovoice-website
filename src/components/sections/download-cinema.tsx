@@ -3,6 +3,7 @@
 import {
   useLayoutEffect,
   useRef,
+  useState,
   useSyncExternalStore,
   type ReactNode,
   type RefObject,
@@ -67,34 +68,9 @@ function ZoomingHeading({
 }) {
   const ref = useRef<HTMLHeadingElement>(null);
   const progress = useSceneProgress(ref, ["start end", "center 0.5"]);
-  const zoom = useMotionValue(MAX_ZOOM);
+  const zoom = useStartingZoom(ref);
 
-  useLayoutEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const measure = () => {
-      // The union of the line boxes is as wide as the widest line. It is
-      // read through the current transform, so undo the current scale.
-      const range = document.createRange();
-      range.selectNodeContents(node);
-      const current = new DOMMatrixReadOnly(getComputedStyle(node).transform).a || 1;
-      const line = range.getBoundingClientRect().width / current;
-      const room = document.documentElement.clientWidth - GUTTER * 2;
-      zoom.set(line > 0 ? Math.max(1, Math.min(MAX_ZOOM, room / line)) : 1);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [zoom]);
-
-  const scale = useTransform([progress, zoom], ([value, start]: number[]) => {
-    return 1 + (start - 1) * (1 - easeOutCubic(clamp01(value)));
-  });
+  const scale = useTransform(progress, (value) => 1 + (zoom - 1) * (1 - easeOutCubic(clamp01(value))));
   const opacity = useTransform(progress, (value) => 0.55 + 0.45 * easeOutCubic(clamp01(value / 0.5)));
   const y = useTransform(progress, (value) => 36 * (1 - easeOutCubic(clamp01(value))));
   // A short focus pull as it arrives, gone well before it is read.
@@ -108,6 +84,46 @@ function ZoomingHeading({
       {children}
     </motion.h2>
   );
+}
+
+/**
+ * How large the heading may start: up to `MAX_ZOOM`, as long as its widest
+ * line still fits the viewport with `GUTTER` on each side.
+ *
+ * Measurements that feed a transform are React state, not motion values, in
+ * every scene of this file. A motion value set from a layout effect reaches
+ * a `useTransform` only if the transform subscribed first, which depends on
+ * hook order and silently leaves the render-time value in place otherwise
+ * (the heading would start at 1.4x on a 320px phone until the scroll moved
+ * it). A state update from a layout effect re-renders before the browser
+ * paints, and a re-render re-derives every transform from the new number.
+ * It only changes when the heading's size or the viewport width changes.
+ */
+function useStartingZoom(ref: RefObject<HTMLElement | null>): number {
+  const [zoom, setZoom] = useState(1);
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const measure = () => {
+      // The union of the line boxes is as wide as the widest line. It is
+      // read through the current transform, so undo the current scale.
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const current = new DOMMatrixReadOnly(getComputedStyle(node).transform).a || 1;
+      const line = range.getBoundingClientRect().width / current;
+      const room = document.documentElement.clientWidth - GUTTER * 2;
+      setZoom(line > 0 ? Math.max(1, Math.min(MAX_ZOOM, room / line)) : 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [ref]);
+  return zoom;
 }
 
 const DECK_QUERY = "(min-width: 48rem)";
@@ -196,17 +212,19 @@ function DealtCard({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const dx = useMotionValue(0);
-  const dy = useMotionValue(0);
-  useOffsetToCentre(ref, dx, dy);
+  // From this card's slot to the middle of the row. State, so the pose
+  // below is re-derived from it before the first paint (see
+  // `useStartingZoom`): the stack is right from the first frame the cards
+  // can be seen, never the grid slots snapping into a pile.
+  const toCentre = useOffsetToCentre(ref);
 
   // -1 … 1 across the row: the fan's shape in the stack.
   const side = count > 1 ? (index / (count - 1)) * 2 - 1 : 0;
   const spread = useTransform(deal, (value) => easeInOutCubic(clamp01(value)));
-  const x = useTransform([spread, dx], ([s, offset]: number[]) => (offset + side * 34) * (1 - s));
-  const y = useTransform([spread, dy], ([s, offset]: number[]) => {
+  const x = useTransform(spread, (s) => (toCentre.x + side * 34) * (1 - s));
+  const y = useTransform(spread, (s) => {
     // The stack is a slight arc, and each card lifts a little on its way out.
-    const stacked = offset + Math.abs(side) * 14;
+    const stacked = toCentre.y + Math.abs(side) * 14;
     return stacked * (1 - s) - Math.sin(Math.PI * s) * 22;
   });
   const rotate = useTransform(spread, (s) => side * 9 * (1 - s));
@@ -223,22 +241,26 @@ function DealtCard({
   );
 }
 
-function useOffsetToCentre(
-  ref: RefObject<HTMLElement | null>,
-  dx: MotionValue<number>,
-  dy: MotionValue<number>,
-) {
+const AT_REST = { x: 0, y: 0 };
+
+/** The vector from the element's resting centre to its offset parent's centre. */
+function useOffsetToCentre(ref: RefObject<HTMLElement | null>): { x: number; y: number } {
+  const [offset, setOffset] = useState(AT_REST);
   useLayoutEffect(() => {
     const node = ref.current;
     const parent = node?.offsetParent as HTMLElement | null | undefined;
     if (!node || !parent) return;
     const measure = () => {
-      dx.set(parent.clientWidth / 2 - (node.offsetLeft + node.offsetWidth / 2));
-      dy.set(parent.clientHeight / 2 - (node.offsetTop + node.offsetHeight / 2));
+      // offset* ignore transforms, so this is the slot, wherever the card is.
+      const x = parent.clientWidth / 2 - (node.offsetLeft + node.offsetWidth / 2);
+      const y = parent.clientHeight / 2 - (node.offsetTop + node.offsetHeight / 2);
+      setOffset((current) => (current.x === x && current.y === y ? current : { x, y }));
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(parent);
+    observer.observe(node);
     return () => observer.disconnect();
-  }, [ref, dx, dy]);
+  }, [ref]);
+  return offset;
 }

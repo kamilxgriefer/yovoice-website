@@ -158,6 +158,7 @@ export function AppStoryCinema() {
               </Rig>
             </div>
           </div>
+          <Floor progress={progress} />
 
           <Rail progress={progress} onSelect={goToChapter} />
         </div>
@@ -267,6 +268,15 @@ function Rig({ progress, children }: { progress: MotionValue<number>; children: 
       {children}
     </motion.div>
   );
+}
+
+/** As the phone steps back it sinks into the page: the stage's floor fades
+ * to the page's own background in front of it, so when the stage lets go
+ * its lower edge meets the section below without a line through the phone
+ * (wide screens only; see `.floor`). */
+function Floor({ progress }: { progress: MotionValue<number> }) {
+  const opacity = useTransform(progress, [...RETREAT], [0, 1]);
+  return <motion.div className={styles.floor} style={{ opacity }} aria-hidden="true" />;
 }
 
 /** The bright core behind the phone, in the same colour as the flood. */
@@ -379,15 +389,15 @@ function Intro({ progress }: { progress: MotionValue<number> }) {
                 opacity: 0,
                 scale: 0.97,
                 filter: "blur(6px)",
-                transition: TEXT_OUT,
-                transitionEnd: { visibility: "hidden" },
+                visibility: "hidden",
+                transition: { ...TEXT_OUT, visibility: { duration: 0, delay: TEXT_OUT.duration } },
               }
             : {
                 opacity: 1,
                 scale: 1,
                 filter: "blur(0px)",
                 visibility: "visible",
-                transition: TEXT_IN,
+                transition: { ...TEXT_IN, visibility: { duration: 0, delay: 0 } },
               }
         }
       >
@@ -449,12 +459,20 @@ function ChapterTexts({ progress }: { progress: MotionValue<number> }) {
  * beat after the line above it, out the other way. The title also clears a
  * short blur. Either way the transition runs to its end. */
 function lineVariants(order: number, blur: boolean): Variants {
+  const outDelay = order * 0.03;
   const out = (y: number) => ({
     opacity: 0,
     y,
     ...(blur ? { filter: "blur(6px)" } : {}),
-    transition: { ...TEXT_OUT, delay: order * 0.03 },
-    transitionEnd: { visibility: "hidden" as const },
+    // Hidden outright once faded (out of find in page's way). Set as a
+    // value of its own, so it also cancels a "visible" still waiting on an
+    // entrance's delay when the visitor scrolls straight through.
+    visibility: "hidden",
+    transition: {
+      ...TEXT_OUT,
+      delay: outDelay,
+      visibility: { duration: 0, delay: outDelay + (TEXT_OUT.duration ?? 0) },
+    },
   });
   return {
     shown: {
@@ -462,7 +480,7 @@ function lineVariants(order: number, blur: boolean): Variants {
       y: 0,
       ...(blur ? { filter: "blur(0px)" } : {}),
       visibility: "visible",
-      transition: { ...TEXT_IN, delay: 0.16 + order * 0.07 },
+      transition: { ...TEXT_IN, delay: 0.16 + order * 0.07, visibility: { duration: 0, delay: 0 } },
     },
     coming: out(26),
     gone: out(-22),
@@ -588,33 +606,31 @@ function WipeLine({
 /* ---- Finale -------------------------------------------------------------- */
 
 /** The hero's line, giant and behind the phone. Decorative: the hero's own
- * heading already says it, so this copy is hidden from assistive tech. On
- * wide screens each word fades in across a soft edge (`.giant`'s mask) as it
- * slides in, and the phone then steps back below the line (`Rig`). */
+ * heading already says it, so this copy is hidden from assistive tech. Each
+ * word slides in from its own side — on wide screens across a soft edge
+ * (`.giant`'s mask) — and the phone then steps back below the line (`Rig`). */
 function GiantWords({ progress }: { progress: MotionValue<number> }) {
   // In viewport widths, so each word starts wholly off its own side of the
   // stage whatever the width of the box it is centred in.
   const left = useTransform(progress, [F + 0.005, F + 0.09], ["-110vw", "0vw"], { ease: easeOut });
   const right = useTransform(progress, [F + 0.02, F + 0.105], ["110vw", "0vw"], { ease: easeOut });
-  // A short fade on the way in, done while the word is still mostly off
-  // stage, so a letter crossing the edge never pops.
-  const leftOpacity = useTransform(progress, [F + 0.005, F + 0.03], [0, 1]);
-  const rightOpacity = useTransform(progress, [F + 0.02, F + 0.045], [0, 1]);
-  // Out of find in page's way until they are on stage.
-  const leftVisibility = useTransform(leftOpacity, (value) => (value > 0 ? "visible" : "hidden"));
-  const rightVisibility = useTransform(rightOpacity, (value) => (value > 0 ? "visible" : "hidden"));
+  // Always at full strength: a word is either off stage or sliding in whole,
+  // never a faint copy wherever the scroll stops. Until it sets off it is
+  // not drawn at all, which also keeps it out of find in page.
+  const leftVisibility = useTransform(progress, (value) => (value > F + 0.005 ? "visible" : "hidden"));
+  const rightVisibility = useTransform(progress, (value) => (value > F + 0.02 ? "visible" : "hidden"));
 
   return (
     <div className={styles.giant} aria-hidden="true">
       <motion.span
         className={`${styles.giantWord} ${styles.giantOutline}`}
-        style={{ x: left, opacity: leftOpacity, visibility: leftVisibility }}
+        style={{ x: left, visibility: leftVisibility }}
       >
         Stop scrolling.
       </motion.span>
       <motion.span
         className={`${styles.giantWord} ${styles.giantSolid}`}
-        style={{ x: right, opacity: rightOpacity, visibility: rightVisibility }}
+        style={{ x: right, visibility: rightVisibility }}
       >
         Start talking.
       </motion.span>

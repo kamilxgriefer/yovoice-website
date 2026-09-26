@@ -64,6 +64,15 @@ export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
+/*
+ * One rule for measurements that feed a scene (a centre offset, a start
+ * position, a zoom): keep them in React state set from a layout effect, or
+ * set the motion values they drive inside the measuring callback itself. A
+ * motion value set in a layout effect declared before the `useTransform`
+ * that combines it is not seen until the scroll moves, which once dealt the
+ * Download cards from their grid slots into a pile in view.
+ */
+
 /**
  * Scroll progress (0..1) of `target` through the viewport, eased by a short
  * spring so a wheel's steps read as one glide. Scroll itself is never taken

@@ -1,6 +1,6 @@
 # Current-UI captures — `public/screenshots/current/`
 
-Provenance for the screenshots the homepage and /updates render. This file
+Provenance for the screenshots the homepage, /servers and /updates render. This file
 deliberately lives outside `public/`: `tests/servers-landing.test.ts` fails if
 any `.md` appears under `public/screenshots`, because provenance is for us,
 not for visitors.
@@ -80,15 +80,15 @@ serving the old transform.
 
 | File | Where | Surface | Size | Pixels |
 | --- | --- | --- | --- | --- |
-| `home-phone-slim.webp` | hero | Home | 81.4 KB | 1206 x 2622 |
-| `servers-phone-slim.webp` | hero | Servers, all five kinds | 65.1 KB | 1206 x 2622 |
-| `chats-phone-slim.webp` | hero | Chats | 61.4 KB | 1206 x 2622 |
-| `moments-phone-slim.webp` | hero | YO Moments (Voice, Discover) | 65.1 KB | 1206 x 2622 |
+| `home-phone-slim.webp` | hero; homepage Inside YO Voice (01) | Home | 81.4 KB | 1206 x 2622 |
+| `servers-phone-slim.webp` | hero; homepage Inside YO Voice (02) | Servers, all five kinds | 65.1 KB | 1206 x 2622 |
+| `chats-phone-slim.webp` | hero; homepage Inside YO Voice (03) | Chats | 61.4 KB | 1206 x 2622 |
+| `moments-phone-slim.webp` | hero; homepage Inside YO Voice (04) | YO Moments (Voice, Discover) | 65.1 KB | 1206 x 2622 |
 | `home-desktop-slim.webp` | hero | Home, desktop layout | 83.8 KB | 2064 x 1548 |
-| `workspace-phone-slim.webp` | Servers section | a server's Channels sheet | 37.8 KB | 1206 x 2164 |
-| `home-wide-slim.webp` | /updates | Home, desktop layout | 83.2 KB | 2160 x 1350 |
-| `chats-wide-slim.webp` | /updates | Chats, desktop layout | 60.7 KB | 2160 x 1350 |
-| `friends-wide-slim.webp` | /updates | Friends, desktop layout | 54.4 KB | 2160 x 1350 |
+| `workspace-phone-slim.webp` | homepage Servers section | a server's Channels sheet | 37.8 KB | 1206 x 2164 |
+| `home-wide-slim.webp` | /updates; homepage What you get (static and cinema) | Home, desktop layout | 83.2 KB | 2160 x 1350 |
+| `chats-wide-slim.webp` | /updates; homepage What you get (cinema) | Chats, desktop layout | 60.7 KB | 2160 x 1350 |
+| `friends-wide-slim.webp` | /updates; homepage What you get (cinema) | Friends, desktop layout | 54.4 KB | 2160 x 1350 |
 | `create-server-desktop-slim.webp` | /servers | Create your server (type picker) | 45.2 KB | 1440 x 800 |
 
 ```
@@ -136,7 +136,7 @@ real person's name or data.
   Weekend crew, "Private server · 12 people", Invite, TEXT (general, memes),
   VOICE (Lounge and Gaming, both LIVE), ORGANISATION (Events, Rules), Add
   channel.
-- **Desktop layout (hero, /updates)**: the rail reads YO Voice and the bell,
+- **Desktop layout (hero, /updates, homepage What you get)**: the rail reads YO Voice and the bell,
   Home, Servers, Chats (2), Moments, CREATE (Create Server, Create Voice
   Moment), MORE (More), then the parked world clock and the profile card
   (Alex, USER, @alex). Home adds Got a minute? / Record a Voice Moment and
@@ -155,7 +155,29 @@ real person's name or data.
 - **A channel's own content is not captured.** Only the channel list is used.
 - **Servers / Chats / Moments are not shown at desktop width in the hero** —
   it keeps one fixed large-screen view (Home), pinned by
-  `tests/homepage-welcome.test.ts` (`desktopRefs` equals `["home"]`).
+  `tests/homepage-welcome.test.ts` (`desktopRefs` equals `["home"]`). The
+  homepage's What you get shows Home, Chats and Friends at desktop width from
+  the /updates frames; Servers and Moments have no desktop-width capture.
+
+## How the homepage scroll cinema frames them (2026-09-26)
+
+Rules: `docs/design/design-system.md`, "Scroll cinema".
+
+- **Inside YO Voice** shows the four phone frames again, one per chapter.
+  Captures and labels come from the hero's `appScreens`
+  (`src/components/story/story-chapters.ts`). With the cinema on they sit in
+  one turning phone that is `aria-hidden` (the chapter text carries the
+  meaning and the hero already describes each screen); without it they are
+  four still phones, each with a short chapter-specific alt text.
+- **What you get** shows the three /updates wide frames inside a drawn
+  browser window (three dots, no address, no lock), with a note that the
+  people and messages are sample content. Without the cinema only Home is
+  shown. On a portrait window the cinema draws each frame as tall as the
+  stage allows (an honest crop of the real capture, never stretched) and
+  pans across it with the scroll, so its text stays legible on a phone.
+- **Servers** draws the Channels sheet inside a device that turns a step
+  with each card of the deck, slightly enlarged so it can drift without
+  showing an edge; the alt text names nothing that falls outside the glass.
 
 ## Servers page hero — `public/screenshots/current/create-server-desktop-slim.webp`
 

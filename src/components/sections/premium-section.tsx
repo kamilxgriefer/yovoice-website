@@ -19,8 +19,8 @@ const benefitIcons = [Mic, Crown, Sparkles];
  *
  * The ring is the one ornament this section is allowed, and in the scroll
  * cinema it is the protagonist: `PremiumIdentity` grows and turns it into
- * place, spreads sound-like rings from the avatar as you scroll and flies the
- * crown and pills out from behind it. The copy and the three benefits rise in
+ * place, spreads sound-like rings from the avatar as you scroll and buds the
+ * crown and pills from its rim. The copy and the three benefits rise in
  * with `Reveal`. Without the cinema (server render, reduced motion, large
  * text, short viewports) every part is drawn at rest in the same layout, with
  * the same words.

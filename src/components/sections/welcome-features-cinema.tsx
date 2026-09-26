@@ -89,8 +89,8 @@ const LANDSCAPE: Timeline = {
   headingLatest: 0.2,
 };
 
-/* Shorter pin (240svh, not 320svh), so the rise is quicker and the three
-   pans take most of it. */
+/* A shorter pin (240svh against a landscape window's 320svh): the rise is
+   quicker, and the three pans take most of it. */
 const PORTRAIT: Timeline = {
   rise: 0.2,
   wipes: [
@@ -153,7 +153,7 @@ const START_GAP = 56;
 const EXIT_GAP = 24;
 /** On a window narrower than the capture, the screen's edge stays this far in at either end. */
 const EDGE_INSET = 16;
-/** Wide windows: the heading steps back (scrubbed) over the first part of the rise. */
+/** The heading steps back (scrubbed) over the first part of the rise. */
 const HEADING_STEP = 0.08;
 
 /** What the stage measured: layout boxes, untransformed, in px. */
@@ -233,6 +233,7 @@ function panAt(p: number, timeline: Timeline): number {
  * screen does, which keeps the near edge `EDGE_INSET` in while it zooms.
  */
 function shiftAt(geometry: Geometry, scale: number, at: number) {
+  if (!geometry.ready) return 0;
   const reach = Math.max(0, (scale * geometry.width - geometry.room) / 2 + EDGE_INSET);
   return reach * (1 - 2 * at);
 }
@@ -267,7 +268,7 @@ function projectedTop(screen: ScreenPose, geometry: Geometry, pose: Pose) {
   return geometry.top + (unprojected * pose.perspective) / (pose.perspective + origin * Math.sin(theta));
 }
 
-/** The heading's scrubbed step back (wide and narrow alike). */
+/** The heading's scrubbed step back. */
 function headingStepAt(p: number) {
   const step = unit(p, 0, HEADING_STEP);
   return { y: -24 * step, scale: 1 - 0.05 * step };
@@ -360,12 +361,15 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
      way when the visitor scrolls up again. */
   const headingY = useTransform(p, (value) => headingStepAt(value).y);
   const headingScale = useTransform(p, (value) => headingStepAt(value).scale);
+  /* The first caption arrives in the same moment, so the stage is never
+     without words. */
   const [headingAway, setHeadingAway] = useState(false);
   const [view, setView] = useState(0);
 
   useMotionValueEvent(p, "change", (value) => {
-    const clearance = geometry.current.ready
-      ? headingClearance(value, geometry.current, pose, timeline)
+    const measuredNow = geometry.current;
+    const clearance = measuredNow.ready
+      ? headingClearance(value, measuredNow, pose, timeline)
       : Number.POSITIVE_INFINITY;
     if (clearance < -HOLD_PX || value > timeline.headingLatest + HOLD) setHeadingAway(true);
     else if (clearance > HOLD_PX && value < timeline.headingLatest - HOLD) setHeadingAway(false);
@@ -602,8 +606,11 @@ const CAPTION: Variants = {
  * beside it, and one line about it. It repeats what the images' alt text
  * already says, so it is hidden from assistive technology. All three
  * captions are laid out in the same cell, so the strip keeps the height of
- * the tallest; each change is a short triggered crossfade on the plain
- * stage background, so the words are either fully there or not there.
+ * the tallest. The strip stands on an opaque floor the width of the stage,
+ * which the tilted screen's near edge sinks behind while it rises (and the
+ * glow and shadow end on), so the words are always on the plain page colour;
+ * each change is a short triggered crossfade, so they are either fully there
+ * or not there.
  */
 function Captions({
   view,

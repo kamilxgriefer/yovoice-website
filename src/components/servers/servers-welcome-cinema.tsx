@@ -1,28 +1,22 @@
 "use client";
 
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import {
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type RefObject,
-} from "react";
-import { motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionStyle,
+  type MotionValue,
+} from "framer-motion";
 
-import { SCENE_SPRING, useSceneProgress } from "@/components/animations/cinema";
+import { SCENE_SPRING } from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
 import styles from "@/components/servers/servers-welcome-cinema.module.css";
-import {
-  SERVERS_INTRO,
-  ServersBoundary,
-  ServersHeadingWords,
-  StarterChannels,
-  TemplatePrivacy,
-  WORKSPACE_CAPTION,
-  WorkspaceCapture,
-} from "@/components/servers/servers-welcome-parts";
+import { ServersBoundary, StarterChannels, TemplatePrivacy } from "@/components/servers/servers-welcome-parts";
+import { ServersAside, useWide } from "@/components/servers/servers-welcome-sheet";
 import { serverTemplates, type ServerTemplate } from "@/content/server-templates";
 import { waveformHeights } from "@/lib/auth/auth-mode";
 import { cn } from "@/lib/utils/cn";
@@ -36,12 +30,14 @@ import { cn } from "@/lib/utils/cn";
  * cards step back — a little smaller, a little darker — so the deck grows a
  * row of edges above the card in front. As a card lands, its numeral comes
  * to rest and the sound of its headline runs across it; the sheet turns a
- * few degrees and its screen drifts with every card that lands. On a phone
+ * few degrees and its screen drifts with every card that lands. On a window
+ * too short for the heading and a readable sheet, the heading scrolls on and
+ * the sheet holds still on its own (`servers-welcome-sheet.tsx`). On a phone
  * the heading and the sheet come first and the deck follows.
  *
  * Scroll is never taken over: the deck is ordinary flow plus
  * `position: sticky`. What follows the scroll is transform, opacity and one
- * clip-path per card.
+ * clip-path per card, and one number per card for its waveform (below).
  *
  * Contrast. A covered card's shade stays at most 0.08 while any of its text
  * is still in view (every line keeps WCAG AA on the surface), and deepens
@@ -82,19 +78,7 @@ export function ServersWelcomeCinema() {
     >
       <div className="mx-auto max-w-[1240px]">
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 xl:gap-20">
-          <div className={styles.aside}>
-            <Reveal>
-              <p className="eyebrow">Servers</p>
-              <h2 id="servers-welcome-heading" className={styles.title}>
-                <ServersHeadingWords accentClassName="lg:block" />
-              </h2>
-              <p className="mt-5 max-w-[34rem] text-base leading-[1.6] text-[var(--text-secondary)]">
-                {SERVERS_INTRO}
-              </p>
-            </Reveal>
-
-            <WorkspaceSheet landed={landed} wide={wide} />
-          </div>
+          <ServersAside landed={landed} wide={wide} />
 
           <ul ref={deckRef} className={styles.deck} aria-label="The five kinds of Server">
             {serverTemplates.map((template, index) => (
@@ -131,6 +115,9 @@ type LandingEvent = {
   to: number;
 };
 
+/** While a card's waveform can be seen, in px of deck travel. */
+type Span = { from: number; to: number };
+
 type DeckGeometry = {
   /** The window's height, as the scroll tracking measures it. */
   viewport: number;
@@ -140,12 +127,22 @@ type DeckGeometry = {
   settle: number[];
   /** Card `k + 1` landing on card `k`, for k = 0..3. */
   events: LandingEvent[];
+  /**
+   * From the moment a card's waveform rises into the window (and the wipe
+   * that draws it has begun) until the next card has slid over it. Only
+   * then does the waveform move with the scroll; a covered one holds still.
+   */
+  voiced: Span[];
 };
+
+/** Never in view: a waveform that is not drawn (a short phone hides it). */
+const SILENT: Span = { from: Infinity, to: -Infinity };
 
 /**
  * Measures the deck once per layout change (never per scroll step): makes
  * every card as tall as the tallest one, so no covered card can show below
- * the card in front, and works out where each card settles and lands.
+ * the card in front, and works out where each card settles and lands, and
+ * while its waveform is in view.
  */
 function useDeckGeometry(ref: RefObject<HTMLUListElement | null>): DeckGeometry | null {
   const [geometry, setGeometry] = useState<DeckGeometry | null>(null);
@@ -196,11 +193,34 @@ function useDeckGeometry(ref: RefObject<HTMLUListElement | null>): DeckGeometry 
           to,
         };
       });
+
+      const voiced = items.map((item, index): Span => {
+        const card = item.firstElementChild as HTMLElement | null;
+        const wave = card?.querySelector<HTMLElement>("[data-deck-wave]");
+        // Hidden (no offsetParent) or measured against something else.
+        if (!card || !wave || wave.offsetParent !== card) return SILENT;
+        const waveTop = wave.offsetTop;
+        // It rises into the window from below, and the wipe has begun.
+        const from = Math.max(
+          index * (height + gap) + waveTop - viewport,
+          settle[index] - viewport * ARRIVAL,
+        );
+        // The next card's top edge has passed it. By then this card has
+        // stepped back, which lifts the waveform a little, so the waveform
+        // is measured as if it had stepped back all the way.
+        const to =
+          index + 1 < items.length
+            ? (index + 1) * (height + gap) - tops[index] - waveTop * (1 - STEP_BACK)
+            : Infinity;
+        return { from, to };
+      });
+
       const next: DeckGeometry = {
         viewport,
         span: list.clientHeight + viewport,
         settle,
         events,
+        voiced,
       };
       setGeometry((previous) => (previous && sameGeometry(previous, next) ? previous : next));
     };
@@ -242,6 +262,9 @@ function sameGeometry(a: DeckGeometry, b: DeckGeometry) {
         event.from === b.events[index].from &&
         event.hide === b.events[index].hide &&
         event.to === b.events[index].to,
+    ) &&
+    a.voiced.every(
+      (span, index) => span.from === b.voiced[index].from && span.to === b.voiced[index].to,
     )
   );
 }
@@ -268,6 +291,12 @@ const ARRIVAL = 0.5;
 /** One bar per 9–11 px of card width. */
 const WAVE_BARS = 32;
 const WAVE_BARS_WIDE = 60;
+/**
+ * Px of scroll per radian of the waveform's movement: every bar's level
+ * falls and rises once over about 113 px of scroll (2π × 18), each bar a
+ * little out of step with the one before it.
+ */
+const WAVE_STEP = 18;
 
 function DeckCard({
   template,
@@ -287,6 +316,7 @@ function DeckCard({
   const events = geometry?.events ?? [];
   const own = events[index];
   const settle = geometry?.settle[index];
+  const voiced = geometry?.voiced[index] ?? SILENT;
   const lead = (geometry?.viewport ?? 0) * ARRIVAL;
 
   const scale = useTransform(travel, (u) => {
@@ -320,6 +350,18 @@ function DeckCard({
   // The sound of the headline runs across the card as it lands.
   const waveClip = useTransform(arrival, (a) => `inset(0 ${((1 - a) * 100).toFixed(2)}% 0 0)`);
 
+  // Like the page's `ScrollWave`, the waveform moves a little with every
+  // scroll step — a level meter, not a loop — and holds still the moment
+  // scrolling stops. The bars are drawn once, each at its own level; what
+  // follows the scroll is one number on the waveform (`--wave-t`) that the
+  // bars' transform reads (see `.bar`), and only while the waveform can be
+  // seen: a card that is covered, or has not come up yet, holds still.
+  const waveTime = useMotionValue(0);
+  useMotionValueEvent(travel, "change", (u) => {
+    const at = travelRaw.get();
+    if (at > voiced.from && at < voiced.to) waveTime.set(Math.round((u / WAVE_STEP) * 1000) / 1000);
+  });
+
   const heights = useMemo(
     () => waveformHeights(headlineEnvelope(template.headline), bars, index * 1.7 + 0.4),
     [template.headline, index, bars],
@@ -347,9 +389,18 @@ function DeckCard({
         </div>
 
         <div data-deck-foot="" className="mt-auto pt-6">
-          <motion.div className={styles.wave} style={{ clipPath: waveClip }} aria-hidden="true">
+          <motion.div
+            className={styles.wave}
+            style={{ clipPath: waveClip, "--wave-t": waveTime } as MotionStyle}
+            data-deck-wave=""
+            aria-hidden="true"
+          >
             {heights.map((height, bar) => (
-              <WaveBar key={bar} height={height} index={bar} travel={travel} />
+              <span
+                key={bar}
+                className={styles.bar}
+                style={{ "--h": height, "--k": bar } as CSSProperties}
+              />
             ))}
           </motion.div>
           <StarterChannels template={template} className="mt-5" />
@@ -360,27 +411,6 @@ function DeckCard({
       </motion.div>
     </li>
   );
-}
-
-/**
- * One bar of a card's waveform. Like the page's `ScrollWave`, it moves a
- * little with every scroll step — a level meter, not a loop — and holds
- * still the moment scrolling stops.
- */
-function WaveBar({
-  height,
-  index,
-  travel,
-}: {
-  height: number;
-  index: number;
-  travel: MotionValue<number>;
-}) {
-  const scaleY = useTransform(
-    travel,
-    (u) => height * (0.78 + 0.22 * Math.abs(Math.sin(u / 36 + index * 0.9))),
-  );
-  return <motion.span className={styles.bar} style={{ scaleY }} />;
 }
 
 /**
@@ -396,72 +426,4 @@ function headlineEnvelope(text: string): number[] {
     if ("aeiouy".includes(character)) return 0.84 + 0.16 * (((position * 7) % 5) / 4);
     return 0.4 + 0.32 * (((character.charCodeAt(0) * 13) % 7) / 6);
   });
-}
-
-/* ---- The Channels sheet ---------------------------------------------------- */
-
-const SLAB_DEPTHS = [3, 6, 9, 12];
-
-/**
- * The workspace capture as a device that turns a few degrees. On a wide
- * screen it holds still beside the deck and turns one step with every card
- * that lands; on a phone, where the deck comes after it, it turns as it
- * crosses the window.
- */
-function WorkspaceSheet({ landed, wide }: { landed: MotionValue<number>; wide: boolean }) {
-  const ref = useRef<HTMLElement>(null);
-  const crossing = useSceneProgress(ref, ["start end", "end start"]);
-  const turn = useTransform([landed, crossing], ([cards, passing]: number[]) =>
-    wide ? cards / 4 : passing,
-  );
-
-  const rotateY = useTransform(turn, [0, 1], [-16, 9]);
-  const rotateX = useTransform(turn, [0, 1], [7, -3]);
-  const drift = useTransform(turn, [0, 1], ["3.5%", "-3.5%"]);
-  const sheenX = useTransform(turn, [0, 1], ["-22%", "22%"]);
-
-  return (
-    <figure ref={ref} className={styles.figure}>
-      <div className={styles.stage}>
-        <div className={styles.glow} aria-hidden="true" />
-        <motion.div className={styles.device} style={{ rotateX, rotateY }}>
-          {SLAB_DEPTHS.map((depth) => (
-            <div
-              key={depth}
-              className={styles.slab}
-              style={{ transform: `translateZ(-${depth}px)` }}
-              aria-hidden="true"
-            />
-          ))}
-          <div className={styles.body}>
-            <div className={styles.screen}>
-              <motion.div className={styles.capture} style={{ y: drift, scale: 1.08 }}>
-                <WorkspaceCapture sizes="(min-width: 1024px) 290px, (min-width: 440px) 312px, 72vw" />
-              </motion.div>
-              <motion.div className={styles.sheen} style={{ x: sheenX }} aria-hidden="true" />
-            </div>
-          </div>
-        </motion.div>
-      </div>
-      <figcaption className={styles.caption}>{WORKSPACE_CAPTION}</figcaption>
-    </figure>
-  );
-}
-
-/* ---- Breakpoint ------------------------------------------------------------- */
-
-const WIDE_QUERY = "(min-width: 64rem)";
-
-function subscribeWide(onChange: () => void) {
-  const query = window.matchMedia(WIDE_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
-
-function useWide(): boolean {
-  return useSyncExternalStore(
-    subscribeWide,
-    () => window.matchMedia(WIDE_QUERY).matches,
-    () => false,
-  );
 }

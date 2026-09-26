@@ -10,16 +10,39 @@
 /* ---- Left column: heading, sentence and the Channels sheet -------------- */
 
 .aside {
+  /* The column's rhythm on a wide screen. The script that decides whether
+     the sheet fits beside the heading reads these back as resolved. */
+  --aside-pad-top: 24px;
+  --aside-pad-bottom: 1rem;
+  --sheet-gap: 2.25rem;
   min-width: 0;
+}
+
+/* Above the device and its shadow, which spreads past the device's box. */
+.intro {
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 64rem) {
   .aside {
+    /* The caption goes beside the sheet or under it by the column's width. */
+    container: servers-aside / inline-size;
     position: sticky;
     top: var(--header-height);
     align-self: start;
     /* Level with the first card, which sticks 24 px under the header. */
-    padding-top: 24px;
+    padding-top: var(--aside-pad-top);
+    padding-bottom: var(--aside-pad-bottom);
+  }
+
+  /* A window too short for the heading and a readable sheet (the script
+     sets `data-fit`): the heading and the sentence scroll on with the page,
+     and the sheet alone holds still beside the deck. `top` stays set so the
+     script can read the header's height back from it. */
+  .aside[data-fit="short"] {
+    position: static;
+    align-self: stretch;
   }
 }
 
@@ -38,6 +61,9 @@
 /* ---- The Channels sheet, as a device that turns a little ---------------- */
 
 .figure {
+  /* The device's height; its width follows from the capture's own ratio
+     plus the 7 px bezel and 1 px rim on each side. */
+  --device-h: min(calc(min(54vw, 15rem) * 2164 / 1206 + 16px), 56svh);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -47,30 +73,47 @@
 
 @media (min-width: 64rem) {
   .figure {
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 1.75rem;
-    margin-top: 2.25rem;
+    /* Beside the heading: all the column has left under the sentence
+       (`--intro-h` and `--caption-room` are measured by the script), at
+       most 29rem. The script only keeps this layout while that is at least
+       its floor (25rem); 15rem is a last guard for the frame before it
+       has measured. */
+    --device-h: clamp(
+      15rem,
+      calc(
+        100svh - var(--header-height) - var(--aside-pad-top) - var(--aside-pad-bottom) -
+          var(--intro-h, 17rem) - var(--sheet-gap) - var(--caption-room, 0px)
+      ),
+      29rem
+    );
+    /* Narrow column: the caption sits under the sheet. */
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: var(--sheet-gap);
+  }
+
+  /* Holding still on its own: as large as the window allows, up to 29rem,
+     centred in the window under the header. */
+  .aside[data-fit="short"] .figure {
+    --device-h: min(
+      29rem,
+      calc(100svh - var(--header-height) - 2.5rem - var(--caption-room, 0px))
+    );
+    position: sticky;
+    top: max(
+      calc(var(--header-height) + 1.25rem),
+      calc((100svh + var(--header-height) - var(--device-h) - var(--caption-room, 0px)) / 2)
+    );
   }
 }
 
 .stage {
-  /* The device's height; its width follows from the capture's own ratio
-     plus the 7 px bezel and 1 px rim on each side. */
-  --device-h: min(calc(min(54vw, 15rem) * 2164 / 1206 + 16px), 56svh);
   position: relative;
   flex: none;
   width: calc((var(--device-h) - 16px) * 1206 / 2164 + 16px);
   height: var(--device-h);
   perspective: 1400px;
   perspective-origin: 50% 40%;
-}
-
-@media (min-width: 64rem) {
-  .stage {
-    /* What the column has left under the heading and the sentence. */
-    --device-h: clamp(15rem, calc(100svh - var(--header-height) - 26rem), 29rem);
-  }
 }
 
 /* One bright core behind the device, never behind text. */
@@ -145,7 +188,12 @@
   pointer-events: none;
 }
 
+/* Painted above the device: the device is positioned and transformed, so
+   without this its drop shadow (96 px of blur) would be painted over the
+   caption's letters and dim them. */
 .caption {
+  position: relative;
+  z-index: 1;
   max-width: 17rem;
   text-align: center;
   font-size: 0.75rem;
@@ -155,9 +203,21 @@
 
 @media (min-width: 64rem) {
   .caption {
-    max-width: 12rem;
-    padding-bottom: 0.25rem;
     text-align: left;
+  }
+
+  /* Wide enough column: the caption sits beside the sheet, at its foot. */
+  @container servers-aside (min-width: 29rem) {
+    .figure {
+      flex-direction: row;
+      align-items: flex-end;
+      gap: 1.75rem;
+    }
+
+    .caption {
+      max-width: 12rem;
+      padding-bottom: 0.25rem;
+    }
   }
 }
 
@@ -331,6 +391,8 @@
   }
 }
 
+/* Each bar is drawn once at its own level (`--h`, from the headline's
+   sound) … */
 .bar {
   flex: 1 1 0;
   height: 100%;
@@ -338,5 +400,16 @@
   border-radius: 3px 3px 0 0;
   background: linear-gradient(180deg, var(--accent), var(--primary));
   opacity: 0.9;
+  transform: scaleY(var(--h));
   transform-origin: bottom;
+}
+
+/* … and moves between 78 % and 100 % of it with the scroll: the card in
+   view writes one number on its waveform (`--wave-t`, radians) and every
+   bar reads it, a little out of step with its neighbour (`--k`). Without
+   CSS trigonometry the bars simply hold their level. */
+@supports (transform: scaleY(cos(1))) {
+  .bar {
+    transform: scaleY(calc(var(--h) * (0.89 - 0.11 * cos(var(--wave-t, 0) + var(--k) * 1.8))));
+  }
 }

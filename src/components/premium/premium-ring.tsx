@@ -1,7 +1,8 @@
 /**
  * The website rendition of the app's PremiumAvatarFrame: a slow
- * violet→magenta conic ring, with no glow: it is the one ornament the
- * Slim site keeps. Same palette, same 6s
+ * violet→magenta conic ring, with no glow on the ring itself: it is the
+ * ring's one ornament (the homepage scroll cinema may light the space around
+ * it, see docs/design/design-system.md "Scroll cinema"). Same palette, same 6s
  * sweep, so the Premium identity a visitor sees here is the one they
  * meet again inside YO Voice. Static under prefers-reduced-motion.
  */

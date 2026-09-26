@@ -68,7 +68,9 @@ function ServersWelcomeStatic() {
                 className="relative overflow-hidden rounded-[10px] bg-[var(--surface-sunken)]"
                 style={{ aspectRatio: WORKSPACE_ASPECT }}
               >
-                <WorkspaceCapture sizes="(max-width: 1024px) 70vw, 272px" />
+                {/* The figure is at most 272 px wide at every breakpoint, less its
+                    6 px padding and 1 px border on each side. */}
+                <WorkspaceCapture sizes="258px" />
               </div>
             </div>
             <figcaption className="mt-4 text-center text-xs leading-5 text-[var(--text-tertiary)] lg:text-left">

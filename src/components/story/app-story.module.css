@@ -1,8 +1,9 @@
 /*
  * The pinned app story. Layout and paint only: every moving value is a
  * framer-motion motion value set inline (transform, opacity, clip-path, and
- * a short blur on titles while a triggered transition runs), so nothing here
- * animates layout.
+ * a short blur on titles while a triggered transition runs) or read from
+ * one (`--retreat`, `--rail-fill`) by a transform here; the rail's arrival
+ * is a CSS opacity transition. Nothing here animates layout.
  *
  * Phones: one grid column — text on top under the header, the phone below
  * (its height is whatever is left, capped at 56svh), the numbered chapter
@@ -11,8 +12,9 @@
  * chapter rail on the right.
  *
  * Stacking, back to front: flood and vignette (0), the bright core behind
- * the phone (1), the heading and the giant words (2), the phone (3), the
- * chapter text (4), the rail (5).
+ * the phone (1), the heading and the giant words (2), the phone and, in the
+ * finale on wide screens, the floor it sinks into (3), the chapter text (4),
+ * the rail (5).
  */
 
 /* The page scrolls anchors to `--header-height + 16px` below the top
@@ -402,6 +404,12 @@
   translate: -50% -50%;
 }
 
+/* In front of the phone, behind the rail: see `Floor`. Wide screens only,
+   where the phone ends the scene partly below the stage. */
+.floor {
+  display: none;
+}
+
 /* ---- Chapter rail ------------------------------------------------------ */
 
 .rail {
@@ -568,7 +576,7 @@ a.ctaLarge {
        never reach ("Stop scrolling." is 6.56em wide), lifted a little above
        the stage's middle so the phone can settle below them. */
     --giant-inset: calc(var(--pad-x) + var(--rail-w) + 1rem);
-    --giant-fade: 2.5rem;
+    --giant-fade: clamp(2.5rem, 4.5vw, 5rem);
     --giant-fs: clamp(
       3rem,
       min(8.6vw, calc((100vw - 2 * var(--giant-inset) - 2 * var(--giant-fade)) / 6.7)),
@@ -667,6 +675,15 @@ a.ctaLarge {
     max-width: 23rem;
     font-size: 1.125rem;
     line-height: 1.6;
+  }
+
+  .floor {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: block;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 82%, var(--background) 100%);
   }
 
   .slot {

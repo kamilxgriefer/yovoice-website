@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-24 (auth switch; Continue with Google / Apple, accessibility pass)
+Last reviewed: 2026-09-26 (homepage scroll cinema)
 
 ## Source of truth
 
@@ -49,9 +49,10 @@ The `@theme inline` block at the top of `globals.css` maps Tailwind's
 token itself instead of a copied hex. The old glass and glow compositing
 tokens are gone: no card, button, badge or ring glows. Two effects remain on
 purpose: the fixed header's `backdrop-blur`, which keeps its links legible
-over scrolled content, and the hero's single corner glow (see below). The auth
-switch adds a transient per-letter blur while its title changes (see "Auth
-switch").
+over scrolled content, and the hero's single corner glow (see below). Two
+owner-approved exceptions add more, each only where it is documented: the
+auth switch's transient per-letter blur (see "Auth switch") and the
+homepage's scene lighting and short focus pulls (see "Scroll cinema").
 
 ## Components and shape
 
@@ -104,23 +105,33 @@ switch").
 - One accent. Highlighted words in section headings use solid `--accent`.
   Gradient text exists only on the hero headline ("Start talking."), with
   `.text-gradient-descender-safe`; the lockup tagline and every other
-  highlight are solid `--accent`. The premium ring keeps its conic gradient
-  as the one ornament, without a glow.
+  highlight are solid `--accent`, and the scroll cinema's giant words are
+  solid or outlined. The premium ring keeps its conic gradient as its one
+  ornament, without a glow on the ring itself; on the homepage the scroll
+  cinema may light the space around it (see "Scroll cinema").
 - No decoration behind content: no deep-space background, blurred blobs,
   grid texture or particles outside the hero, which keeps one calm radial glow
   in its corner. The body's top-to-background gradient is the only page
-  gradient.
+  gradient. The homepage scroll cinema is the one exception; its decoration
+  is listed there and is not reused on other pages.
 - No card in a card. A surface either is a `.panel` or sits on one; auth
   pages are a single surface, not a shell around an inner card.
 - Feature lists are rows (`.feature-row`: a 40 px `.icon-tile`, title and
-  description) in a two-column grid (one on phones), not boxes.
+  description) in a two-column grid (one on phones), not boxes. With the
+  scroll cinema on, the Welcome section's three answers (Talk, Stay, Share)
+  stand in three columns and return to `.feature-row` in its static layout.
 - Section type scale: eyebrow 11 px / 700 / `.12em` in `--text-tertiary`;
   section title 40 px desktop / 30 px phone, 800, `-0.025em`; copy 16 px / 1.6
-  in `--text-secondary`. One `<h1>` per page.
-- Motion (framer-motion) is reserved for the hero rotators, the hero CTA spring
-  and the menu. Use Tailwind v4's `motion-reduce:` variant. The one other
-  motion moment is the auth switch below; it uses CSS and the Web Animations
-  API, not framer-motion.
+  in `--text-secondary`. One `<h1>` per page. The scroll cinema may set a
+  scene's title at display size (Inter 800, `-0.04em`, a `clamp()` that fits
+  320 px); it is the only place a heading may be larger than the hero's
+  `<h1>`. Static layouts keep this scale, and an item title (`<h3>`) is never
+  larger than its section title.
+- Motion (framer-motion) is reserved for the hero rotators, the hero CTA
+  spring, the menu and the homepage scroll cinema below. Use Tailwind v4's
+  `motion-reduce:` variant for CSS transitions; scroll-driven motion is gated
+  by `useCinema()` instead. The auth switch is the one other motion moment;
+  it uses CSS and the Web Animations API, not framer-motion.
 
 ## Auth switch (Log in / Create account)
 
@@ -206,6 +217,130 @@ mail-action and recovery pages keep the accounts panel with its three rings.
   ("Back", "Back to password") returns focus to the button or the password
   field that led there.
 
+## Scroll cinema (homepage)
+
+The owner-approved exception to "no decoration behind content", "motion is
+reserved" and the section type scale (owner request, 2026-09-26: the whole
+homepage should move with the scroll the way the reference sites do,
+"strictly fitted to YO Voice"). It applies to `src/app/page.tsx` only. The
+Download section also renders on `/servers`, where it keeps its entrances
+but not the "Be You." finale (`<DownloadSection finale />` is the
+homepage's alone). Only patterns are borrowed from the references (pinned
+stage, 3D product turn, colour flood, numbered chapter rail, giant type
+behind the product, expanding window, stacking cards, word-by-word reveal),
+never their names, logos, colours or lines.
+
+- **Gate.** `useCinema()` (`src/components/animations/cinema.ts`) is false
+  on the server and in the first client render, and true only while
+  `(prefers-reduced-motion: no-preference) and (min-width: 20rem) and
+  (min-height: 32rem)` matches. The thresholds are rem, so they follow the
+  visitor's text setting: phones at 200 % text and short windows keep the
+  static layout. A tall desktop window can keep the cinema at 150-200 %
+  text, so every stage sizes its text to its content (What you get sizes its
+  caption strip first and the picture from what is left). The value is
+  deferred, so arming every scene after hydration is an interruptible
+  background render rather than one long task.
+- **The static layout is the contract.** It is what the server sends and
+  what a visitor gets without JavaScript, with reduced motion or under the
+  thresholds, and it reads well on its own. Both layouts of a scene render
+  the same section `id` and `aria-labelledby`, the same headings and the same
+  copy (`#inside` with `#inside-home|servers|chats|moments`, `#welcome`,
+  `#features`, `#servers`, `#premium`, `#download`). `useScroll` and
+  `useSceneProgress` run only in components mounted while the cinema is on.
+- **Scroll is never taken over.** Pinned stages are `position: sticky`,
+  `100svh`, inside a tall track (Inside YO Voice 495svh, 550svh from 64rem;
+  What you get 320svh, 240svh on a portrait window); the Servers deck is
+  sticky cards in normal flow. No scroll-snap, wheel or touch listeners,
+  smooth-scroll libraries or `overflow: hidden` on `html` / `body`. The only
+  programmatic scrolls are the story rail's links and `CinemaScrollAnchor`,
+  which re-lands a URL fragment, a reload or a back/forward arrival once the
+  cinema has grown the page (restoration is `manual` on the homepage, and
+  every such jump is instant). `<html data-scroll-behavior="smooth">` makes
+  Next jump, not sweep, on navigation.
+- **Nothing moves on its own.** No timers or loops. Scenes follow the
+  scroll through one short spring (`SCENE_SPRING`) and jump, instead of
+  fast-forwarding, when the scroll relocates by a third of a scene at once.
+  Text never rests mid-fade: text blocks enter once and finish (`Reveal`,
+  the story's chapter text on each chapter change, the What you get
+  captions), and only pictures, floods and decoration are scrubbed. The hero
+  tour and the premium ring's sweep are unchanged. Only `transform`,
+  `opacity` and `clip-path` animate, plus a blur of at most 8 px on a heading
+  entering or leaving, which always completes.
+- **Scenes.**
+  - Hero exit: the copy drifts up and softens to no less than 85 %; the
+    device frames recline up to 16° and settle to 92 %; the corner glow
+    follows the scroll out and the hero's foot darkens into the page.
+  - Inside YO Voice (after the hero): a pinned phone turns in 3D (at most
+    24° on Y and 22° on X) through Home, Servers, Chats and Moments; each
+    capture swipes in behind an edge in that destination's dock colour over
+    a flood of the same hue; thin voice rings mark each hand-over; a
+    numbered rail of links follows; "Stop scrolling. / Start talking."
+    arrives behind the phone, which then steps back so both lines read.
+    "Start talking" and its note follow the stage in normal flow.
+  - Welcome: the heading settles into place and its last words arrive one
+    after another; a waveform under it moves a little with every scroll step;
+    the sentence lights up word by word (`WordReveal`, one copy of the text).
+  - What you get: YO Voice in a drawn browser window (three dots, no
+    address, no lock) rises from a laptop-lid tilt to nearly full screen and
+    wipes Home → Chats → Friends with a caption each; on a portrait window
+    the camera fills the stage's height with an honest crop and pans across
+    each capture. The feature rows rise in after the stage.
+  - Servers: the five kinds stack as cards beside the Channels sheet, which
+    turns a step with each card; on short windows the heading scrolls on and
+    the sheet alone stays beside the deck. Only uncovered cards move their
+    waveform.
+  - Premium: the ring grows into place, ripples spread from it, and the
+    crown and pills slide out from behind it.
+  - Download: the heading zooms in, the four cards are dealt from a fanned
+    stack (keyboard focus completes the deal), and the homepage ends on
+    "Be You.", which fills as the visitor reaches the bottom and stays filled.
+    It is sized by the window's height as well as its width, so at the very
+    end it sits whole under the header, or, where the footer is taller than
+    the room (phones), has scrolled off whole.
+  - A 2 px meter under the header shows how far down the homepage the
+    visitor is.
+- **Decoration, here only.** Deep full-bleed floods of the dock colours
+  behind the story stage; one bright radial core behind a product (phone,
+  browser window, Channels sheet, premium ring), never behind text; thin
+  voice rings; glowing wipe edges and the rail's lit dot; the browser
+  window's glare; the Servers deck's lit top edge and outlined numerals; the
+  header meter's violet → magenta gradient; the hero's dusk gradient. In the
+  static layout only the story's soft dock-colour glow behind each phone
+  remains. Every decorative layer is `aria-hidden`.
+- **Type.** Scene titles may be display size (see "Slim rules"). The only
+  giant words are the hero's line ("Stop scrolling. / Start talking.") and
+  the site's tagline ("Be You."), solid or outlined, never gradient text,
+  and `aria-hidden` because the `<h1>` and the site title already say them.
+- **Contrast.** Any text visible at any scroll position meets WCAG AA
+  against what is behind it at that moment. `WordReveal`'s unlit words are
+  `#7f7689` (4.6:1 on `--background`). The story's chapter labels
+  (`#c3a8ff`, `#dca6ff`, `#7de9ed`, `#eba6ff`) and copy read at 5.9:1 or more
+  on their floods (`story-chapters.ts` holds each chapter's `ink`, `core` and
+  `flood`). The hero copy never drops below 85 % opacity. A covered Servers
+  card is shaded at most 0.08 while any of its text shows. Captions change
+  by a triggered crossfade, never scrubbed.
+- **Screen readers and focus.** In the cinema the story's visible heading
+  and chapter text are `aria-hidden` copies; the real `<h2>` and one `<h3>`
+  per chapter sit in visually hidden anchors inside the tall track at the
+  scroll position where that chapter is shown, so focus-follow, find in page
+  and `#inside-chats` land on the chapter that is on screen. The phone and
+  its captures are `aria-hidden` there (the hero describes each screen); the
+  static layout keeps a short alt per chapter. No link sits in a pinned
+  stage except the story rail, which is drawn whenever it has focus;
+  "Start talking", "See every feature" and the Servers links follow their
+  stages in normal flow. A `Reveal` or dealt card that holds a link is drawn
+  at rest the moment focus arrives. In forced colours the rail marks the
+  current chapter in `Highlight`.
+- **Captures.** Only `public/screenshots/current/` (provenance, and where
+  each is used: `current-screenshots.md`). The story takes its captures and
+  labels from the hero's `appScreens`. What you get shows the three /updates
+  wide frames, and its note says the people and messages are sample content.
+- **Colours.** Tokens wherever CSS can use them. Hex values appear only
+  where framer-motion interpolates or a scene needs a tint the palette does
+  not have: the chapter floods, cores and inks in `story-chapters.ts`, the
+  ripple colours in `premium-identity.tsx`, and the browser window's greys
+  in `welcome-features-parts.tsx`.
+
 ## Legal hygiene
 
 - Borrow patterns, never names, logos, icons or colours of other products
@@ -238,6 +373,9 @@ mail-action and recovery pages keep the accounts panel with its three rings.
 - Account-readiness artwork may show the persistent verification reminder, but
   it must not imply that an email has been sent or verified without a real
   account action.
+- A capture drawn inside device or browser chrome is still a labelled
+  illustration: the chrome carries no live address, lock or account, and
+  its caption says the people and messages are sample content.
 - Dark is the website shell. Pearl appears as a clearly bounded application
   preview using the exact light `AppPalette` colours; it is not a second,
   partially implemented website theme.

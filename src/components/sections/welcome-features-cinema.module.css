@@ -72,18 +72,6 @@
   pointer-events: none;
 }
 
-/* The last stretch of the stage fades to the page colour over the glow and
-   the screen's shadow (the strip's words sit above it). */
-.region::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 0;
-  height: 2.5rem;
-  background: linear-gradient(to bottom, rgb(12 8 20 / 0), var(--surface-sunken));
-  pointer-events: none;
-}
-
 .figure {
   /* The screen's width at full size, estimated with the strip at its least
      height. Only the strip's width reads it (so the caption lines up with
@@ -220,10 +208,18 @@
  * the view's line under them (wide windows: all three on one row). Every
  * caption is laid out at once in the same cell, so the strip is as tall as
  * the tallest of them and the screen never resizes when the caption changes.
+ *
+ * It stands on a floor of the page colour, as wide as the stage and down to
+ * its bottom edge. The screen's box ends where the floor starts, so it only
+ * dips behind it while it still lies back (its near edge is drawn lower than
+ * its box); the words are on the plain page colour at every moment, and the
+ * glow and shadow never reach the stage's bottom edge (no seam when it lets
+ * go).
  */
 .strip {
   position: relative;
   z-index: 1;
+  isolation: isolate;
   display: grid;
   width: 100%;
   min-height: var(--strip);
@@ -237,6 +233,18 @@
   column-gap: 1rem;
   row-gap: 0.375rem;
   padding: 1rem 1.25rem 0.75rem;
+}
+
+.strip::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-block: 0;
+  inset-inline: calc((100% - 100cqw) / 2);
+  /* Soft for its first few px (inside the strip's top padding, above the
+     words), then solid. */
+  background: linear-gradient(to bottom, rgb(12 8 20 / 0), var(--surface-sunken) 0.625rem);
+  pointer-events: none;
 }
 
 .labels,
