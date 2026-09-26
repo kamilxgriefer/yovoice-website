@@ -1,4 +1,4 @@
-import { Lock, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 /**
  * Pieces the "What you get" section shares between its static layout and its
@@ -12,12 +12,14 @@ export type Feature = {
   description: string;
 };
 
-/** One sentence for the big-screen picture as a whole. */
+/**
+ * The caption for the big-screen picture as a whole. The frames come from
+ * the app's preview harness on sample people (like the /servers and /updates
+ * captures, which say so), so the caption says so too: they are an
+ * illustration of the layout, not somebody's live account.
+ */
 export const SCREEN_NOTE =
-  "The same YO Voice in a modern browser, laid out for a big screen.";
-
-/** The web app's address, drawn in the browser bar above the captures. */
-export const SCREEN_ADDRESS = "app.yovoice.app";
+  "The same YO Voice in a modern browser, laid out for a big screen. The people and messages are sample content, not a live account.";
 
 /** Every wide capture is 2160 × 1350 (16:10). */
 export const SCREEN_SIZE = { width: 2160, height: 1350 } as const;
@@ -55,9 +57,12 @@ export const SCREEN_VIEWS = [
 export type ScreenView = (typeof SCREEN_VIEWS)[number];
 
 /**
- * A quiet browser bar: three dots and the web app's address. It is part of
- * the picture, so it is hidden from assistive technology; the captures carry
- * the description. Its height and type follow `--bar` on an ancestor.
+ * A quiet, neutral window bar: three dots and nothing else. It carries no
+ * address, lock or account, because the frames are sample-content renders,
+ * not a live session at some URL (design-system.md: app previews are labelled
+ * illustrations). It is part of the picture, so it is hidden from assistive
+ * technology; the captures carry the description. Its height follows `--bar`
+ * on an ancestor.
  */
 export function BrowserBar() {
   return (
@@ -70,10 +75,6 @@ export function BrowserBar() {
         <span className="size-[0.75em] rounded-full bg-[#3a3046]" />
         <span className="size-[0.75em] rounded-full bg-[#3a3046]" />
         <span className="size-[0.75em] rounded-full bg-[#3a3046]" />
-      </span>
-      <span className="absolute left-1/2 top-1/2 flex h-[1.9em] min-w-[16em] max-w-[46%] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-[0.5em] rounded-full border border-[#2c2338] bg-[#1a1424] px-[1.2em] font-medium leading-none tracking-[0.01em] text-[#b8afc2]">
-        <Lock className="size-[0.9em] flex-none" strokeWidth={2.2} />
-        <span className="truncate">{SCREEN_ADDRESS}</span>
       </span>
     </div>
   );

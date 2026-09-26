@@ -1,89 +1,132 @@
 /*
  * The big-screen stage of "What you get".
  *
- * A tall track with a sticky, full-height stage. Inside it, `.region` is a
- * size container, so the screen can be sized to whatever room the stage has
- * left in one expression: as wide as the region allows, or as tall as its
- * height allows once the caption strip is set aside — a 16:10 capture under a
- * browser bar inside a thin bezel. The motion only ever scales that box down
+ * A tall track with a sticky, full-height stage. The heading sits over the
+ * top of the stage; under the fixed header, `.region` holds the screen and,
+ * at the bottom, the caption strip.
+ *
+ * The strip is sized by its content (never clipped, whatever the visitor's
+ * text size), and the screen gets whatever height is left: `.slot` takes the
+ * rest of the region and is a size container, so the screen's width is
+ * derived from the slot's height in one expression (a 16:10 capture under a
+ * browser bar inside a thin bezel). The motion only ever scales that box down
  * from there (transform), so the size it reaches is the size it was laid out
  * at and nothing is resampled upwards.
  *
- * Phone and tablet (< 64rem): heading, screen and strip stack in a column and
- * the screen fills the width (a landscape picture on a portrait screen is
- * limited by width, never by height). Wide screens: the heading sits over the
- * top of the region and the screen grows up and over it.
+ * Landscape windows: the screen is also capped at 92 % of the width, so it
+ * always fits and the whole capture is shown.
+ *
+ * Portrait windows (phones, tablets held upright): the screen is as tall as
+ * the slot, so the capture is drawn at a size its text can be read at, which
+ * is wider than the window. The stage crops it (an honest crop of the real
+ * capture, never stretched) and the scroll pans the camera across it
+ * (`x` in welcome-features-cinema.tsx). The pin is shorter there.
  */
 
 .track {
   position: relative;
-  height: 280svh;
+  height: 320svh;
+}
+
+@media (orientation: portrait) {
+  .track {
+    height: 240svh;
+  }
 }
 
 .stage {
   --bar: 1.5rem;
   --bezel: 0.3125rem;
-  --strip: 7rem;
+  --radius: 0.875rem;
+  /* The strip's height at the default text size: the least it takes. */
+  --strip: 6.5rem;
   position: sticky;
   top: 0;
-  display: flex;
   height: 100svh;
-  flex-direction: column;
   overflow: clip;
-  padding-top: calc(var(--header-height) + 1.5rem);
-  padding-bottom: 0.5rem;
+  /* The glow sits above the middle and has faded out before the bottom
+     edge, and the last fifth fades to the page colour, so the stage lets go
+     on the same colour as the rows under it (no seam). */
   background:
-    radial-gradient(120% 70% at 50% 100%, rgb(123 47 247 / 0.14), transparent 62%),
+    linear-gradient(to bottom, rgb(12 8 20 / 0) 80%, var(--surface-sunken) 100%),
+    radial-gradient(120% 70% at 50% 78%, rgb(123 47 247 / 0.14), transparent 55%),
     var(--surface-sunken);
 }
 
 .heading {
-  position: relative;
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--header-height) + clamp(1.5rem, 6svh, 4.5rem));
   z-index: 1;
-  flex: none;
   padding-inline: 1.25rem;
   text-align: center;
 }
 
 .region {
-  position: relative;
+  position: absolute;
+  inset: calc(var(--header-height) + 0.75rem) 0 0;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  container-type: size;
+  pointer-events: none;
+}
+
+/* The last stretch of the stage fades to the page colour over the glow and
+   the screen's shadow (the strip's words sit above it). */
+.region::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 0;
+  height: 2.5rem;
+  background: linear-gradient(to bottom, rgb(12 8 20 / 0), var(--surface-sunken));
+  pointer-events: none;
+}
+
+.figure {
+  /* The screen's width at full size, estimated with the strip at its least
+     height. Only the strip's width reads it (so the caption lines up with
+     the screen's edges at the default text size); the screen itself is
+     sized from the room the strip actually leaves. */
+  --screen-est: min(
+    92cqw,
+    calc((100cqh - var(--strip) - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel))
+  );
   display: flex;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-top: 0.75rem;
-  container-type: size;
-  pointer-events: none;
-}
-
-/* The screen's width at full size, shared by the screen and its caption. */
-.figure {
-  --screen-w: min(
-    100cqw,
-    calc((100cqh - var(--strip) - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel))
-  );
-  display: flex;
   margin: 0;
-  flex-direction: column;
-  align-items: center;
 }
 
 .slot {
   position: relative;
-  width: var(--screen-w);
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 0;
+  align-items: flex-end;
+  /* Centred even when the screen is wider than the window (portrait). */
+  justify-content: center;
+  container-type: size;
+}
+
+/* The screen's own box at full size. Its perspective is set inline (it only
+   reaches direct children), from the pose the offset math uses. */
+.frame {
+  position: relative;
+  width: calc((100cqh - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel));
   flex: none;
-  /* The perspective itself is set inline on this, the screen's own parent
-     (it only reaches direct children), from the pose the offset math uses. */
   perspective-origin: 50% 0%;
 }
 
-/* The light the screen throws on the room behind it. Decorative. */
+/* The light the screen throws on the room behind it. Decorative. It ends a
+   little under the screen, above the stage's bottom edge. */
 .glow {
   position: absolute;
-  inset: -22% -12% -30%;
+  inset: -22% -12% -6%;
   background: radial-gradient(closest-side, rgb(123 47 247 / 0.42), rgb(192 38 255 / 0.12) 55%, transparent);
   pointer-events: none;
 }
@@ -98,12 +141,17 @@
   inset: 2% 3% 0;
   border-radius: 1.5rem;
   box-shadow:
-    0 2.5rem 5rem -1rem rgb(0 0 0 / 0.7),
+    0 2rem 4rem -1rem rgb(0 0 0 / 0.7),
     0 0 0 1px rgb(0 0 0 / 0.2);
 }
 
+/* A constant corner: the screen's scale already changes how big it looks,
+   and a static clip costs nothing per frame (an animated clip-path made the
+   whole screen layer re-rasterise on every scroll step). */
 .bezel {
   position: relative;
+  overflow: clip;
+  border-radius: var(--radius);
   padding: var(--bezel);
   background: linear-gradient(180deg, #2d2439 0%, #1a1424 40%, #110c19 100%);
 }
@@ -167,75 +215,114 @@
   pointer-events: none;
 }
 
+/*
+ * The caption strip: which view it is and the progress segments on one row,
+ * the view's line under them (wide windows: all three on one row). Every
+ * caption is laid out at once in the same cell, so the strip is as tall as
+ * the tallest of them and the screen never resizes when the caption changes.
+ */
 .strip {
   position: relative;
-  display: flex;
-  width: 100cqw;
-  height: var(--strip);
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  min-height: var(--strip);
   flex: none;
-  flex-direction: column;
-  padding: 1rem 1.25rem 0;
+  grid-template-areas:
+    "label segments"
+    "line line";
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.375rem;
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+.labels,
+.lines {
+  display: grid;
+  min-width: 0;
+}
+
+.labels {
+  grid-area: label;
+}
+
+.lines {
+  grid-area: line;
+}
+
+.labels > *,
+.lines > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.segments {
+  display: flex;
+  grid-area: segments;
+  gap: 0.375rem;
+}
+
+.segment {
+  position: relative;
+  display: block;
+  width: 2rem;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #342a43;
 }
 
 @media (min-width: 40rem) {
   .stage {
     --bar: 1.875rem;
     --bezel: 0.4375rem;
-    --strip: 6.5rem;
+    --radius: 1rem;
+    --strip: 5.25rem;
   }
 
   .strip {
-    width: var(--screen-w);
+    width: min(100%, var(--screen-est));
     padding-inline: 0.25rem;
-  }
-
-  .figure {
-    --screen-w: min(
-      94cqw,
-      calc((100cqh - var(--strip) - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel))
-    );
   }
 }
 
 @media (min-width: 64rem) {
-  .track {
-    height: 320svh;
-  }
-
   .stage {
     --bar: 2.25rem;
     --bezel: 0.5rem;
+    --radius: 1.125rem;
     --strip: 4.75rem;
-    display: block;
-    padding: 0;
-  }
-
-  .heading {
-    position: absolute;
-    inset-inline: 0;
-    top: calc(var(--header-height) + clamp(1.75rem, 6svh, 4.5rem));
-    padding-inline: 3rem;
   }
 
   .region {
-    position: absolute;
     inset: calc(var(--header-height) + 1.25rem) 0 0;
-    margin: 0;
-    justify-content: flex-start;
-  }
-
-  .figure {
-    --screen-w: min(
-      92cqw,
-      calc((100cqh - var(--strip) - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel))
-    );
   }
 
   .strip {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    padding: 0 0.25rem;
+    grid-template-areas: "label line segments";
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-content: center;
+    column-gap: 1rem;
+    padding: 0.75rem 0.25rem;
+  }
+
+  .segments {
+    gap: 0.5rem;
+  }
+
+  .segment {
+    width: 3.5rem;
+  }
+}
+
+@media (orientation: landscape) {
+  .frame {
+    width: min(
+      92cqw,
+      calc((100cqh - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel))
+    );
   }
 }

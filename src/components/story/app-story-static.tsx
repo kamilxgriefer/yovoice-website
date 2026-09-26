@@ -13,7 +13,9 @@ import { StoryCta, StoryHeading } from "@/components/story/story-shared";
  *
  * The same heading, the same four chapters and the same captures as the
  * pinned scene, laid out as calm rows — the phone and its chapter side by
- * side, alternating on wide screens, stacked on phones.
+ * side, alternating on wide screens, stacked on phones. Each chapter keeps
+ * the id the scene gives it (`#inside-home` … `#inside-moments`), so a link
+ * to one lands on it in either layout.
  */
 export function AppStoryStatic() {
   return (
@@ -29,6 +31,7 @@ export function AppStoryStatic() {
           {CHAPTERS.map((chapter, index) => (
             <li
               key={chapter.screen.id}
+              id={`inside-${chapter.screen.id}`}
               className="grid items-center gap-8 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10 lg:grid-cols-2 lg:gap-16"
             >
               <StaticPhone
@@ -48,7 +51,8 @@ export function AppStoryStatic() {
                   <span className="h-px w-8 bg-current" aria-hidden="true" />
                   <span>{chapter.screen.label}</span>
                 </p>
-                <h3 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(1.75rem,1.3rem+1.6vw,2.75rem)] font-extrabold leading-[1.05] tracking-[-.03em] text-[var(--foreground)]">
+                {/* At most 36px: a step below the section title above it. */}
+                <h3 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(1.5rem,1.2rem+1vw,2.25rem)] font-extrabold leading-[1.05] tracking-[-.03em] text-[var(--foreground)]">
                   {chapter.title}
                 </h3>
                 <p className="mt-4 text-base leading-[1.65] text-[var(--text-secondary)] sm:text-[1.0625rem]">
@@ -83,12 +87,14 @@ function StaticPhone({ chapter, className }: { chapter: StoryChapter; className?
           className="relative overflow-hidden rounded-[2.2rem] bg-[#08040f]"
           style={{ aspectRatio: `${PHONE_CAPTURE.width} / ${PHONE_CAPTURE.height}` }}
         >
+          {/* The frame is 16px wider than the capture (7px padding and a
+              1px border each side). */}
           <Image
             src={chapter.screen.phone}
-            alt={chapter.screen.alt}
+            alt={chapter.alt}
             width={PHONE_CAPTURE.width}
             height={PHONE_CAPTURE.height}
-            sizes="(min-width: 1024px) 272px, (min-width: 640px) 216px, 62vw"
+            sizes="(min-width: 1024px) 256px, (min-width: 640px) 200px, min(calc(62vw - 16px), 224px)"
             className="size-full object-cover object-top"
           />
         </div>
