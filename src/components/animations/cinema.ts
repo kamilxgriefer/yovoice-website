@@ -1,7 +1,7 @@
 "use client";
 
-import { useSyncExternalStore, type RefObject } from "react";
-import { useScroll, useSpring, type MotionValue } from "framer-motion";
+import { useDeferredValue, useSyncExternalStore, type RefObject } from "react";
+import { useMotionValueEvent, useScroll, useSpring, type MotionValue } from "framer-motion";
 
 /**
  * Scroll cinema: the homepage's scroll-driven scenes (owner request,
@@ -17,8 +17,11 @@ import { useScroll, useSpring, type MotionValue } from "framer-motion";
  *   revealed, and nothing moves on its own;
  * - a viewport shorter than 32rem or narrower than 20rem. The query is in
  *   `rem`, which media queries resolve against the visitor's default font
- *   size, so a larger text setting (200 % text on a phone) or page zoom turns
- *   the pinned, fixed-height stages off before they could clip that text;
+ *   size, so a larger text setting or page zoom turns the pinned,
+ *   fixed-height stages off on a phone (200 % text) and on short desktop
+ *   windows. A tall desktop window can keep the cinema at 150-200 % text, so
+ *   every stage sizes its text blocks to their content (and a scene that
+ *   cannot hold its text falls back to its own static layout);
  * - before hydration, so the server and the first client render agree.
  */
 export const CINEMA_QUERY =
@@ -44,7 +47,13 @@ const serverSnapshot = () => false;
  * hooks that measure scroll position always attach to elements that exist.
  */
 export function useCinema(): boolean {
-  return useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
+  // After hydration the store's snapshot changes from false to true, which
+  // React re-renders synchronously. Deferring the value moves the expensive
+  // part (every scene swapping in its scroll-driven tree) into a background
+  // render that React can interrupt, so arming the cinema never blocks the
+  // main thread in one long task while the visitor starts to scroll. A scene
+  // mounted later (client navigation) gets the current value at once.
+  return useDeferredValue(useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot));
 }
 
 /** One shared feel for every scrubbed scene: a short, well-damped follow. */
@@ -71,5 +80,15 @@ export function useSceneProgress(
   offset: ScrollOffset = ["start start", "end end"],
 ): MotionValue<number> {
   const { scrollYProgress } = useScroll({ target, offset });
-  return useSpring(scrollYProgress, SCENE_SPRING);
+  const progress = useSpring(scrollYProgress, SCENE_SPRING);
+  // A jump of a third of the scene in one step is not a scroll but a
+  // relocation — an in-page link, a restored position, a scene mounting
+  // mid-page. The scene lands there instead of fast-forwarding through
+  // every frame in between.
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (Math.abs(latest - progress.get()) > SCENE_JUMP) progress.jump(latest);
+  });
+  return progress;
 }
+
+const SCENE_JUMP = 0.34;

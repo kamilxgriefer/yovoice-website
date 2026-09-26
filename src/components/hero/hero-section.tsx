@@ -22,11 +22,12 @@ export function HeroSection() {
        min-height subtracts the same token, so the fold follows the header
        instead of a hard-coded 80px. */
     <section className="relative overflow-hidden pt-22 sm:pt-30 lg:min-h-[calc(100svh-var(--header-height))] lg:pt-0">
-      {/* The whole decorative layer of this page is this one radial glow in
-          the top-left corner. The starfield, the nebula wisp, the dust motes
-          and the vignette are gone: the first thing a visitor notices should
-          be the sentence, not the backdrop. On the way out it drifts down
-          after the scroll, so the light leaves the hero last. */}
+      {/* The hero's whole decorative layer is this one radial glow in the
+          top-left corner (the scroll cinema's scenes below carry their own).
+          The starfield, the nebula wisp, the dust motes and the vignette are
+          gone: the first thing a visitor notices should be the sentence, not
+          the backdrop. On the way out it drifts down after the scroll, so the
+          light leaves the hero last. */}
       <HeroGlowDepth className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-10%] top-[-18%] size-[640px] rounded-full bg-[radial-gradient(circle,rgba(123,47,247,.14),transparent_70%)]" />
       </HeroGlowDepth>
@@ -124,7 +125,7 @@ export function HeroSection() {
           href="#inside"
           whileHover={{ y: 2 }}
           className="focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-[var(--text-tertiary)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
-          aria-label="Scroll to the tour of YO Voice"
+          aria-label="Scroll to Inside YO Voice"
         >
           <ArrowDown className="size-4" aria-hidden="true" />
         </motion.a>

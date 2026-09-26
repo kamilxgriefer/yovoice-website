@@ -16,8 +16,9 @@ const LIT = "#f8f5fc";
  * A sentence that lights up word by word as it scrolls through the viewport,
  * as if it were being said.
  *
- * Screen readers get the sentence once, as plain text; the per-word spans
- * are `aria-hidden`, so VoiceOver does not step through them one by one.
+ * The words are the sentence itself — plain inline spans in one paragraph,
+ * with the spaces between them — so it is in the page once: a screen reader
+ * reads one paragraph, and selecting or copying it gives the sentence once.
  * Without the cinema the sentence is plain text in its lit colour.
  */
 export function WordReveal({
@@ -39,19 +40,16 @@ function ScrubbedWords({ text }: { text: string }) {
   const words = text.split(" ");
 
   return (
-    <>
-      <span className="sr-only">{text}</span>
-      <span ref={ref} className="block" aria-hidden="true">
-        {words.map((word, index) => {
-          const start = (index / words.length) * 0.85;
-          return (
-            <Word key={`${word}-${index}`} progress={progress} range={[start, start + 0.15]}>
-              {word}
-            </Word>
-          );
-        })}
-      </span>
-    </>
+    <span ref={ref} className="block">
+      {words.map((word, index) => {
+        const start = (index / words.length) * 0.85;
+        return (
+          <Word key={`${word}-${index}`} progress={progress} range={[start, start + 0.15]}>
+            {word}
+          </Word>
+        );
+      })}
+    </span>
   );
 }
 

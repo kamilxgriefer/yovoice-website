@@ -179,12 +179,15 @@ test("the hero's in-page links point at sections the homepage actually renders",
   }
 
   // The welcome order the owner asked for: hero, what YO Voice is, features,
-  // Servers as a welcome, then the way in.
+  // Servers as a welcome, then the way in. Inside YO Voice, the scroll
+  // cinema's tour of the app's four places, follows the hero (2026-09-26).
   const order = [
     "<HeroSection />",
+    "<AppStory />",
     "<WelcomeIntro />",
     "<WelcomeFeatures />",
     "<ServersWelcome />",
+    "<PremiumSection />",
     "<DownloadSection finale />",
   ];
   let cursor = -1;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { CinemaScrollAnchor } from "@/components/animations/cinema-scroll-anchor";
 import { ScrollProgress } from "@/components/animations/scroll-progress";
 import { HeroSection } from "@/components/hero/hero-section";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -35,6 +36,7 @@ export default function HomePage() {
     <div>
       <SiteHeader />
       <ScrollProgress />
+      <CinemaScrollAnchor />
       <main id="main-content">
         <HeroSection />
         <AppStory />

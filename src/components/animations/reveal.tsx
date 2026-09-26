@@ -20,6 +20,10 @@ const ELEMENTS = {
  * reduced motion and the no-cinema layouts all draw it at rest, and when the
  * cinema arms after hydration only what is still below the fold is hidden,
  * so nothing already on screen blinks out and back in.
+ *
+ * Keyboard focus never waits for the entrance: the moment anything inside
+ * receives focus the block is drawn at rest, at once, so a focused link is
+ * never transparent or still on its way up.
  */
 export function Reveal({
   children,
@@ -40,6 +44,8 @@ export function Reveal({
   const ref = useRef<HTMLElement>(null);
   const opacity = useMotionValue(1);
   const y = useMotionValue(0);
+  // While the entrance is armed or running: draws the block at rest at once.
+  const settle = useRef<(() => void) | null>(null);
 
   useLayoutEffect(() => {
     const node = ref.current;
@@ -61,12 +67,18 @@ export function Reveal({
       { rootMargin: "0px 0px -8% 0px" },
     );
     observer.observe(node);
-
-    return () => {
+    // Waiting or still rising: either way, straight to rest.
+    const toRest = () => {
       observer.disconnect();
       running.forEach((animation) => animation.stop());
       opacity.set(1);
       y.set(0);
+    };
+    settle.current = toRest;
+
+    return () => {
+      settle.current = null;
+      toRest();
     };
   }, [cinema, delay, distance, opacity, y]);
 
@@ -77,6 +89,7 @@ export function Reveal({
       ref={ref as never}
       className={className}
       style={{ opacity, y }}
+      onFocusCapture={() => settle.current?.()}
     >
       {children}
     </Element>

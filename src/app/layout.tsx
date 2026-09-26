@@ -62,7 +62,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // data-scroll-behavior: Next 16 only switches the smooth scrolling in
+    // globals.css off during route changes when asked to, so a navigation or
+    // a back/forward arrival jumps instead of sweeping through the page.
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={inter.variable}>
         <script
           type="application/ld+json"

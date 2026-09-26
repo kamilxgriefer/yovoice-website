@@ -140,6 +140,8 @@ test("Premium and Updates do not turn a planned allowance into a paid or shipped
     "src/config/premium.ts",
     "src/components/premium/premium-plans-view.tsx",
     "src/components/sections/premium-section.tsx",
+    // The homepage identity pills moved here with the scroll cinema.
+    "src/components/sections/premium-identity.tsx",
     "src/app/(marketing)/premium/page.tsx",
   ]) {
     assert.doesNotMatch(
@@ -234,6 +236,7 @@ test("Premium never sells Build 27-only benefits unless a phrase marks them as n
     "src/config/premium.ts",
     "src/app/(marketing)/premium/page.tsx",
     "src/components/sections/premium-section.tsx",
+    "src/components/sections/premium-identity.tsx",
     "src/components/premium/premium-plans-view.tsx",
   ];
   const unreleased =

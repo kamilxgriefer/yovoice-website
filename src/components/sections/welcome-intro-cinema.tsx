@@ -170,9 +170,11 @@ function SpokenHeading() {
       ref={ref}
       id="welcome-heading"
       style={{ scale, y, originX: 0, originY: 1 }}
-      className="mt-6 break-words font-[family-name:var(--font-display)] text-[clamp(2.5rem,0.6rem+5.4vw,6.5rem)] font-extrabold leading-[0.98] tracking-[-0.04em] text-balance text-[var(--foreground)]"
+      className="mt-6 break-words hyphens-auto font-[family-name:var(--font-display)] text-[clamp(2.5rem,0.6rem+5.4vw,6.5rem)] font-extrabold leading-[0.98] tracking-[-0.04em] text-balance text-[var(--foreground)]"
     >
-      <span className="sm:block">Small communities that</span>{" "}
+      {/* The same soft hyphen as the static heading: at 320 px the display
+          size would otherwise break "communities" wherever it overflows. */}
+      <span className="sm:block">Small commu{"\u00AD"}nities that</span>{" "}
       <span ref={lineRef} className="text-[var(--accent)] sm:block">
         {ACCENT_WORDS.map((word, index) => (
           <span key={word}>
