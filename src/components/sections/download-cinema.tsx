@@ -71,16 +71,13 @@ function ZoomingHeading({
   const zoom = useStartingZoom(ref);
 
   const scale = useTransform(progress, (value) => 1 + (zoom - 1) * (1 - easeOutCubic(clamp01(value))));
-  const opacity = useTransform(progress, (value) => 0.55 + 0.45 * easeOutCubic(clamp01(value / 0.5)));
+  // Scrubbed, so it can rest wherever the visitor stops: no blur, and never
+  // fainter than 80 %, where even the accent words keep 3:1 as large text.
+  const opacity = useTransform(progress, (value) => 0.8 + 0.2 * easeOutCubic(clamp01(value / 0.5)));
   const y = useTransform(progress, (value) => 36 * (1 - easeOutCubic(clamp01(value))));
-  // A short focus pull as it arrives, gone well before it is read.
-  const filter = useTransform(progress, (value) => {
-    const blur = 6 * (1 - clamp01(value / 0.4));
-    return blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : "none";
-  });
 
   return (
-    <motion.h2 ref={ref} id={id} className={className} style={{ scale, opacity, y, filter }}>
+    <motion.h2 ref={ref} id={id} className={className} style={{ scale, opacity, y }}>
       {children}
     </motion.h2>
   );

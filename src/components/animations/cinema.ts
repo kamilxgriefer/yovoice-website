@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useSyncExternalStore, type RefObject } from "react";
+import { useDeferredValue, useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import { useMotionValueEvent, useScroll, useSpring, type MotionValue } from "framer-motion";
 
 /**
@@ -90,14 +90,31 @@ export function useSceneProgress(
 ): MotionValue<number> {
   const { scrollYProgress } = useScroll({ target, offset });
   const progress = useSpring(scrollYProgress, SCENE_SPRING);
-  // A jump of a third of the scene in one step is not a scroll but a
-  // relocation — an in-page link, a restored position, a scene mounting
-  // mid-page. The scene lands there instead of fast-forwarding through
-  // every frame in between.
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (Math.abs(latest - progress.get()) > SCENE_JUMP) progress.jump(latest);
-  });
+  useRelocationJump(scrollYProgress, progress);
   return progress;
 }
 
-const SCENE_JUMP = 0.34;
+/**
+ * Makes a spring that follows the scroll land at once when the page is
+ * relocated rather than scrolled — an in-page link, a restored position, or
+ * the scene itself mounting mid-page — instead of fast-forwarding through
+ * every frame in between. A relocation is one step of more than one and a
+ * half windows; a wheel, a trackpad flick, Page Down or the rail's smooth
+ * scroll all move less than that per step, so they keep the spring.
+ */
+export function useRelocationJump(source: MotionValue<number>, follower: MotionValue<number>) {
+  const lastY = useRef<number | null>(null);
+  const mountedAt = useRef<number | null>(null);
+  useEffect(() => {
+    mountedAt.current = performance.now();
+    lastY.current = window.scrollY;
+  }, []);
+  useMotionValueEvent(source, "change", (latest) => {
+    const y = window.scrollY;
+    const step = lastY.current === null ? 0 : Math.abs(y - lastY.current);
+    lastY.current = y;
+    // The first measurement after mounting is where the scene already is.
+    const justMounted = mountedAt.current === null || performance.now() - mountedAt.current < 250;
+    if (justMounted || step > window.innerHeight * 1.5) follower.jump(latest);
+  });
+}

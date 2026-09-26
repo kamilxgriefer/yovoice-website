@@ -244,11 +244,46 @@ test("links and restored positions land where they point once the cinema grows t
   // Next 16 only switches the page's smooth scrolling off for navigations when asked.
   assert.match(layout, /<html lang="en" data-scroll-behavior="smooth">/);
   assert.match(anchor, /window\.history\.scrollRestoration = "manual";/);
-  assert.match(anchor, /addEventListener\("pagehide", save\)/);
+  // The position is taken as the visitor leaves: the page hidden, a link
+  // followed, or Back / Forward to another page (from the last position
+  // scrolled to on this page, before the next page clamps it).
+  assert.match(anchor, /addEventListener\("pagehide", hide\)/);
+  assert.match(anchor, /addEventListener\("popstate", travel\)/);
+  assert.match(anchor, /if \(window\.location\.pathname !== home\) save\(lastY\);/);
+  // A reload or back/forward arrival returns to where the visitor was, even
+  // with a fragment still in the address; a fresh arrival follows the fragment.
+  const land = anchor.slice(anchor.indexOf("function landing("));
+  assert.ok(land.indexOf("arrivedByHistory(documentLoad)") < land.indexOf("window.location.hash"));
   // Re-landing is instant, never a smooth sweep through every scene.
   assert.match(anchor, /scrollIntoView\(\{ block: "start", behavior: "instant" \}\)/);
   assert.match(anchor, /scrollTo\(\{ top: y, behavior: "instant" \}\)/);
   assert.doesNotMatch(withoutComments(anchor), /behavior: "smooth"/);
+
+  // The page itself only scrolls smoothly for a jump the visitor asks for on
+  // it, so a fragment on load or a restored position never sweeps the scenes.
+  const css = await readFile("src/app/globals.css", "utf8");
+  assert.doesNotMatch(css, /html \{[^}]*scroll-behavior: smooth/);
+  assert.match(css, /@media \(prefers-reduced-motion: no-preference\) \{\s*html:focus-within \{ scroll-behavior: smooth; \}/);
+});
+
+test("a finale sized from what is below it never feeds back on itself", async () => {
+  const finale = await readFile("src/components/sections/be-you-finale.tsx", "utf8");
+  // Rounding a new word size moves the page by a pixel; only a real change is written.
+  assert.match(finale, /if \(Math\.abs\(tail - written\) < 2\) return;/);
+});
+
+test("springs that follow the scroll land at once on a relocation, and only then", async () => {
+  const cinema = await readFile("src/components/animations/cinema.ts", "utf8");
+  assert.match(cinema, /export function useRelocationJump\(/);
+  assert.match(cinema, /step > window\.innerHeight \* 1\.5/);
+  for (const file of [
+    "src/components/animations/cinema.ts",
+    "src/components/animations/scroll-progress.tsx",
+    "src/components/hero/hero-scroll-depth.tsx",
+    "src/components/sections/be-you-finale.tsx",
+  ]) {
+    assert.match(await readFile(file, "utf8"), /useRelocationJump\(/, file);
+  }
 });
 
 test("the story and What you get show only current captures, honestly framed", async () => {

@@ -11,7 +11,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 
-import { SCENE_SPRING, useCinema } from "@/components/animations/cinema";
+import { SCENE_SPRING, useCinema, useRelocationJump } from "@/components/animations/cinema";
 
 /**
  * The hero's exit: what happens to it while it scrolls away, and nothing
@@ -124,6 +124,7 @@ function ExitTracker({
     () => scrollYProgress.get() * Math.min(1, Math.max(0, scrollY.get() / REST_UNTIL_PX)),
   );
   const eased = useSpring(gated, SCENE_SPRING);
+  useRelocationJump(gated, eased);
   useMotionValueEvent(eased, "change", (value) => into.set(value));
   useEffect(() => () => into.set(0), [into]);
   return null;

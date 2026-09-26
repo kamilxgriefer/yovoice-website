@@ -52,9 +52,20 @@ export function CinemaScrollAnchor() {
     if (saved.current === undefined) saved.current = readSaved();
     const previous = window.history.scrollRestoration;
     window.history.scrollRestoration = "manual";
-    const save = () => {
+    const home = window.location.pathname;
+    // The last position scrolled to while the address was still this page.
+    // By the time Back or a route change is reported, the next page may
+    // already have clamped or reset the scroll.
+    let lastY = window.scrollY;
+    const track = () => {
+      if (window.location.pathname === home) lastY = window.scrollY;
+    };
+    // When the position was last taken on the way out; a later unmount keeps it.
+    let savedAt = -Infinity;
+    const save = (y = window.scrollY) => {
+      savedAt = performance.now();
       const position: SavedPosition = {
-        y: window.scrollY,
+        y,
         cinema: cinemaNow.current,
         width: window.innerWidth,
       };
@@ -65,21 +76,32 @@ export function CinemaScrollAnchor() {
       }
     };
     // A client navigation away resets the scroll to the top before this
-    // unmounts, so the position is taken when the link is followed.
-    let leaving = false;
+    // unmounts, so the position is taken as the visitor leaves: when a link
+    // to another page is followed in this tab, or when Back / Forward takes
+    // the tab to another page (popstate fires before the new page renders).
     const follow = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const link = (event.target as Element | null)?.closest?.("a[href]");
-      if (!(link instanceof HTMLAnchorElement)) return;
-      if (link.pathname === window.location.pathname && link.origin === window.location.origin) return;
+      if (!(link instanceof HTMLAnchorElement) || link.hasAttribute("download")) return;
+      if (link.target && link.target !== "_self") return;
+      if (link.origin === window.location.origin && link.pathname === home) return;
       save();
-      leaving = true;
     };
+    const travel = () => {
+      if (window.location.pathname !== home) save(lastY);
+    };
+    const hide = () => save();
+    window.addEventListener("scroll", track, { passive: true });
     document.addEventListener("click", follow, true);
-    window.addEventListener("pagehide", save);
+    window.addEventListener("popstate", travel);
+    window.addEventListener("pagehide", hide);
     return () => {
-      if (!leaving) save();
+      if (performance.now() - savedAt > 2000) save(lastY);
+      window.removeEventListener("scroll", track);
       document.removeEventListener("click", follow, true);
-      window.removeEventListener("pagehide", save);
+      window.removeEventListener("popstate", travel);
+      window.removeEventListener("pagehide", hide);
       window.history.scrollRestoration = previous;
     };
   }, []);
@@ -122,16 +144,25 @@ function landing(
   documentLoad: boolean,
   saved: SavedPosition | null,
 ): (() => void) | null {
+  // A reload or a back/forward arrival returns to where the visitor was,
+  // even when the address still carries a fragment they followed earlier
+  // (the hero arrow leaves /#inside in it).
+  if (
+    arrivedByHistory(documentLoad) &&
+    saved &&
+    saved.cinema === cinema &&
+    saved.width === window.innerWidth
+  ) {
+    const y = saved.y;
+    return () => window.scrollTo({ top: y, behavior: "instant" });
+  }
+
   const id = decodeURIComponent(window.location.hash.slice(1));
   const target = id ? document.getElementById(id) : null;
   if (target) {
     return () => target.scrollIntoView({ block: "start", behavior: "instant" });
   }
-
-  if (!arrivedByHistory(documentLoad)) return null;
-  if (!saved || saved.cinema !== cinema || saved.width !== window.innerWidth) return null;
-  const y = saved.y;
-  return () => window.scrollTo({ top: y, behavior: "instant" });
+  return null;
 }
 
 let lastPopState = -Infinity;

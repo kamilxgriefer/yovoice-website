@@ -11,7 +11,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 
-import { SCENE_SPRING, useCinema } from "@/components/animations/cinema";
+import { SCENE_SPRING, useCinema, useRelocationJump } from "@/components/animations/cinema";
 import { ScrollWave } from "@/components/animations/scroll-wave";
 
 /**
@@ -99,7 +99,13 @@ const WORD_STYLE: CSSProperties = { fontSize: WORD_SIZE };
  * Keeps `--finale-tail` equal to the distance from the top of the wave to
  * the end of the document. It changes when the footer reflows (a new width,
  * web fonts arriving) and never with the word itself, so observing the
- * document's size is enough, and a write only happens when it changes.
+ * document's size is enough.
+ *
+ * The word's size is derived from the tail, and the page's height is a
+ * whole number of pixels while the wave's top is not: a new word size moves
+ * the measured tail by a fraction of a pixel, which used to resize the word
+ * again, every frame, forever. Only a change of 2px or more is written, so
+ * a reflowed footer still lands and rounding never feeds back.
  */
 function useTailMeasure(root: RefObject<HTMLElement | null>, wave: RefObject<HTMLElement | null>) {
   useLayoutEffect(() => {
@@ -107,13 +113,13 @@ function useTailMeasure(root: RefObject<HTMLElement | null>, wave: RefObject<HTM
     const waveNode = wave.current;
     if (!node || !waveNode) return;
     const page = document.documentElement;
-    let written = "";
+    let written = Number.NaN;
     const measure = () => {
-      const tail = page.scrollHeight - (waveNode.getBoundingClientRect().top + window.scrollY);
-      const value = `${Math.max(0, tail).toFixed(1)}px`;
-      if (value === written) return;
-      written = value;
-      node.style.setProperty("--finale-tail", value);
+      const top = waveNode.getBoundingClientRect().top + window.scrollY;
+      const tail = Math.max(0, Math.round(page.scrollHeight - top));
+      if (Math.abs(tail - written) < 2) return;
+      written = tail;
+      node.style.setProperty("--finale-tail", `${tail}px`);
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -204,9 +210,6 @@ function SpokenWord() {
   );
 }
 
-/** A step this large is a relocation (End key, a link), not a scroll: land, do not replay. */
-const JUMP = 0.34;
-
 /**
  * `progress`: 0 as the word's top edge enters the screen, 1 once its foot
  * has risen to 60 % of the screen's height — a little below the middle,
@@ -227,9 +230,7 @@ function useFinaleProgress(ref: RefObject<HTMLElement | null>): {
   const { scrollYProgress: page } = useScroll();
   const raw = useTransform([word, page], ([value, end]: number[]) => (end > 0.998 ? 1 : value));
   const progress = useSpring(raw, SCENE_SPRING);
-  useMotionValueEvent(raw, "change", (latest) => {
-    if (Math.abs(latest - progress.get()) > JUMP) progress.jump(latest);
-  });
+  useRelocationJump(raw, progress);
 
   const reached = useMotionValue(0);
   useMotionValueEvent(progress, "change", (value) => {

@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useSpring } from "framer-motion";
 
-import { SCENE_SPRING, useCinema } from "@/components/animations/cinema";
+import { SCENE_SPRING, useCinema, useRelocationJump } from "@/components/animations/cinema";
 
 /**
  * A 2 px level meter along the bottom edge of the fixed header: how far down
@@ -17,6 +17,7 @@ export function ScrollProgress() {
 function Meter() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, SCENE_SPRING);
+  useRelocationJump(scrollYProgress, scaleX);
   return (
     <motion.div
       className="pointer-events-none fixed inset-x-0 top-[calc(var(--header-height)-1px)] z-50 h-[2px] origin-left bg-[linear-gradient(90deg,var(--primary),var(--secondary),var(--accent))]"
