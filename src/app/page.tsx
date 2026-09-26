@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ScrollProgress } from "@/components/animations/scroll-progress";
 import { HeroSection } from "@/components/hero/hero-section";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -8,6 +9,7 @@ import { PremiumSection } from "@/components/sections/premium-section";
 import { WelcomeFeatures } from "@/components/sections/welcome-features";
 import { WelcomeIntro } from "@/components/sections/welcome-intro";
 import { ServersWelcome } from "@/components/servers/servers-welcome";
+import { AppStory } from "@/components/story/app-story";
 
 /**
  * The homepage welcomes; it does not report a build.
@@ -32,8 +34,10 @@ export default function HomePage() {
   return (
     <div>
       <SiteHeader />
+      <ScrollProgress />
       <main id="main-content">
         <HeroSection />
+        <AppStory />
         <WelcomeIntro />
         <WelcomeFeatures />
         <ServersWelcome />
