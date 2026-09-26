@@ -1,0 +1,639 @@
+/*
+ * The pinned app story. Layout and paint only: every moving value is a
+ * framer-motion motion value set inline (transform, opacity, clip-path and a
+ * short blur on headings), so nothing here animates layout.
+ *
+ * Phones: one grid column — text on top under the header, the phone below
+ * (its height is whatever is left, capped at 56svh), the numbered chapter
+ * row at the bottom like the app's own dock.
+ * lg+: three columns — chapter text, the phone in the exact centre, the
+ * chapter rail on the right.
+ *
+ * Stacking, back to front: flood and vignette (0), the bright core behind
+ * the phone (1), the heading and the giant words (2), the phone (3), the
+ * chapter text (4), the rail (5).
+ */
+
+/* The page scrolls anchors to `--header-height + 16px` below the top
+   (globals.css). The stage already clears the header itself, so a link to
+   #inside lands with the stage pinned and the heading in full view. */
+.section {
+  scroll-margin-top: calc(-1 * (var(--header-height) + 16px));
+}
+
+.track {
+  position: relative;
+  height: 520svh;
+}
+
+.stage {
+  --iris-y: 62%;
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  row-gap: 0.75rem;
+  height: 100svh;
+  padding: calc(var(--header-height) + 1rem) 1rem 0.875rem;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--background);
+}
+
+/* ---- Backdrop ---------------------------------------------------------- */
+
+.flood {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  will-change: clip-path;
+}
+
+.floodLayer {
+  position: absolute;
+  inset: 0;
+}
+
+/* A fixed vignette over the flood: darker edges where the text and the rail
+   sit, and a fade to the page background at the bottom so the stage lets go
+   into the next section without a hard edge. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(140% 105% at 50% 58%, transparent 50%, rgb(8 7 17 / 0.6) 100%),
+    linear-gradient(to bottom, transparent 82%, rgb(8 7 17 / 0.88) 100%);
+}
+
+/* ---- Intro heading ----------------------------------------------------- */
+
+.intro {
+  position: absolute;
+  top: calc(var(--header-height) + 1rem);
+  right: 1rem;
+  left: 1rem;
+  z-index: 2;
+}
+
+.introEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #cbbfda;
+}
+
+.introTitle {
+  margin-top: 0.75rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.25rem, 10vw, 3.25rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+/* ---- Giant words (finale) ---------------------------------------------- */
+
+/* On phones the words take the chapter text's place above the phone. */
+.giant {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+  gap: 0.1em;
+  font-size: clamp(2.25rem, 11.6vw, 4rem);
+  pointer-events: none;
+}
+
+.giantWord {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-align: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.giantOutline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--foreground);
+}
+
+.giantSolid {
+  color: var(--foreground);
+}
+
+/* ---- Chapter text ------------------------------------------------------ */
+
+.text {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-row: 1;
+  grid-column: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* All four chapters share one cell, so it is as tall as the longest. */
+.chapter {
+  grid-area: 1 / 1;
+}
+
+.chapterMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.chapterRule {
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.chapterTitle {
+  margin-top: 0.5rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.625rem, 7.6vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  color: var(--foreground);
+}
+
+.chapterText {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #e2dbeb;
+}
+
+/* ---- Phone slot -------------------------------------------------------- */
+
+/* The phone and its core share one grid area; the core sits lower in the
+   stack so the giant words pass in front of the glow and behind the phone. */
+.slot {
+  position: relative;
+  grid-row: 2;
+  grid-column: 1;
+  min-height: 0;
+  container-type: size;
+}
+
+.phoneSlot {
+  z-index: 3;
+}
+
+.coreSlot {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.slotInner {
+  --phone-h: min(100cqh, 56svh);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1300px;
+}
+
+.phone {
+  /* The hero's frame radii (2.6rem body, 2.2rem glass at ~650 px tall),
+     scaled with the phone so a small phone is not drawn as a pill. */
+  --phone-r: min(2.6rem, calc(var(--phone-h) * 0.064));
+  position: relative;
+  width: calc((var(--phone-h) - 16px) * 1206 / 2622 + 16px);
+  height: var(--phone-h);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* The device's thickness: slabs stacked behind the glass, lit a little at
+   the rim so the side reads when the phone turns. */
+.edge {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #4a3d5c;
+  border-radius: var(--phone-r);
+  background: #1a1326;
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  padding: 7px;
+  border: 1px solid #45385a;
+  border-radius: var(--phone-r);
+  background: #0b0714;
+  box-shadow:
+    0 40px 110px rgb(0 0 0 / 0.5),
+    inset 0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--phone-r) - 6px);
+  background: #08040f;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+.layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  background: #05030b;
+  pointer-events: none;
+}
+
+.wipe {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wipeLine {
+  position: absolute;
+  top: -1px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: currentColor;
+  box-shadow: 0 0 22px 4px currentColor;
+}
+
+.sheen {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -70%;
+  width: 240%;
+  pointer-events: none;
+  background: linear-gradient(
+    104deg,
+    transparent 34%,
+    rgb(255 255 255 / 0.12) 45%,
+    rgb(255 255 255 / 0.035) 52%,
+    transparent 62%
+  );
+}
+
+/* The one bright core, centred on the phone and behind it. */
+.core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--phone-h) * 1.05);
+  height: calc(var(--phone-h) * 1.3);
+  translate: -50% -50%;
+}
+
+.coreLayer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Voice rings: the phone "speaks" at each hand-over, a pair of thin rings
+   spreading out from behind it and fading before they reach the text. */
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--phone-h) * 0.62);
+  aspect-ratio: 1;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  translate: -50% -50%;
+}
+
+/* ---- Chapter rail ------------------------------------------------------ */
+
+.rail {
+  position: relative;
+  z-index: 5;
+  grid-row: 3;
+  grid-column: 1;
+  justify-self: center;
+}
+
+.railList {
+  position: relative;
+  padding: 0.25rem;
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 999px;
+  background: rgb(12 8 20 / 0.8);
+}
+
+.railItems {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.railTrack {
+  position: absolute;
+  top: 50%;
+  right: calc(0.25rem + 1.375rem);
+  left: calc(0.25rem + 1.375rem);
+  height: 2px;
+  margin-top: -1px;
+  background: #3a2f4a;
+}
+
+.railFill {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(var(--rail-fill, 0));
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.railButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 1px solid #3a2f4a;
+  border-radius: 999px;
+  background: #0c0814;
+  color: #cdc4d8;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.railButton:hover {
+  border-color: var(--border-strong);
+  color: var(--foreground);
+}
+
+.railButton[aria-current="step"] {
+  border-color: var(--rail-ink, var(--accent));
+  background: #1d1428;
+  color: var(--foreground);
+}
+
+.railNumber {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.railDot {
+  display: none;
+}
+
+/* Visually hidden on phones, where the chapter text already names it. */
+.railLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Wide screens ------------------------------------------------------ */
+
+@media (min-width: 64rem) {
+  .track {
+    height: 580svh;
+  }
+
+  .stage {
+    --iris-y: 53%;
+    --pad-x: clamp(3rem, 5.5vw, 6rem);
+    --rail-w: 10.5rem;
+    --phone-h-wide: min(74svh, calc(100svh - var(--header-height) - 6svh), 48rem);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: center;
+    column-gap: clamp(2.5rem, 4.5vw, 5rem);
+    padding: calc(var(--header-height) + 3svh) var(--pad-x) 3svh;
+  }
+
+  .intro {
+    top: calc(var(--header-height) + 6svh);
+    right: 0;
+    left: 0;
+    text-align: center;
+  }
+
+  .introEyebrow {
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+
+  .introTitle {
+    max-width: 14ch;
+    margin: 1.25rem auto 0;
+    font-size: clamp(3.5rem, 6.6vw, 6.75rem);
+    line-height: 0.95;
+  }
+
+  /* Centred on the phone, and clipped just short of the rail on the right
+     so the incoming word emerges from beside the rail, never under it. */
+  .giant {
+    --giant-inset: calc(var(--pad-x) + var(--rail-w) + 1rem);
+    position: absolute;
+    /* Out of the grid: the stage's padding box is the containing block. */
+    grid-row: auto;
+    grid-column: auto;
+    align-self: stretch;
+    top: var(--header-height);
+    left: 0;
+    right: var(--giant-inset);
+    bottom: 0;
+    padding-left: var(--giant-inset);
+    justify-content: center;
+    gap: 0.06em;
+    overflow: clip;
+    /* "Stop scrolling." is 6.56em wide: never wider than the clip box. */
+    font-size: clamp(3rem, min(8.6vw, calc((100vw - 2 * var(--giant-inset) - 1rem) / 6.8)), 9.5rem);
+  }
+
+  .giantOutline {
+    -webkit-text-stroke-width: 2px;
+  }
+
+  .text {
+    grid-row: 1;
+    grid-column: 1;
+    max-width: 25rem;
+  }
+
+  .chapterMeta {
+    gap: 0.875rem;
+    font-size: 0.75rem;
+  }
+
+  .chapterRule {
+    width: 2.5rem;
+  }
+
+  .chapterTitle {
+    margin-top: 1.25rem;
+    font-size: clamp(2.25rem, 3.4vw, 3.5rem);
+    line-height: 1.02;
+  }
+
+  .chapterText {
+    margin-top: 1.25rem;
+    max-width: 23rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .slot {
+    grid-row: 1;
+    grid-column: 2;
+    width: calc((var(--phone-h-wide) - 16px) * 1206 / 2622 + 16px);
+    height: 100%;
+    container-type: normal;
+  }
+
+  .slotInner {
+    --phone-h: var(--phone-h-wide);
+  }
+
+  .rail {
+    grid-row: 1;
+    grid-column: 3;
+    justify-self: end;
+    width: var(--rail-w);
+  }
+
+  .railList {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .railItems {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .railTrack {
+    top: 1.375rem;
+    right: auto;
+    bottom: 1.375rem;
+    left: calc(1.375rem - 1px);
+    width: 2px;
+    height: auto;
+    margin-top: 0;
+  }
+
+  .railFill {
+    transform: scaleY(var(--rail-fill, 0));
+    transform-origin: center top;
+    background: linear-gradient(180deg, var(--primary), var(--accent));
+  }
+
+  .railButton {
+    justify-content: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+    padding: 0 0.875rem 0 0;
+    border: 0;
+    border-radius: var(--radius-field);
+    background: none;
+  }
+
+  .railButton:hover {
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  .railButton[aria-current="step"] {
+    background: none;
+  }
+
+  .railDot {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .railDot::before {
+    content: "";
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 2px solid #7c6790;
+    border-radius: 999px;
+    background: #0c0814;
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .railButton[data-done="true"] .railDot::before {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .railButton[aria-current="step"] .railDot::before {
+    transform: scale(1.35);
+    border-color: var(--rail-ink, var(--accent));
+    background: var(--rail-ink, var(--accent));
+    box-shadow: 0 0 0 5px rgb(255 255 255 / 0.08), 0 0 18px var(--rail-ink, var(--accent));
+  }
+
+  .railNumber {
+    font-size: 0.75rem;
+  }
+
+  .railLabel {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+}

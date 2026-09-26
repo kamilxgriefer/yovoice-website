@@ -1,0 +1,340 @@
+/* Servers welcome — stacking cards.
+ *
+ * The five kinds of Server form a deck. Every card is `position: sticky`
+ * inside the one list, a little lower than the card before it, so the next
+ * card slides up over the previous one and the covered ones leave a thin,
+ * darker edge above it. Scroll is never taken over: the deck is ordinary
+ * flow plus sticky positioning, and only the scale of covered cards and the
+ * shade over them follow the scroll (transform and opacity, see the TSX). */
+
+/* ---- Left column: heading, sentence and the Channels sheet -------------- */
+
+.aside {
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .aside {
+    position: sticky;
+    top: var(--header-height);
+    align-self: start;
+    /* Level with the first card, which sticks 24 px under the header. */
+    padding-top: 24px;
+  }
+}
+
+.title {
+  margin-top: 1.25rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.25rem, 1.3rem + 2.4vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  color: var(--foreground);
+}
+
+/* ---- The Channels sheet, as a device that turns a little ---------------- */
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 2.5rem 0 0;
+}
+
+@media (min-width: 64rem) {
+  .figure {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1.75rem;
+    margin-top: 2.25rem;
+  }
+}
+
+.stage {
+  /* The device's height; its width follows from the capture's own ratio
+     plus the 7 px bezel and 1 px rim on each side. */
+  --device-h: min(calc(min(62vw, 17rem) * 2164 / 1206 + 16px), 64svh);
+  position: relative;
+  flex: none;
+  width: calc((var(--device-h) - 16px) * 1206 / 2164 + 16px);
+  height: var(--device-h);
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+@media (min-width: 64rem) {
+  .stage {
+    /* What the column has left under the heading and the sentence. */
+    --device-h: clamp(15rem, calc(100svh - var(--header-height) - 26rem), 29rem);
+  }
+}
+
+/* One bright core behind the device, never behind text. */
+.glow {
+  position: absolute;
+  inset: 12% -38% 4%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(123 47 247 / 0.5),
+    rgb(192 38 255 / 0.16) 58%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.device {
+  --device-r: min(2.2rem, calc(var(--device-h) * 0.07));
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Thickness: slabs stacked behind the glass, lit a little at the rim. */
+.slab {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #4a3d5c;
+  border-radius: var(--device-r);
+  background: #1a1326;
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  padding: 7px;
+  border: 1px solid #45385a;
+  border-radius: var(--device-r);
+  background: #0b0714;
+  box-shadow:
+    0 36px 96px rgb(0 0 0 / 0.5),
+    inset 0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--device-r) - 6px);
+  background: #08040f;
+}
+
+/* The capture is drawn a little larger than the glass so it can drift
+   without showing an edge. */
+.capture {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.sheen {
+  position: absolute;
+  inset: -20% -60%;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgb(255 255 255 / 0.07) 48%,
+    rgb(255 255 255 / 0.02) 56%,
+    transparent 64%
+  );
+  pointer-events: none;
+}
+
+.caption {
+  max-width: 17rem;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: var(--text-tertiary);
+}
+
+@media (min-width: 64rem) {
+  .caption {
+    max-width: 12rem;
+    padding-bottom: 0.25rem;
+    text-align: left;
+  }
+}
+
+/* ---- The deck ------------------------------------------------------------ */
+
+.deck {
+  /* Scroll between one card settling and the next one arriving. */
+  --deck-gap: max(16svh, 7.5rem);
+  /* How long the full deck holds before the section scrolls on. */
+  --deck-tail: 10svh;
+  /* The smallest a card is drawn; the script raises every card to the
+     tallest one's natural height (`--card-h`), so all five match. */
+  --card-min: 0px;
+  --card-size: max(var(--card-h, 0px), var(--card-min));
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  row-gap: var(--deck-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Holds the finished deck for a moment. A pseudo-element, not an extra
+   list item, so the list still reads as exactly five kinds. */
+.deck::after {
+  content: "";
+  display: block;
+  height: var(--deck-tail);
+}
+
+.item {
+  /* Each card settles a little lower than the one before it; a card too
+     tall for the window settles with its bottom edge in view instead. */
+  position: sticky;
+  top: min(
+    calc(var(--header-height) + 16px + var(--i) * 10px),
+    calc(100svh - var(--card-size) - 12px)
+  );
+}
+
+@media (min-width: 64rem) {
+  .deck {
+    --deck-gap: 20svh;
+    --deck-tail: 12svh;
+    --card-min: clamp(22rem, 54svh, 31rem);
+  }
+
+  /* The whole deck — four edges and the card in front — sits in the middle
+     of the window under the header. */
+  .item {
+    top: min(
+      calc(
+        max(
+            calc(var(--header-height) + 24px),
+            calc((100svh + var(--header-height) - var(--card-size) - 56px) / 2)
+          ) +
+          var(--i) * 14px
+      ),
+      calc(100svh - var(--card-size) - 16px)
+    );
+  }
+}
+
+/* The card itself: `.panel` gives the opaque surface, hairline and radius. */
+.card {
+  display: flex;
+  min-height: var(--card-size);
+  flex-direction: column;
+  overflow: clip;
+  padding: 1.5rem 1.25rem 1.25rem;
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
+@media (min-width: 40rem) {
+  .card {
+    padding: 2rem 2rem 1.75rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .card {
+    padding: 2.25rem 2.25rem 2rem;
+  }
+}
+
+/* Lit top edge of the card in front. */
+.edge {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary) 55%, var(--accent));
+  pointer-events: none;
+}
+
+/* The card's place in the deck, drawn as an outline. Decorative. */
+.numeral {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(4rem, 2.4rem + 5vw, 8.5rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgb(217 134 255 / 0.42);
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 40rem) {
+  .numeral {
+    top: 1.5rem;
+    right: 1.6rem;
+  }
+}
+
+/* Clears the numeral for the lines beside it. */
+.head {
+  padding-right: 5.25rem;
+}
+
+@media (min-width: 40rem) {
+  .head {
+    padding-right: 10rem;
+  }
+}
+
+.name {
+  margin-top: 0.75rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.75rem, 1.2rem + 1.7vw, 3rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--foreground);
+}
+
+/* Shade over a covered card. Above the content, under nothing. */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: #05030b;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The sound of the card's headline: bars on a hairline, like the page's
+   other waveforms. Decorative; revealed left to right as the card lands. */
+.wave {
+  display: flex;
+  height: 2rem;
+  align-items: flex-end;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+@media (min-width: 40rem) {
+  .wave {
+    height: 2.75rem;
+  }
+}
+
+/* On a short phone the card needs every line for words: the sound goes. */
+@media (max-width: 63.99rem) and (max-height: 38rem) {
+  .wave {
+    display: none;
+  }
+}
+
+.bar {
+  flex: 1 1 0;
+  height: 100%;
+  margin-inline: min(1.5px, 0.53%);
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--accent), var(--primary));
+  opacity: 0.9;
+  transform-origin: bottom;
+}

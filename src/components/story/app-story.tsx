@@ -1,18 +1,20 @@
 "use client";
 
-import { ScrollWave } from "@/components/animations/scroll-wave";
-import { WordReveal } from "@/components/animations/word-reveal";
+import { useCinema } from "@/components/animations/cinema";
+import { AppStoryCinema } from "@/components/story/app-story-cinema";
+import { AppStoryStatic } from "@/components/story/app-story-static";
 
-/** Placeholder for the pinned app story; replaced by the story scene. */
+/**
+ * Inside YO Voice — the homepage's product scene, right after the hero.
+ *
+ * With the scroll cinema on, a pinned stage walks through the app's first
+ * four destinations on one turning phone (`app-story-cinema.tsx`). Without it
+ * — on the server, before hydration, without JavaScript, with reduced motion,
+ * large text or a short window — the same heading, chapters and captures are
+ * calm rows (`app-story-static.tsx`). Both keep `#inside` and
+ * `#inside-heading`, which the hero links to.
+ */
 export function AppStory() {
-  return (
-    <section id="inside" aria-labelledby="inside-heading" className="relative px-5 py-24">
-      <h2 id="inside-heading" className="section-title">Inside YO Voice</h2>
-      <WordReveal
-        className="mt-6 max-w-3xl text-3xl font-bold leading-tight"
-        text="Your people, your Servers, your Chats and the short stuff in between, all in one place that would rather talk than scroll."
-      />
-      <ScrollWave className="mt-10" />
-    </section>
-  );
+  const cinema = useCinema();
+  return cinema ? <AppStoryCinema /> : <AppStoryStatic />;
 }

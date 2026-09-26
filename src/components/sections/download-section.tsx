@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone, type LucideIcon } from "lucide-react";
 
+import { Reveal } from "@/components/animations/reveal";
+import { BeYouFinale } from "@/components/sections/be-you-finale";
+import { PlatformDeck, ZoomHeading } from "@/components/sections/download-cinema";
 import { currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
 
 /**
  * The way in. Every sentence here is pinned by `tests/product-updates.test.ts`
- * and `tests/servers-landing.test.ts` — "Desktop installers are not available
- * yet" appears exactly twice — so this pass changed the surface only: no
- * bloom behind the section, panels instead of glass, icon tiles instead of
- * gradient squares, and the accent instead of fuchsia on the links.
+ * and `tests/servers-landing.test.ts` — the desktop sentence appears exactly
+ * twice — so the copy stays in this file and the scroll cinema only moves it:
+ * the heading zooms into place (`ZoomHeading`), the four platform cards are
+ * dealt from one fanned stack (`PlatformDeck`), the identity panel rises in,
+ * and the page closes on the giant "Be You." (`BeYouFinale`). Without the
+ * cinema everything is drawn at rest in the same layout.
  *
  * The desktop cards carry no action: there are no desktop installers and no
  * published GitHub releases, and the Web card already links to the web app.
@@ -51,36 +56,46 @@ export function DownloadSection() {
   ];
 
   return (
-    <section id="download" className="relative border-t border-[var(--border)] bg-[var(--background)] py-16 sm:py-24">
+    <section
+      id="download"
+      aria-labelledby="download-heading"
+      className="relative overflow-x-clip border-t border-[var(--border)] bg-[var(--background)] pt-16 sm:pt-24"
+    >
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="eyebrow">YO Voice everywhere</p>
-          <h2 className="section-title">
+          <Reveal>
+            <p className="eyebrow">YO Voice everywhere</p>
+          </Reveal>
+          <ZoomHeading id="download-heading" className="section-title">
             Ready to find <span className="text-[var(--accent)]">your people?</span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
-            Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
-          </p>
+          </ZoomHeading>
+          <Reveal delay={0.12}>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
+              Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
+            </p>
+          </Reveal>
         </div>
 
         {/* min-h on the description exists to equalize card heights when
             they sit in a row; stacked on mobile it only added blank space. */}
-        <div id="mobile-downloads" className="mt-10 grid gap-4 sm:mt-14 md:grid-cols-2 xl:grid-cols-4">
-          {platforms.map(({icon: Icon,title,description,href,action}) => (
-            <article key={title} className="panel flex flex-col p-5 sm:p-6">
+        <PlatformDeck
+          id="mobile-downloads"
+          className="mt-10 grid gap-4 sm:mt-14 md:grid-cols-2 xl:grid-cols-4"
+          cards={platforms.map(({ icon: Icon, title, description, href, action }) => (
+            <article key={title} className="panel flex flex-1 flex-col p-5 sm:p-6">
               <span className="icon-tile"><Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
               <h3 className="mt-4 text-lg font-bold text-[var(--foreground)]">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)] md:min-h-20">{description}</p>
               {href && action ? (
                 <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold link-accent">
-                  {action}<ArrowRight className="size-4"/>
+                  {action}<ArrowRight className="size-4" aria-hidden="true"/>
                 </Link>
               ) : null}
             </article>
           ))}
-        </div>
+        />
 
-        <div className="panel mt-8 flex flex-col items-start justify-between gap-6 p-6 sm:p-8 lg:flex-row lg:items-center">
+        <Reveal className="panel mt-8 flex flex-col items-start justify-between gap-6 p-6 sm:p-8 lg:flex-row lg:items-center">
           <div className="flex items-start gap-5">
             <span className="icon-tile"><Download className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
             <div>
@@ -89,9 +104,11 @@ export function DownloadSection() {
             </div>
           </div>
           <Link href={APP_ENTRY_PATH} className="premium-button focus-ring shrink-0">
-            Open YO Voice <ArrowRight className="size-4"/>
+            Open YO Voice <ArrowRight className="size-4" aria-hidden="true"/>
           </Link>
-        </div>
+        </Reveal>
+
+        <BeYouFinale />
       </div>
     </section>
   );
