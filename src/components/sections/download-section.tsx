@@ -12,9 +12,12 @@ import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
  * and `tests/servers-landing.test.ts` — the desktop sentence appears exactly
  * twice — so the copy stays in this file and the scroll cinema only moves it:
  * the heading zooms into place (`ZoomHeading`), the four platform cards are
- * dealt from one fanned stack (`PlatformDeck`), the identity panel rises in,
- * and the page closes on the giant "Be You." (`BeYouFinale`). Without the
- * cinema everything is drawn at rest in the same layout.
+ * dealt from one fanned stack (`PlatformDeck`) and the identity panel rises
+ * in. Without the cinema everything is drawn at rest in the same layout.
+ *
+ * `finale` closes the page on the giant "Be You." (`BeYouFinale`). Only the
+ * homepage asks for it (owner, 2026-09-26): /servers renders this section
+ * too and ends on the way in, not on the homepage's last word.
  *
  * The desktop cards carry no action: there are no desktop installers and no
  * published GitHub releases, and the Web card already links to the web app.
@@ -27,7 +30,7 @@ type PlatformCard = {
   action?: string;
 };
 
-export function DownloadSection() {
+export function DownloadSection({ finale = false }: { finale?: boolean }) {
   const platforms: PlatformCard[] = [
     {
       icon: Smartphone,
@@ -59,7 +62,7 @@ export function DownloadSection() {
     <section
       id="download"
       aria-labelledby="download-heading"
-      className="relative overflow-x-clip border-t border-[var(--border)] bg-[var(--background)] pt-16 sm:pt-24"
+      className={`relative overflow-x-clip border-t border-[var(--border)] bg-[var(--background)] pt-16 sm:pt-24 ${finale ? "" : "pb-16 sm:pb-24"}`}
     >
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-4xl text-center">
@@ -108,7 +111,7 @@ export function DownloadSection() {
           </Link>
         </Reveal>
 
-        <BeYouFinale />
+        {finale ? <BeYouFinale /> : null}
       </div>
     </section>
   );

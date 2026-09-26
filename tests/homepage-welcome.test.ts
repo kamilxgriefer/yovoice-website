@@ -185,7 +185,7 @@ test("the hero's in-page links point at sections the homepage actually renders",
     "<WelcomeIntro />",
     "<WelcomeFeatures />",
     "<ServersWelcome />",
-    "<DownloadSection />",
+    "<DownloadSection finale />",
   ];
   let cursor = -1;
   for (const element of order) {
@@ -193,6 +193,20 @@ test("the hero's in-page links point at sections the homepage actually renders",
     assert.ok(at > cursor, `${element} is missing or out of order on the homepage`);
     cursor = at;
   }
+});
+
+test("only the homepage ends on the \"Be You.\" finale", async () => {
+  const [section, servers] = await Promise.all([
+    readFile("src/components/sections/download-section.tsx", "utf8"),
+    readFile("src/app/(marketing)/servers/page.tsx", "utf8"),
+  ]);
+
+  // The finale is opt-in (owner, 2026-09-26): /servers renders the same way
+  // in, but closes on it rather than on the homepage's last word.
+  assert.match(section, /export function DownloadSection\(\{ finale = false \}/);
+  assert.match(section, /\{finale \? <BeYouFinale \/> : null\}/);
+  assert.match(servers, /<DownloadSection \/>/);
+  assert.doesNotMatch(servers, /finale/);
 });
 
 test("the hero keeps self-advancing tabs, which is what the owner asked to have back", async () => {

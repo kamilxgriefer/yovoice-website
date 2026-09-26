@@ -42,7 +42,7 @@ export default function HomePage() {
         <WelcomeFeatures />
         <ServersWelcome />
         <PremiumSection />
-        <DownloadSection />
+        <DownloadSection finale />
       </main>
       <SiteFooter />
     </div>

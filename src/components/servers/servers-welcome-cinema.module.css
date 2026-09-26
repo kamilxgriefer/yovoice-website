@@ -57,7 +57,7 @@
 .stage {
   /* The device's height; its width follows from the capture's own ratio
      plus the 7 px bezel and 1 px rim on each side. */
-  --device-h: min(calc(min(62vw, 17rem) * 2164 / 1206 + 16px), 64svh);
+  --device-h: min(calc(min(54vw, 15rem) * 2164 / 1206 + 16px), 56svh);
   position: relative;
   flex: none;
   width: calc((var(--device-h) - 16px) * 1206 / 2164 + 16px);
@@ -164,10 +164,12 @@
 /* ---- The deck ------------------------------------------------------------ */
 
 .deck {
-  /* Scroll between one card settling and the next one arriving. */
-  --deck-gap: max(16svh, 7.5rem);
+  /* Scroll between one card settling and the next one arriving. Kept
+     short (owner, 2026-09-26: "shorten the card stack"): each card still
+     holds for its own height of scroll before the next one covers it. */
+  --deck-gap: max(5svh, 2.5rem);
   /* How long the full deck holds before the section scrolls on. */
-  --deck-tail: 10svh;
+  --deck-tail: 6svh;
   /* The smallest a card is drawn; the script raises every card to the
      tallest one's natural height (`--card-h`), so all five match. */
   --card-min: 0px;
@@ -201,9 +203,9 @@
 
 @media (min-width: 64rem) {
   .deck {
-    --deck-gap: 20svh;
-    --deck-tail: 12svh;
-    --card-min: clamp(22rem, 54svh, 31rem);
+    --deck-gap: 6svh;
+    --deck-tail: 8svh;
+    --card-min: clamp(18rem, 40svh, 24rem);
   }
 
   /* The whole deck — four edges and the card in front — sits in the middle
@@ -311,7 +313,7 @@
    other waveforms. Decorative; revealed left to right as the card lands. */
 .wave {
   display: flex;
-  height: 2rem;
+  height: 1.5rem;
   align-items: flex-end;
   border-bottom: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
 }
