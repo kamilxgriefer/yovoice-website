@@ -36,12 +36,20 @@ capture is used: `docs/design/current-screenshots.md`; pinned by
 
 The first cut was reviewed on four dimensions (visual QA at nine sizes,
 accessibility, engineering and performance, truth and repository rules),
-every finding was checked by an independent verifier, and the 30 confirmed
-findings were fixed. Known limits: on phones the site footer is taller than
-the screen, so at the very bottom "Be You." has already scrolled off whole
-rather than resting under the header; native find-in-page scrolling to a
-story chapter could not be exercised in headless Chromium (the chapter text
-it would find sits at that chapter's scroll position).
+every finding was checked by an independent verifier, and the confirmed
+findings were fixed; a final check re-verified every fix and its new
+findings (a finale re-layout loop, restored positions after Back / Forward
+and after following the hero arrow, a deep-link sweep, stale text after a
+jump, forced-colour veils) were fixed too. Known limits: on phones the site
+footer is taller than the screen, so at the very bottom "Be You." has
+already scrolled off whole rather than resting under the header; arming the
+cinema after load still ends in one commit of about 220-270 ms on a 4x
+throttled phone (it was about 360 ms before it was deferred); the Welcome
+wave and sentence drive one motion value per bar or word; native
+find-in-page scrolling to a story chapter could not be exercised in
+headless Chromium (the chapter text it would find sits at that chapter's
+scroll position). Pre-existing and outside this work: at 150 % text on a
+desktop the header's buttons are taller than its 56 px bar.
 
 ## Continue with Google / Apple (September 2026)
 

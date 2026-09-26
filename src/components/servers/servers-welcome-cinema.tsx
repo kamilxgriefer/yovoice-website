@@ -12,7 +12,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 
-import { SCENE_SPRING } from "@/components/animations/cinema";
+import { SCENE_SPRING, useRelocationJump } from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
 import styles from "@/components/servers/servers-welcome-cinema.module.css";
 import { ServersBoundary, StarterChannels, TemplatePrivacy } from "@/components/servers/servers-welcome-parts";
@@ -57,9 +57,13 @@ export function ServersWelcomeCinema() {
 
   // Scroll distance, in px, since the top of the deck passed the top of the
   // window (negative before). `travel` follows through the scene spring;
-  // `travelRaw` is exact.
+  // `travelRaw` is exact. Like every scene's spring, it lands at once when
+  // the deck mounts mid-page (client Back to the homepage, the cinema
+  // re-arming) or the page is relocated, instead of replaying the cards'
+  // landings on the way there.
   const { scrollYProgress } = useScroll({ target: deckRef, offset: ["start end", "end start"] });
   const eased = useSpring(scrollYProgress, SCENE_SPRING);
+  useRelocationJump(scrollYProgress, eased);
   const toTravel = (progress: number) =>
     geometry ? progress * geometry.span - geometry.viewport : 0;
   const travel = useTransform(eased, toTravel);

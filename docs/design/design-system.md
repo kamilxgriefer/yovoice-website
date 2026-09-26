@@ -265,7 +265,10 @@ never their names, logos, colours or lines.
   captions), and only pictures, floods and decoration are scrubbed. The hero
   tour and the premium ring's sweep are unchanged. Only `transform`,
   `opacity` and `clip-path` animate, plus a blur of at most 8 px on a heading
-  entering or leaving, which always completes.
+  entering or leaving, which always completes. When a scene lands somewhere
+  new (a link, a restored position, a scene mounting mid-page) it is drawn
+  in place at once, triggered text included, without replaying its way
+  there.
 - **Scenes.**
   - Hero exit: the copy drifts up and softens to no less than 85 %; the
     device frames recline up to 16° and settle to 92 %; the corner glow
@@ -330,7 +333,8 @@ never their names, logos, colours or lines.
   "Start talking", "See every feature" and the Servers links follow their
   stages in normal flow. A `Reveal` or dealt card that holds a link is drawn
   at rest the moment focus arrives. In forced colours the rail marks the
-  current chapter in `Highlight`.
+  current chapter in `Highlight`, and the scenes leave their decorative
+  shades, glows and dimmers out so nothing veils a capture.
 - **Captures.** Only `public/screenshots/current/` (provenance, and where
   each is used: `current-screenshots.md`). The story takes its captures and
   labels from the hero's `appScreens`. What you get shows the three /updates

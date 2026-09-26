@@ -413,3 +413,21 @@
     transform: scaleY(calc(var(--h) * (0.89 - 0.11 * cos(var(--wave-t, 0) + var(--k) * 1.8))));
   }
 }
+
+/* ---- Forced colours (Windows contrast themes) ---------------------------- */
+
+/* A forced palette paints every background in the system's Canvas colour and
+   every border in its text colour: the shade over a covered card would turn
+   into a veil (white in a light theme), and the Channels sheet's side slabs
+   into a stack of outlines around it. Both are decoration, as are the
+   sheet's glow and sheen and the lit top edge, whose gradients the palette
+   drops anyway: all of them are left out. */
+@media (forced-colors: active) {
+  .shade,
+  .slab,
+  .glow,
+  .sheen,
+  .edge {
+    display: none;
+  }
+}

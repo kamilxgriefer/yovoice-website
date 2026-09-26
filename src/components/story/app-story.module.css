@@ -2,8 +2,8 @@
  * The pinned app story. Layout and paint only: every moving value is a
  * framer-motion motion value set inline (transform, opacity, clip-path, and
  * a short blur on titles while a triggered transition runs) or read from
- * one (`--retreat`, `--rail-fill`) by a transform here; the rail's arrival
- * is a CSS opacity transition. Nothing here animates layout.
+ * one (`--rise`, `--retreat`, `--rail-fill`) by a transform here; the rail's
+ * arrival is a CSS opacity transition. Nothing here animates layout.
  *
  * Phones: one grid column — text on top under the header, the phone below
  * (its height is whatever is left, capped at 56svh), the numbered chapter
@@ -288,9 +288,16 @@
   /* The hero's frame radii (2.6rem body, 2.2rem glass at ~650 px tall),
      scaled with the phone so a small phone is not drawn as a pill. */
   --phone-r: min(2.6rem, calc(var(--phone-h) * 0.064));
+  /* How far below its place (a share of its own height) the phone starts
+     while the heading holds the stage; `--rise` runs 1 → 0 over the intro.
+     In one column the phone's place is already under the chapter text's
+     row, which is empty during the intro, so it starts only a little low:
+     the first frame shows it whole, just under the heading. */
+  --rise-from: 8%;
   position: relative;
   width: calc((var(--phone-h) - 16px) * 1206 / 2622 + 16px);
   height: var(--phone-h);
+  translate: 0 calc(var(--rise, 0) * var(--rise-from));
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -425,6 +432,15 @@
 .rail[data-shown="false"]:not(:focus-within) {
   opacity: 0;
   pointer-events: none;
+}
+
+/* The scene has landed somewhere new (a link, a restored position, a scene
+   mounting mid-page): the rail is drawn in its new state at once, like the
+   chapter text beside it, instead of fading its way there. */
+.rail[data-land="true"],
+.rail[data-land="true"] .railLink,
+.rail[data-land="true"] .railDot::before {
+  transition: none;
 }
 
 .railList {
@@ -696,6 +712,12 @@ a.ctaLarge {
 
   .slotInner {
     --phone-h: var(--phone-h-wide);
+  }
+
+  /* Beside the text column the phone's place is the stage's middle, so it
+     rises from lower down, into the heading's space as the heading leaves. */
+  .phone {
+    --rise-from: 40%;
   }
 
   /* The phone ends at 0.645 of its size (1.04 × 0.62) with its top edge on

@@ -176,6 +176,16 @@
   object-fit: cover;
 }
 
+/* Darkens the capture while the screen still lies back (it wakes as it
+   faces the visitor), and the one under a wipe at its midpoint. */
+.dimmer {
+  background: #05030a;
+}
+
+.wipeDim {
+  background: #000;
+}
+
 /* The bright edge that runs across while one view wipes over the last. */
 .edge {
   position: absolute;
@@ -332,5 +342,28 @@
       92cqw,
       calc((100cqh - var(--bar) - 2 * var(--bezel)) * 1.6 + 2 * var(--bezel))
     );
+  }
+}
+
+/* ---- Forced colours (Windows contrast themes) ---------------------------- */
+
+/* A forced palette paints every background in the system's Canvas colour, so
+   the shades laid over the capture (the dimmer and a wipe's dim) would turn
+   into a white veil over it in a light theme. They are decoration, as are
+   the glow, the glare and the wipe's lit edge, whose gradients the palette
+   drops anyway: all of them are left out, and the capture shows as it is.
+   The caption strip's floor keeps the tilted screen's near edge behind it in
+   the theme's own background colour. */
+@media (forced-colors: active) {
+  .dimmer,
+  .wipeDim,
+  .glow,
+  .glare,
+  .edge {
+    display: none;
+  }
+
+  .strip::before {
+    background: Canvas;
   }
 }

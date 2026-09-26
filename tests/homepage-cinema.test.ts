@@ -281,8 +281,19 @@ test("springs that follow the scroll land at once on a relocation, and only then
     "src/components/animations/scroll-progress.tsx",
     "src/components/hero/hero-scroll-depth.tsx",
     "src/components/sections/be-you-finale.tsx",
+    "src/components/servers/servers-welcome-cinema.tsx",
   ]) {
     assert.match(await readFile(file, "utf8"), /useRelocationJump\(/, file);
+  }
+});
+
+test("in forced colours the scenes leave their decorative shades out", async () => {
+  for (const file of [
+    "src/components/story/app-story.module.css",
+    "src/components/sections/welcome-features-cinema.module.css",
+    "src/components/servers/servers-welcome-cinema.module.css",
+  ]) {
+    assert.match(await readFile(file, "utf8"), /@media \(forced-colors: active\)/, file);
   }
 });
 

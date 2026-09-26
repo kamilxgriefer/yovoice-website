@@ -2,17 +2,20 @@
 
 import {
   useCallback,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type MouseEvent,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 import Image from "next/image";
 import { AudioLines } from "lucide-react";
 import {
   easeInOut,
   easeOut,
+  frame,
   motion,
   useMotionTemplate,
   useMotionValueEvent,
@@ -113,14 +116,29 @@ const HEADING_OUT = 0.03;
 /** How far past a threshold the progress must be before text changes, so a
  * spring settling right on one cannot flick it back and forth. */
 const HOLD = 0.005;
+/** One change of the progress larger than this is the scene landing
+ * somewhere new (see `useTextStep`); the spring following a scroll moves it
+ * far less per frame. */
+const RELOCATION = 0.15;
 
 /** Triggered text: in with the site's ease-out, out a little quicker. */
 const TEXT_IN: Transition = { duration: 0.55, ease: EASE_OUT };
 const TEXT_OUT: Transition = { duration: 0.32, ease: EASE_OUT };
+/** … or at once, when the scene lands somewhere new. */
+const LAND: Transition = { duration: 0 };
 
 export function AppStoryCinema() {
   const trackRef = useRef<HTMLDivElement>(null);
   const progress = useSceneProgress(trackRef);
+
+  // Mounted mid-page (client Back to the homepage, the cinema re-arming), the
+  // scene starts where the page already is, before its first frame is drawn:
+  // the spring has not measured the scroll yet and would otherwise read 0 —
+  // the opening pose, with the heading over whatever chapter is really there.
+  useLayoutEffect(() => {
+    const at = trackProgress(trackRef.current);
+    if (at !== null) progress.jump(at);
+  }, [progress]);
 
   const goToChapter = useCallback((index: number) => {
     const track = trackRef.current;
@@ -367,17 +385,16 @@ function TintLayer({
 
 /* ---- Heading ------------------------------------------------------------- */
 
+/** 1 once the heading has left the stage, 0 while it holds it. */
+const headingStepAt = (value: number) => (value > HEADING_OUT ? 1 : 0);
+
 /** The stage's picture of the heading. It steps back with the scroll
  * (transform only), and leaves — or comes back — in one short triggered
  * fade, so it is never left half-faded. */
 function Intro({ progress }: { progress: MotionValue<number> }) {
   const y = useTransform(progress, [0, 0.06], [0, -32]);
-  const [away, setAway] = useState(() => progress.get() > HEADING_OUT);
-
-  useMotionValueEvent(progress, "change", (value) => {
-    if (value > HEADING_OUT + HOLD) setAway(true);
-    else if (value < HEADING_OUT - HOLD) setAway(false);
-  });
+  const { step, land } = useTextStep(progress, headingStepAt);
+  const away = step === 1;
 
   return (
     <motion.div className={styles.intro} style={{ y }} aria-hidden="true">
@@ -390,14 +407,16 @@ function Intro({ progress }: { progress: MotionValue<number> }) {
                 scale: 0.97,
                 filter: "blur(6px)",
                 visibility: "hidden",
-                transition: { ...TEXT_OUT, visibility: { duration: 0, delay: TEXT_OUT.duration } },
+                transition: land
+                  ? LAND
+                  : { ...TEXT_OUT, visibility: { duration: 0, delay: TEXT_OUT.duration } },
               }
             : {
                 opacity: 1,
                 scale: 1,
                 filter: "blur(0px)",
                 visibility: "visible",
-                transition: { ...TEXT_IN, visibility: { duration: 0, delay: 0 } },
+                transition: land ? LAND : { ...TEXT_IN, visibility: { duration: 0, delay: 0 } },
               }
         }
       >
@@ -413,22 +432,73 @@ function Intro({ progress }: { progress: MotionValue<number> }) {
 
 /* ---- Chapters ------------------------------------------------------------ */
 
-/** The chapter the scroll has reached, held steady across a boundary. */
-function useTextStep(progress: MotionValue<number>): number {
-  const [step, setStep] = useState(() => textStepAt(progress.get()));
+/**
+ * Where the scroll has brought a triggered piece of text: the chapter the
+ * stage shows (`textStepAt`), or whether the heading has left.
+ *
+ * - While the visitor scrolls, it follows the scene's spring and changes
+ *   only once the progress is `HOLD` past a threshold, so a spring settling
+ *   right on one cannot flick the text back and forth. Its transition runs.
+ * - When the progress arrives in one move rather than frame by frame (a jump
+ *   bigger than the hold band: an in-page link, a restored position), it is
+ *   read straight from where the progress now is, even inside a hold band.
+ *   A move bigger than `RELOCATION`, or the first one after the scene mounts
+ *   (the spring starting where the page already is), is the scene landing
+ *   somewhere new: `land` is set, and the text lands with the picture, in
+ *   the same frame, instead of fading through the way there.
+ */
+function useTextStep(
+  progress: MotionValue<number>,
+  stepAt: (value: number) => number = textStepAt,
+): { step: number; land: boolean } {
+  const [state, setState] = useState(() => ({ step: stepAt(progress.get()), land: true }));
+  const last = useRef<number | null>(null);
+
   useMotionValueEvent(progress, "change", (value) => {
-    const before = textStepAt(value - HOLD);
-    const after = textStepAt(value + HOLD);
-    if (before === after) setStep(before);
+    const moved = last.current === null ? Number.POSITIVE_INFINITY : Math.abs(value - last.current);
+    last.current = value;
+    let step = stepAt(value);
+    if (moved <= 2 * HOLD) {
+      const before = stepAt(value - HOLD);
+      if (before !== stepAt(value + HOLD)) return;
+      step = before;
+    }
+    const land = moved > RELOCATION;
+    const update = () => setState((current) => (current.step === step ? current : { step, land }));
+    if (land) commitInThisFrame(update);
+    else update();
   });
-  return step;
+
+  return state;
+}
+
+/**
+ * Commits a landing in the frame the picture lands in. The spring lands
+ * while the scroll's notifications run; the update is committed right after
+ * them, in the same pass of the frame loop (never inside them, where a render
+ * would re-subscribe the very transforms being notified), so the text's
+ * instant change is drawn with this frame's picture rather than the next.
+ */
+function commitInThisFrame(update: () => void) {
+  frame.preUpdate(() => flushSync(update), false, true);
+}
+
+/** How far the stage is through its track right now (0..1, the scene
+ * progress without the spring), read from the layout. */
+function trackProgress(track: HTMLElement | null): number | null {
+  if (!track) return null;
+  const box = track.getBoundingClientRect();
+  const travel = box.height - document.documentElement.clientHeight;
+  if (travel <= 0) return null;
+  return Math.min(1, Math.max(0, -box.top / travel));
 }
 
 /** The stage's picture of the chapter text. All four share one cell; the
  * one the scroll has reached is shown, the others wait below it (still to
  * come) or have left above it (already read), hidden outright once out. */
 function ChapterTexts({ progress }: { progress: MotionValue<number> }) {
-  const step = useTextStep(progress);
+  const { step, land } = useTextStep(progress);
+  const lines = land ? LANDED_LINES : LINES;
   return (
     <div className={styles.text} aria-hidden="true">
       {CHAPTERS.map((chapter, index) => (
@@ -438,15 +508,15 @@ function ChapterTexts({ progress }: { progress: MotionValue<number> }) {
           initial={false}
           animate={index === step ? "shown" : index > step ? "coming" : "gone"}
         >
-          <motion.p className={styles.chapterMeta} style={{ color: chapter.ink }} variants={LINES[0]}>
+          <motion.p className={styles.chapterMeta} style={{ color: chapter.ink }} variants={lines[0]}>
             <span className="tabular-nums">{chapter.number}</span>
             <span className={styles.chapterRule} />
             <span>{chapter.screen.label}</span>
           </motion.p>
-          <motion.p className={styles.chapterTitle} variants={LINES[1]}>
+          <motion.p className={styles.chapterTitle} variants={lines[1]}>
             {chapter.title}
           </motion.p>
-          <motion.p className={styles.chapterText} variants={LINES[2]}>
+          <motion.p className={styles.chapterText} variants={lines[2]}>
             {chapter.text}
           </motion.p>
         </motion.div>
@@ -457,8 +527,9 @@ function ChapterTexts({ progress }: { progress: MotionValue<number> }) {
 
 /** One line of a chapter: in from below (or from above, scrolling back), a
  * beat after the line above it, out the other way. The title also clears a
- * short blur. Either way the transition runs to its end. */
-function lineVariants(order: number, blur: boolean): Variants {
+ * short blur. Either way the transition runs to its end — or, when the scene
+ * lands somewhere new (`land`), there is none. */
+function lineVariants(order: number, blur: boolean, land: boolean): Variants {
   const outDelay = order * 0.03;
   const out = (y: number) => ({
     opacity: 0,
@@ -468,11 +539,13 @@ function lineVariants(order: number, blur: boolean): Variants {
     // value of its own, so it also cancels a "visible" still waiting on an
     // entrance's delay when the visitor scrolls straight through.
     visibility: "hidden",
-    transition: {
-      ...TEXT_OUT,
-      delay: outDelay,
-      visibility: { duration: 0, delay: outDelay + (TEXT_OUT.duration ?? 0) },
-    },
+    transition: land
+      ? LAND
+      : {
+          ...TEXT_OUT,
+          delay: outDelay,
+          visibility: { duration: 0, delay: outDelay + (TEXT_OUT.duration ?? 0) },
+        },
   });
   return {
     shown: {
@@ -480,14 +553,17 @@ function lineVariants(order: number, blur: boolean): Variants {
       y: 0,
       ...(blur ? { filter: "blur(0px)" } : {}),
       visibility: "visible",
-      transition: { ...TEXT_IN, delay: 0.16 + order * 0.07, visibility: { duration: 0, delay: 0 } },
+      transition: land
+        ? LAND
+        : { ...TEXT_IN, delay: 0.16 + order * 0.07, visibility: { duration: 0, delay: 0 } },
     },
     coming: out(26),
     gone: out(-22),
   };
 }
 
-const LINES = [lineVariants(0, false), lineVariants(1, true), lineVariants(2, false)];
+const LINES = [0, 1, 2].map((order) => lineVariants(order, order === 1, false));
+const LANDED_LINES = [0, 1, 2].map((order) => lineVariants(order, order === 1, true));
 
 /* ---- Phone --------------------------------------------------------------- */
 
@@ -496,8 +572,10 @@ const EDGE_DEPTHS = [3, 6, 9, 12, 15];
 
 function Phone({ progress }: { progress: MotionValue<number> }) {
   // It starts just under the heading, so the first pinned frame already
-  // shows most of it, and rises into place as the heading leaves.
-  const y = useTransform(progress, [0, INTRO_END], ["40%", "0%"], { ease: easeOut });
+  // shows most of it, and rises into place as the heading leaves: `--rise`
+  // runs 1 → 0, times a distance the stylesheet sets for the layout
+  // (`--rise-from` on `.phone`).
+  const rise = useTransform(progress, [0, INTRO_END], [1, 0], { ease: easeOut });
   const rotateY = useTransform(progress, POSE_AT, ROTATE_Y, { ease: easeInOut });
   const rotateZ = useTransform(progress, POSE_AT, ROTATE_Z, { ease: easeInOut });
   const rotateX = useTransform(progress, LIFT_AT, ROTATE_X, { ease: easeInOut });
@@ -509,7 +587,10 @@ function Phone({ progress }: { progress: MotionValue<number> }) {
   const sheenOpacity = useTransform(rotateY, [-24, -10, 0, 10, 24], [1, 0.75, 0.3, 0.75, 1]);
 
   return (
-    <motion.div className={styles.phone} style={{ y, rotateX, rotateY, rotateZ, scale }}>
+    <motion.div
+      className={styles.phone}
+      style={{ "--rise": rise, rotateX, rotateY, rotateZ, scale } as MotionStyle}
+    >
       {EDGE_DEPTHS.map((depth) => (
         <div key={depth} className={styles.edge} style={{ transform: `translateZ(-${depth}px)` }} />
       ))}
@@ -656,8 +737,9 @@ function Rail({
   onSelect: (index: number) => void;
 }) {
   // The same step as the chapter text: current while its text is shown,
-  // done once read, all done in the finale.
-  const current = useTextStep(progress);
+  // done once read, all done in the finale. When the scene lands somewhere
+  // new, the rail is drawn in its new state at once (`data-land`).
+  const { step: current, land } = useTextStep(progress);
   const fill = useTransform(progress, [chapterMid(0), chapterMid(CHAPTERS.length - 1)], [0, 1]);
 
   const select = (event: MouseEvent<HTMLAnchorElement>, index: number) => {
@@ -672,6 +754,7 @@ function Rail({
       className={styles.rail}
       aria-label="Inside YO Voice chapters"
       data-shown={current >= 0 ? "true" : "false"}
+      data-land={land ? "true" : undefined}
     >
       <div className={styles.railList}>
         <span className={styles.railTrack} aria-hidden="true">

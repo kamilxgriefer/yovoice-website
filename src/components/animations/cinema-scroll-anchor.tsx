@@ -111,20 +111,12 @@ export function CinemaScrollAnchor() {
     // Wait for the cinema's layout if this visit will have one.
     if (window.matchMedia(CINEMA_QUERY).matches && !cinema) return;
 
-    const land = landing(cinema, documentLoad, saved.current ?? null);
-    if (!land) {
-      handled.current = true;
-      return;
-    }
-    // Two frames: the scenes have committed, sticky stages have their height.
-    // Only a landing that actually ran counts as handled.
-    let frame = requestAnimationFrame(() => {
-      frame = requestAnimationFrame(() => {
-        handled.current = true;
-        land();
-      });
-    });
-    return () => cancelAnimationFrame(frame);
+    // The scenes have committed with this render, and reading the layout to
+    // scroll lays their tracks out, so the landing runs right here. Not in
+    // an animation frame: a scroll made there is measured by the scenes a
+    // frame late, and they would paint their opening pose once at the target.
+    handled.current = true;
+    landing(cinema, documentLoad, saved.current ?? null)?.();
   }, [cinema, documentLoad]);
 
   return null;

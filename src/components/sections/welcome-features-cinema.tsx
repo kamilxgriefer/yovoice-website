@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { flushSync } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -9,6 +10,7 @@ import {
   cubicBezier,
   easeInOut,
   easeOut,
+  frame as frameLoop,
   motion,
   useMotionValue,
   useMotionValueEvent,
@@ -122,6 +124,36 @@ function viewAt(p: number, timeline: Timeline): number {
 const HOLD = 0.006;
 /** The same for the heading, in px of the screen's projected top edge. */
 const HOLD_PX = 4;
+/** One change of the progress larger than this is the stage landing
+ * somewhere new; the spring following a scroll moves it far less per frame. */
+const RELOCATION = 0.15;
+/** A triggered change made when the stage lands somewhere new: no fade. */
+const LAND = { duration: 0 } as const;
+const HEADING_FADE = { duration: 0.45, ease: EASE_OUT };
+const SEGMENTS_FADE = { duration: 0.4, ease: EASE_OUT };
+
+/** What the words on the stage show: whether the heading has left, which
+ * view the caption names, and whether the last change was a landing. */
+type Words = { away: boolean; view: number; land: boolean };
+
+/**
+ * The words for progress `p`, read straight from it: used when the stage
+ * mounts and when it lands somewhere new, where there is no "before" to
+ * hold on to.
+ */
+function wordsAt(p: number, geometry: Geometry, pose: Pose, timeline: Timeline) {
+  const clearance = geometry.ready ? headingClearance(p, geometry, pose, timeline) : Number.POSITIVE_INFINITY;
+  return { away: clearance < 0 || p > timeline.headingLatest, view: viewAt(p, timeline) };
+}
+
+/** How far the stage is through its track right now (0..1, the progress
+ * without the spring), read from the layout. */
+function trackProgress(track: HTMLElement): number | null {
+  const box = track.getBoundingClientRect();
+  const travel = box.height - document.documentElement.clientHeight;
+  if (travel <= 0) return null;
+  return Math.min(1, Math.max(0, -box.top / travel));
+}
 
 /**
  * The two poses of the screen. `tilt` is how far it lies back (rotateX) at
@@ -362,22 +394,48 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
   const headingY = useTransform(p, (value) => headingStepAt(value).y);
   const headingScale = useTransform(p, (value) => headingStepAt(value).scale);
   /* The first caption arrives in the same moment, so the stage is never
-     without words. */
-  const [headingAway, setHeadingAway] = useState(false);
-  const [view, setView] = useState(0);
+     without words.
+
+     While the visitor scrolls, both follow the spring and hold while the
+     progress sits right on a threshold, so a spring settling there cannot
+     flick them back and forth. When the progress arrives in one move (a
+     link, a restored position, the spring landing after the stage mounted
+     mid-page) they are read straight from where it now is, even inside a
+     hold band, and a move bigger than `RELOCATION` lands them without their
+     fade. When the stage mounts they are read from the track's position
+     (the layout effect below), since the spring has not measured yet. */
+  const [words, setWords] = useState<Words>({ away: false, view: 0, land: true });
+  const lastP = useRef(p.get());
+  /** Sets what changed; `null` holds the current value. */
+  const show = (away: boolean | null, view: number | null, instant: boolean) =>
+    setWords((current) => {
+      const next = { away: away ?? current.away, view: view ?? current.view };
+      return next.away === current.away && next.view === current.view ? current : { ...next, land: instant };
+    });
 
   useMotionValueEvent(p, "change", (value) => {
+    const moved = Math.abs(value - lastP.current);
+    lastP.current = value;
     const measuredNow = geometry.current;
+    if (moved > 2 * HOLD) {
+      const at = wordsAt(value, measuredNow, pose, timeline);
+      // A landing is committed in the frame the picture lands in: right
+      // after the scroll's notifications (never inside them, where a render
+      // would re-subscribe the transforms being notified), so the words'
+      // instant change is drawn with this frame's picture, not the next.
+      if (moved > RELOCATION) frameLoop.preUpdate(() => flushSync(() => show(at.away, at.view, true)), false, true);
+      else show(at.away, at.view, false);
+      return;
+    }
     const clearance = measuredNow.ready
       ? headingClearance(value, measuredNow, pose, timeline)
       : Number.POSITIVE_INFINITY;
-    if (clearance < -HOLD_PX || value > timeline.headingLatest + HOLD) setHeadingAway(true);
-    else if (clearance > HOLD_PX && value < timeline.headingLatest - HOLD) setHeadingAway(false);
-    // Hold the current view while the progress sits right on a boundary, so
-    // a spring settling there cannot flick the caption back and forth.
+    let away: boolean | null = null;
+    if (clearance < -HOLD_PX || value > timeline.headingLatest + HOLD) away = true;
+    else if (clearance > HOLD_PX && value < timeline.headingLatest - HOLD) away = false;
+    // Hold the current view while the progress sits right on a boundary.
     const before = viewAt(value - HOLD, timeline);
-    const after = viewAt(value + HOLD, timeline);
-    if (before === after) setView(before);
+    show(away, before === viewAt(value + HOLD, timeline) ? before : null, false);
   });
 
   /* Measured after every transform above that reads the measurements is
@@ -416,13 +474,23 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
       measured.set(measured.get() + 1);
     };
     measure();
+    // The words for where the stage is as it mounts (or as the window
+    // turns), before the first frame is drawn: the spring has not measured
+    // yet, so it would say the stage is at its start.
+    const at = track.current ? trackProgress(track.current) : null;
+    if (at !== null) {
+      const now = wordsAt(at, geometry.current, pose, timeline);
+      setWords((current) =>
+        current.away === now.away && current.view === now.view ? current : { ...now, land: true },
+      );
+    }
     const observer = new ResizeObserver(measure);
     observer.observe(stage);
     observer.observe(heading);
     observer.observe(slot);
     observer.observe(frame);
     return () => observer.disconnect();
-  }, [pose, measured]);
+  }, [pose, timeline, measured]);
 
   return (
     <section
@@ -438,11 +506,11 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
             style={{ y: headingY, scale: headingScale }}
             initial={false}
             animate={
-              headingAway
+              words.away
                 ? { opacity: 0, filter: "blur(6px)" }
                 : { opacity: 1, filter: "blur(0px)" }
             }
-            transition={{ duration: 0.45, ease: EASE_OUT }}
+            transition={words.land ? LAND : HEADING_FADE}
           >
             <p className="eyebrow">What you get</p>
             <h2
@@ -503,7 +571,7 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
                           />
                           <motion.div
                             aria-hidden="true"
-                            className={`${styles.layer} bg-[#05030a]`}
+                            className={`${styles.layer} ${styles.dimmer}`}
                             style={{ opacity: dimmer }}
                           />
                         </div>
@@ -513,7 +581,12 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
                   </motion.div>
                 </div>
               </div>
-              <Captions view={headingAway ? view : -1} progress={p} timeline={timeline} />
+              <Captions
+                view={words.away ? words.view : -1}
+                land={words.land}
+                progress={p}
+                timeline={timeline}
+              />
             </figure>
           </div>
         </div>
@@ -580,7 +653,7 @@ function Wipe({
 
   return (
     <>
-      <motion.div aria-hidden="true" className={`${styles.layer} bg-black`} style={{ opacity: dim }} />
+      <motion.div aria-hidden="true" className={`${styles.layer} ${styles.wipeDim}`} style={{ opacity: dim }} />
       <motion.div className={styles.layer} style={{ clipPath }}>
         <motion.div className={styles.layer} style={{ scale }}>
           <Image src={view.src} alt={view.alt} fill sizes={IMAGE_SIZES} />
@@ -600,6 +673,11 @@ const CAPTION: Variants = {
   shown: { opacity: 1, y: [10, 0], transition: { duration: 0.32, delay: 0.14, ease: EASE_OUT } },
   hidden: { opacity: 0, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
 };
+/** … or is simply there, when the stage lands somewhere new. */
+const CAPTION_LANDED: Variants = {
+  shown: { opacity: 1, y: 0, transition: LAND },
+  hidden: { opacity: 0, y: -8, transition: LAND },
+};
 
 /**
  * The caption under the screen: which view it is, the progress segments
@@ -614,14 +692,17 @@ const CAPTION: Variants = {
  */
 function Captions({
   view,
+  land,
   progress,
   timeline,
 }: {
   view: number;
+  land: boolean;
   progress: MotionValue<number>;
   timeline: Timeline;
 }) {
   const [first, second] = switches(timeline);
+  const caption = land ? CAPTION_LANDED : CAPTION;
   const segments = [
     [timeline.captionIn, first],
     [first, second],
@@ -634,7 +715,7 @@ function Captions({
           <motion.span
             key={item.id}
             className="flex items-baseline gap-3"
-            variants={CAPTION}
+            variants={caption}
             initial={false}
             animate={index === view ? "shown" : "hidden"}
           >
@@ -651,7 +732,7 @@ function Captions({
         className={styles.segments}
         initial={false}
         animate={{ opacity: view >= 0 ? 1 : 0 }}
-        transition={{ duration: 0.4, ease: EASE_OUT }}
+        transition={land ? LAND : SEGMENTS_FADE}
       >
         {segments.map((range, index) => (
           <Segment key={SCREEN_VIEWS[index].id} progress={progress} range={range} />
@@ -662,7 +743,7 @@ function Captions({
           <motion.span
             key={item.id}
             className="text-[0.9375rem] leading-[1.45] text-[var(--text-secondary)]"
-            variants={CAPTION}
+            variants={caption}
             initial={false}
             animate={index === view ? "shown" : "hidden"}
           >
