@@ -209,9 +209,13 @@ export function AppStoryCinema() {
         </div>
       </div>
 
-      <Reveal distance={RISE.block}>
-        <StoryCta large className="pb-12 pt-6 sm:pb-16 sm:pt-8" />
-      </Reveal>
+      {/* On the seam violet the stage fades into, which Welcome's top
+          continues: one colour from the story's foot into the next section. */}
+      <div className="bg-[var(--seam)]">
+        <Reveal distance={RISE.block}>
+          <StoryCta large className="pb-12 pt-6 sm:pb-16 sm:pt-8" />
+        </Reveal>
+      </div>
     </section>
   );
 }

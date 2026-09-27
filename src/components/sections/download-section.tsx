@@ -46,14 +46,6 @@ type PlatformCard = {
   action?: string;
 };
 
-/**
- * /servers keeps the site's section title (`.section-title`) in the cinema
- * as well. `SceneOpener` draws its cinema title at display size with a global
- * class, which outranks utilities, hence the important modifiers.
- */
-const SECTION_TITLE_SIZE =
-  "text-[length:clamp(1.875rem,1.4rem+1.5vw,2.5rem)]! leading-[1.1]! tracking-[-0.025em]!";
-
 export function DownloadSection({ finale = false }: { finale?: boolean }) {
   const cinema = useCinema();
   const platforms: PlatformCard[] = [
@@ -98,14 +90,15 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
       <div className="frame">
         <SceneOpener
           className="max-w-4xl"
-          size="scene"
+          // /servers keeps the site's section title: its own heading is smaller.
+          size={finale ? "scene" : "section"}
           eyebrow="YO Voice everywhere"
           ink="#d986ff"
           title="Ready to find"
           accent="your people?"
           accentClassName="sm:block"
           headingId="download-heading"
-          titleClassName={cn("text-balance", finale ? "" : SECTION_TITLE_SIZE)}
+          titleClassName="text-balance"
           leadClassName="text-pretty"
           lead="Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones."
         />

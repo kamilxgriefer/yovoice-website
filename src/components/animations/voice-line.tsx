@@ -111,16 +111,22 @@ type Attachment = {
   mount: HTMLSpanElement;
   tick: HTMLSpanElement;
   /** A stage stop only: the stub from the stage's top down to the eyebrow. */
-  stub: { svg: SVGSVGElement; track: SVGPathElement; lit: SVGPathElement; node: HTMLSpanElement; length: number } | null;
+  stub: {
+    svg: SVGSVGElement;
+    track: SVGPathElement;
+    lit: SVGPathElement;
+    node: HTMLSpanElement;
+    length: number;
+    /** The lit length last written. */
+    drawn: number;
+  } | null;
   restorePosition: string | null;
 };
 
 type Stop = {
-  id: string;
   /** The eyebrow's centre line in the page, at rest (px). */
   y: number;
-  /** The eyebrow's left edge (px). */
-  left: number;
+  /** The eyebrow's colour (its section's ink). */
   ink: string;
   cover: Cover | null;
   attachment: Attachment;
@@ -266,7 +272,7 @@ function attach(target: HTMLElement, covered: boolean, previous: Attachment | un
     const node = document.createElement("span");
     node.className = "absolute -left-1 -top-1 block size-2 rounded-full border-[1.5px]";
     mount.append(svg, node);
-    stub = { svg, track, lit, node, length: 0 };
+    stub = { svg, track, lit, node, length: 0, drawn: -1 };
   }
   target.append(mount);
   return { target, mount, tick, stub, restorePosition };
@@ -332,7 +338,8 @@ function VoiceLineCinema() {
         runLit.current?.setAttribute("stroke-dashoffset", (g.runLength - run).toFixed(1));
       }
 
-      // The covering stage, where it is now: the line passes behind it.
+      // The covering stage, where it is now: the line passes behind it. The
+      // page has one (What you get); a second would need a clip of its own.
       let hidden = false;
       for (const stop of g.stops) {
         const cover = stop.cover;
@@ -357,7 +364,11 @@ function VoiceLineCinema() {
         if (near) corner = stub.svg.getBoundingClientRect().top + y;
         if (headY > top && headY < bottom && headY > corner + 1) hidden = true;
         const along = Math.min(stub.length, Math.max(0, headY - (corner - stub.length)));
-        stub.lit.setAttribute("stroke-dashoffset", (stub.length - along).toFixed(1));
+        if (Math.abs(along - stub.drawn) > 0.2) {
+          stub.drawn = along;
+          stub.lit.setAttribute("stroke-dashoffset", (stub.length - along).toFixed(1));
+        }
+        break;
       }
 
       // The head.
@@ -386,14 +397,7 @@ function VoiceLineCinema() {
       }
     };
 
-
     const build = () => {
-      const t0 = performance.now();
-      buildInner();
-      const w = window as unknown as { __vlb?: number[] };
-      (w.__vlb ??= []).push(performance.now() - t0);
-    };
-    const buildInner = () => {
       frame = 0;
       const svg = svgRef.current;
       if (!svg) return;
@@ -460,12 +464,11 @@ function VoiceLineCinema() {
           attachment.stub.lit.setAttribute("stroke", litAt((cover.top - startY) / Math.max(1, endY - startY)));
           attachment.stub.lit.setAttribute("stroke-dasharray", `${length.toFixed(1)} ${(length + 1).toFixed(1)}`);
           attachment.stub.length = length;
+          attachment.stub.drawn = -1;
         }
         const previous = geometry.current?.stops.find((stop) => stop.attachment === attachment);
         stops.push({
-          id,
           y,
-          left: box.x,
           ink: getComputedStyle(target).color,
           cover,
           attachment,

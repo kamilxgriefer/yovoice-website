@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { animate, motion, useMotionValue, type AnimationPlaybackControls } from "framer-motion";
 
-import { EASE_OUT, useCinema } from "@/components/animations/cinema";
+import { EASE_OUT, justRelocated, useCinema } from "@/components/animations/cinema";
 
 const ELEMENTS = {
   div: motion.div,
@@ -59,6 +59,12 @@ export function Reveal({
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         observer.disconnect();
+        // Arrived by a link or a restored position: drawn in place.
+        if (justRelocated()) {
+          opacity.set(1);
+          y.set(0);
+          return;
+        }
         running = [
           animate(opacity, 1, { duration: 0.7, delay, ease: EASE_OUT }),
           animate(y, 0, { duration: 0.95, delay, ease: EASE_OUT }),

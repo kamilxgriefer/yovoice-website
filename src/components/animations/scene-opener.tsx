@@ -10,12 +10,18 @@ import {
   EXIT,
   RISE,
   STAGGER,
+  justRelocated,
   useCinema,
   useSceneProgress,
 } from "@/components/animations/cinema";
 import { cn } from "@/lib/utils/cn";
 
-type OpenerSize = "scene" | "column";
+/**
+ * `scene` and `column` are the homepage's two display sizes; `section` keeps
+ * the site's standard section title in the cinema too (a page whose own
+ * heading is smaller, such as /servers).
+ */
+type OpenerSize = "scene" | "column" | "section";
 
 /**
  * How every homepage section opens (2026-09-27): a ruled eyebrow in the
@@ -152,7 +158,9 @@ export function SceneOpener({
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         observer.disconnect();
-        play();
+        // Arrived by a link or a restored position: drawn in place.
+        if (justRelocated()) clear();
+        else play();
       },
       { rootMargin: "0px 0px -12% 0px" },
     );
@@ -202,7 +210,8 @@ export function SceneOpener({
     return () => move.stop();
   }, [away, cinema]);
 
-  const titleClass = cinema ? (size === "scene" ? "title-scene" : "title-column") : "section-title";
+  const titleClass =
+    cinema && size !== "section" ? (size === "scene" ? "title-scene" : "title-column") : "section-title";
 
   return (
     <motion.div ref={root} className={className} style={cinema ? { y: settleY } : undefined}>

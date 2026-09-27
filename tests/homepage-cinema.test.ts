@@ -74,6 +74,11 @@ const CINEMA_FILES = [
   "src/components/sections/download-cinema.tsx",
   "src/components/sections/be-you-finale.tsx",
   "src/components/animations/voice-line.tsx",
+  "src/components/animations/scene-opener.tsx",
+  "src/components/story/story-phone-canvas.tsx",
+  "src/components/story/story-phone-gl.ts",
+  "src/components/story/story-pose.ts",
+  "src/components/ui/magnetic-cta.tsx",
 ];
 
 test("the cinema gate: reduced motion and a rem-sized window, never on the server", async () => {
@@ -347,4 +352,49 @@ test("the design system documents the cinema as an owner-approved exception", as
   const doc = await readFile("docs/design/design-system.md", "utf8");
   assert.match(doc, /^## Scroll cinema \(homepage\)$/m);
   assert.match(doc, /Motion \(framer-motion\) is reserved for[^.]*homepage scroll cinema/);
+});
+
+test("every section opens the same way, and the static layout keeps the plain title", async () => {
+  const opener = await readFile("src/components/animations/scene-opener.tsx", "utf8");
+  // Words are split for their entrance only while the cinema is on.
+  assert.match(opener, /\{cinema \? splitWords\(title, "t"\) : title\}/);
+  assert.match(opener, /cinema && size !== "section" \? \(size === "scene" \? "title-scene" : "title-column"\) : "section-title"/);
+  // A jump or restored position draws it in place; focus draws it at rest.
+  assert.match(opener, /if \(justRelocated\(\)\) clear\(\);\s*else play\(\);/);
+  assert.match(opener, /onFocusCapture=\{\(\) => settle\.current\?\.\(\)\}/);
+
+  for (const file of [
+    "src/components/story/app-story-static.tsx",
+    "src/components/sections/welcome-intro-cinema.tsx",
+    "src/components/sections/welcome-features-cinema.tsx",
+    "src/components/servers/servers-welcome-sheet.tsx",
+    "src/components/sections/premium-section.tsx",
+    "src/components/sections/download-section.tsx",
+  ]) {
+    assert.match(await readFile(file, "utf8"), /<SceneOpener\b/, `${file} opens with the shared SceneOpener`);
+  }
+
+  // The frame and the opener anatomy live in one place.
+  const css = await readFile("src/app/globals.css", "utf8");
+  assert.match(css, /--frame: 1240px;/);
+  assert.match(css, /--edge: max\(var\(--gutter\), calc\(\(100% - var\(--frame\)\) \/ 2\)\);/);
+  assert.match(css, /\.opener-rule \{ forced-color-adjust: none; background: CanvasText; \}/);
+});
+
+test("the 3D phone is an enhancement over the CSS phone, never a requirement", async () => {
+  const canvas = await readFile("src/components/story/story-phone-canvas.tsx", "utf8");
+  // Loaded only when needed, refused on software rendering, and aria-hidden.
+  assert.match(canvas, /import\(/);
+  assert.match(canvas, /failIfMajorPerformanceCaveat/);
+  assert.match(canvas, /aria-hidden="true"/);
+  const pkg = JSON.parse(await readFile("package.json", "utf8"));
+  assert.ok(pkg.dependencies.ogl, "ogl is the one 3D dependency");
+  assert.ok(!pkg.dependencies.three && !pkg.dependencies["@react-three/fiber"], "no three.js");
+});
+
+test("primary actions lean toward the pointer without adding a Tab stop", async () => {
+  const cta = await readFile("src/components/ui/magnetic-cta.tsx", "utf8");
+  assert.match(cta, /tabIndex=\{-1\}/);
+  assert.match(cta, /\(hover: hover\) and \(pointer: fine\)/);
+  assert.match(cta, /useReducedMotion\(\)/);
 });

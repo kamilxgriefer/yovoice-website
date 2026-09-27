@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { animate, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 
@@ -39,7 +39,8 @@ export function MagneticCta({
   const springX = useSpring(x, follow);
   const springY = useSpring(y, follow);
   const ring = useRef<HTMLSpanElement>(null);
-  const [fine, setFine] = useState(false);
+  // Known before the first hover, so the first one already leans and lifts.
+  const fine = useSyncExternalStore(subscribeFine, fineSnapshot, () => false);
 
   const moves = fine && !reduce;
 
@@ -52,9 +53,7 @@ export function MagneticCta({
       transition={press}
       tabIndex={-1}
       onPointerEnter={(event) => {
-        const precise = event.pointerType === "mouse" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-        setFine(precise);
-        if (!precise || reduce || !ring.current) return;
+        if (event.pointerType !== "mouse" || !moves || !ring.current) return;
         animate(
           ring.current,
           { opacity: [0.7, 0], scale: [1, 1.35] },
@@ -84,3 +83,11 @@ export function MagneticCta({
     </motion.div>
   );
 }
+
+const FINE_QUERY = "(hover: hover) and (pointer: fine)";
+function subscribeFine(onChange: () => void) {
+  const query = window.matchMedia(FINE_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+const fineSnapshot = () => window.matchMedia(FINE_QUERY).matches;

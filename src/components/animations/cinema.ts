@@ -63,6 +63,30 @@ export function useCinema(): boolean {
   return useDeferredValue(useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot));
 }
 
+let lastRelocation = -Infinity;
+if (typeof window !== "undefined") {
+  let lastY = window.scrollY;
+  window.addEventListener(
+    "scroll",
+    () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) > window.innerHeight * 1.5) lastRelocation = performance.now();
+      lastY = y;
+    },
+    { passive: true },
+  );
+}
+
+/**
+ * True for a moment after the page was relocated rather than scrolled (an
+ * in-page link, a restored position): one step of more than one and a half
+ * windows. A triggered entrance that comes into view because of it is drawn
+ * in place instead of played, like every scene does on a relocation.
+ */
+export function justRelocated(): boolean {
+  return performance.now() - lastRelocation < 400;
+}
+
 /** One shared feel for every scrubbed scene: a short, well-damped follow. */
 export const SCENE_SPRING = { stiffness: 170, damping: 32, mass: 0.3, restDelta: 0.0005 } as const;
 

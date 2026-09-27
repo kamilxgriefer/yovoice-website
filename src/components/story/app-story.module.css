@@ -117,8 +117,9 @@
 }
 
 /* A fixed vignette over the flood: darker edges where the text and the rail
-   sit, and a fade to the page background at the bottom so the stage lets go
-   into the next section without a hard edge. */
+   sit, and a fade at the bottom to the seam violet (--seam) that the "Start
+   talking" band and Welcome's top continue, so the stage lets go into the
+   next section without an edge. */
 .shade {
   position: absolute;
   inset: 0;
@@ -126,7 +127,7 @@
   pointer-events: none;
   background:
     radial-gradient(140% 105% at 50% 58%, transparent 50%, rgb(8 7 17 / 0.6) 100%),
-    linear-gradient(to bottom, transparent 82%, rgb(8 7 17 / 0.88) 100%);
+    linear-gradient(to bottom, transparent 82%, rgb(18 9 45 / 0.9) 100%);
 }
 
 /* ---- Intro heading ----------------------------------------------------- */
@@ -736,7 +737,7 @@ a.ctaLarge {
     z-index: 3;
     display: block;
     pointer-events: none;
-    background: linear-gradient(to bottom, transparent 82%, var(--background) 100%);
+    background: linear-gradient(to bottom, transparent 82%, var(--seam) 100%);
   }
 
   .slot {
