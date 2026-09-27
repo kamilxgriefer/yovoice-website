@@ -26,19 +26,33 @@ import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
  * targets below 44px, and the brief forbids all three — the row would wrap
  * onto two lines instead. 1160px is the smallest width that clears every
  * state, leaving 65/55px of slack in the two steady variants and still
- * fitting the transient one. Gutters are `lg:px-8` rather than the `lg:px-12`
- * used elsewhere: the header has its own `max-w-[1480px]` and never lined up
- * with the 1280/1400px content containers anyway, and the 32px it saves is
- * what buys the 40px move down from the old `min-[1200px]`.
+ * fitting the transient one. The breakpoint is written as 72.5rem, which is
+ * 1160px at the default text size: the row is text, so a visitor who sets a
+ * larger default text size gets the menu button until the row fits (at
+ * 150 % text the row needs about 1740px; the px breakpoint let it wrap).
+ *
+ * The row sits on the page's frame (`.frame`, 2026-09-27): the lockup
+ * starts on the same edge as every section's content and the last action
+ * ends on its mirror — 100px at 1440, 340px at 1920. Below the breakpoint
+ * the row is only the lockup and the menu button, so it takes the frame's
+ * own gutter (`--gutter`: 20/32/48px). From the breakpoint the gutter is
+ * the frame's, but never more than leaves the row 69.5rem (1112px at the
+ * default size; the "Signing out…" row measured 1104px in September 2026,
+ * with today's six links), and never under 2rem: 32px up to 1176px, easing
+ * to 48px by 1208px and following the frame's edge from 1336px. The row
+ * never has less room than it had with the old fixed 2rem gutters wherever
+ * the longest row fitted. (The base gutter is the token rather than
+ * `sm:`/`lg:` steps: Tailwind orders an arbitrary breakpoint apart from the
+ * named ones, and an `lg:` padding could win over it.)
  *
  * Tailwind v4 scans source text for candidates, so the classes are written
  * out in full here and reused by reference; a template literal would leave
  * the utilities unbuilt.
  */
-const DESKTOP_ROW = "hidden min-[1160px]:flex";
-const MOBILE_ONLY = "min-[1160px]:hidden";
+const DESKTOP_ROW = "hidden min-[72.5rem]:flex";
+const MOBILE_ONLY = "min-[72.5rem]:hidden";
 /** Must stay in sync with the two class constants above. */
-const DESKTOP_MEDIA_QUERY = "(min-width: 1160px)";
+const DESKTOP_MEDIA_QUERY = "(min-width: 72.5rem)";
 
 const FOCUSABLE_SELECTOR =
   'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
@@ -170,7 +184,7 @@ export function SiteHeader() {
       ref={headerRef}
       className="fixed inset-x-0 top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/92 backdrop-blur-xl"
     >
-      <div className="mx-auto flex h-[var(--header-height)] w-full max-w-[1480px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-8">
+      <div className="flex h-[var(--header-height)] w-full items-center justify-between gap-4 px-[var(--gutter)] min-[72.5rem]:px-[max(2rem,min(max(var(--gutter),calc((100%_-_var(--frame))_/_2)),calc((100%_-_69.5rem)_/_2)))]">
         <BrandLockup variant="compact" priority />
 
         <nav className={`${DESKTOP_ROW} items-center gap-0.5`} aria-label="Primary navigation">

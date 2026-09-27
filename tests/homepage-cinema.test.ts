@@ -73,6 +73,7 @@ const CINEMA_FILES = [
   "src/components/sections/premium-identity.tsx",
   "src/components/sections/download-cinema.tsx",
   "src/components/sections/be-you-finale.tsx",
+  "src/components/animations/voice-line.tsx",
 ];
 
 test("the cinema gate: reduced motion and a rem-sized window, never on the server", async () => {

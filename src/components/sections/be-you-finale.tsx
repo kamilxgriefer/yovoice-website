@@ -11,7 +11,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 
-import { SCENE_SPRING, useCinema, useRelocationJump } from "@/components/animations/cinema";
+import { SCENE_SPRING, useCinema, useRelocationJump, useScrollLean } from "@/components/animations/cinema";
 import { ScrollWave } from "@/components/animations/scroll-wave";
 
 /**
@@ -24,9 +24,17 @@ import { ScrollWave } from "@/components/animations/scroll-wave";
  * is solid it stays solid: scrolling back up lowers the word back into its
  * line but never erases it, and it is only drawn as outlines again after it
  * has left the screen at the bottom. The waveform beneath is shaped like the
- * two syllables being said. Everything here is decorative (the tagline is
- * also the site's title), so it is hidden from assistive technology. Without
- * the cinema the word is drawn solid, at rest.
+ * two syllables being said, and the page's voice line (`VoiceLine`) turns
+ * under it to become the line its bars stand on (`data-voice-line-end`).
+ *
+ * The page's colour comes back for the last word (the colour arc): the
+ * violet the story ends on floods the room behind it, rising with the fill
+ * and staying lit with it, so the film ends where its brightest scene did.
+ * The word leans into the scroll with its speed and stands straight the
+ * moment the scroll stops, like the story's giant words, pivoting on its own
+ * baseline. Everything here is decorative (the tagline is also the site's
+ * title), so it is hidden from assistive technology. Without the cinema the
+ * word is drawn solid, at rest, on the page's ground.
  *
  * The page ends here, so the bottom of the page is where the word is last
  * seen, and it must be seen whole there: never cut by the fixed header.
@@ -44,17 +52,50 @@ export function BeYouFinale() {
   const bars = useWaveBars();
   const root = useRef<HTMLDivElement>(null);
   const wave = useRef<HTMLDivElement>(null);
+  // How far the word has filled (latched): the word drives it, the flood
+  // behind it follows it.
+  const fill = useMotionValue(0);
   useTailMeasure(root, wave);
 
   return (
-    <div ref={root} aria-hidden="true" className={`mt-20 select-none sm:mt-28 lg:mt-32 ${ROOM_VARS}`}>
-      {/* The container the word's width is measured against. */}
-      <div className="[container-type:inline-size]">{cinema ? <SpokenWord /> : <Word />}</div>
+    <div ref={root} aria-hidden="true" className={`relative mt-20 select-none sm:mt-28 lg:mt-32 ${ROOM_VARS}`}>
+      {cinema ? <FinaleFlood fill={fill} /> : null}
+      {/* The container the word's width is measured against. Positioned, so
+          the word paints over the flood. */}
+      <div className="relative [container-type:inline-size]">
+        {cinema ? <SpokenWord fillOut={fill} /> : <Word />}
+      </div>
       <div style={{ height: SPACER }} />
-      <div ref={wave} className="mt-[var(--finale-gap)]">
+      <div ref={wave} data-voice-line-end="" className="relative mt-[var(--finale-gap)]">
         <ScrollWave bars={bars} envelope={BE_YOU_ENVELOPE} className="h-[var(--finale-wave)]" />
       </div>
     </div>
+  );
+}
+
+/**
+ * The finale's flood: the colour the story ends on (its last tint, as a
+ * flood with one bright core), so the film is bookended. Full-bleed,
+ * bottom-anchored on the page's floor (the footer's hairline) and as tall
+ * as the room, its core low behind the word. It lies behind everything in
+ * the Download section (which is its own stacking context), so the cards
+ * and the identity panel above the word sit on it, never under it. It comes
+ * up with the word's fill and, like the fill, stays lit at the bottom of the
+ * page.
+ *
+ * Contrast on the brightest pixel behind the word at full light: "Be"
+ * #f8f5fc on #451a93 is 11.9:1 and "You." #d986ff 4.9:1 (large text needs
+ * 3:1). In forced colours the flood is left out.
+ */
+const FLOOD =
+  "radial-gradient(75% 60% at 50% 62%, #451a93 0%, #2a1061 34%, #1a0a44 55%, rgb(26 10 68 / 0) 82%)";
+
+function FinaleFlood({ fill }: { fill: MotionValue<number> }) {
+  return (
+    <motion.div
+      className="pointer-events-none absolute bottom-0 -z-1 h-[min(110svh,70rem)] forced-colors:hidden"
+      style={{ insetInline: "calc(50% - 50vw)", background: FLOOD, opacity: fill }}
+    />
   );
 }
 
@@ -179,32 +220,44 @@ function Word() {
   );
 }
 
-function SpokenWord() {
+/** The word leans at most this far (degrees) with the speed of the scroll. */
+const LEAN = 6;
+/** Where it leans from: its baseline, 90 % down its 0.9em line box. */
+const BASELINE = 0.9;
+
+function SpokenWord({ fillOut }: { fillOut: MotionValue<number> }) {
   const ref = useRef<HTMLDivElement>(null);
   const { progress, fill } = useFinaleProgress(ref);
   const lift = useTransform(progress, (value) => `${16 * (1 - easeOutCubic(clamp01(value / 0.8)))}%`);
+  // Into the direction of the scroll, like the story's giant words.
+  const lean = useScrollLean(LEAN);
+  const skewX = useTransform(lean, (degrees) => -degrees);
+  useMotionValueEvent(fill, "change", (value) => fillOut.set(value));
+  useLayoutEffect(() => fillOut.set(fill.get()), [fill, fillOut]);
 
   return (
     <div ref={ref} style={WORD_STYLE}>
-      {/* The line the letters rise out of: clipped at its foot only. */}
-      <motion.div
-        data-finale-word=""
-        className={`${WORD} [clip-path:inset(-20%_-10%_0_-10%)]`}
-        style={{ y: lift }}
-      >
-        {LETTERS.map((letter, index) => (
-          <SpokenLetter
-            key={index}
-            index={index}
-            count={LETTERS.length}
-            progress={progress}
-            fill={fill}
-            color={letter.accent ? ACCENT : FOREGROUND}
-            kern={"kern" in letter ? letter.kern : undefined}
-          >
-            {letter.char}
-          </SpokenLetter>
-        ))}
+      <motion.div className="will-change-transform" style={{ skewX, originY: BASELINE }}>
+        {/* The line the letters rise out of: clipped at its foot only. */}
+        <motion.div
+          data-finale-word=""
+          className={`${WORD} [clip-path:inset(-20%_-10%_0_-10%)]`}
+          style={{ y: lift }}
+        >
+          {LETTERS.map((letter, index) => (
+            <SpokenLetter
+              key={index}
+              index={index}
+              count={LETTERS.length}
+              progress={progress}
+              fill={fill}
+              color={letter.accent ? ACCENT : FOREGROUND}
+              kern={"kern" in letter ? letter.kern : undefined}
+            >
+              {letter.char}
+            </SpokenLetter>
+          ))}
+        </motion.div>
       </motion.div>
     </div>
   );

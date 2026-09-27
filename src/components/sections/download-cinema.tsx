@@ -1,127 +1,13 @@
 "use client";
 
-import {
-  useLayoutEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 import { motion, useMotionValue, useTransform, type MotionValue } from "framer-motion";
 
-import { useCinema, useSceneProgress } from "@/components/animations/cinema";
+import { STAGGER, useCinema, useSceneProgress } from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
-const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-/**
- * "Ready to find your people?" — the question the whole page has been
- * building to — zooms into place as it rises into view: it starts up to 1.4×
- * its size and settles as its centre reaches the middle of the screen.
- *
- * The starting size is capped by the widest line of the heading against the
- * viewport, so on a 320px phone it never grows past the screen edge. It never
- * fades below 55 % either, where both the white and the accent words still
- * read above 3:1 as large bold text, and the short focus pull (≤ 6px blur)
- * is gone by the time the heading is 40 % of the way in. Without the cinema
- * it is a plain `<h2>`.
- */
-export function ZoomHeading({
-  id,
-  className,
-  children,
-}: {
-  id: string;
-  className?: string;
-  children: ReactNode;
-}) {
-  const cinema = useCinema();
-  if (!cinema) {
-    return (
-      <h2 id={id} className={className}>
-        {children}
-      </h2>
-    );
-  }
-  return (
-    <ZoomingHeading id={id} className={className}>
-      {children}
-    </ZoomingHeading>
-  );
-}
-
-const MAX_ZOOM = 1.4;
-/** Clear space kept on each side of the zoomed heading, in px. */
-const GUTTER = 16;
-
-function ZoomingHeading({
-  id,
-  className,
-  children,
-}: {
-  id: string;
-  className?: string;
-  children: ReactNode;
-}) {
-  const ref = useRef<HTMLHeadingElement>(null);
-  const progress = useSceneProgress(ref, ["start end", "center 0.5"]);
-  const zoom = useStartingZoom(ref);
-
-  const scale = useTransform(progress, (value) => 1 + (zoom - 1) * (1 - easeOutCubic(clamp01(value))));
-  // Scrubbed, so it can rest wherever the visitor stops: no blur, and never
-  // fainter than 80 %, where even the accent words keep 3:1 as large text.
-  const opacity = useTransform(progress, (value) => 0.8 + 0.2 * easeOutCubic(clamp01(value / 0.5)));
-  const y = useTransform(progress, (value) => 36 * (1 - easeOutCubic(clamp01(value))));
-
-  return (
-    <motion.h2 ref={ref} id={id} className={className} style={{ scale, opacity, y }}>
-      {children}
-    </motion.h2>
-  );
-}
-
-/**
- * How large the heading may start: up to `MAX_ZOOM`, as long as its widest
- * line still fits the viewport with `GUTTER` on each side.
- *
- * Measurements that feed a transform are React state, not motion values, in
- * every scene of this file. A motion value set from a layout effect reaches
- * a `useTransform` only if the transform subscribed first, which depends on
- * hook order and silently leaves the render-time value in place otherwise
- * (the heading would start at 1.4x on a 320px phone until the scroll moved
- * it). A state update from a layout effect re-renders before the browser
- * paints, and a re-render re-derives every transform from the new number.
- * It only changes when the heading's size or the viewport width changes.
- */
-function useStartingZoom(ref: RefObject<HTMLElement | null>): number {
-  const [zoom, setZoom] = useState(1);
-  useLayoutEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const measure = () => {
-      // The union of the line boxes is as wide as the widest line. It is
-      // read through the current transform, so undo the current scale.
-      const range = document.createRange();
-      range.selectNodeContents(node);
-      const current = new DOMMatrixReadOnly(getComputedStyle(node).transform).a || 1;
-      const line = range.getBoundingClientRect().width / current;
-      const room = document.documentElement.clientWidth - GUTTER * 2;
-      setZoom(line > 0 ? Math.max(1, Math.min(MAX_ZOOM, room / line)) : 1);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [ref]);
-  return zoom;
-}
 
 const DECK_QUERY = "(min-width: 48rem)";
 
@@ -164,7 +50,7 @@ export function PlatformDeck({
   return (
     <div id={id} className={className}>
       {cards.map((card, index) => (
-        <Reveal key={index} delay={index * 0.08} className="flex min-w-0 flex-col">
+        <Reveal key={index} delay={Math.min(index, 4) * STAGGER.item} className="flex min-w-0 flex-col">
           {card}
         </Reveal>
       ))}
@@ -209,10 +95,12 @@ function DealtCard({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  // From this card's slot to the middle of the row. State, so the pose
-  // below is re-derived from it before the first paint (see
-  // `useStartingZoom`): the stack is right from the first frame the cards
-  // can be seen, never the grid slots snapping into a pile.
+  // From this card's slot to the middle of the row. State, not a motion
+  // value set from a layout effect: a state update from a layout effect
+  // re-renders before the browser paints, and the re-render re-derives every
+  // transform below from the new number, so the stack is right from the
+  // first frame the cards can be seen, never the grid slots snapping into a
+  // pile (see the measurement rule in cinema.ts).
   const toCentre = useOffsetToCentre(ref);
 
   // -1 … 1 across the row: the fan's shape in the stack.

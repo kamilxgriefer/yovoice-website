@@ -29,7 +29,7 @@ const socialLinks: { Icon: LucideIcon; href: string; label: string }[] = [
 export function SiteFooter() {
   return (
     <footer id="footer" className="border-t border-[var(--border)] bg-[var(--background)]">
-      <div className="mx-auto grid max-w-[1400px] gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,1fr)_1.5fr] lg:gap-16 lg:px-12">
+      <div className="frame grid gap-12 py-14 lg:grid-cols-[minmax(0,1fr)_1.5fr] lg:gap-16">
         <div className="max-w-sm">
           <p className="text-sm leading-6 text-[var(--text-secondary)]">Your people. Your space. Your voice. A place for the conversations, communities and little moments that bring us closer.</p>
           <p className="eyebrow mt-5">Voice first. Community always.</p>
@@ -49,7 +49,7 @@ export function SiteFooter() {
 
       {/* One line: lockup, copyright, profiles. */}
       <div className="border-t border-[var(--border)]">
-        <div className="mx-auto flex max-w-[1400px] flex-col gap-5 px-5 py-6 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+        <div className="frame flex flex-col gap-5 py-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <BrandLockup className="w-fit" />
             <p className="text-sm text-[var(--text-tertiary)]">© {new Date().getFullYear()} YO Voice. All rights reserved.</p>
