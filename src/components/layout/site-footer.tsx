@@ -35,7 +35,11 @@ export function SiteFooter() {
           <p className="eyebrow mt-5">Voice first. Community always.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+        {/* Below sm the columns size to their words: two side by side where
+            the longest label fits (a 320px phone at the default text size),
+            one under the other at 200 % text, so no label runs into the
+            next column or past the page's edge. */}
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,6.5rem),1fr))] gap-8 sm:grid-cols-4">
           {columns.map((column) => (
             <div key={column.title}>
               <h2 className="text-sm font-bold text-white">{column.title}</h2>

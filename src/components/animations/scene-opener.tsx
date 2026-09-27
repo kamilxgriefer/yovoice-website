@@ -121,6 +121,13 @@ export function SceneOpener({
   useLayoutEffect(() => {
     const node = root.current;
     if (!cinema || !cue || !node) return;
+    // The page landed on the opener while its words were being split (a
+    // fragment or a restored position lands between the two commits): it is
+    // on screen now, so it is drawn at rest before anything is painted.
+    if (node.getBoundingClientRect().top < window.innerHeight) {
+      setCue(false);
+      return;
+    }
 
     const rule = eyebrowRef.current?.querySelector<HTMLElement>(".opener-rule") ?? null;
     const label = eyebrowRef.current?.querySelector<HTMLElement>(".opener-label") ?? null;

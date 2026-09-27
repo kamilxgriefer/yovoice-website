@@ -20,10 +20,16 @@ import { useCinema } from "@/components/animations/cinema";
  * the page.
  *
  * - Decoration only: `aria-hidden`, no pointer events, left out in forced
- *   colours, and mounted only while the scroll cinema is on, from a tablet's
- *   width up. On a phone the gutter is 20px: a spine 10px from the glass
- *   doubles the edge of every card beside it and its ticks are too short to
- *   read, so phones have no line. The static layout has none either.
+ *   colours, and mounted only while the scroll cinema is on, from a laptop's
+ *   width up (64rem, where the gutter is 48px and the spine stands at
+ *   least 24px off the cards). On a phone (20px gutter) or a tablet (32px)
+ *   the spine would run 10–16px beside every card's edge, reading as a
+ *   doubled border, and its ticks would be too short to read, so they have
+ *   no line. The static layout has none either.
+ * - Its colours are the page's tokens (`--border` for the track,
+ *   `--foreground` for the head, the brand's violet, magenta and accent for
+ *   the lit line), set through CSS; only the lit colour at a given height is
+ *   worked out in script, from the same three colours (`LIT`).
  * - Never behind text: the spine keeps to the gutter and a tick crosses only
  *   the gap between the spine and the eyebrow. A stage that covers the gutter
  *   while it is pinned (What you get's big screen) hides the line: the spine
@@ -51,8 +57,8 @@ export function VoiceLine() {
   return cinema && wide ? <VoiceLineCinema /> : null;
 }
 
-/** Tablets and up. */
-const WIDE_QUERY = "(min-width: 48rem)";
+/** Laptops and up: where the frame's gutter is 48px (`--gutter`, globals.css). */
+const WIDE_QUERY = "(min-width: 64rem)";
 const wideSnapshot = () => window.matchMedia(WIDE_QUERY).matches;
 
 function subscribeWide(onChange: () => void) {
@@ -83,15 +89,23 @@ const RUN_DONE_AT = 0.25;
 const OVERSHOOT = 56;
 
 const EASE = "cubic-bezier(.22,1,.36,1)";
+/**
+ * The lit line's colour along its length, as numbers because a stage stop's
+ * stub is painted in the colour the line has at that height, worked out
+ * here: `--primary` at the top, `--secondary` at 55 %, `--accent` at the
+ * foot — the same three stops the lit gradient below takes from the tokens.
+ */
 const LIT = [
   [0, [123, 47, 247]],
   [0.55, [192, 38, 255]],
   [1, [217, 134, 255]],
 ] as const;
-const TRACK = "#342a43";
-const NODE_IDLE = { fill: "#080711", stroke: "#7c6790" } as const;
-const HEAD = "#f8f5fc";
-const HALO = "#c026ff";
+/** The faint track ahead of the head. */
+const TRACK = "var(--border)";
+/** A stage stop's node before the head reaches it. */
+const NODE_IDLE = { fill: "var(--background)", stroke: "var(--border-strong)" } as const;
+const HEAD = "var(--foreground)";
+const HALO = "var(--secondary)";
 
 type Point = { x: number; y: number; s: number };
 
@@ -263,7 +277,7 @@ function attach(target: HTMLElement, covered: boolean, previous: Attachment | un
     svg.setAttribute("height", "1");
     const track = document.createElementNS(SVG_NS, "path");
     track.setAttribute("fill", "none");
-    track.setAttribute("stroke", TRACK);
+    track.style.stroke = TRACK;
     track.setAttribute("stroke-width", "1.5");
     const lit = document.createElementNS(SVG_NS, "path");
     lit.setAttribute("fill", "none");
@@ -599,19 +613,19 @@ function VoiceLineCinema() {
     >
       <defs>
         <linearGradient ref={litGradient} id={ids.lit} gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#7b2ff7" stopOpacity="0" />
-          <stop ref={(node) => { if (node) fadeStops.current[0] = node; }} offset="0.02" stopColor="#7b2ff7" />
-          <stop offset="0.55" stopColor="#c026ff" />
-          <stop offset="1" stopColor="#d986ff" />
+          <stop offset="0" style={{ stopColor: "var(--primary)" }} stopOpacity="0" />
+          <stop ref={(node) => { if (node) fadeStops.current[0] = node; }} offset="0.02" style={{ stopColor: "var(--primary)" }} />
+          <stop offset="0.55" style={{ stopColor: "var(--secondary)" }} />
+          <stop offset="1" style={{ stopColor: "var(--accent)" }} />
         </linearGradient>
         <linearGradient ref={trackGradient} id={ids.track} gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={TRACK} stopOpacity="0" />
-          <stop ref={(node) => { if (node) fadeStops.current[1] = node; }} offset="0.02" stopColor={TRACK} />
-          <stop offset="1" stopColor={TRACK} />
+          <stop offset="0" style={{ stopColor: TRACK }} stopOpacity="0" />
+          <stop ref={(node) => { if (node) fadeStops.current[1] = node; }} offset="0.02" style={{ stopColor: TRACK }} />
+          <stop offset="1" style={{ stopColor: TRACK }} />
         </linearGradient>
         <radialGradient id={ids.halo}>
-          <stop offset="0" stopColor={HALO} stopOpacity="0.55" />
-          <stop offset="1" stopColor={HALO} stopOpacity="0" />
+          <stop offset="0" style={{ stopColor: HALO }} stopOpacity="0.55" />
+          <stop offset="1" style={{ stopColor: HALO }} stopOpacity="0" />
         </radialGradient>
         <clipPath id={ids.clip} clipPathUnits="userSpaceOnUse">
           <rect ref={clipAbove} x="0" y="0" width="100%" height="0" />
@@ -622,11 +636,11 @@ function VoiceLineCinema() {
         <path ref={verticalTrack} fill="none" stroke={`url(#${ids.track})`} strokeWidth={1.5} />
         <path ref={verticalLit} fill="none" stroke={`url(#${ids.lit})`} strokeWidth={2} strokeLinecap="round" />
       </g>
-      <path ref={runTrack} fill="none" stroke={TRACK} strokeWidth={1.5} />
+      <path ref={runTrack} fill="none" style={{ stroke: TRACK }} strokeWidth={1.5} />
       <path ref={runLit} fill="none" stroke={`url(#${ids.lit})`} strokeWidth={2} strokeLinecap="round" />
       <g ref={head} opacity={1}>
         <circle r={11} fill={`url(#${ids.halo})`} />
-        <circle r={3.5} fill={HEAD} />
+        <circle r={3.5} style={{ fill: HEAD }} />
       </g>
     </svg>
   );

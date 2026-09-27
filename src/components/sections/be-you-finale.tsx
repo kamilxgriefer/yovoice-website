@@ -13,6 +13,8 @@ import {
 
 import { SCENE_SPRING, useCinema, useRelocationJump, useScrollLean } from "@/components/animations/cinema";
 import { ScrollWave } from "@/components/animations/scroll-wave";
+import { alpha, mix } from "@/components/animations/tint";
+import { FINALE_TINT } from "@/components/story/story-chapters";
 
 /**
  * The page's last word: "Be You." — YO Voice's own tagline — set as wide as
@@ -83,12 +85,16 @@ export function BeYouFinale() {
  * up with the word's fill and, like the fill, stays lit at the bottom of the
  * page.
  *
- * Contrast on the brightest pixel behind the word at full light: "Be"
- * #f8f5fc on #451a93 is 11.9:1 and "You." #d986ff 4.9:1 (large text needs
- * 3:1). In forced colours the flood is left out.
+ * Its colours are the story's finale tint (`FINALE_TINT`), lifted toward
+ * its core by the story's own amounts: 44 % at the centre, 16 % a third of
+ * the way out, then the flood itself, fading to nothing by 82 %.
+ *
+ * Contrast on the brightest pixel behind the word at full light (#451a93):
+ * "Be" in `--foreground` (#f8f5fc) is 10.7:1 and "You." in `--accent`
+ * (#d986ff) 4.8:1 (large text needs 3:1). In forced colours the flood is
+ * left out.
  */
-const FLOOD =
-  "radial-gradient(75% 60% at 50% 62%, #451a93 0%, #2a1061 34%, #1a0a44 55%, rgb(26 10 68 / 0) 82%)";
+const FLOOD = `radial-gradient(75% 60% at 50% 62%, ${mix(FINALE_TINT.flood, FINALE_TINT.core, 0.44 * FINALE_TINT.lift)} 0%, ${mix(FINALE_TINT.flood, FINALE_TINT.core, 0.16 * FINALE_TINT.lift)} 34%, ${FINALE_TINT.flood} 55%, ${alpha(FINALE_TINT.flood, 0)} 82%)`;
 
 function FinaleFlood({ fill }: { fill: MotionValue<number> }) {
   return (
@@ -196,8 +202,8 @@ const BE_YOU_ENVELOPE = [
 
 const WORD =
   "flex w-full justify-center whitespace-nowrap font-[family-name:var(--font-display)] font-extrabold leading-[0.9] tracking-[-0.04em]";
-const FOREGROUND = "#f8f5fc";
-const ACCENT = "#d986ff";
+const FOREGROUND = "var(--foreground)";
+const ACCENT = "var(--accent)";
 
 function Word() {
   return (

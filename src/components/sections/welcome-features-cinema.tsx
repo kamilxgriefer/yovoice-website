@@ -29,6 +29,7 @@ import {
 } from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
 import { SceneOpener } from "@/components/animations/scene-opener";
+import { mix } from "@/components/animations/tint";
 import styles from "@/components/sections/welcome-features-cinema.module.css";
 import {
   BrowserBar,
@@ -62,9 +63,12 @@ import {
  * a deep light in the dock colour of the view on it — Home violet, Chats
  * cyan, Friends magenta — which comes up as the screen wakes, changes as each
  * wipe crosses the screen, and dims as it settles back. It is the story's
- * flood again, at about 60 % of its strength, so the story stays the peak.
- * The light rises with the screen and never reaches the heading: its top
- * edge stays under the heading for as long as the heading is on the stage.
+ * flood colours with a smaller core (`roomPaint`); where it shows, at the
+ * stage's sides, it is about as strong as the story's flood, but the screen
+ * covers most of it, so the room as a whole reads at well under the story's
+ * strength and the story stays the peak. The light rises with the screen and
+ * never reaches the heading: its top edge stays under the heading for as
+ * long as the heading is on the stage.
  *
  * It opens the way every homepage section does (`SceneOpener`), on the
  * page's frame: the ruled eyebrow in the scene's cyan, the title rising word
@@ -674,21 +678,16 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
   );
 }
 
-/** `amount` of `to` over `from`, both #rrggbb. */
-function mix(from: string, to: string, amount: number): string {
-  const channel = (hex: string, at: number) => parseInt(hex.slice(at, at + 2), 16);
-  return `#${[1, 3, 5]
-    .map((at) => Math.round(channel(from, at) + (channel(to, at) - channel(from, at)) * amount))
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("")}`;
-}
-
 /**
- * One view's light on the room: the story's flood recipe at about 60 % of
- * its strength — brightest low in the middle, behind the screen, and down to
- * the page colour at the stage's corners — under a foot of the page colour
- * that fades it out above the caption strip, so the strip's floor never
- * shows an edge in the light. Both are painted in the room's own place.
+ * One view's light on the room: the story's flood recipe (`floodPaint` in
+ * app-story-cinema.tsx) with a smaller core — lifted 36 % toward the core
+ * where the story lifts 44 %, the same 16 % a little past halfway, the full
+ * flood colour at 80 % of the way out, and down to the page colour at the
+ * stage's corners — under a foot of the page colour that fades it out above
+ * the caption strip, so the strip's floor never shows an edge in the light.
+ * Where it is seen, beside the screen, it is about as strong as the story's
+ * flood; it reads well under the story's strength only because the screen
+ * covers its brightest part. Both are painted in the room's own place.
  */
 function roomPaint({ flood, core, lift }: ScreenView["room"]): string {
   const foot = `linear-gradient(to top, #080711 var(--strip), rgb(8 7 17 / 0.9) calc(var(--strip) + 5.5%), rgb(8 7 17 / 0.5) calc(var(--strip) + 11%), rgb(8 7 17 / 0.1) calc(var(--strip) + 16.5%), rgb(8 7 17 / 0) calc(var(--strip) + 22%))`;

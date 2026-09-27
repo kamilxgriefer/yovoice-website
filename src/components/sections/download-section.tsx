@@ -1,9 +1,7 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone, type LucideIcon } from "lucide-react";
 
-import { useCinema } from "@/components/animations/cinema";
+import { CinemaSurface } from "@/components/animations/cinema-surface";
 import { Reveal } from "@/components/animations/reveal";
 import { SceneOpener } from "@/components/animations/scene-opener";
 import { BeYouFinale } from "@/components/sections/be-you-finale";
@@ -19,8 +17,9 @@ import { cn } from "@/lib/utils/cn";
  * twice — so the copy stays in this file and the scroll cinema only moves it.
  *
  * It sits on the homepage frame and opens the way every section does
- * (`SceneOpener`): the ruled eyebrow in the Download ink, "Ready to find /
- * your people?" rising word by word, and the lead. The four platform cards
+ * (`SceneOpener`): the ruled eyebrow in the openers' default ink
+ * (`--accent`), "Ready to find / your people?" rising word by word, and the
+ * lead. The four platform cards
  * are then dealt from one fanned stack (`PlatformDeck`) and the identity
  * panel rises in. Without the cinema everything is drawn at rest in the same
  * layout.
@@ -35,6 +34,9 @@ import { cn } from "@/lib/utils/cn";
  * is that size, and only the homepage's scenes may outgrow their hero — its
  * hairline and a still button.
  *
+ * A server component: only the seam asks for the cinema (`CinemaSurface`),
+ * so the copy and the release data are not shipped as client code.
+ *
  * The desktop cards carry no action: there are no desktop installers and no
  * published GitHub releases, and the Web card already links to the web app.
  */
@@ -47,7 +49,11 @@ type PlatformCard = {
 };
 
 export function DownloadSection({ finale = false }: { finale?: boolean }) {
-  const cinema = useCinema();
+  // A stacking context of its own, so the finale's flood can lie behind
+  // everything in it and still over its ground.
+  const ground = "relative isolate overflow-x-clip bg-[var(--background)] pt-[var(--opener-top)]";
+  const hairline = "border-t border-[var(--border)]";
+  const foot = finale ? "" : "pb-[var(--section-bottom)]";
   const platforms: PlatformCard[] = [
     {
       icon: Smartphone,
@@ -76,16 +82,13 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
   ];
 
   return (
-    <section
+    <CinemaSurface
       id="download"
       aria-labelledby="download-heading"
-      className={cn(
-        // A stacking context of its own, so the finale's flood can lie behind
-        // everything in it and still over its ground.
-        "relative isolate overflow-x-clip bg-[var(--background)] pt-[var(--opener-top)]",
-        finale && cinema ? "" : "border-t border-[var(--border)]",
-        finale ? "" : "pb-[var(--section-bottom)]",
-      )}
+      className={cn(ground, hairline, foot)}
+      // In the cinema the homepage's finale shares the page's one ground with
+      // Premium instead of a hairline; /servers keeps its hairline.
+      cinemaClassName={cn(ground, finale ? "" : hairline, foot)}
     >
       <div className="frame">
         <SceneOpener
@@ -93,7 +96,6 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
           // /servers keeps the site's section title: its own heading is smaller.
           size={finale ? "scene" : "section"}
           eyebrow="YO Voice everywhere"
-          ink="#d986ff"
           title="Ready to find"
           accent="your people?"
           accentClassName="sm:block"
@@ -143,6 +145,6 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
 
         {finale ? <BeYouFinale /> : null}
       </div>
-    </section>
+    </CinemaSurface>
   );
 }

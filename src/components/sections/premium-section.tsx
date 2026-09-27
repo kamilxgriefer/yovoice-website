@@ -1,10 +1,9 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Crown, Mic, Sparkles } from "lucide-react";
 
-import { DUR, STAGGER, useCinema } from "@/components/animations/cinema";
+import { CinemaSurface } from "@/components/animations/cinema-surface";
+import { DUR, STAGGER } from "@/components/animations/motion";
 import { Reveal } from "@/components/animations/reveal";
 import { SceneOpener } from "@/components/animations/scene-opener";
 import { PremiumBadge } from "@/components/premium/premium-badge";
@@ -50,20 +49,19 @@ const FOLLOW = DUR.swap;
  *
  * Seams: the static layout keeps the site's hairline and sunken ground; in
  * the cinema the section shares the page's one ground with its neighbours
- * and the hand-over is the opener's own entrance.
+ * and the hand-over is the opener's own entrance. That seam is the only
+ * thing here that asks for the cinema (`CinemaSurface`), so the section is
+ * a server component and its copy and plan data are not shipped as client
+ * code.
  */
 export function PremiumSection() {
-  const cinema = useCinema();
+  const room = "relative overflow-x-clip pb-[var(--section-bottom)] pt-[var(--opener-top)]";
   return (
-    <section
+    <CinemaSurface
       id="premium"
       aria-labelledby="premium-heading"
-      className={cn(
-        "relative overflow-x-clip pb-[var(--section-bottom)] pt-[var(--opener-top)]",
-        cinema
-          ? "bg-[var(--background)]"
-          : "border-t border-[var(--border)] bg-[var(--surface-sunken)]",
-      )}
+      className={cn(room, "border-t border-[var(--border)] bg-[var(--surface-sunken)]")}
+      cinemaClassName={cn(room, "bg-[var(--background)]")}
     >
       <div className="frame">
         <div className="grid min-w-0 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
@@ -154,6 +152,6 @@ export function PremiumSection() {
           })}
         </div>
       </div>
-    </section>
+    </CinemaSurface>
   );
 }

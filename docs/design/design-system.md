@@ -378,10 +378,12 @@ page, and made the story's phone a real 3D object.
     end it sits whole under the header, or, where the footer is taller than
     the room (phones), has scrolled off whole.
   - A 2 px meter under the header shows how far down the homepage the
-    visitor is, and on tablets and up a thin voice line runs down the frame's
-    edge from the story's end, pulses into each section's ruled eyebrow and
-    becomes the baseline of the "Be You." wave (hidden behind pinned stages,
-    in forced colours and on phones).
+    visitor is, and from 64rem a thin voice line runs down the gutter just
+    outside the frame from the story's end, pulses into each section's ruled
+    eyebrow (Premium's badge) and becomes the baseline of the "Be You." wave
+    (hidden behind pinned stages, in forced colours, and below 64rem, where
+    the gutter is too narrow for it to read as anything but a second card
+    edge).
 - **Decoration, here only.** Deep full-bleed floods of the dock colours
   behind the story stage; one bright radial core behind a product (phone,
   browser window, Channels sheet, premium ring), never behind text; thin
@@ -425,10 +427,18 @@ page, and made the story's phone a real 3D object.
   labels from the hero's `appScreens`. What you get shows the three /updates
   wide frames, and its note says the people and messages are sample content.
 - **Colours.** Tokens wherever CSS can use them. Hex values appear only
-  where framer-motion interpolates or a scene needs a tint the palette does
-  not have: the chapter floods, cores and inks in `story-chapters.ts`, the
-  ripple colours in `premium-identity.tsx`, and the browser window's greys
-  in `welcome-features-parts.tsx`.
+  where framer-motion or a scene's script interpolates, or a scene needs a
+  tint the palette does not have: the chapter floods, cores and inks and the
+  finale tint in `story-chapters.ts` (the story and Servers opener inks in
+  `story-shared.tsx` and `servers-welcome-parts.tsx` are chapter inks, and
+  the What you get room light, the finale flood and the Premium glow are
+  mixed from these with `animations/tint.ts`), the page ground where a
+  gradient script fades to it, the story rail's interpolated accent, the
+  ripple colours in `premium-identity.tsx`, the unlit words in
+  `word-reveal.tsx`, and the greys of the drawn browser window
+  (`welcome-features-parts.tsx`) and the hero's device frames
+  (`app-screen-rotator.tsx`). The 3D phone's material and the voice line's
+  lit colour are numbers in their scripts.
 
 ## Legal hygiene
 

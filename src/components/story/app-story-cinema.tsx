@@ -40,6 +40,7 @@ import {
 } from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
 import { SceneOpener } from "@/components/animations/scene-opener";
+import { mix } from "@/components/animations/tint";
 import styles from "@/components/story/app-story.module.css";
 import {
   CHAPTERS,
@@ -300,16 +301,6 @@ function floodPaint({ flood, core, lift }: { flood: string; core: string; lift: 
   const centre = mix(flood, core, 0.44 * lift);
   const middle = mix(flood, core, 0.16 * lift);
   return `radial-gradient(78% 82% at 50% var(--iris-y), ${centre} 0%, ${middle} 55%, ${flood} 100%)`;
-}
-
-/** `amount` of `to` over `from`, both #rrggbb (no color-mix(), so older
- * browsers still paint the flood). */
-function mix(from: string, to: string, amount: number): string {
-  const channel = (hex: string, at: number) => parseInt(hex.slice(at, at + 2), 16);
-  return `#${[1, 3, 5]
-    .map((at) => Math.round(channel(from, at) + (channel(to, at) - channel(from, at)) * amount))
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("")}`;
 }
 
 /**

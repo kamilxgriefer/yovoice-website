@@ -54,7 +54,11 @@ export function WelcomeIntroCinema({
             wherever it fits, "talk out loud." takes the second line; where
             even that does not fit (phones, very large text) it wraps as
             "Small communities / that talk out loud." and never leaves "that"
-            on a line of its own. */}
+            on a line of its own. Where it needs three lines or more (a
+            phone narrower than 24rem: 384px, or 768px at 200 % text) it is
+            balanced, so "loud." never stands alone on the last line:
+            "Small / communities / that talk out loud.". Wider, balancing
+            would undo the break above, so it is left alone. */}
         <SceneOpener
           size="scene"
           eyebrow={opener.eyebrow}
@@ -62,7 +66,7 @@ export function WelcomeIntroCinema({
           title={opener.title}
           accent={opener.accent}
           headingId="welcome-heading"
-          titleClassName="max-w-[11.6em] hyphens-auto"
+          titleClassName="max-w-[11.6em] hyphens-auto max-[24rem]:text-balance"
         />
 
         <ScrollWave bars={bars} className="mt-[var(--opener-gap)] h-14 sm:h-16 lg:h-20" />

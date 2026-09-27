@@ -5,6 +5,7 @@ import { AudioLines, MessageCircle, Mic2, type LucideIcon } from "lucide-react";
 import { useCinema } from "@/components/animations/cinema";
 import { SceneOpener } from "@/components/animations/scene-opener";
 import { WelcomeIntroCinema } from "@/components/sections/welcome-intro-cinema";
+import { CHAPTERS } from "@/components/story/story-chapters";
 
 /**
  * The homepage's welcome, not its changelog.
@@ -65,15 +66,20 @@ export type WelcomeOpenerCopy = {
  * "communities" break as "commu-nities" where it cannot fit a line (a narrow
  * phone at display size, or 200 % text) without relying on the browser
  * having an English hyphenation dictionary; everywhere else it is invisible.
- * No `text-wrap: balance` on this title: balanced lines break at the soft
- * hyphen without drawing it. The ink is the story's violet label, which the
+ * Below 24rem, where the title takes three lines or more, it is balanced
+ * so the last line never holds "loud." alone (wider, balancing would move
+ * "that" off the first line); where a balanced line breaks at the soft
+ * hyphen (200 % text on a phone) Chrome 141 draws the hyphen (checked
+ * 2026-09-27).
+ * The ink is the story's violet label (`story-chapters.ts`, Home), which the
  * welcome inherits along with the story's last light.
  */
 export const WELCOME_OPENER: WelcomeOpenerCopy = {
   eyebrow: "Welcome",
   title: "Small commu­nities that",
   accent: "talk out loud.",
-  ink: "#c3a8ff",
+  // The story's first chapter, Home.
+  ink: CHAPTERS[0].ink,
 };
 
 export function WelcomeIntro() {
@@ -107,7 +113,7 @@ function WelcomeIntroStatic() {
           title={WELCOME_OPENER.title}
           accent={WELCOME_OPENER.accent}
           headingId="welcome-heading"
-          titleClassName="max-w-[11.6em] break-words hyphens-auto"
+          titleClassName="max-w-[11.6em] break-words hyphens-auto max-[24rem]:text-balance"
         />
 
         <div className="min-w-0">

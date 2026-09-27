@@ -457,3 +457,61 @@ test("the documented motion tokens are the ones the code uses", async () => {
     assert.equal(documented, `${pairs.join(", ")}${unit}`, `${name} in the doc matches motion.ts`);
   }
 });
+
+/** Every .ts / .tsx file under `dir`. */
+async function sourceFiles(dir: string): Promise<string[]> {
+  const { readdir } = await import("node:fs/promises");
+  const entries = await readdir(dir, { withFileTypes: true, recursive: true });
+  return entries
+    .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
+    .map((entry) => `${entry.parentPath}/${entry.name}`);
+}
+
+test("ogl loads only with the 3D phone, on demand", async () => {
+  for (const file of await sourceFiles("src")) {
+    const body = withoutComments(await readFile(file, "utf8"));
+    if (file !== "src/components/story/story-phone-gl.ts") {
+      assert.doesNotMatch(body, /from\s+["']ogl["']/, `${file} imports ogl`);
+    }
+    // The engine is reached only through a dynamic import; other files may import its types.
+    for (const match of body.matchAll(/import\s+([^;]*?)\s+from\s+["']@\/components\/story\/story-phone-gl["']/g)) {
+      assert.match(match[1], /^type\b/, `${file} imports the 3D engine statically`);
+    }
+  }
+  const canvas = await readFile("src/components/story/story-phone-canvas.tsx", "utf8");
+  assert.match(canvas, /await import\("@\/components\/story\/story-phone-gl"\)/);
+});
+
+test("the 3D phone shows only the story's captures and hands back to the CSS phone", async () => {
+  const canvas = withoutComments(await readFile("src/components/story/story-phone-canvas.tsx", "utf8"));
+  const engine = withoutComments(await readFile("src/components/story/story-phone-gl.ts", "utf8"));
+  assert.match(canvas, /captures: CHAPTERS\.map\(\(chapter\) => captureUrl\(chapter\.screen\.phone\)\)/);
+  for (const body of [canvas, engine]) {
+    assert.doesNotMatch(body, /\/screenshots\/|https?:\/\/|\.(?:png|jpe?g|webp|hdr|exr|ktx2?|glb|gltf)\b/);
+  }
+  // Refused where it would not run well, and handed back when it cannot keep up or loses its context.
+  assert.match(canvas, /forced\.matches \|\| connection\?\.saveData \|\| memory < 4/);
+  assert.match(canvas, /addEventListener\("webglcontextlost", lost\)/);
+  assert.match(canvas, /engine\.setDpr\(1\);\s*\} else handBack\(\);/);
+  // The CSS phone stays mounted underneath.
+  const story = await readFile("src/components/story/app-story-cinema.tsx", "utf8");
+  assert.ok(story.includes("<Phone progress={progress} />") && story.includes("<StoryPhoneGL"));
+});
+
+test("the voice line and the finale flood are cinema-only decoration", async () => {
+  const line = await readFile("src/components/animations/voice-line.tsx", "utf8");
+  assert.match(line, /return cinema && wide \? <VoiceLineCinema \/> : null;/);
+  assert.match(line, /mount\.setAttribute\("aria-hidden", "true"\)/);
+  assert.ok((line.match(/forced-colors:hidden/g) ?? []).length >= 2);
+  const finale = await readFile("src/components/sections/be-you-finale.tsx", "utf8");
+  assert.match(finale, /\{cinema \? <FinaleFlood fill=\{fill\} \/> : null\}/);
+  assert.match(finale, /forced-colors:hidden/);
+});
+
+test("the Download and Premium sections stay server components", async () => {
+  for (const file of ["src/components/sections/download-section.tsx", "src/components/sections/premium-section.tsx"]) {
+    const body = await readFile(file, "utf8");
+    assert.doesNotMatch(body, /^"use client";/m, `${file} ships its copy as client code`);
+    assert.match(body, /<CinemaSurface\b/, `${file} switches its ground through CinemaSurface`);
+  }
+});
