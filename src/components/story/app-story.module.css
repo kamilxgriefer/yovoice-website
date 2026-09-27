@@ -3,7 +3,9 @@
  * framer-motion motion value set inline (transform, opacity, clip-path, and
  * a short blur on titles while a triggered transition runs) or read from
  * one (`--rise`, `--retreat`, `--rail-fill`) by a transform here; the rail's
- * arrival is a CSS opacity transition. Nothing here animates layout.
+ * arrival is a CSS opacity transition. Nothing here animates layout (the
+ * one inline exception, the landing weight of the decorative "Start
+ * talking.", changes inside a box of fixed width: `.loud`).
  *
  * Phones: one grid column — text on top under the header, the phone below
  * (its height is whatever is left, capped at 56svh), the numbered chapter
@@ -12,9 +14,14 @@
  * chapter rail on the right.
  *
  * Stacking, back to front: flood and vignette (0), the bright core behind
- * the phone (1), the heading and the giant words (2), the phone and, in the
- * finale on wide screens, the floor it sinks into (3), the chapter text (4),
- * the rail (5).
+ * the phone (1), the heading and the giant words (2), the phone (the CSS
+ * phone, or the 3D phone's canvas over it) and, in the finale on wide
+ * screens, the floor it sinks into (3), the chapter text (4), the rail (5).
+ *
+ * The stage's text sits on the page's frame (`--edge`: 100px at 1440, 340px
+ * at 1920, 20px on phones), like every other section's content. Only the
+ * giant words keep the stage's own full-bleed inset, so they stay as large
+ * as the window allows.
  */
 
 /* The page scrolls anchors to `--header-height + 16px` below the top
@@ -55,7 +62,7 @@
 .anchor {
   position: absolute;
   top: calc(var(--at, 0) * var(--travel));
-  left: var(--pad-x, 1rem);
+  left: var(--edge);
   width: 1px;
   height: 100svh;
   margin: 0;
@@ -89,7 +96,7 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   row-gap: 0.75rem;
   height: 100svh;
-  padding: calc(var(--header-height) + 1rem) 1rem 0.875rem;
+  padding: calc(var(--header-height) + 1rem) var(--edge) 0.875rem;
   overflow: clip;
   isolation: isolate;
   background: var(--background);
@@ -124,34 +131,27 @@
 
 /* ---- Intro heading ----------------------------------------------------- */
 
+/* The page's section opener (`SceneOpener`, scene size), left-aligned on the
+   frame at the height every section's first frame opens at. */
 .intro {
   position: absolute;
-  top: calc(var(--header-height) + 1rem);
-  right: 1rem;
-  left: 1rem;
+  top: var(--opener-top);
+  right: var(--edge);
+  left: var(--edge);
   z-index: 2;
 }
 
-.introEyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #cbbfda;
+.introTitle {
+  max-width: 12ch;
+  text-wrap: balance;
 }
 
-.introTitle {
-  margin-top: 0.75rem;
-  font-family: var(--font-display), sans-serif;
-  font-size: clamp(2.25rem, 10vw, 3.25rem);
-  font-weight: 800;
-  line-height: 0.98;
-  letter-spacing: -0.045em;
-  color: var(--foreground);
-  text-wrap: balance;
+/* The narrowest phones: the title a touch smaller (at most 11vw, so only
+   under 356px) so it sets in two lines, not three with "your" alone. */
+@media (max-width: 22.25rem) {
+  .introTitle {
+    font-size: min(var(--type-scene), 11vw);
+  }
 }
 
 /* ---- Giant words (finale) ---------------------------------------------- */
@@ -188,6 +188,32 @@
 
 .giantSolid {
   color: var(--foreground);
+}
+
+/* The lean: the words tilt with the scroll's speed about a point near their
+   baseline (a transform on its own layer). */
+.lean {
+  display: inline-block;
+  transform-origin: 50% 80%;
+  will-change: transform;
+}
+
+/* "Start talking." gets louder as it lands. An invisible copy at the heavy
+   weight holds the line's box, and the visible word is centred over it, so
+   the changing weight never moves the words around it. */
+.loud {
+  display: inline-grid;
+  justify-items: center;
+}
+
+.loudBox,
+.loudWord {
+  grid-area: 1 / 1;
+}
+
+.loudBox {
+  font-weight: 800;
+  visibility: hidden;
 }
 
 /* ---- Chapter text ------------------------------------------------------ */
@@ -411,6 +437,52 @@
   translate: -50% -50%;
 }
 
+/* The 3D phone (`StoryPhoneGL`): a canvas over the CSS phone, in the same
+   grid area (an absolutely positioned grid item takes its area as its
+   containing block; both lines are given, as an `auto` end line would be
+   the stage's padding edge). The canvas is a little larger than the phone, so it
+   can turn and lean inside it; it rises into place with the CSS phone's own
+   rise. Until its first frame is drawn it is transparent, and the CSS phone
+   shows. */
+.gl {
+  --phone-h: min(100cqh, 56svh);
+  --rise-share: 0.08;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  container-type: size;
+  pointer-events: none;
+}
+
+/* Measures the phone's height in px for the camera. */
+.glSizer {
+  position: absolute;
+  width: 0;
+  height: var(--phone-h);
+  visibility: hidden;
+}
+
+.glCanvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  height: calc(var(--phone-h) / 0.84);
+  aspect-ratio: 0.8;
+  translate: -50% calc(-50% + var(--rise, 0) * var(--phone-h) * var(--rise-share));
+  opacity: 0;
+}
+
+/* Once the 3D phone has drawn, it fades in over the CSS phone, which is
+   hidden when the fade is done. Taken back (a lost context, a device that
+   cannot keep up), the CSS phone shows again at once. */
+.stage[data-gl="ready"] .phoneSlot {
+  visibility: hidden;
+  transition: visibility 0s linear 0.32s;
+}
+
 /* In front of the phone, behind the rail: see `Floor`. Wide screens only,
    where the phone ends the scene partly below the stage. */
 .floor {
@@ -425,10 +497,11 @@
   grid-row: 3;
   grid-column: 1;
   justify-self: center;
-  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* It arrives with the first chapter. A focused link is always drawn. */
+/* It arrives with the first chapter and steps aside for the finale's line.
+   A focused link is always drawn. */
 .rail[data-shown="false"]:not(:focus-within) {
   opacity: 0;
   pointer-events: none;
@@ -489,7 +562,7 @@
   border-radius: 999px;
   background: #0c0814;
   color: #cdc4d8;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: color 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
 }
 
 .railLink:hover {
@@ -539,28 +612,10 @@ a.ctaLarge {
 
 /* ---- Tablets ----------------------------------------------------------- */
 
-/* The phone layout with the site's 32px gutters and a measure for the
+/* The phone layout on the frame's 32px gutters with a measure for the
    chapter copy, so a 768–1023px window reads as a composed frame rather
    than a stretched phone. */
 @media (min-width: 40rem) {
-  .track {
-    --pad-x: 2rem;
-  }
-
-  .stage {
-    padding-inline: 2rem;
-  }
-
-  .intro {
-    right: 2rem;
-    left: 2rem;
-  }
-
-  .introTitle {
-    max-width: 15ch;
-    font-size: clamp(3rem, 7.4vw, 4rem);
-  }
-
   .text {
     max-width: 34rem;
   }
@@ -580,6 +635,7 @@ a.ctaLarge {
 @media (min-width: 64rem) {
   .track {
     --travel: 450svh;
+    /* The stage's own full-bleed inset, kept for the giant words only. */
     --pad-x: clamp(3rem, 5.5vw, 6rem);
   }
 
@@ -603,26 +659,7 @@ a.ctaLarge {
     grid-template-rows: minmax(0, 1fr);
     align-items: center;
     column-gap: clamp(2.5rem, 4.5vw, 5rem);
-    padding: calc(var(--header-height) + 3svh) var(--pad-x) 3svh;
-  }
-
-  .intro {
-    top: calc(var(--header-height) + 6svh);
-    right: 0;
-    left: 0;
-    text-align: center;
-  }
-
-  .introEyebrow {
-    justify-content: center;
-    font-size: 0.75rem;
-  }
-
-  .introTitle {
-    max-width: 14ch;
-    margin: 1.25rem auto 0;
-    font-size: clamp(3.5rem, 6.6vw, 6.75rem);
-    line-height: 0.95;
+    padding: calc(var(--header-height) + 3svh) var(--edge) 3svh;
   }
 
   /* Centred on the phone, and clipped just short of the rail on the right
@@ -720,6 +757,32 @@ a.ctaLarge {
     --rise-from: 40%;
   }
 
+  .gl {
+    --phone-h: var(--phone-h-wide);
+    --rise-share: 0.4;
+    grid-row: 1 / 2;
+    grid-column: 2 / 3;
+    container-type: normal;
+  }
+
+  /* The finale's range: the canvas covers the stage (below the header) so
+     the other destinations can fan out beside the phone, which keeps its
+     size and place (the camera follows the canvas). */
+  .gl[data-range="true"] {
+    top: var(--header-height);
+    grid-row: auto;
+    grid-column: auto;
+  }
+
+  .gl[data-range="true"] .glCanvas {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    translate: none;
+  }
+
   /* The phone ends at 0.645 of its size (1.04 × 0.62) with its top edge on
      the second line's baseline: the line box's middle is `--giant-lift / 2`
      above the phone's, and the baseline 0.87em below that. */
@@ -800,8 +863,8 @@ a.ctaLarge {
     border: 2px solid #7c6790;
     border-radius: 999px;
     background: #0c0814;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease,
-      box-shadow 0.25s ease;
+    transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease,
+      box-shadow 0.16s ease;
   }
 
   .railLink[data-done="true"] .railDot::before {

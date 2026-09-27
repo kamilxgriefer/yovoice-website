@@ -37,9 +37,12 @@ export function HeroSection() {
           conversation scene on the right. Below lg the same pieces return
           to the centered stack that already works well on phones. The tour
           provider gives the welcome sentence and the phone one clock and one
-          Pause control, so the screen always matches the sentence. */}
+          Pause control, so the screen always matches the sentence.
+          The stage is the homepage's frame (`.frame`): from lg the promise
+          starts on the same edge as the header's logo and every section
+          opener below it (100px at 1440, 340px at 1920). */}
       <HeroTourProvider>
-        <div className="relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:grid lg:min-h-[calc(100svh-var(--header-height))] lg:grid-cols-[minmax(0,.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-16 xl:gap-16">
+        <div className="frame relative lg:grid lg:min-h-[calc(100svh-var(--header-height))] lg:grid-cols-[minmax(0,.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12 lg:py-16 xl:gap-16">
           {/* The copy is the far layer of the hero's exit: it drifts up
               slower than the page and softens as it leaves. */}
           <HeroCopyDepth className="flex origin-top flex-col items-center text-center lg:origin-top-left lg:items-start lg:text-left">
@@ -55,9 +58,13 @@ export function HeroSection() {
               <LiveStats />
             </div>
 
+            {/* On the frame (lg and up) the headline takes the openers'
+                optical edge: Inter 800's side bearing is pulled back, so the
+                stems of "Stop" and "Start" stand on the same line as the chip
+                above and every section title further down. */}
             <motion.h1
               initial={false}
-              className="mt-5 font-[family-name:var(--font-display)] text-[2.5rem] font-extrabold leading-[1.03] tracking-[-.03em] text-white sm:text-6xl lg:text-[3.25rem] xl:text-[4rem]"
+              className="mt-5 font-[family-name:var(--font-display)] text-[2.5rem] font-extrabold leading-[1.03] tracking-[-.03em] text-white sm:text-6xl lg:-ms-[.045em] lg:text-[3.25rem] xl:text-[4rem]"
             >
               <span className="block">Stop scrolling.</span>
               <span className="text-gradient text-gradient-descender-safe mt-1 block">
@@ -77,7 +84,7 @@ export function HeroSection() {
             >
               <HeroPrimaryCta href={APP_ENTRY_PATH}>
                 Start talking
-                <ArrowRight className="size-4" aria-hidden="true" />
+                <ArrowRight className="arrow-nudge size-4" aria-hidden="true" />
               </HeroPrimaryCta>
               <HeroSecondaryCta href="/download">
                 <Download className="size-4" aria-hidden="true" />
@@ -120,15 +127,19 @@ export function HeroSection() {
         </div>
       </HeroTourProvider>
 
-      <div className="relative mx-auto max-w-[1400px] px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-16 lg:absolute lg:inset-x-0 lg:bottom-3 lg:p-0">
-        <motion.a
+      <div className="frame relative pb-8 pt-12 sm:pb-10 sm:pt-16 lg:absolute lg:inset-x-0 lg:bottom-3 lg:py-0">
+        {/* A ghost link stays where it is; only its arrow leans the way it
+            points, the page's arrow nudge turned downward. */}
+        <a
           href="#inside"
-          whileHover={{ y: 2 }}
-          className="focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-[var(--text-tertiary)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+          className="group focus-ring mx-auto flex size-11 items-center justify-center rounded-full text-[var(--text-tertiary)] transition-colors duration-160 hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           aria-label="Scroll to Inside YO Voice"
         >
-          <ArrowDown className="size-4" aria-hidden="true" />
-        </motion.a>
+          <ArrowDown
+            className="size-4 transition-transform duration-160 ease-[cubic-bezier(.22,1,.36,1)] motion-safe:group-hover:translate-y-[3px] motion-safe:group-focus-visible:translate-y-[3px]"
+            aria-hidden="true"
+          />
+        </a>
       </div>
     </section>
   );

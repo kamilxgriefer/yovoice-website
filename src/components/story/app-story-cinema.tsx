@@ -11,7 +11,6 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import Image from "next/image";
-import { AudioLines } from "lucide-react";
 import {
   easeInOut,
   easeOut,
@@ -26,8 +25,18 @@ import {
   type Variants,
 } from "framer-motion";
 
-import { EASE_OUT, useSceneProgress } from "@/components/animations/cinema";
+import {
+  DUR,
+  EASE_IN,
+  EASE_OUT,
+  EXIT,
+  RISE,
+  STAGGER,
+  useSceneProgress,
+  useScrollLean,
+} from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
+import { SceneOpener } from "@/components/animations/scene-opener";
 import styles from "@/components/story/app-story.module.css";
 import {
   CHAPTERS,
@@ -40,8 +49,10 @@ import {
   textStepAt,
   type StoryChapter,
 } from "@/components/story/story-chapters";
+import { StoryPhoneGL } from "@/components/story/story-phone-canvas";
 import {
   STORY_EYEBROW,
+  STORY_INK,
   STORY_TITLE,
   StoryCta,
   StoryHeading,
@@ -60,6 +71,18 @@ import {
  * giant words). Text never rests half-faded: the heading, each chapter's text
  * and the rail change on the chapter the scroll has reached, with a short
  * triggered transition that always runs to the end.
+ *
+ * The phone is drawn twice. The CSS phone below is the baseline; where
+ * WebGL 2 runs on a real GPU, a lit 3D phone takes over from it once loaded
+ * (`StoryPhoneGL`, fetched as the story approaches), turns further, catches
+ * each dock colour on its bevel, and on wide screens ends the story on the
+ * whole range — the four destinations fanned out under "Start talking.".
+ * The CSS phone stays mounted underneath and takes the stage back if the 3D
+ * phone cannot keep up or loses its context.
+ *
+ * Every animated value is a transform, an opacity or a clip-path, with one
+ * exception: the weight of the decorative "Start talking." as it lands,
+ * inside a box held at its heaviest width (`GiantWords`).
  *
  * What assistive technology reads is not the stage. The stage is a picture of
  * the story, hidden from it; the story itself — the heading and one heading
@@ -121,14 +144,17 @@ const HOLD = 0.005;
  * far less per frame. */
 const RELOCATION = 0.15;
 
-/** Triggered text: in with the site's ease-out, out a little quicker. */
-const TEXT_IN: Transition = { duration: 0.55, ease: EASE_OUT };
-const TEXT_OUT: Transition = { duration: 0.32, ease: EASE_OUT };
+/** Triggered text, in the page's motion language: in with the ease-out,
+ * out quicker with the ease-in (a cut, not a drift). */
+const TEXT_IN: Transition = { duration: DUR.text, ease: EASE_OUT };
+const TEXT_OUT: Transition = { duration: EXIT.duration, ease: EASE_IN };
 /** … or at once, when the scene lands somewhere new. */
 const LAND: Transition = { duration: 0 };
 
 export function AppStoryCinema() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const slotRef = useRef<HTMLDivElement>(null);
   const progress = useSceneProgress(trackRef);
 
   // Mounted mid-page (client Back to the homepage, the cinema re-arming), the
@@ -153,7 +179,7 @@ export function AppStoryCinema() {
       <div ref={trackRef} className={styles.track}>
         <StoryText />
 
-        <div className={styles.stage}>
+        <div ref={stageRef} className={styles.stage}>
           <Flood progress={progress} />
           <div className={styles.shade} aria-hidden="true" />
           <Intro progress={progress} />
@@ -169,20 +195,21 @@ export function AppStoryCinema() {
             </div>
           </div>
 
-          <div className={`${styles.slot} ${styles.phoneSlot}`} aria-hidden="true">
+          <div ref={slotRef} className={`${styles.slot} ${styles.phoneSlot}`} aria-hidden="true">
             <div className={styles.slotInner}>
               <Rig progress={progress}>
                 <Phone progress={progress} />
               </Rig>
             </div>
           </div>
+          <StoryPhoneGL progress={progress} trackRef={trackRef} stageRef={stageRef} slotRef={slotRef} />
           <Floor progress={progress} />
 
           <Rail progress={progress} onSelect={goToChapter} />
         </div>
       </div>
 
-      <Reveal distance={28}>
+      <Reveal distance={RISE.block}>
         <StoryCta large className="pb-12 pt-6 sm:pb-16 sm:pt-8" />
       </Reveal>
     </section>
@@ -388,44 +415,33 @@ function TintLayer({
 /** 1 once the heading has left the stage, 0 while it holds it. */
 const headingStepAt = (value: number) => (value > HEADING_OUT ? 1 : 0);
 
-/** The stage's picture of the heading. It steps back with the scroll
- * (transform only), and leaves — or comes back — in one short triggered
- * fade, so it is never left half-faded. */
+/**
+ * The stage's picture of the heading: the page's section opener, on the
+ * frame. The first time it comes into view the rule draws and the title's
+ * words rise out of their baseline; once the phone comes up under it, it
+ * leaves the stage with the opener's exit cue and comes back the same way
+ * (`away`), never left half-faded. It also steps back a little with the
+ * scroll (transform only).
+ *
+ * When the scene lands somewhere new (a link, a restored position) a fresh
+ * opener is drawn in its new state at once (`landing` keys it), like the
+ * chapter text, instead of fading its way there.
+ */
 function Intro({ progress }: { progress: MotionValue<number> }) {
   const y = useTransform(progress, [0, 0.06], [0, -32]);
-  const { step, land } = useTextStep(progress, headingStepAt);
-  const away = step === 1;
+  const { step, landing } = useTextStep(progress, headingStepAt);
 
   return (
     <motion.div className={styles.intro} style={{ y }} aria-hidden="true">
-      <motion.div
-        initial={false}
-        animate={
-          away
-            ? {
-                opacity: 0,
-                scale: 0.97,
-                filter: "blur(6px)",
-                visibility: "hidden",
-                transition: land
-                  ? LAND
-                  : { ...TEXT_OUT, visibility: { duration: 0, delay: TEXT_OUT.duration } },
-              }
-            : {
-                opacity: 1,
-                scale: 1,
-                filter: "blur(0px)",
-                visibility: "visible",
-                transition: land ? LAND : { ...TEXT_IN, visibility: { duration: 0, delay: 0 } },
-              }
-        }
-      >
-        <p className={styles.introEyebrow}>
-          <AudioLines className="size-4 text-[var(--accent)]" aria-hidden="true" />
-          {STORY_EYEBROW}
-        </p>
-        <p className={styles.introTitle}>{STORY_TITLE}</p>
-      </motion.div>
+      <SceneOpener
+        key={landing}
+        eyebrow={STORY_EYEBROW}
+        title={STORY_TITLE}
+        ink={STORY_INK}
+        size="scene"
+        away={step === 1}
+        titleClassName={styles.introTitle}
+      />
     </motion.div>
   );
 }
@@ -450,8 +466,8 @@ function Intro({ progress }: { progress: MotionValue<number> }) {
 function useTextStep(
   progress: MotionValue<number>,
   stepAt: (value: number) => number = textStepAt,
-): { step: number; land: boolean } {
-  const [state, setState] = useState(() => ({ step: stepAt(progress.get()), land: true }));
+): { step: number; land: boolean; landing: number } {
+  const [state, setState] = useState(() => ({ step: stepAt(progress.get()), land: true, landing: 0 }));
   const last = useRef<number | null>(null);
 
   useMotionValueEvent(progress, "change", (value) => {
@@ -464,7 +480,10 @@ function useTextStep(
       step = before;
     }
     const land = moved > RELOCATION;
-    const update = () => setState((current) => (current.step === step ? current : { step, land }));
+    const update = () =>
+      setState((current) =>
+        current.step === step ? current : { step, land, landing: current.landing + (land ? 1 : 0) },
+      );
     if (land) commitInThisFrame(update);
     else update();
   });
@@ -526,15 +545,15 @@ function ChapterTexts({ progress }: { progress: MotionValue<number> }) {
 }
 
 /** One line of a chapter: in from below (or from above, scrolling back), a
- * beat after the line above it, out the other way. The title also clears a
- * short blur. Either way the transition runs to its end — or, when the scene
- * lands somewhere new (`land`), there is none. */
+ * line's beat after the line above it, out the other way with the exit cue.
+ * The title also clears a short blur. Either way the transition runs to its
+ * end — or, when the scene lands somewhere new (`land`), there is none. */
 function lineVariants(order: number, blur: boolean, land: boolean): Variants {
-  const outDelay = order * 0.03;
+  const outDelay = order * STAGGER.word;
   const out = (y: number) => ({
     opacity: 0,
     y,
-    ...(blur ? { filter: "blur(6px)" } : {}),
+    ...(blur ? { filter: `blur(${EXIT.blur}px)` } : {}),
     // Hidden outright once faded (out of find in page's way). Set as a
     // value of its own, so it also cancels a "visible" still waiting on an
     // entrance's delay when the visitor scrolls straight through.
@@ -555,10 +574,10 @@ function lineVariants(order: number, blur: boolean, land: boolean): Variants {
       visibility: "visible",
       transition: land
         ? LAND
-        : { ...TEXT_IN, delay: 0.16 + order * 0.07, visibility: { duration: 0, delay: 0 } },
+        : { ...TEXT_IN, delay: 0.16 + order * STAGGER.line, visibility: { duration: 0, delay: 0 } },
     },
-    coming: out(26),
-    gone: out(-22),
+    coming: out(RISE.line),
+    gone: out(EXIT.y),
   };
 }
 
@@ -686,15 +705,39 @@ function WipeLine({
 
 /* ---- Finale -------------------------------------------------------------- */
 
+/** The words lean at most this far (degrees) with the speed of the scroll. */
+const LEAN = 7;
+
+/** "Start talking." arrives quiet and lands loud: its weight over its slide. */
+const QUIET = 300;
+const LOUD = 800;
+
 /** The hero's line, giant and behind the phone. Decorative: the hero's own
  * heading already says it, so this copy is hidden from assistive tech. Each
  * word slides in from its own side — on wide screens across a soft edge
- * (`.giant`'s mask) — and the phone then steps back below the line (`Rig`). */
+ * (`.giant`'s mask) — and the phone then steps back below the line (`Rig`),
+ * or, with the 3D phone, the whole range fans out under it.
+ *
+ * The words speak: both lean into the direction of the scroll with its
+ * speed and straighten the moment it stops (a transform), and the solid
+ * line gets louder as it lands, from a light weight to the heavy one. Its
+ * box is held at the heavy weight's width by an invisible copy, so the
+ * changing weight never moves anything around it. */
 function GiantWords({ progress }: { progress: MotionValue<number> }) {
   // In viewport widths, so each word starts wholly off its own side of the
   // stage whatever the width of the box it is centred in.
-  const left = useTransform(progress, [F + 0.005, F + 0.09], ["-110vw", "0vw"], { ease: easeOut });
-  const right = useTransform(progress, [F + 0.02, F + 0.105], ["110vw", "0vw"], { ease: easeOut });
+  const leftVw = useTransform(progress, [F + 0.005, F + 0.09], [-110, 0], { ease: easeOut });
+  const rightVw = useTransform(progress, [F + 0.02, F + 0.105], [110, 0], { ease: easeOut });
+  const left = useMotionTemplate`${leftVw}vw`;
+  const right = useMotionTemplate`${rightVw}vw`;
+  const lean = useScrollLean(LEAN);
+  const skewX = useTransform(lean, (degrees) => -degrees);
+  // Quiet while it is still most of a screen away, loud as it lands; in
+  // steps of 10 so the text is only re-set when the weight really changes.
+  const fontWeight = useTransform(rightVw, (vw) => {
+    const k = Math.max(0, 1 - Math.abs(vw) / 90);
+    return Math.round((QUIET + (LOUD - QUIET) * k * k) / 10) * 10;
+  });
   // Always at full strength: a word is either off stage or sliding in whole,
   // never a faint copy wherever the scroll stops. Until it sets off it is
   // not drawn at all, which also keeps it out of find in page.
@@ -707,13 +750,20 @@ function GiantWords({ progress }: { progress: MotionValue<number> }) {
         className={`${styles.giantWord} ${styles.giantOutline}`}
         style={{ x: left, visibility: leftVisibility }}
       >
-        Stop scrolling.
+        <motion.span className={styles.lean} style={{ skewX }}>
+          Stop scrolling.
+        </motion.span>
       </motion.span>
       <motion.span
         className={`${styles.giantWord} ${styles.giantSolid}`}
         style={{ x: right, visibility: rightVisibility }}
       >
-        Start talking.
+        <motion.span className={`${styles.lean} ${styles.loud}`} style={{ skewX }}>
+          <span className={styles.loudBox}>Start talking.</span>
+          <motion.span className={styles.loudWord} style={{ fontWeight }}>
+            Start talking.
+          </motion.span>
+        </motion.span>
       </motion.span>
     </div>
   );
@@ -726,8 +776,9 @@ function GiantWords({ progress }: { progress: MotionValue<number> }) {
  * work as plain in-page links too (a new tab, a copied address). A click
  * glides to the middle of that chapter instead of jumping.
  *
- * It appears with the first chapter (a CSS fade on `data-shown`), and is
- * drawn whenever it holds keyboard focus, so a link is never focused unseen.
+ * It appears with the first chapter and steps aside for the finale's line
+ * once the chapters are done (a CSS fade on `data-shown`), and is drawn
+ * whenever it holds keyboard focus, so a link is never focused unseen.
  */
 function Rail({
   progress,
@@ -753,7 +804,7 @@ function Rail({
     <nav
       className={styles.rail}
       aria-label="Inside YO Voice chapters"
-      data-shown={current >= 0 ? "true" : "false"}
+      data-shown={current >= 0 && current < CHAPTERS.length ? "true" : "false"}
       data-land={land ? "true" : undefined}
     >
       <div className={styles.railList}>

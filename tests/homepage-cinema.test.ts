@@ -171,7 +171,12 @@ test("every scene picks its cinema or static twin, and both keep the section's i
     for (const twin of twins) {
       const body = withoutComments(await read(twin));
       for (const id of ids) assert.ok(body.includes(id), `${twin} lacks ${id}`);
-      assert.ok(withParts(twin).includes(heading), `${twin} (or a part it imports) lacks ${heading}`);
+      // Or hands the id to the shared opener: <SceneOpener headingId="…" />.
+      const drawn = withParts(twin);
+      assert.ok(
+        drawn.includes(heading) || drawn.includes(`heading${heading.replace(/^id=/, "Id=")}`),
+        `${twin} (or a part it imports) lacks ${heading}`,
+      );
     }
   }
 

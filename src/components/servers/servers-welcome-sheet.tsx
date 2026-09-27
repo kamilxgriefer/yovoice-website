@@ -4,10 +4,11 @@ import { useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "r
 import { motion, useTransform, type MotionValue } from "framer-motion";
 
 import { useSceneProgress } from "@/components/animations/cinema";
+import { SceneOpener } from "@/components/animations/scene-opener";
 import styles from "@/components/servers/servers-welcome-cinema.module.css";
 import {
   SERVERS_INTRO,
-  ServersHeadingWords,
+  SERVERS_OPENER,
   WORKSPACE_CAPTION,
   WorkspaceCapture,
 } from "@/components/servers/servers-welcome-parts";
@@ -25,8 +26,13 @@ import {
  * size its screen can be read at. On a phone the heading and the sheet come
  * first and the deck follows.
  *
- * No `Reveal` here: the heading is drawn at rest, so it can never still be
- * on its way in while the first card beside it is already there.
+ * The heading opens the way every scene does (`SceneOpener`, the column
+ * size): the Servers rule draws, "A server for every circle." rises word by
+ * word and the sentence follows. The cue starts as the heading clears the
+ * bottom eighth of the window and is over in about a second, while the first
+ * card beside it still has most of a window of scroll before it settles, so
+ * the heading is never still on its way in beside a deck that has already
+ * begun.
  */
 export function ServersAside({ landed, wide }: { landed: MotionValue<number>; wide: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -35,13 +41,17 @@ export function ServersAside({ landed, wide }: { landed: MotionValue<number>; wi
   return (
     <div ref={ref} className={styles.aside}>
       <div className={styles.intro} data-sheet-intro="">
-        <p className="eyebrow">Servers</p>
-        <h2 id="servers-welcome-heading" className={styles.title}>
-          <ServersHeadingWords accentClassName="lg:block" />
-        </h2>
-        <p className="mt-5 max-w-[34rem] text-base leading-[1.6] text-[var(--text-secondary)]">
-          {SERVERS_INTRO}
-        </p>
+        <SceneOpener
+          size="column"
+          eyebrow={SERVERS_OPENER.eyebrow}
+          ink={SERVERS_OPENER.ink}
+          title={SERVERS_OPENER.title}
+          accent={SERVERS_OPENER.accent}
+          accentClassName="lg:block"
+          titleClassName="text-balance"
+          lead={SERVERS_INTRO}
+          headingId="servers-welcome-heading"
+        />
       </div>
 
       <WorkspaceSheet landed={landed} wide={wide} />

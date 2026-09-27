@@ -1,42 +1,42 @@
 "use client";
 
-import { useLayoutEffect, useRef, useSyncExternalStore } from "react";
-import {
-  animate,
-  cubicBezier,
-  motion,
-  useMotionValue,
-  useTransform,
-  type AnimationPlaybackControls,
-  type MotionValue,
-} from "framer-motion";
+import { useSyncExternalStore } from "react";
 
-import { EASE_OUT, useSceneProgress } from "@/components/animations/cinema";
+import { STAGGER } from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
+import { SceneOpener } from "@/components/animations/scene-opener";
 import { ScrollWave } from "@/components/animations/scroll-wave";
 import { WordReveal } from "@/components/animations/word-reveal";
-import type { WelcomeRow } from "@/components/sections/welcome-intro";
+import type { WelcomeOpenerCopy, WelcomeRow } from "@/components/sections/welcome-intro";
 
 /**
  * The welcome as a spoken moment.
  *
- * The heading comes forward as it rises into view and its last three words —
- * "talk out loud." — arrive one after another, as if said. Under it the
- * page's voice (`ScrollWave`) speaks while you scroll, and the sentence that
- * explains YO Voice is set large and lights up word by word as it is read
- * (`WordReveal`). The three answers rise in after it.
+ * It opens the way every scene does (`SceneOpener`): the eyebrow's rule
+ * draws, and "Small communities that talk out loud." rises out of its
+ * baseline word by word, as if said. Under it the page's voice
+ * (`ScrollWave`) speaks while you scroll, and the sentence that explains
+ * YO Voice is set large and lights up word by word as it is read
+ * (`WordReveal`). The three answers rise in after it, a beat apart.
+ *
+ * The story's violet does not stop at a line: the welcome has no hairline in
+ * the cinema, and its ground starts in the story's last light (the finale
+ * flood over the page) and settles into the page's own ground before the
+ * sentence begins, so the sentence's unlit words only ever sit on
+ * `--background`, where they read at 4.6:1.
  *
  * Only mounted while the scroll cinema is on; `WelcomeIntro` renders the
  * static layout otherwise, with the same heading, id, sentence and rows.
- * Scrubbed motion here is transform-only, plus `WordReveal`'s colour, whose
- * unlit words still read at 4.6:1, so every line meets WCAG AA wherever the
- * visitor stops. The only fades are triggered entrances (the accent words,
- * the rows) that run once and finish on their own within a second and a half.
+ * Scrubbed motion here is transform-only, plus `WordReveal`'s colour, so
+ * every line meets WCAG AA wherever the visitor stops. The only fades are
+ * triggered entrances (the opener, the rows) that run once and finish.
  */
 export function WelcomeIntroCinema({
+  opener,
   sentence,
   rows,
 }: {
+  opener: WelcomeOpenerCopy;
   sentence: string;
   rows: readonly WelcomeRow[];
 }) {
@@ -45,13 +45,27 @@ export function WelcomeIntroCinema({
     <section
       id="welcome"
       aria-labelledby="welcome-heading"
-      className="relative overflow-x-clip border-t border-[var(--border)] bg-[var(--background)] px-5 pb-24 pt-20 sm:px-8 sm:pb-28 sm:pt-28 lg:px-12 lg:pb-32 lg:pt-36"
+      className="relative overflow-x-clip bg-[var(--background)] pb-[var(--section-bottom)] pt-[var(--opener-top)]"
+      style={{ backgroundImage: SEAM_GROUND }}
     >
-      <div className="mx-auto min-w-0 max-w-[1240px]">
-        <p className="eyebrow">Welcome</p>
-        <SpokenHeading />
+      <div className="frame min-w-0">
+        {/* The title breaks by measure, not by a forced line: 11.6em holds
+            "Small communities that" (10.75em) but not "… talk" (12.6em), so
+            wherever it fits, "talk out loud." takes the second line; where
+            even that does not fit (phones, very large text) it wraps as
+            "Small communities / that talk out loud." and never leaves "that"
+            on a line of its own. */}
+        <SceneOpener
+          size="scene"
+          eyebrow={opener.eyebrow}
+          ink={opener.ink}
+          title={opener.title}
+          accent={opener.accent}
+          headingId="welcome-heading"
+          titleClassName="max-w-[11.6em] hyphens-auto"
+        />
 
-        <ScrollWave bars={bars} className="mt-10 h-14 sm:mt-14 sm:h-16 lg:h-20" />
+        <ScrollWave bars={bars} className="mt-[var(--opener-gap)] h-14 sm:h-16 lg:h-20" />
 
         <div className="lg:pl-[calc(100%/6)]">
           <WordReveal
@@ -67,7 +81,7 @@ export function WelcomeIntroCinema({
               <Reveal
                 as="li"
                 key={title}
-                delay={index * 0.1}
+                delay={Math.min(index, 4) * STAGGER.item}
                 className="min-w-0 border-t border-[var(--border)] pt-6"
               >
                 <span className="icon-tile">
@@ -87,6 +101,23 @@ export function WelcomeIntroCinema({
     </section>
   );
 }
+
+/**
+ * The welcome's ground in the cinema. It starts in the story's last light —
+ * `--seam`, the story's finale flood laid over the page, which the story's
+ * own foot fades into — and settles into the page's ground over
+ * `SEAM_DEPTH`. The fade is eased (smoothstep), flat where it leaves the
+ * story and flat where it lands, so neither end reads as an edge. It is over
+ * well before the sentence starts (about 525px down at 1440, 357px at 390,
+ * 419px at 320×568), so the sentence's unlit words sit on `--background` only.
+ */
+const SEAM_DEPTH = "min(36svh, 20rem)";
+const SEAM_GROUND = `linear-gradient(to bottom, ${[0, 0.2, 0.4, 0.6, 0.8, 1]
+  .map((at) => {
+    const settled = at * at * (3 - 2 * at);
+    return `color-mix(in srgb, var(--background) ${(settled * 100).toFixed(1)}%, var(--seam, #12092d)) calc(${SEAM_DEPTH} * ${at})`;
+  })
+  .join(", ")})`;
 
 /**
  * How many bars the welcome's waveform draws: roughly one per 9–13 px of
@@ -112,113 +143,4 @@ function waveBarsSnapshot() {
 
 function useWaveBars(): number {
   return useSyncExternalStore(subscribeWaveBars, waveBarsSnapshot, () => PHONE_BARS);
-}
-
-const ACCENT_WORDS = ["talk", "out", "loud."] as const;
-
-/** The accent words' entrance, in seconds, and the site's ease-out curve. */
-const ARRIVAL_SECONDS = 1.5;
-const WORD_GAP_SECONDS = 0.14;
-const easeOut = cubicBezier(...EASE_OUT);
-
-/**
- * "Small communities that talk out loud." at display size. The whole heading
- * settles from 92 % to full size as it climbs from the bottom of the window
- * to a third of the way down (scrubbed, transform only), and the accent words
- * arrive one after another the first time the line comes into view.
- *
- * The arrival is one triggered clock for the whole line, like `Reveal`: it is
- * never scrubbed, so a visitor who stops scrolling mid-way never sees "loud."
- * without "talk", and a line that is already on screen when the cinema arms
- * is simply left at rest.
- */
-function SpokenHeading() {
-  const ref = useRef<HTMLHeadingElement>(null);
-  const lineRef = useRef<HTMLSpanElement>(null);
-  const progress = useSceneProgress(ref, ["start end", "start 0.35"]);
-  const scale = useTransform(progress, [0, 1], [0.92, 1]);
-  const y = useTransform(progress, [0, 1], [36, 0]);
-  // 1 is at rest; the entrance runs it from 0 to 1 in ARRIVAL_SECONDS.
-  const arrival = useMotionValue(1);
-
-  useLayoutEffect(() => {
-    const line = lineRef.current;
-    if (!line) return;
-    if (line.getBoundingClientRect().top < window.innerHeight) return;
-
-    arrival.set(0);
-    let running: AnimationPlaybackControls | undefined;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        running = animate(arrival, 1, { duration: ARRIVAL_SECONDS, ease: "linear" });
-      },
-      { rootMargin: "0px 0px -12% 0px" },
-    );
-    observer.observe(line);
-
-    return () => {
-      observer.disconnect();
-      running?.stop();
-      arrival.set(1);
-    };
-  }, [arrival]);
-
-  return (
-    <motion.h2
-      ref={ref}
-      id="welcome-heading"
-      style={{ scale, y, originX: 0, originY: 1 }}
-      className="mt-6 break-words hyphens-auto font-[family-name:var(--font-display)] text-[clamp(2.5rem,0.6rem+5.4vw,6.5rem)] font-extrabold leading-[0.98] tracking-[-0.04em] text-[var(--foreground)]"
-    >
-      {/* The same soft hyphen as the static heading: at 320 px the display
-          size would otherwise break "communities" wherever it overflows.
-          No text-wrap: balance here — balanced lines break at the soft
-          hyphen without drawing it. */}
-      <span className="sm:block">Small commu{"\u00AD"}nities that</span>{" "}
-      <span ref={lineRef} className="text-[var(--accent)] sm:block">
-        {ACCENT_WORDS.map((word, index) => (
-          <span key={word}>
-            {index > 0 ? " " : null}
-            <AccentWord arrival={arrival} index={index}>
-              {word}
-            </AccentWord>
-          </span>
-        ))}
-      </span>
-    </motion.h2>
-  );
-}
-
-/**
- * One accent word, a beat after the word before it: from a little to the
- * right, blurred, transparent and slightly large, to rest. Each word starts a
- * touch larger than the one before, so "loud." lands the loudest.
- */
-function AccentWord({
-  arrival,
-  index,
-  children,
-}: {
-  arrival: MotionValue<number>;
-  index: number;
-  children: string;
-}) {
-  const at = (seconds: number) => Math.min(1, (0.1 + index * WORD_GAP_SECONDS + seconds) / ARRIVAL_SECONDS);
-  const options = { ease: easeOut };
-  const opacity = useTransform(arrival, [at(0), at(0.6)], [0, 1], options);
-  const x = useTransform(arrival, [at(0), at(0.95)], [56, 0], options);
-  const scale = useTransform(arrival, [at(0), at(1.1)], [1 + (index + 1) * 0.06, 1], options);
-  const blur = useTransform(arrival, [at(0), at(0.7)], [10, 0], options);
-  const filter = useTransform(blur, (value) => (value > 0.05 ? `blur(${value}px)` : "none"));
-
-  return (
-    <motion.span
-      className="inline-block"
-      style={{ opacity, x, scale, filter, originX: 0, originY: 0.8 }}
-    >
-      {children}
-    </motion.span>
-  );
 }

@@ -121,18 +121,23 @@ function IdentityCinema({ ring }: { ring: ReactNode }) {
           className="absolute inset-0 will-change-transform"
           style={{ rotate: turn, rotateX: tilt }}
         >
-          {/* The one bright core, behind the ring only. */}
+          {/* The one bright core, behind the ring only. Magenta at its
+              heart — the Moments dock colour the story flooded the phone
+              with, back as Premium's key — deepening to the brand violet
+              and gone before its edge, so no text is ever on it (the pills
+              sit on their own surface). */}
           <motion.div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 size-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(123,47,247,0.34),rgba(123,47,247,0.12)_52%,rgba(123,47,247,0)_100%)]"
+            className="pointer-events-none absolute left-1/2 top-1/2 size-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(192_38_255/0.4),rgb(123_47_247/0.16)_52%,rgb(123_47_247/0)_100%)] forced-colors:hidden"
             style={{ scale: coreScale, opacity: coreOpacity }}
           />
           {/* The ripples fade out towards their widest ring as well, so
               they are strongest near the avatar and never end on a hard
-              edge. */}
+              edge. In forced colours, like every scene's glows, they are
+              left out rather than drawn as system-colour circles. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,#000_58%,transparent_100%)]"
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,#000_58%,transparent_100%)] forced-colors:hidden"
             style={{ width: RIPPLE, height: RIPPLE }}
           >
             {RIPPLE_COLORS.map((color, index) => (
