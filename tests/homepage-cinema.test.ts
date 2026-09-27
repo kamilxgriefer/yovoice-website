@@ -73,6 +73,12 @@ const CINEMA_FILES = [
   "src/components/sections/premium-identity.tsx",
   "src/components/sections/download-cinema.tsx",
   "src/components/sections/be-you-finale.tsx",
+  "src/components/animations/voice-line.tsx",
+  "src/components/animations/scene-opener.tsx",
+  "src/components/story/story-phone-canvas.tsx",
+  "src/components/story/story-phone-gl.ts",
+  "src/components/story/story-pose.ts",
+  "src/components/ui/magnetic-cta.tsx",
 ];
 
 test("the cinema gate: reduced motion and a rem-sized window, never on the server", async () => {
@@ -171,7 +177,12 @@ test("every scene picks its cinema or static twin, and both keep the section's i
     for (const twin of twins) {
       const body = withoutComments(await read(twin));
       for (const id of ids) assert.ok(body.includes(id), `${twin} lacks ${id}`);
-      assert.ok(withParts(twin).includes(heading), `${twin} (or a part it imports) lacks ${heading}`);
+      // Or hands the id to the shared opener: <SceneOpener headingId="…" />.
+      const drawn = withParts(twin);
+      assert.ok(
+        drawn.includes(heading) || drawn.includes(`heading${heading.replace(/^id=/, "Id=")}`),
+        `${twin} (or a part it imports) lacks ${heading}`,
+      );
     }
   }
 
@@ -318,7 +329,7 @@ test("the story and What you get show only current captures, honestly framed", a
   for (const asset of wide) await access(`public${asset}`);
 
   // The frames are sample-content renders: the drawn window claims no live
-  // address or lock, and the note under them says so.
+  // address or lock, and the note above them says so.
   assert.match(parts, /export const SCREEN_NOTE =\s*"[^"]*\bsample content\b[^"]*";/);
   assert.doesNotMatch(withoutComments(parts), /app\.yovoice\.app|<Lock\b/);
 
@@ -341,4 +352,166 @@ test("the design system documents the cinema as an owner-approved exception", as
   const doc = await readFile("docs/design/design-system.md", "utf8");
   assert.match(doc, /^## Scroll cinema \(homepage\)$/m);
   assert.match(doc, /Motion \(framer-motion\) is reserved for[^.]*homepage scroll cinema/);
+});
+
+test("every section opens the same way, and the static layout keeps the plain title", async () => {
+  const opener = await readFile("src/components/animations/scene-opener.tsx", "utf8");
+  // Words are split only while their entrance waits or runs; before and
+  // after it the title is one run of text (and the space before the accent
+  // stays inside it, where Chrome's accessibility tree keeps it).
+  assert.match(opener, /\{cue \? splitWords\(accent \? `\$\{title\} ` : title, "t"\) : accent \? `\$\{title\} ` : title\}/);
+  assert.match(opener, /\{cinema \? <OpenerSettle target=\{root\} into=\{settleY\} \/> : null\}/);
+  assert.match(opener, /cinema && size !== "section" \? \(size === "scene" \? "title-scene" : "title-column"\) : "section-title"/);
+  // A jump or restored position draws it in place, judged by when the
+  // intersection was seen, and a landing draws it before the next paint;
+  // focus draws it at rest.
+  assert.match(opener, /if \(justRelocated\(entry\.time\)\) finish\(\);\s*else play\(\);/);
+  assert.match(opener, /onRelocation\(/);
+  assert.match(opener, /onFocusCapture=\{\(\) => settle\.current\?\.\(\)\}/);
+
+  for (const file of [
+    "src/components/story/app-story-static.tsx",
+    "src/components/story/app-story-cinema.tsx",
+    "src/components/sections/welcome-intro.tsx",
+    "src/components/sections/welcome-features.tsx",
+    "src/components/servers/servers-welcome.tsx",
+    "src/components/sections/welcome-intro-cinema.tsx",
+    "src/components/sections/welcome-features-cinema.tsx",
+    "src/components/servers/servers-welcome-sheet.tsx",
+    "src/components/sections/premium-section.tsx",
+    "src/components/sections/download-section.tsx",
+  ]) {
+    assert.match(await readFile(file, "utf8"), /<SceneOpener\b/, `${file} opens with the shared SceneOpener`);
+  }
+
+  // The frame and the opener anatomy live in one place.
+  const css = await readFile("src/app/globals.css", "utf8");
+  assert.match(css, /--frame: 1240px;/);
+  assert.match(css, /--edge: max\(var\(--gutter\), calc\(\(100% - var\(--frame\)\) \/ 2\)\);/);
+  assert.match(css, /\.opener-rule \{ forced-color-adjust: none; background: CanvasText; \}/);
+});
+
+test("the 3D phone is an enhancement over the CSS phone, never a requirement", async () => {
+  const canvas = await readFile("src/components/story/story-phone-canvas.tsx", "utf8");
+  // Loaded only when needed, refused on software rendering, and aria-hidden.
+  assert.match(canvas, /import\(/);
+  assert.match(canvas, /failIfMajorPerformanceCaveat/);
+  assert.match(canvas, /aria-hidden="true"/);
+  const pkg = JSON.parse(await readFile("package.json", "utf8"));
+  assert.ok(pkg.dependencies.ogl, "ogl is the one 3D dependency");
+  assert.ok(!pkg.dependencies.three && !pkg.dependencies["@react-three/fiber"], "no three.js");
+});
+
+test("primary actions lean toward the pointer without adding a Tab stop", async () => {
+  const cta = await readFile("src/components/ui/magnetic-cta.tsx", "utf8");
+  assert.match(cta, /tabIndex=\{-1\}/);
+  assert.match(cta, /\(hover: hover\) and \(pointer: fine\)/);
+  assert.match(cta, /useReducedMotion\(\)/);
+});
+
+test("a layout change keeps the visitor's place, and every page jump is a relocation", async () => {
+  const [anchor, cinema] = await Promise.all([
+    readFile("src/components/animations/cinema-scroll-anchor.tsx", "utf8"),
+    readFile("src/components/animations/cinema.ts", "utf8"),
+  ]);
+  // The landings go through `relocate`, so scenes draw in place whatever the distance.
+  assert.match(cinema, /export function relocate\(jump: \(\) => void\)/);
+  assert.match(cinema, /export function onRelocation\(listener: \(\) => void\)/);
+  assert.match(anchor, /relocate\(land\)/);
+  // The cinema switching mid-visit (or its first arming after a scroll) puts
+  // the visitor back in the same section, the same distance in; so does a
+  // new width, before the cinema can switch.
+  assert.match(anchor, /if \(rendered\.current !== null && rendered\.current !== cinema\) pending\.current = place\.current;/);
+  assert.match(anchor, /addEventListener\("resize", reflow\)/);
+  assert.match(anchor, /#main-content > section, body footer/);
+});
+
+test("the giant words' lean ignores jumps and comes to rest", async () => {
+  const cinema = await readFile("src/components/animations/cinema.ts", "utf8");
+  const lean = cinema.slice(cinema.indexOf("export function useScrollLean("));
+  assert.match(lean, /justRelocated\(\) \? 0 : speed/);
+  assert.match(lean, /onRelocation\(\(\) => eased\.jump\(0\)\)/);
+  assert.match(lean, /restDelta: 5, restSpeed: 50/);
+});
+
+test("a primary action's lift and lean add up, and its ring grows evenly", async () => {
+  const cta = await readFile("src/components/ui/magnetic-cta.tsx", "utf8");
+  assert.match(cta, /useTransform\(\(\) => springY\.get\(\) \+ lift\.get\(\)\)/);
+  assert.doesNotMatch(cta, /whileHover/);
+  assert.match(cta, /outlineOffset: \["0px", "10px"\]/);
+});
+
+test("the documented motion tokens are the ones the code uses", async () => {
+  const [motion, doc] = await Promise.all([
+    readFile("src/components/animations/motion.ts", "utf8"),
+    readFile("docs/design/design-system.md", "utf8"),
+  ]);
+  // Server-safe, so server components read plain numbers.
+  assert.doesNotMatch(motion, /^"use client";/m);
+  for (const [name, unit] of [["DUR", " s"], ["STAGGER", " s"], ["RISE", " px"]] as const) {
+    const body = new RegExp(`export const ${name} = \\{([^}]*)\\}`).exec(motion)?.[1];
+    assert.ok(body, `${name} is exported from motion.ts`);
+    const pairs = [...body.matchAll(/(\w+): ([\d.]+)/g)].map(([, key, value]) => `${key} ${value.replace(/^0\./, ".")}`);
+    const documented = new RegExp(`\`${name}\` \\(([^)]*)\\)`).exec(doc.replace(/\s+/g, " "))?.[1];
+    assert.ok(documented, `${name} is documented`);
+    assert.equal(documented, `${pairs.join(", ")}${unit}`, `${name} in the doc matches motion.ts`);
+  }
+});
+
+/** Every .ts / .tsx file under `dir`. */
+async function sourceFiles(dir: string): Promise<string[]> {
+  const { readdir } = await import("node:fs/promises");
+  const entries = await readdir(dir, { withFileTypes: true, recursive: true });
+  return entries
+    .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
+    .map((entry) => `${entry.parentPath}/${entry.name}`);
+}
+
+test("ogl loads only with the 3D phone, on demand", async () => {
+  for (const file of await sourceFiles("src")) {
+    const body = withoutComments(await readFile(file, "utf8"));
+    if (file !== "src/components/story/story-phone-gl.ts") {
+      assert.doesNotMatch(body, /from\s+["']ogl["']/, `${file} imports ogl`);
+    }
+    // The engine is reached only through a dynamic import; other files may import its types.
+    for (const match of body.matchAll(/import\s+([^;]*?)\s+from\s+["']@\/components\/story\/story-phone-gl["']/g)) {
+      assert.match(match[1], /^type\b/, `${file} imports the 3D engine statically`);
+    }
+  }
+  const canvas = await readFile("src/components/story/story-phone-canvas.tsx", "utf8");
+  assert.match(canvas, /await import\("@\/components\/story\/story-phone-gl"\)/);
+});
+
+test("the 3D phone shows only the story's captures and hands back to the CSS phone", async () => {
+  const canvas = withoutComments(await readFile("src/components/story/story-phone-canvas.tsx", "utf8"));
+  const engine = withoutComments(await readFile("src/components/story/story-phone-gl.ts", "utf8"));
+  assert.match(canvas, /captures: CHAPTERS\.map\(\(chapter\) => captureUrl\(chapter\.screen\.phone\)\)/);
+  for (const body of [canvas, engine]) {
+    assert.doesNotMatch(body, /\/screenshots\/|https?:\/\/|\.(?:png|jpe?g|webp|hdr|exr|ktx2?|glb|gltf)\b/);
+  }
+  // Refused where it would not run well, and handed back when it cannot keep up or loses its context.
+  assert.match(canvas, /forced\.matches \|\| connection\?\.saveData \|\| memory < 4/);
+  assert.match(canvas, /addEventListener\("webglcontextlost", lost\)/);
+  assert.match(canvas, /engine\.setDpr\(1\);\s*\} else handBack\(\);/);
+  // The CSS phone stays mounted underneath.
+  const story = await readFile("src/components/story/app-story-cinema.tsx", "utf8");
+  assert.ok(story.includes("<Phone progress={progress} />") && story.includes("<StoryPhoneGL"));
+});
+
+test("the voice line and the finale flood are cinema-only decoration", async () => {
+  const line = await readFile("src/components/animations/voice-line.tsx", "utf8");
+  assert.match(line, /return cinema && wide \? <VoiceLineCinema \/> : null;/);
+  assert.match(line, /mount\.setAttribute\("aria-hidden", "true"\)/);
+  assert.ok((line.match(/forced-colors:hidden/g) ?? []).length >= 2);
+  const finale = await readFile("src/components/sections/be-you-finale.tsx", "utf8");
+  assert.match(finale, /\{cinema \? <FinaleFlood fill=\{fill\} \/> : null\}/);
+  assert.match(finale, /forced-colors:hidden/);
+});
+
+test("the Download and Premium sections stay server components", async () => {
+  for (const file of ["src/components/sections/download-section.tsx", "src/components/sections/premium-section.tsx"]) {
+    const body = await readFile(file, "utf8");
+    assert.doesNotMatch(body, /^"use client";/m, `${file} ships its copy as client code`);
+    assert.match(body, /<CinemaSurface\b/, `${file} switches its ground through CinemaSurface`);
+  }
 });

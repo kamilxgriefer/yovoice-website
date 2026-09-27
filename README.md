@@ -30,6 +30,7 @@ The official website serves as the public face of the project, allowing users to
 - Tailwind CSS
 - Firebase
 - Framer Motion
+- OGL (the homepage's 3D phone, loaded lazily)
 - Vercel
 
 ---

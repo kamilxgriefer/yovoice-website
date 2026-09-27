@@ -1,6 +1,6 @@
 # YO Voice website design system
 
-Last reviewed: 2026-09-26 (homepage scroll cinema)
+Last reviewed: 2026-09-27 (homepage scroll cinema: frame, openers, 3D phone)
 
 ## Source of truth
 
@@ -41,7 +41,11 @@ values for the pinned ones.
 | Chip and badge radius | `--radius-pill` | `999px` |
 | Live state | `--live` / `--on-live` | `#FF335C` / `#16040A` |
 | Floating chrome shadow | `--shadow-float` | `0 16px 40px rgba(0,0,0,.42)` |
-| Fixed header height | `--header-height` | `56px` |
+| Fixed header height | `--header-height` | `max(56px, 3.5rem)` (grows with the visitor's text size) |
+| Homepage frame | `--frame`, `--gutter`, `--edge` | `1240px`; `1.25rem` / `2rem` from 40rem / `3rem` from 64rem; `max(var(--gutter), (100% - var(--frame)) / 2)` |
+| Homepage opener rhythm | `--opener-top`, `--section-bottom`, `--opener-gap` | header height + `clamp(2rem, 6svh, 4.5rem)`; section foot; opener-to-content gap |
+| Homepage display sizes | `--type-scene`, `--type-column` | `clamp(2.5rem, 1rem + 5vw, 6rem)`, `clamp(2.25rem, 1.25rem + 3vw, 4rem)` |
+| Story-to-Welcome seam | `--seam` | `#12092d` |
 
 The `@theme inline` block at the top of `globals.css` maps Tailwind's
 `--color-*` namespace onto these tokens through `var()`, so utilities such as
@@ -99,7 +103,8 @@ homepage's scene lighting and short focus pulls (see "Scroll cinema").
 
 ## Slim rules
 
-- Chrome is thin: a 56 px fixed header (`--header-height`), 14 px links, one
+- Chrome is thin: a 56 px fixed header (`--header-height`, which grows with
+  the visitor's text size so its controls and focus rings stay inside it), 14 px links, one
   primary action ("Open YO Voice"). Pages pad their top by the header height
   rather than by a hard-coded 80 px.
 - One accent. Highlighted words in section headings use solid `--accent`.
@@ -125,8 +130,13 @@ homepage's scene lighting and short focus pulls (see "Scroll cinema").
   in `--text-secondary`. One `<h1>` per page. The scroll cinema may set a
   scene's title at display size (Inter 800, `-0.04em`, a `clamp()` that fits
   320 px); it is the only place a heading may be larger than the hero's
-  `<h1>`. Static layouts keep this scale, and an item title (`<h3>`) is never
-  larger than its section title.
+  `<h1>`. Homepage section openers use the ruled eyebrow (`.opener-eyebrow`:
+  12 px / 700 / `.16em`, a 28-40 px rule, in the scene's ink) in both
+  layouts, and one lead (`.opener-lead`: 34rem measure, 17 px, 18 px from
+  64rem) in both layouts; `.eyebrow` stays for card labels and every other
+  page except the Download section that `/servers` shares. Static layouts
+  keep the rest of this scale, and an item title (`<h3>`) is never larger
+  than its section title.
 - Motion (framer-motion) is reserved for the hero rotators, the hero CTA
   spring, the menu and the homepage scroll cinema below. Use Tailwind v4's
   `motion-reduce:` variant for CSS transitions; scroll-driven motion is gated
@@ -228,7 +238,46 @@ but not the "Be You." finale (`<DownloadSection finale />` is the
 homepage's alone). Only patterns are borrowed from the references (pinned
 stage, 3D product turn, colour flood, numbered chapter rail, giant type
 behind the product, expanding window, stacking cards, word-by-word reveal),
-never their names, logos, colours or lines.
+never their names, logos, colours or lines. A second pass (owner,
+2026-09-27: "go a step further", plus a last touch and alignment) put every
+section on one frame and one opener, brought the colour back later in the
+page, and made the story's phone a real 3D object.
+
+- **Frame.** Every homepage section's content starts on one edge: `.frame`
+  (1240px plus `--gutter`: 1.25rem, 2rem from 40rem, 3rem from 64rem) and
+  `--edge` for full-bleed stages, so text sits at 100px at 1440, 340px at
+  1920, 48px at 1280 and 1024, 32px at 834 and 20px on phones. The footer
+  and `/servers` sit on the same edge, and so does the header wherever its
+  row fits; between about 1160 and 1208px, and at larger text sizes on wide
+  windows, its row keeps the room its links need. Section openers are left-aligned; only the
+  giant decorative lines, the things that belong to a centred picture (the
+  story CTA, the hero phone's tabs) and the hero copy below `lg` are centred.
+- **Openers.** Every section opens with `SceneOpener`
+  (`src/components/animations/scene-opener.tsx`): a ruled eyebrow in the
+  scene's ink (inside and Welcome `#c3a8ff`, What you get `#7de9ed`, Servers
+  `#dca6ff`, Download `#d986ff`; Premium keeps its badge), the title in one
+  of two display sizes — `.title-scene` clamp(2.5rem, 1rem + 5vw, 6rem) for
+  Inside YO Voice, Welcome, What you get and Download; `.title-column`
+  clamp(2.25rem, 1.25rem + 3vw, 4rem) for Servers and Premium — and one lead
+  measure (34rem). The first time an opener comes into view its rule draws,
+  the title's words rise out of their own baseline one after another (the
+  move "Be You." closes the page on) and the lead follows; it is triggered,
+  always finishes, is drawn in place after a jump (before the next paint)
+  and at rest on focus. The words are split into spans only while their
+  entrance waits or runs; before and after it the title is one run of text,
+  so screen readers, find in page and copy read it as written. Without the
+  cinema it is the same markup with `.section-title`. As the opener crosses
+  the window it settles the last 32 px, finishing by the time its eyebrow
+  reaches the voice line's head.
+- **Motion language.** `motion.ts` (server-safe; `cinema.ts` re-exports
+  it) holds the tokens every triggered move uses: `DUR` (micro .16, swap .32, text .56, block .9 s), `STAGGER` (word
+  .03, line .07, item .08 s), `RISE` (text 16, line 24, block 36 px), `EXIT`
+  (.28 s, `EASE_IN`, -16 px, 6 px blur), `SWAP`, `EASE_OUT`, `EASE_IN`,
+  `EASE_IN_OUT`. Primary actions other than the hero's use `MagneticCta`
+  (lean of at most 6 px toward a fine pointer on top of a 2 px lift, one
+  voice ring on arrival that grows 10 px on every side; nothing for touch,
+  keyboard or reduced motion); arrows in links
+  nudge 3 px (`.arrow-nudge`); secondary links never move; cards stay flat.
 
 - **Gate.** `useCinema()` (`src/components/animations/cinema.ts`) is false
   on the server and in the first client render, and true only while
@@ -252,20 +301,31 @@ never their names, logos, colours or lines.
   What you get 320svh, 240svh on a portrait window); the Servers deck is
   sticky cards in normal flow. No scroll-snap, wheel or touch listeners,
   smooth-scroll libraries or `overflow: hidden` on `html` / `body`. The only
-  programmatic scrolls are the story rail's links and `CinemaScrollAnchor`,
+  programmatic scrolls are the story rail's pointer clicks (keyboard
+  activation follows the native `#inside-*` link) and `CinemaScrollAnchor`,
   which re-lands a URL fragment, a reload or a back/forward arrival once the
-  cinema has grown the page (restoration is `manual` on the homepage, and
-  every such jump is instant). `<html data-scroll-behavior="smooth">` makes
+  cinema has grown the page, and puts the visitor back in the same section,
+  the same distance in, whenever the layout changes under them (the cinema
+  switching on or off mid-visit, a phone rotated, a new window width).
+  Restoration is `manual` on the homepage, and every such jump is instant
+  and made as a relocation (`relocate`), so scenes draw in place. `<html data-scroll-behavior="smooth">` makes
   Next jump, not sweep, on navigation.
 - **Nothing moves on its own.** No timers or loops. Scenes follow the
   scroll through one short spring (`SCENE_SPRING`) and jump, instead of
-  fast-forwarding, when the scroll relocates by a third of a scene at once.
+  fast-forwarding, when the page is relocated (one step of more than one and
+  a half windows, or any jump `CinemaScrollAnchor` makes) or a scene mounts
+  mid-page. The giant words' lean reads a relocation as standing still.
   Text never rests mid-fade: text blocks enter once and finish (`Reveal`,
   the story's chapter text on each chapter change, the What you get
   captions), and only pictures, floods and decoration are scrubbed. The hero
   tour and the premium ring's sweep are unchanged. Only `transform`,
   `opacity` and `clip-path` animate, plus a blur of at most 8 px on a heading
-  entering or leaving, which always completes. When a scene lands somewhere
+  entering or leaving, which always completes. The exceptions: the story's
+  WebGL canvas; "Start talking." getting louder — its weight rises in coarse
+  steps inside a box held at weight 800, so nothing around it reflows; the
+  voice line's lit length (a `stroke-dashoffset` on one 2 px path and its
+  clip rects); and the `MagneticCta` ring (`outline-offset` on one small
+  element, once per pointer arrival). When a scene lands somewhere
   new (a link, a restored position, a scene mounting mid-page) it is drawn
   in place at once, triggered text included, without replaying its way
   there.
@@ -273,44 +333,71 @@ never their names, logos, colours or lines.
   - Hero exit: the copy drifts up and softens to no less than 85 %; the
     device frames recline up to 16° and settle to 92 %; the corner glow
     follows the scroll out and the hero's foot darkens into the page.
-  - Inside YO Voice (after the hero): a pinned phone turns in 3D (at most
-    24° on Y and 22° on X) through Home, Servers, Chats and Moments; each
-    capture swipes in behind an edge in that destination's dock colour over
-    a flood of the same hue; thin voice rings mark each hand-over; a
-    numbered rail of links follows; "Stop scrolling. / Start talking."
-    arrives behind the phone, which then steps back so both lines read.
-    "Start talking" and its note follow the stage in normal flow.
-  - Welcome: the heading settles into place and its last words arrive one
-    after another; a waveform under it moves a little with every scroll step;
-    the sentence lights up word by word (`WordReveal`, one copy of the text).
+  - Inside YO Voice (after the hero): a real 3D phone (WebGL, `ogl`, loaded
+    only in the cinema as the story comes near) is lifted and spun into view,
+    showing its dark glass back once, then turns through Home, Servers, Chats
+    and Moments; its bevel catches the rim light of each destination's dock
+    colour. It is refused on software rendering, low memory or save-data,
+    drops its resolution and then hands back to the CSS phone if it cannot
+    keep up, and hands back at once on context loss; the CSS phone (at most
+    24° on Y and 22° on X) stays underneath as the fallback. Each capture
+    swipes in behind an edge in the dock colour over a flood of the same hue;
+    thin voice rings mark each hand-over; a numbered rail of links follows.
+    In the finale "Stop scrolling. / Start talking." slide in behind the
+    phone, leaning with the speed of the scroll, "Start talking." getting
+    louder; the 3D phone makes one full turn and, on wide screens, the three
+    other screens then fan out beside it under the words, while the CSS
+    phone instead steps back below the line. "Start talking" and its note
+    follow on the seam violet the stage fades into.
+  - Welcome: opens with the shared opener on the story's violet, which
+    settles into the page ground above the sentence; a waveform under the
+    heading moves a little with every scroll step; the sentence lights up
+    word by word (`WordReveal`, one copy of the text).
   - What you get: YO Voice in a drawn browser window (three dots, no
     address, no lock) rises from a laptop-lid tilt to nearly full screen and
     wipes Home → Chats → Friends with a caption each; on a portrait window
     the camera fills the stage's height with an honest crop and pans across
-    each capture. The feature rows rise in after the stage.
+    each capture. The room takes the light of the view on screen (the
+    story's flood colours with a smaller core; the window covers most of it,
+    so overall it reads well under the story's strength, and it never
+    reaches the heading), and each wipe carries the next view's light
+    across it. The
+    feature rows rise in after the stage.
   - Servers: the five kinds stack as cards beside the Channels sheet, which
     turns a step with each card; on short windows the heading scrolls on and
     the sheet alone stays beside the deck. Only uncovered cards move their
     waveform.
-  - Premium: the ring grows into place, ripples spread from it, and the
-    crown and pills slide out from behind it.
-  - Download: the heading zooms in, the four cards are dealt from a fanned
-    stack (keyboard focus completes the deal), and the homepage ends on
-    "Be You.", which fills as the visitor reaches the bottom and stays filled.
+  - Premium: opens with the shared opener (its badge in the eyebrow slot);
+    the ring grows into place on a Moments-magenta core, ripples spread from
+    it, and the crown and pills slide out from behind it.
+  - Download: opens with the shared opener, the four cards are dealt from a
+    fanned stack (keyboard focus completes the deal), and the homepage ends
+    on "Be You." over a violet flood, leaning with the speed of the scroll;
+    it fills as the visitor reaches the bottom and stays filled.
     It is sized by the window's height as well as its width, so at the very
     end it sits whole under the header, or, where the footer is taller than
     the room (phones), has scrolled off whole.
   - A 2 px meter under the header shows how far down the homepage the
-    visitor is.
+    visitor is, and from 64rem a thin voice line runs down the gutter just
+    outside the frame from the story's end, pulses into each section's ruled
+    eyebrow (Premium's badge) and becomes the baseline of the "Be You." wave
+    (hidden behind pinned stages, in forced colours, and below 64rem, where
+    the gutter is too narrow for it to read as anything but a second card
+    edge).
 - **Decoration, here only.** Deep full-bleed floods of the dock colours
   behind the story stage; one bright radial core behind a product (phone,
   browser window, Channels sheet, premium ring), never behind text; thin
   voice rings; glowing wipe edges and the rail's lit dot; the browser
   window's glare; the Servers deck's lit top edge and outlined numerals; the
-  header meter's violet → magenta gradient; the hero's dusk gradient. In the
-  static layout only the story's soft dock-colour glow behind each phone
-  remains. Every decorative layer is `aria-hidden`.
-- **Type.** Scene titles may be display size (see "Slim rules"). The only
+  header meter's violet → magenta gradient; the hero's dusk gradient; the 3D
+  phone's rim light and glass glare (at most +0.06 face-on, rising to a
+  Fresnel sheen of about +0.2 at grazing angles while it turns); the What you get room
+  light; the story-to-Welcome seam violet (`--seam`); the finale flood; the
+  voice line. In the cinema sections share one ground and no hairlines
+  between them; the static layout keeps its hairlines and the alternating
+  grounds, and of all this only the story's soft dock-colour glow behind each
+  phone remains there. Every decorative layer is `aria-hidden`.
+- **Type.** Scene titles use the two opener sizes above (see "Slim rules"). The only
   giant words are the hero's line ("Stop scrolling. / Start talking.") and
   the site's tagline ("Be You."), solid or outlined, never gradient text,
   and `aria-hidden` because the `<h1>` and the site title already say them.
@@ -340,10 +427,18 @@ never their names, logos, colours or lines.
   labels from the hero's `appScreens`. What you get shows the three /updates
   wide frames, and its note says the people and messages are sample content.
 - **Colours.** Tokens wherever CSS can use them. Hex values appear only
-  where framer-motion interpolates or a scene needs a tint the palette does
-  not have: the chapter floods, cores and inks in `story-chapters.ts`, the
-  ripple colours in `premium-identity.tsx`, and the browser window's greys
-  in `welcome-features-parts.tsx`.
+  where framer-motion or a scene's script interpolates, or a scene needs a
+  tint the palette does not have: the chapter floods, cores and inks and the
+  finale tint in `story-chapters.ts` (the story and Servers opener inks in
+  `story-shared.tsx` and `servers-welcome-parts.tsx` are chapter inks, and
+  the What you get room light, the finale flood and the Premium glow are
+  mixed from these with `animations/tint.ts`), the page ground where a
+  gradient script fades to it, the story rail's interpolated accent, the
+  ripple colours in `premium-identity.tsx`, the unlit words in
+  `word-reveal.tsx`, and the greys of the drawn browser window
+  (`welcome-features-parts.tsx`) and the hero's device frames
+  (`app-screen-rotator.tsx`). The 3D phone's material and the voice line's
+  lit colour are numbers in their scripts.
 
 ## Legal hygiene
 

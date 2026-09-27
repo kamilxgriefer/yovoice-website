@@ -1,11 +1,12 @@
 "use client";
 
 import { useCinema } from "@/components/animations/cinema";
+import { SceneOpener } from "@/components/animations/scene-opener";
 import { ServersWelcomeCinema } from "@/components/servers/servers-welcome-cinema";
 import {
   SERVERS_INTRO,
+  SERVERS_OPENER,
   ServersBoundary,
-  ServersHeadingWords,
   StarterChannels,
   TemplatePrivacy,
   WORKSPACE_ASPECT,
@@ -32,11 +33,15 @@ import { serverTemplates } from "@/content/server-templates";
  * ADR-197), YO Voice itself is still in internal testing, and Podcast
  * recording is the one piece still switched off.
  *
+ * It sits on the homepage frame and opens the way every section does
+ * (`SceneOpener`, the column size, in the Servers ink).
+ *
  * With the scroll cinema on, the five kinds become a deck of stacking cards
  * (`servers-welcome-cinema.tsx`): each one slides up over the one before it
  * while the heading and the Channels sheet hold still beside them. Without
  * it — on the server, before hydration, with reduced motion, large text or a
- * short window — this grid is what renders, with the same words.
+ * short window — this grid is what renders, with the same words, and keeps
+ * the site's hairline above the section.
  */
 export function ServersWelcome() {
   const cinema = useCinema();
@@ -48,19 +53,21 @@ function ServersWelcomeStatic() {
     <section
       id="servers"
       aria-labelledby="servers-welcome-heading"
-      className="relative border-t border-[var(--border)] bg-[var(--background)] px-5 py-16 sm:px-8 sm:py-24 lg:px-12"
+      className="relative border-t border-[var(--border)] bg-[var(--background)] pb-[var(--section-bottom)] pt-[var(--opener-top)]"
     >
-      <div className="mx-auto max-w-[1240px]">
+      <div className="frame">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:gap-14">
-          <div className="max-w-2xl">
-            <p className="eyebrow">Servers</p>
-            <h2 id="servers-welcome-heading" className="section-title">
-              <ServersHeadingWords />
-            </h2>
-            <p className="mt-5 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
-              {SERVERS_INTRO}
-            </p>
-          </div>
+          <SceneOpener
+            className="min-w-0 max-w-2xl"
+            size="column"
+            eyebrow={SERVERS_OPENER.eyebrow}
+            ink={SERVERS_OPENER.ink}
+            title={SERVERS_OPENER.title}
+            accent={SERVERS_OPENER.accent}
+            titleClassName="text-balance"
+            lead={SERVERS_INTRO}
+            headingId="servers-welcome-heading"
+          />
 
           <figure className="mx-auto w-full max-w-[272px] lg:mx-0 lg:ml-auto">
             <div className="rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface)] p-1.5">

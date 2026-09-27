@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CinemaScrollAnchor } from "@/components/animations/cinema-scroll-anchor";
 import { ScrollProgress } from "@/components/animations/scroll-progress";
+import { VoiceLine } from "@/components/animations/voice-line";
 import { HeroSection } from "@/components/hero/hero-section";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -48,6 +49,7 @@ export default function HomePage() {
         <ServersWelcome />
         <PremiumSection />
         <DownloadSection finale />
+        <VoiceLine />
       </main>
       <SiteFooter />
     </div>

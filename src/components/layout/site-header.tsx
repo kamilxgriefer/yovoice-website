@@ -26,25 +26,56 @@ import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
  * targets below 44px, and the brief forbids all three — the row would wrap
  * onto two lines instead. 1160px is the smallest width that clears every
  * state, leaving 65/55px of slack in the two steady variants and still
- * fitting the transient one. Gutters are `lg:px-8` rather than the `lg:px-12`
- * used elsewhere: the header has its own `max-w-[1480px]` and never lined up
- * with the 1280/1400px content containers anyway, and the 32px it saves is
- * what buys the 40px move down from the old `min-[1200px]`.
+ * fitting the transient one. The breakpoint is written as 72.5rem, which is
+ * 1160px at the default text size: the row is text, so a visitor who sets a
+ * larger default text size gets the menu button until the row fits (at
+ * 150 % text the row needs about 1740px; the px breakpoint let it wrap).
+ *
+ * The row sits on the page's frame (`.frame`, 2026-09-27): the lockup
+ * starts on the same edge as every section's content and the last action
+ * ends on its mirror — 100px at 1440, 340px at 1920. Below the breakpoint
+ * the row is only the lockup and the menu button, so it takes the frame's
+ * edge itself (`--edge`: the gutter, 20/32/48px, or the frame's margin once
+ * the window is wider than the frame). The menu state is not only a narrow
+ * window's: at 150 % text a 1440px window shows it too, and its lockup still
+ * starts at 100px, over every section's content. From the breakpoint the
+ * gutter is the frame's, but never more than leaves the row 69.5rem (1112px
+ * at the default size; the "Signing out…" row measured 1104px in September
+ * 2026, with today's six links), and never under 2rem: 32px up to 1176px,
+ * easing to 48px by 1208px and following the frame's edge from 1336px. The
+ * row never has less room than it had with the old fixed 2rem gutters
+ * wherever the longest row fitted. (The base padding is the token rather
+ * than `sm:`/`lg:` steps: Tailwind orders an arbitrary breakpoint apart from
+ * the named ones, and an `lg:` padding could win over it.)
+ *
+ * The bar is `--header-height` tall, which grows with the visitor's text
+ * size (globals.css), so the rem-sized controls and their focus rings stay
+ * inside it at 150-200 % text.
  *
  * Tailwind v4 scans source text for candidates, so the classes are written
  * out in full here and reused by reference; a template literal would leave
  * the utilities unbuilt.
  */
-const DESKTOP_ROW = "hidden min-[1160px]:flex";
-const MOBILE_ONLY = "min-[1160px]:hidden";
+const DESKTOP_ROW = "hidden min-[72.5rem]:flex";
+const MOBILE_ONLY = "min-[72.5rem]:hidden";
 /** Must stay in sync with the two class constants above. */
-const DESKTOP_MEDIA_QUERY = "(min-width: 1160px)";
+const DESKTOP_MEDIA_QUERY = "(min-width: 72.5rem)";
 
 const FOCUSABLE_SELECTOR =
   'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
 
 const NAV_LINK =
   "focus-ring inline-flex min-h-11 items-center rounded-xl px-2 text-sm font-medium link-muted transition hover:bg-[var(--surface)]";
+
+/**
+ * The row's action buttons are 3rem tall in a 3.5rem bar, a quarter rem
+ * above and below them (4px at the default text size). The site's ring, 2px
+ * at a 4px offset, needs 6px, so under 150 % text it stood past the bar: cut
+ * off by the top of the window and over the hairline at the bottom. A 2px
+ * offset keeps it inside at every size. `!` because the global ring rule is
+ * unlayered.
+ */
+const ACTION_RING = "focus-ring focus-visible:outline-offset-2!";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -170,7 +201,7 @@ export function SiteHeader() {
       ref={headerRef}
       className="fixed inset-x-0 top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/92 backdrop-blur-xl"
     >
-      <div className="mx-auto flex h-[var(--header-height)] w-full max-w-[1480px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-8">
+      <div className="flex h-[var(--header-height)] w-full items-center justify-between gap-4 px-[var(--edge)] min-[72.5rem]:px-[max(2rem,min(max(var(--gutter),calc((100%_-_var(--frame))_/_2)),calc((100%_-_69.5rem)_/_2)))]">
         <BrandLockup variant="compact" priority />
 
         <nav className={`${DESKTOP_ROW} items-center gap-0.5`} aria-label="Primary navigation">
@@ -184,31 +215,31 @@ export function SiteHeader() {
         <div className={`${DESKTOP_ROW} items-center gap-2`}>
           {user ? (
             <>
-              <Link href="/account/profile" className="premium-button-ghost focus-ring">
+              <Link href="/account/profile" className={`premium-button-ghost ${ACTION_RING}`}>
                 My account
               </Link>
               <button
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className="premium-button-ghost focus-ring disabled:opacity-50"
+                className={`premium-button-ghost ${ACTION_RING} disabled:opacity-50`}
               >
                 <LogOut className="size-4" aria-hidden="true" />
                 {signingOut ? "Signing out…" : "Log out"}
               </button>
-              <Link href={APP_ENTRY_PATH} className="premium-button focus-ring">
+              <Link href={APP_ENTRY_PATH} className={`premium-button ${ACTION_RING}`}>
                 Open YO Voice
               </Link>
             </>
           ) : (
             <>
-              <Link href="/login" className="premium-button-ghost focus-ring">
+              <Link href="/login" className={`premium-button-ghost ${ACTION_RING}`}>
                 Log in
               </Link>
-              <Link href="/register" className="premium-button-secondary focus-ring">
+              <Link href="/register" className={`premium-button-secondary ${ACTION_RING}`}>
                 Create account
               </Link>
-              <Link href={APP_ENTRY_PATH} className="premium-button focus-ring">
+              <Link href={APP_ENTRY_PATH} className={`premium-button ${ACTION_RING}`}>
                 Open YO Voice
               </Link>
             </>
@@ -236,8 +267,10 @@ export function SiteHeader() {
         /* The panel is sized by an explicit height rather than `bottom-0`:
            the header carries `backdrop-blur`, and a backdrop-filter makes an
            element the containing block for its fixed-position descendants,
-           so `top`/`bottom` would resolve against the 56px header box and
-           collapse the panel to its padding. */
+           so `top`/`bottom` would resolve against the header's own box and
+           collapse the panel to its padding. Both read `--header-height`,
+           which grows with the visitor's text size, so the panel always
+           starts under the bar and never covers the Close button's ring. */
         <div
           id="mobile-navigation"
           className={`fixed inset-x-0 top-[var(--header-height)] z-40 h-[calc(100svh-var(--header-height))] overflow-y-auto bg-[var(--surface)] px-5 py-6 ${MOBILE_ONLY}`}

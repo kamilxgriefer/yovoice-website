@@ -5,6 +5,8 @@ import { motion, useTransform, type MotionValue } from "framer-motion";
 import { Crown, Mic, Sparkles, Users, type LucideIcon } from "lucide-react";
 
 import { useCinema, useSceneProgress } from "@/components/animations/cinema";
+import { alpha } from "@/components/animations/tint";
+import { CHAPTERS, FINALE_TINT } from "@/components/story/story-chapters";
 
 /**
  * The Premium identity: the ring a member's avatar gets in the app, with the
@@ -121,18 +123,23 @@ function IdentityCinema({ ring }: { ring: ReactNode }) {
           className="absolute inset-0 will-change-transform"
           style={{ rotate: turn, rotateX: tilt }}
         >
-          {/* The one bright core, behind the ring only. */}
+          {/* The one bright core, behind the ring only. Magenta at its
+              heart — the Moments dock colour the story flooded the phone
+              with, back as Premium's key — deepening to the brand violet
+              the story's finale returns to, and gone before its edge, so no
+              text is ever on it (the pills sit on their own surface). */}
           <motion.div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 size-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(123,47,247,0.34),rgba(123,47,247,0.12)_52%,rgba(123,47,247,0)_100%)]"
-            style={{ scale: coreScale, opacity: coreOpacity }}
+            className="pointer-events-none absolute left-1/2 top-1/2 size-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full forced-colors:hidden"
+            style={{ scale: coreScale, opacity: coreOpacity, backgroundImage: CORE_GLOW }}
           />
           {/* The ripples fade out towards their widest ring as well, so
               they are strongest near the avatar and never end on a hard
-              edge. */}
+              edge. In forced colours, like every scene's glows, they are
+              left out rather than drawn as system-colour circles. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,#000_58%,transparent_100%)]"
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,#000_58%,transparent_100%)] forced-colors:hidden"
             style={{ width: RIPPLE, height: RIPPLE }}
           >
             {RIPPLE_COLORS.map((color, index) => (
@@ -157,6 +164,14 @@ function IdentityCinema({ ring }: { ring: ReactNode }) {
     </div>
   );
 }
+
+/** The Moments chapter's dock colour (`story-chapters.ts`). */
+const MOMENTS_CORE = CHAPTERS.find((chapter) => chapter.screen.id === "moments")?.core ?? FINALE_TINT.core;
+/**
+ * The core's light, from the story's own colours: Moments' magenta at 40 %
+ * in the middle, the finale's violet at 16 % halfway out, clear at the edge.
+ */
+const CORE_GLOW = `radial-gradient(closest-side, ${alpha(MOMENTS_CORE, 0.4)}, ${alpha(FINALE_TINT.core, 0.16)} 52%, ${alpha(FINALE_TINT.core, 0)} 100%)`;
 
 /** Violet, magenta and the accent: the ring's own palette. */
 const RIPPLE_COLORS = ["#7b2ff7", "#c026ff", "#d986ff", "#9b4dff"] as const;

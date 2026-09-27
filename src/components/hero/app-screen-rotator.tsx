@@ -93,6 +93,9 @@ export function AppScreenRotator() {
   const { screenId, reduceMotion, selectScreen, setInteractionPaused } = useHeroTour();
   const panelId = useId();
   const active = appScreens.find((screen) => screen.id === screenId) ?? appScreens[0];
+  // The tour's next screen: every step moves along this list (Home, Servers,
+  // Chats, Moments, and back to Home), or stays on the same screen.
+  const upcoming = appScreens[(appScreens.indexOf(active) + 1) % appScreens.length];
 
   return (
     <div
@@ -145,6 +148,30 @@ export function AppScreenRotator() {
             aria-live="off"
             aria-label={active.label}
           >
+            {/* The next capture, fetched and decoded while the current one is
+                on screen, so the tour's next screen is ready when the old one
+                has faded out. Left to load when it mounts, a capture on a
+                phone network arrived about a quarter of a second after its
+                fade-in began, over an empty black screen. It is never shown
+                (the visible copy below reuses the same file), and with
+                reduced motion there is no tour to prepare for. */}
+            {reduceMotion ? null : (
+              <Image
+                key={upcoming.id}
+                src={upcoming.phone}
+                alt=""
+                aria-hidden="true"
+                width={PHONE_WIDTH}
+                height={PHONE_HEIGHT}
+                sizes="(max-width: 640px) 80vw, 326px"
+                loading="eager"
+                fetchPriority="low"
+                onLoad={(event) => {
+                  event.currentTarget.decode().catch(() => {});
+                }}
+                className="pointer-events-none invisible absolute inset-0 size-full object-cover object-top"
+              />
+            )}
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={active.id}

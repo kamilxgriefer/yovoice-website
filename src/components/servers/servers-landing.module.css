@@ -8,16 +8,24 @@
 .landing :where(a, button) { -webkit-tap-highlight-color: transparent; }
 .landing :where(a, button, [tabindex]):focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
 
+/* The site's frame (`.frame` and `--gutter` in globals.css): the page's
+   content starts on the same edge as the header's lockup, the Download
+   opener below it and the footer — 100px at 1440, 340px at 1920, 48px on a
+   laptop, 32px on a tablet and 20px on a phone. */
 .hero,
 .explorer,
 .howSection {
-  width: min(1280px, calc(100% - 64px));
+  width: min(var(--frame), calc(100% - 2 * var(--gutter)));
   margin-inline: auto;
 }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, .82fr) minmax(560px, 1.18fr);
+  /* 41 : 59, written in whole fr: where the picture's 560px floor wins
+     (up to about 1100px), the copy takes all the rest. A flex sum under 1
+     (.82fr beside a floored 1.18fr) left the copy only 82 % of the rest and
+     an empty strip at the frame's right edge. */
+  grid-template-columns: minmax(0, 41fr) minmax(560px, 59fr);
   align-items: center;
   gap: 54px;
   min-height: 0;
@@ -179,9 +187,6 @@
 }
 
 @media (max-width: 760px) {
-  .hero,
-  .explorer,
-  .howSection { width: min(100% - 36px, 1280px); }
   .hero { min-height: 0; padding-block: calc(var(--header-height) + 48px) 62px; }
   .hero h1 { font-size: 1.875rem; }
   .explorer,
@@ -208,9 +213,6 @@
 }
 
 @media (max-width: 360px) {
-  .hero,
-  .explorer,
-  .howSection { width: calc(100% - 28px); }
   .hero h1 { font-size: 1.875rem; }
   .templateDetail { padding: 19px; }
   .typeButton { min-width: 152px; }

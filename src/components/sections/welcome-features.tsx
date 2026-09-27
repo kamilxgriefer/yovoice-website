@@ -12,11 +12,14 @@ import {
 } from "lucide-react";
 
 import { useCinema } from "@/components/animations/cinema";
+import { SceneOpener } from "@/components/animations/scene-opener";
 import { WelcomeFeaturesCinema } from "@/components/sections/welcome-features-cinema";
 import {
   BrowserBar,
+  FEATURES_OPENER,
   FeatureRowBody,
   SCREEN_NOTE,
+  SCREEN_NOTE_ID,
   SCREEN_SIZE,
   SCREEN_VIEWS,
   type Feature,
@@ -31,6 +34,12 @@ import {
  *
  * Five rows: an icon tile, a title and one sentence, in two columns on a
  * wide screen and one on a phone.
+ *
+ * It opens the way every homepage section does (`SceneOpener`), on the
+ * page's frame: a ruled eyebrow in the scene's cyan, the title, and the note
+ * that the people and messages in the picture are sample content as the
+ * lead, directly above the picture it describes. The picture spans the
+ * frame, so it starts on the same edge as the words.
  *
  * With the scroll cinema on, the section opens as the page's big-screen
  * moment (`welcome-features-cinema.tsx`): YO Voice in a browser on a large
@@ -84,18 +93,26 @@ function WelcomeFeaturesStatic() {
     <section
       id="features"
       aria-labelledby="welcome-features-heading"
-      className="relative border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-16 sm:px-8 sm:py-24 lg:px-12"
+      className="relative border-t border-[var(--border)] bg-[var(--surface-sunken)] pb-[var(--section-bottom)] pt-[var(--opener-top)]"
     >
-      <div className="mx-auto max-w-[1240px]">
-        <div className="max-w-2xl">
-          <p className="eyebrow">What you get</p>
-          <h2 id="welcome-features-heading" className="section-title text-balance break-words">
-            One place for the{" "}
-            <span className="text-[var(--accent)]">people you talk to.</span>
-          </h2>
-        </div>
+      <div className="frame">
+        <SceneOpener
+          size="scene"
+          eyebrow={FEATURES_OPENER.eyebrow}
+          ink={FEATURES_OPENER.ink}
+          title={FEATURES_OPENER.title}
+          accent={FEATURES_OPENER.accent}
+          accentClassName="sm:block"
+          lead={<span id={SCREEN_NOTE_ID}>{SCREEN_NOTE}</span>}
+          leadClassName="text-pretty"
+          headingId="welcome-features-heading"
+          titleClassName="text-balance break-words"
+        />
 
-        <figure className="mx-auto mt-10 max-w-[1080px] [--bar:1.625rem] sm:mt-12 sm:[--bar:2.125rem]">
+        <figure
+          aria-describedby={SCREEN_NOTE_ID}
+          className="mt-[var(--opener-gap)] [--bar:1.625rem] sm:[--bar:2.125rem]"
+        >
           <div className="rounded-[0.875rem] bg-[linear-gradient(180deg,#2d2439_0%,#1a1424_40%,#110c19_100%)] p-[5px] shadow-[0_2rem_4rem_-1.5rem_rgb(0_0_0/0.7)] sm:rounded-[1.125rem] sm:p-[7px]">
             <div className="relative overflow-hidden rounded-[0.5rem] bg-[var(--surface-sunken)] shadow-[inset_0_0_0_1px_rgb(124_103_144/0.35)] sm:rounded-[0.6875rem]">
               <BrowserBar />
@@ -104,17 +121,14 @@ function WelcomeFeaturesStatic() {
                 alt={home.alt}
                 width={SCREEN_SIZE.width}
                 height={SCREEN_SIZE.height}
-                sizes="(min-width: 1200px) 1080px, (min-width: 1024px) calc(100vw - 96px), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
+                sizes="(min-width: 1336px) 1240px, (min-width: 1024px) calc(100vw - 96px), (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
                 className="block h-auto w-full"
               />
             </div>
           </div>
-          <figcaption className="mt-4 break-words text-sm leading-6 text-[var(--text-tertiary)]">
-            {SCREEN_NOTE}
-          </figcaption>
         </figure>
 
-        <ul className="mt-12 grid gap-8 sm:mt-16 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
+        <ul className="mt-[var(--opener-gap)] grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
           {features.map((feature) => (
             <li key={feature.title} className="feature-row">
               <FeatureRowBody feature={feature} />
@@ -124,7 +138,7 @@ function WelcomeFeaturesStatic() {
 
         <Link href="/features" className="premium-button-secondary focus-ring mt-10 w-fit">
           See every feature
-          <ArrowRight className="size-4" aria-hidden="true" />
+          <ArrowRight className="arrow-nudge size-4" aria-hidden="true" />
         </Link>
       </div>
     </section>

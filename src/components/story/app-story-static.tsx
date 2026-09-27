@@ -1,11 +1,12 @@
 import Image from "next/image";
 
+import { SceneOpener } from "@/components/animations/scene-opener";
 import {
   CHAPTERS,
   PHONE_CAPTURE,
   type StoryChapter,
 } from "@/components/story/story-chapters";
-import { StoryCta, StoryHeading } from "@/components/story/story-shared";
+import { STORY_EYEBROW, STORY_INK, STORY_TITLE, StoryCta } from "@/components/story/story-shared";
 
 /**
  * The app story without the cinema: the server render, the no-JS render and
@@ -15,17 +16,26 @@ import { StoryCta, StoryHeading } from "@/components/story/story-shared";
  * pinned scene, laid out as calm rows — the phone and its chapter side by
  * side, alternating on wide screens, stacked on phones. Each chapter keeps
  * the id the scene gives it (`#inside-home` … `#inside-moments`), so a link
- * to one lands on it in either layout.
+ * to one lands on it in either layout. It opens like every section, with the
+ * page's opener (a ruled eyebrow in the story's ink, the section title), on
+ * the frame.
  */
 export function AppStoryStatic() {
   return (
     <section
       id="inside"
       aria-labelledby="inside-heading"
-      className="relative overflow-x-clip px-5 pt-20 sm:px-8 sm:pt-24 lg:px-12 lg:pt-28"
+      className="relative overflow-x-clip pt-20 sm:pt-24 lg:pt-28"
     >
-      <div className="mx-auto max-w-[1120px]">
-        <StoryHeading className="max-w-2xl" titleClassName="section-title" />
+      <div className="frame">
+        <SceneOpener
+          eyebrow={STORY_EYEBROW}
+          title={STORY_TITLE}
+          headingId="inside-heading"
+          ink={STORY_INK}
+          size="scene"
+          className="max-w-2xl"
+        />
 
         <ol className="mt-12 grid gap-16 sm:mt-16 lg:gap-24" aria-label="Four places in YO Voice">
           {CHAPTERS.map((chapter, index) => (

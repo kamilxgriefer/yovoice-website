@@ -73,12 +73,15 @@ export function HeroPromptRotator() {
         }}
       >
         {/* The one Pause for the whole hero: it stops the welcome messages
-            and the app screens together. */}
+            and the app screens together. On the frame (lg and up) it is
+            pulled back by its own padding, so its icon — all that shows at
+            rest — stands on the column's edge while the 44px target and the
+            hover pill reach into the gutter. */}
         {reduceMotion !== true && (
           <button
             type="button"
             onClick={togglePaused}
-            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-white/55 transition hover:bg-white/[.04] hover:text-white/80 motion-reduce:transition-none"
+            className="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-white/55 lg:-ms-3 transition hover:bg-white/[.04] hover:text-white/80 motion-reduce:transition-none"
             aria-label={paused ? "Play the welcome tour" : "Pause the welcome tour"}
           >
             {paused ? (

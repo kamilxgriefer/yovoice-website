@@ -17,15 +17,18 @@ export const SERVERS_INTRO =
 export const WORKSPACE_CAPTION =
   "Text and voice channels inside one server, with invites in reach.";
 
-/** "A server for every circle." with the solid accent on its last words. */
-export function ServersHeadingWords({ accentClassName }: { accentClassName?: string }) {
-  return (
-    <>
-      A server for{" "}
-      <span className={cn("text-[var(--accent)]", accentClassName)}>every circle.</span>
-    </>
-  );
-}
+/**
+ * The opener, the same words in both layouts (`SceneOpener`): "A server for
+ * every circle." with the solid accent on its last words, under a ruled
+ * eyebrow in the Servers ink — the story's Servers chapter label, #dca6ff,
+ * 10.4:1 on the page's ground.
+ */
+export const SERVERS_OPENER = {
+  eyebrow: "Servers",
+  title: "A server for",
+  accent: "every circle.",
+  ink: "#dca6ff",
+} as const;
 
 /*
  * The channel list as the 3.0.0 app draws it on a phone: the Channels sheet,
@@ -81,12 +84,14 @@ export function StarterChannels({
         const isVoice = channel === template.channel;
         const Icon = isVoice ? AudioLines : Hash;
         return (
-          <li key={channel} className="chip">
+          // A long channel name at a very large text size on a narrow
+          // phone breaks inside its chip rather than widening the page.
+          <li key={channel} className="chip max-w-full [overflow-wrap:anywhere]">
             {/* The colour rides on the glyph, not the chip: `.chip` is
                 unlayered, so a `text-*` utility on the chip itself would be
                 discarded. */}
             <Icon
-              className={`size-3.5 ${isVoice ? "text-[var(--accent)]" : "text-[var(--text-tertiary)]"}`}
+              className={`size-3.5 shrink-0 ${isVoice ? "text-[var(--accent)]" : "text-[var(--text-tertiary)]"}`}
               aria-hidden="true"
             />
             {channel}
@@ -138,13 +143,23 @@ export function ServersBoundary({ className }: { className?: string }) {
         is still in internal testing.
       </p>
       <div className="flex flex-wrap gap-3">
-        <Link href="/servers" className="premium-button-secondary focus-ring">
+        {/* On a wide screen a label never breaks inside its button; the
+            sentence beside them takes the narrower measure instead. On a
+            narrow phone at a very large text size a word may break inside
+            its button rather than widen the page. */}
+        <Link
+          href="/servers"
+          className="premium-button-secondary focus-ring max-w-full [overflow-wrap:anywhere] lg:whitespace-nowrap"
+        >
           See the Servers interface
-          <ArrowRight className="size-4" aria-hidden="true" />
+          <ArrowRight className="arrow-nudge size-4 shrink-0" aria-hidden="true" />
         </Link>
-        <Link href="/updates" className="premium-button-ghost focus-ring">
+        <Link
+          href="/updates"
+          className="premium-button-ghost focus-ring max-w-full [overflow-wrap:anywhere] lg:whitespace-nowrap"
+        >
           Where it stands
-          <ArrowRight className="size-4" aria-hidden="true" />
+          <ArrowRight className="arrow-nudge size-4 shrink-0" aria-hidden="true" />
         </Link>
       </div>
     </div>

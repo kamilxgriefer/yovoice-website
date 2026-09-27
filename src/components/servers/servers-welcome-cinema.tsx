@@ -46,6 +46,12 @@ import { cn } from "@/lib/utils/cn";
  * position, not the spring, so scrolling back up never uncovers text that
  * is still shaded.
  *
+ * Seams: no hairline above the section in the cinema. Servers shares the
+ * page's one ground with the scenes around it, and the hand-over is the
+ * heading's own entrance (`SceneOpener`: the rule draws on the frame's edge,
+ * the words rise). Servers is the film's deliberate breath in colour: no
+ * flood, only the Channels sheet's core.
+ *
  * Only mounted while the scroll cinema is on; `ServersWelcome` renders the
  * static grid otherwise, with the same heading, id, sentence, figure, cards
  * and links.
@@ -78,9 +84,9 @@ export function ServersWelcomeCinema() {
     <section
       id="servers"
       aria-labelledby="servers-welcome-heading"
-      className="relative overflow-x-clip border-t border-[var(--border)] bg-[var(--background)] px-5 pb-16 pt-16 sm:px-8 sm:pb-24 sm:pt-24 lg:px-12"
+      className={cn("relative overflow-x-clip bg-[var(--background)] pb-[var(--section-bottom)]", styles.section)}
     >
-      <div className="mx-auto max-w-[1240px]">
+      <div className="frame">
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 xl:gap-20">
           <ServersAside landed={landed} wide={wide} />
 

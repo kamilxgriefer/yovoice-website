@@ -1,7 +1,16 @@
 "use client";
 
 import { useDeferredValue, useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
-import { useMotionValueEvent, useScroll, useSpring, type MotionValue } from "framer-motion";
+import {
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+  useVelocity,
+  type MotionValue,
+} from "framer-motion";
+
+import { SCENE_SPRING } from "@/components/animations/motion";
 
 /**
  * Scroll cinema: the homepage's scroll-driven scenes (owner request,
@@ -56,11 +65,67 @@ export function useCinema(): boolean {
   return useDeferredValue(useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot));
 }
 
-/** One shared feel for every scrubbed scene: a short, well-damped follow. */
-export const SCENE_SPRING = { stiffness: 170, damping: 32, mass: 0.3, restDelta: 0.0005 } as const;
+let lastRelocation = -Infinity;
+let relocationCount = 0;
+const relocationListeners = new Set<() => void>();
 
-/** The site's one ease-out curve (the hero frames use it too). */
-export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+function relocated() {
+  lastRelocation = performance.now();
+  relocationCount += 1;
+  for (const listener of [...relocationListeners]) listener();
+}
+
+let lastScrollY = 0;
+if (typeof window !== "undefined") {
+  lastScrollY = window.scrollY;
+  window.addEventListener(
+    "scroll",
+    () => {
+      const y = window.scrollY;
+      const step = Math.abs(y - lastScrollY);
+      lastScrollY = y;
+      if (step > window.innerHeight * 1.5) relocated();
+    },
+    { passive: true },
+  );
+}
+
+/**
+ * Moves the page as a relocation rather than a scroll, whatever the
+ * distance: the page's own landings (a fragment, a restored position, the
+ * cinema switching layout mid-visit) run their jump through this, so the
+ * scenes draw in place instead of playing or sweeping. `jump` must scroll
+ * synchronously (`behavior: "instant"`).
+ */
+export function relocate(jump: () => void) {
+  jump();
+  lastScrollY = window.scrollY;
+  relocated();
+}
+
+/**
+ * Called synchronously after every relocation, before the next paint, with
+ * the page already at its new position. Returns the unsubscribe.
+ */
+export function onRelocation(listener: () => void): () => void {
+  relocationListeners.add(listener);
+  return () => relocationListeners.delete(listener);
+}
+
+/**
+ * True for a moment after the page was relocated rather than scrolled (an
+ * in-page link, a restored position): one step of more than one and a half
+ * windows, or a jump made through `relocate`. A triggered entrance that
+ * comes into view because of it is drawn in place instead of played, like
+ * every scene does on a relocation. Pass the time the intersection was
+ * computed (`IntersectionObserverEntry.time`), not the time its callback
+ * runs, so a slow device that reports late still counts it.
+ */
+export function justRelocated(at: number = performance.now()): boolean {
+  return at >= lastRelocation && at - lastRelocation < 400;
+}
+
+export { DUR, EASE_IN, EASE_IN_OUT, EASE_OUT, EXIT, RISE, SCENE_SPRING, STAGGER, SWAP } from "@/components/animations/motion";
 
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
@@ -105,6 +170,7 @@ export function useSceneProgress(
 export function useRelocationJump(source: MotionValue<number>, follower: MotionValue<number>) {
   const lastY = useRef<number | null>(null);
   const mountedAt = useRef<number | null>(null);
+  const seen = useRef(relocationCount);
   useEffect(() => {
     mountedAt.current = performance.now();
     lastY.current = window.scrollY;
@@ -115,6 +181,28 @@ export function useRelocationJump(source: MotionValue<number>, follower: MotionV
     lastY.current = y;
     // The first measurement after mounting is where the scene already is.
     const justMounted = mountedAt.current === null || performance.now() - mountedAt.current < 250;
-    if (justMounted || step > window.innerHeight * 1.5) follower.jump(latest);
+    // The page's own landings count whatever their distance (`relocate`).
+    const landed = seen.current !== relocationCount && justRelocated();
+    seen.current = relocationCount;
+    if (justMounted || landed || step > window.innerHeight * 1.5) follower.jump(latest);
   });
+}
+
+/**
+ * A lean, in degrees, that follows how fast the page is being scrolled and
+ * straightens when it stops — for giant decorative words only. Positive
+ * while scrolling down. Mount it only while the cinema is on.
+ *
+ * A relocation is not a scroll: a jump, a restored position or a landing
+ * reads as standing still, so the words never arrive slanted. The follow
+ * comes to rest within a few px/s (well under 0.01°), so it stops asking for
+ * frames soon after the scroll does.
+ */
+export function useScrollLean(max = 6): MotionValue<number> {
+  const { scrollY } = useScroll();
+  const velocity = useVelocity(scrollY);
+  const scrolled = useTransform(velocity, (speed) => (justRelocated() ? 0 : speed));
+  const eased = useSpring(scrolled, { stiffness: 260, damping: 44, mass: 0.6, restDelta: 5, restSpeed: 50 });
+  useEffect(() => onRelocation(() => eased.jump(0)), [eased]);
+  return useTransform(eased, [-2600, 0, 2600], [-max, 0, max], { clamp: true });
 }

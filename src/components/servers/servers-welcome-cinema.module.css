@@ -7,12 +7,31 @@
  * flow plus sticky positioning, and only the scale of covered cards and the
  * shade over them follow the scroll (transform and opacity, see the TSX). */
 
+/* ---- The section ---------------------------------------------------------- */
+
+/* No hairline in the cinema: Servers shares one ground with the scenes on
+   either side, and the hand-over is carried by the opener's rule drawing on
+   the frame's edge. The eyebrow lands on the page's opener line
+   (`--opener-top`) in the section's first frame; on a wide screen the
+   column's own top padding, which keeps it level with the first card, is
+   part of that distance. */
+.section {
+  --aside-pad-top: 24px;
+  padding-top: var(--opener-top);
+}
+
+@media (min-width: 64rem) {
+  .section {
+    padding-top: calc(var(--opener-top) - var(--aside-pad-top));
+  }
+}
+
 /* ---- Left column: heading, sentence and the Channels sheet -------------- */
 
 .aside {
-  /* The column's rhythm on a wide screen. The script that decides whether
-     the sheet fits beside the heading reads these back as resolved. */
-  --aside-pad-top: 24px;
+  /* The column's rhythm on a wide screen (`--aside-pad-top` comes from the
+     section). The script that decides whether the sheet fits beside the
+     heading reads these back as resolved. */
   --aside-pad-bottom: 1rem;
   --sheet-gap: 2.25rem;
   min-width: 0;
@@ -44,18 +63,6 @@
     position: static;
     align-self: stretch;
   }
-}
-
-.title {
-  margin-top: 1.25rem;
-  font-family: var(--font-display), sans-serif;
-  font-size: clamp(2.25rem, 1.3rem + 2.4vw, 3.75rem);
-  font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: -0.04em;
-  text-wrap: balance;
-  overflow-wrap: break-word;
-  color: var(--foreground);
 }
 
 /* ---- The Channels sheet, as a device that turns a little ---------------- */
@@ -429,5 +436,13 @@
   .sheen,
   .edge {
     display: none;
+  }
+
+  /* The numeral stays an outline: a forced palette would fill its
+     transparent letters with the text colour and turn it into a slab. */
+  .numeral {
+    forced-color-adjust: none;
+    color: transparent;
+    -webkit-text-stroke-color: CanvasText;
   }
 }

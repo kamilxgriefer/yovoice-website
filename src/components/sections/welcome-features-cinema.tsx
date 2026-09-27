@@ -1,12 +1,11 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type RefObject } from "react";
 import { flushSync } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import {
-  animate,
   cubicBezier,
   easeInOut,
   easeOut,
@@ -15,18 +14,29 @@ import {
   useMotionValue,
   useMotionValueEvent,
   useTransform,
-  type AnimationPlaybackControls,
   type MotionValue,
   type Variants,
 } from "framer-motion";
 
-import { EASE_OUT, useSceneProgress } from "@/components/animations/cinema";
+import {
+  DUR,
+  EASE_IN,
+  EASE_OUT,
+  EXIT,
+  STAGGER,
+  SWAP,
+  useSceneProgress,
+} from "@/components/animations/cinema";
 import { Reveal } from "@/components/animations/reveal";
+import { SceneOpener } from "@/components/animations/scene-opener";
+import { mix } from "@/components/animations/tint";
 import styles from "@/components/sections/welcome-features-cinema.module.css";
 import {
   BrowserBar,
+  FEATURES_OPENER,
   FeatureRowBody,
   SCREEN_NOTE,
+  SCREEN_NOTE_ID,
   SCREEN_VIEWS,
   type Feature,
   type ScreenView,
@@ -49,13 +59,28 @@ import {
  * wipes while it is parked at an end, and zooms back out to the whole screen
  * at the end. The pin is shorter there.
  *
+ * The room takes the screen's colour. Behind the screen the stage fills with
+ * a deep light in the dock colour of the view on it — Home violet, Chats
+ * cyan, Friends magenta — which comes up as the screen wakes, changes as each
+ * wipe crosses the screen, and dims as it settles back. It is the story's
+ * flood colours with a smaller core (`roomPaint`); where it shows, at the
+ * stage's sides, it is about as strong as the story's flood, but the screen
+ * covers most of it, so the room as a whole reads at well under the story's
+ * strength and the story stays the peak. The light rises with the screen and
+ * never reaches the heading: its top edge stays under the heading for as
+ * long as the heading is on the stage.
+ *
+ * It opens the way every homepage section does (`SceneOpener`), on the
+ * page's frame: the ruled eyebrow in the scene's cyan, the title rising word
+ * by word, and the sample-content note as its lead.
+ *
  * The visitor's scroll is the only clock. Everything scrubbed here is a
  * transform, a clip-path on a capture or the opacity of a decorative layer
- * (glow, glare, the screen's dimmer). Words are never left half-faded: the
- * heading leaves by a short triggered fade the moment the rising screen
- * reaches it, the first caption arrives in the same moment (so the stage
- * always carries one line of words), and the captions change by a short
- * triggered crossfade.
+ * (the room light, glare, the screen's dimmer). Words are never left
+ * half-faded: the heading leaves with the opener's exit cue the moment the
+ * rising screen reaches it, the first caption arrives in the same moment (so
+ * the stage always carries one line of words), and the captions change by
+ * the site's caption swap.
  *
  * Only mounted while the scroll cinema is on; `WelcomeFeatures` renders the
  * static layout otherwise, with the same heading, sentence, rows and link.
@@ -129,8 +154,18 @@ const HOLD_PX = 4;
 const RELOCATION = 0.15;
 /** A triggered change made when the stage lands somewhere new: no fade. */
 const LAND = { duration: 0 } as const;
-const HEADING_FADE = { duration: 0.45, ease: EASE_OUT };
-const SEGMENTS_FADE = { duration: 0.4, ease: EASE_OUT };
+const SEGMENTS_FADE = { duration: DUR.swap, ease: EASE_OUT };
+
+/**
+ * The heading leaving the stage and coming back: the section opener's exit
+ * cue (`EXIT`, eased in, a cut rather than a drift) and its return. Opacity
+ * only, never `visibility`: this is the section's real `<h2>`, so it stays in
+ * the accessibility tree and in find in page while it is off the stage.
+ */
+const HEADING_AWAY = { opacity: 0, y: EXIT.y, filter: `blur(${EXIT.blur}px)` };
+const HEADING_BACK = { opacity: 1, y: 0, filter: "blur(0px)" };
+const HEADING_EXIT = { duration: EXIT.duration, ease: EASE_IN };
+const HEADING_RETURN = { duration: 0.42, ease: EASE_OUT };
 
 /** What the words on the stage show: whether the heading has left, which
  * view the caption names, and whether the last change was a landing. */
@@ -196,19 +231,20 @@ type Geometry = {
   height: number;
   /** The room across: the window's width. */
   room: number;
+  /** The stage's height. */
+  stageHeight: number;
   bezel: number;
   /** The screen's layout top, in the stage. */
   top: number;
-  /** The heading's layout bottom and height, in the stage. */
+  /** The heading's layout bottom, in the stage. */
   headingBottom: number;
-  headingHeight: number;
   /** How far below its final place the screen starts. */
   start: number;
 };
 
 const UNMEASURED: Geometry = {
-  ready: false, width: 1, height: 1, room: 1, bezel: 0, top: 0,
-  headingBottom: 0, headingHeight: 0, start: 0,
+  ready: false, width: 1, height: 1, room: 1, stageHeight: 1, bezel: 0, top: 0,
+  headingBottom: 0, start: 0,
 };
 
 /**
@@ -300,21 +336,52 @@ function projectedTop(screen: ScreenPose, geometry: Geometry, pose: Pose) {
   return geometry.top + (unprojected * pose.perspective) / (pose.perspective + origin * Math.sin(theta));
 }
 
-/** The heading's scrubbed step back. */
+/**
+ * The heading's scrubbed step back: it drifts up a line's rise as the screen
+ * comes up under it. No scale, so its left edge stays on the frame and the
+ * text stays crisp.
+ */
 function headingStepAt(p: number) {
-  const step = unit(p, 0, HEADING_STEP);
-  return { y: -24 * step, scale: 1 - 0.05 * step };
+  return -RISE_STEP * unit(p, 0, HEADING_STEP);
 }
+const RISE_STEP = 24;
 
 /**
  * How far (px) the screen's projected top edge is from the point where the
  * heading leaves: positive while it is still clear of the heading.
  */
 function headingClearance(p: number, geometry: Geometry, pose: Pose, timeline: Timeline) {
-  const step = headingStepAt(p);
-  const bottom = geometry.headingBottom + step.y - ((1 - step.scale) * geometry.headingHeight) / 2;
+  const bottom = geometry.headingBottom + headingStepAt(p);
   return projectedTop(poseAt(p, 1, geometry, pose, timeline), geometry, pose) - (bottom + EXIT_GAP);
 }
+
+/**
+ * Where the room light's ceiling sits (its `y`, px): the page-coloured shade
+ * over the top of the light, whose soft lower edge starts just above the
+ * screen's projected top edge, so the light comes up with the screen. While
+ * the heading may still be on the stage the light starts `EXIT_GAP` above
+ * the screen — the heading leaves before the screen's top comes closer to it
+ * than that, so the light never reaches it. Once the screen has passed the
+ * point where the heading leaves (or the heading has had to leave at
+ * `headingLatest`), the light climbs its soft edge's length above the screen,
+ * so the room is lit all round. The shade is the stage's height and its last
+ * `ROOM_FADE` is the soft edge (`.ceiling`).
+ */
+function ceilingAt(p: number, enter: number, geometry: Geometry, pose: Pose, timeline: Timeline) {
+  if (!geometry.ready) return 0;
+  const height = geometry.stageHeight;
+  const top = projectedTop(poseAt(p, enter, geometry, pose, timeline), geometry, pose);
+  // Past the hold band too, so the light never climbs while the heading stays.
+  const past = (-headingClearance(p, geometry, pose, timeline) - HOLD_PX) / (CLIMB * height);
+  const climb = ROOM_FADE * height * Math.max(Math.min(1, Math.max(0, past)), unit(p, timeline.headingLatest, timeline.rise));
+  const start = Math.max(0, top - EXIT_GAP - climb);
+  return start - (1 - ROOM_FADE) * height;
+}
+/** How far past the heading's exit point (a share of the stage's height) the
+ * screen rises while the light climbs above it. */
+const CLIMB = 0.18;
+/** The ceiling's soft edge, as a share of the stage's height (`.ceiling`). */
+const ROOM_FADE = 0.22;
 
 /**
  * The part of the capture (0..1 across) the camera sees while a wipe runs,
@@ -379,20 +446,21 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
   const scale = useTransform(screen, (value) => value.scale);
   const rotateX = useTransform(screen, (value) => value.rotateX);
 
-  const grow = useTransform(p, [0.02, timeline.rise], [0, 1], { ease: easeInOut });
-  const settle = useTransform(p, [timeline.settle, 1], [0, 1], { ease: easeInOut });
   const face = useTransform(p, [0, timeline.rise - 0.03], [1, 0], { ease: easeInOut });
-  const glow = useTransform([grow, settle], ([g, s]: number[]) => 0.3 + 0.7 * g - 0.35 * s);
   const glare = useTransform(face, (f) => f * 0.9);
   // The screen wakes as it turns to face the visitor.
   const dimmer = useTransform(face, (f) => f * 0.4);
+  // The room light's top edge follows the screen up (see `ceilingAt`).
+  const ceiling = useTransform([p, enter, measured], ([progress, entered]: number[]) =>
+    ceilingAt(progress, entered, geometry.current, pose, timeline),
+  );
 
   /* The heading steps back as the screen comes up (scrubbed, transform
-     only), then leaves the moment the screen's top edge reaches it — a short
-     triggered fade, so it is never left half-faded — and comes back the same
-     way when the visitor scrolls up again. */
-  const headingY = useTransform(p, (value) => headingStepAt(value).y);
-  const headingScale = useTransform(p, (value) => headingStepAt(value).scale);
+     only), then leaves the moment the screen's top edge reaches it — the
+     opener's exit cue, which always completes, so it is never left
+     half-faded — and comes back the same way when the visitor scrolls up
+     again. */
+  const headingY = useTransform(p, headingStepAt);
   /* The first caption arrives in the same moment, so the stage is never
      without words.
 
@@ -463,10 +531,10 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
         width,
         height,
         room,
+        stageHeight: stage.clientHeight,
         bezel: (width - viewport.offsetWidth) / 2,
         top,
         headingBottom,
-        headingHeight: heading.offsetHeight,
         start: 0,
       };
       next.start = startOffset(pose, startScale(next, pose), headingBottom, top, height);
@@ -493,49 +561,42 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
   }, [pose, timeline, measured]);
 
   return (
-    <section
-      id="features"
-      aria-labelledby="welcome-features-heading"
-      className="relative border-t border-[var(--border)] bg-[var(--surface-sunken)]"
-    >
+    <section id="features" aria-labelledby="welcome-features-heading" className="relative bg-[var(--background)]">
       <div ref={track} className={styles.track}>
         <div ref={stageRef} className={styles.stage}>
-          <motion.div
-            ref={headingRef}
-            className={styles.heading}
-            style={{ y: headingY, scale: headingScale }}
-            initial={false}
-            animate={
-              words.away
-                ? { opacity: 0, filter: "blur(6px)" }
-                : { opacity: 1, filter: "blur(0px)" }
-            }
-            transition={words.land ? LAND : HEADING_FADE}
-          >
-            <p className="eyebrow">What you get</p>
-            <h2
-              id="welcome-features-heading"
-              className="mx-auto mt-3 max-w-[13em] text-balance break-words font-[family-name:var(--font-display)] text-[clamp(1.875rem,1.2rem+3.4vw,4.25rem)] font-extrabold leading-[1.02] tracking-[-0.04em] text-[var(--foreground)] lg:mt-4"
+          <RoomLight progress={p} ceiling={ceiling} timeline={timeline} />
+
+          <motion.div ref={headingRef} className={styles.heading} style={{ y: headingY }}>
+            <motion.div
+              initial={false}
+              animate={words.away ? HEADING_AWAY : HEADING_BACK}
+              transition={words.land ? LAND : words.away ? HEADING_EXIT : HEADING_RETURN}
             >
-              One place for the{" "}
-              <span className="text-[var(--accent)]">people you talk to.</span>
-            </h2>
-            <p className="mx-auto mt-3 max-w-[34rem] text-balance text-[0.9375rem] leading-[1.5] text-[var(--text-secondary)] sm:text-base lg:mt-5 lg:text-lg">
-              {SCREEN_NOTE}
-            </p>
+              <SceneOpener
+                size="scene"
+                eyebrow={FEATURES_OPENER.eyebrow}
+                ink={FEATURES_OPENER.ink}
+                title={FEATURES_OPENER.title}
+                accent={FEATURES_OPENER.accent}
+                accentClassName="sm:block"
+                lead={<span id={SCREEN_NOTE_ID}>{SCREEN_NOTE}</span>}
+                leadClassName="text-pretty"
+                headingId="welcome-features-heading"
+                titleClassName="text-balance"
+              />
+            </motion.div>
           </motion.div>
 
           <div className={styles.region}>
-            {/* No name of its own: the sentence above already says what the
-                picture is, and each capture's alt text what it shows. */}
-            <figure className={styles.figure}>
+            {/* The note in the heading describes the picture; each capture's
+                alt text says what it shows. */}
+            <figure aria-describedby={SCREEN_NOTE_ID} className={styles.figure}>
               <div ref={slotRef} className={styles.slot}>
                 <div
                   ref={frameRef}
                   className={styles.frame}
                   style={{ perspective: `${pose.perspective}px` }}
                 >
-                  <motion.div aria-hidden="true" className={styles.glow} style={{ opacity: glow }} />
                   <motion.div
                     className={styles.screen}
                     style={{ x, y, scale, rotateX, originY: pose.originY }}
@@ -592,31 +653,154 @@ export function WelcomeFeaturesCinema({ features }: { features: readonly Feature
         </div>
       </div>
 
-      <div className="px-5 pb-20 pt-14 sm:px-8 sm:pb-24 sm:pt-20 lg:px-12 lg:pb-28">
-        <div className="mx-auto max-w-[1240px]">
-          <ul className="grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
-            {features.map((feature, index) => (
-              <Reveal as="li" key={feature.title} delay={index * 0.08} className="feature-row">
-                <FeatureRowBody feature={feature} />
-              </Reveal>
-            ))}
-          </ul>
+      <div className="frame pb-[var(--section-bottom)] pt-[var(--opener-gap)]">
+        <ul className="grid gap-8 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-9">
+          {features.map((feature, index) => (
+            <Reveal
+              as="li"
+              key={feature.title}
+              delay={Math.min(index, 4) * STAGGER.item}
+              className="feature-row"
+            >
+              <FeatureRowBody feature={feature} />
+            </Reveal>
+          ))}
+        </ul>
 
-          <RiseIn delay={features.length * 0.08} className="mt-10 w-fit">
-            <Link href="/features" className="premium-button-secondary focus-ring">
-              See every feature
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </RiseIn>
-        </div>
+        <Reveal delay={Math.min(features.length, 4) * STAGGER.item} className="mt-10 w-fit">
+          <Link href="/features" className="premium-button-secondary focus-ring">
+            See every feature
+            <ArrowRight className="arrow-nudge size-4" aria-hidden="true" />
+          </Link>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 /**
- * The next capture wiping in from the left over the one before, with a
- * bright edge running across and a slight settle of the incoming picture.
+ * One view's light on the room: the story's flood recipe (`floodPaint` in
+ * app-story-cinema.tsx) with a smaller core — lifted 36 % toward the core
+ * where the story lifts 44 %, the same 16 % a little past halfway, the full
+ * flood colour at 80 % of the way out, and down to the page colour at the
+ * stage's corners — under a foot of the page colour that fades it out above
+ * the caption strip, so the strip's floor never shows an edge in the light.
+ * Where it is seen, beside the screen, it is about as strong as the story's
+ * flood; it reads well under the story's strength only because the screen
+ * covers its brightest part. Both are painted in the room's own place.
+ */
+function roomPaint({ flood, core, lift }: ScreenView["room"]): string {
+  const foot = `linear-gradient(to top, #080711 var(--strip), rgb(8 7 17 / 0.9) calc(var(--strip) + 5.5%), rgb(8 7 17 / 0.5) calc(var(--strip) + 11%), rgb(8 7 17 / 0.1) calc(var(--strip) + 16.5%), rgb(8 7 17 / 0) calc(var(--strip) + 22%))`;
+  return `${foot}, radial-gradient(95% 75% at 50% 64%, ${mix(flood, core, 0.36 * lift)} 0%, ${mix(flood, core, 0.16 * lift)} 55%, ${flood} 80%, #080711 100%)`;
+}
+
+/**
+ * The room light: one layer per view. Each next view's light crosses the
+ * room from left to right while its wipe crosses the screen, so the colour
+ * of the room follows the wipe's edge: the wall on the left turns first, the
+ * one on the right last. The whole light comes up as the screen wakes and
+ * dims as it settles back; a page-coloured ceiling follows the screen up
+ * (`ceiling`). Decorative: opacity and transform only.
+ *
+ * Cheap to draw: outside a wipe only the current view's layer and the
+ * ceiling are drawn (the others are at opacity 0), and a crossing layer
+ * exists only while its wipe runs. The light's strength is set on each layer
+ * rather than on the room, so no group has to be drawn off screen first; the
+ * wipes run while the light is full, where the two are the same.
+ */
+function RoomLight({
+  progress,
+  ceiling,
+  timeline,
+}: {
+  progress: MotionValue<number>;
+  ceiling: MotionValue<number>;
+  timeline: Timeline;
+}) {
+  const [first, second] = timeline.wipes;
+  // A faint light from the sleeping screen, full once it faces the visitor,
+  // gone by the time the stage lets go.
+  const light = useTransform(progress, (value) => {
+    const wake = easeOut(unit(value, 0, timeline.rise - 0.06));
+    const dim = easeInOut(unit(value, timeline.settle, 1));
+    return (ROOM_ASLEEP + (1 - ROOM_ASLEEP) * wake) * (1 - dim);
+  });
+  // Each view's light is the room's once its wipe has finished crossing.
+  const ends = [Number.NEGATIVE_INFINITY, first[1], second[1], Number.POSITIVE_INFINITY];
+  const settled = SCREEN_VIEWS.map((_, index) => [ends[index], ends[index + 1]] as const);
+  return (
+    <div aria-hidden="true" className={styles.room}>
+      {SCREEN_VIEWS.map((view, index) => (
+        <RoomLayer key={view.id} progress={progress} light={light} range={settled[index]} view={view} />
+      ))}
+      <RoomSweep progress={progress} light={light} range={first} view={SCREEN_VIEWS[1]} />
+      <RoomSweep progress={progress} light={light} range={second} view={SCREEN_VIEWS[2]} />
+      <motion.div className={styles.ceiling} style={{ y: ceiling }} />
+    </div>
+  );
+}
+
+/** A view's light while it is the room's: from `range[0]` up to `range[1]`. */
+function RoomLayer({
+  progress,
+  light,
+  range,
+  view,
+}: {
+  progress: MotionValue<number>;
+  light: MotionValue<number>;
+  range: readonly [number, number];
+  view: ScreenView;
+}) {
+  const opacity = useTransform([progress, light], ([p, l]: number[]) =>
+    p >= range[0] && p < range[1] ? l : 0,
+  );
+  return <motion.div className={styles.roomLayer} style={{ opacity, background: roomPaint(view.room) }} />;
+}
+
+/**
+ * The next view's light crossing the room while its wipe runs: a window 130 %
+ * of the room's width with a soft right edge (the last 30 % of the room's
+ * width) slides from left of the room to right of it, and the light inside
+ * it slides the other way by as much, so the light itself stays where it is
+ * in the room and only the edge moves. Both are transforms, so nothing is
+ * repainted.
+ */
+function RoomSweep({
+  progress,
+  light,
+  range,
+  view,
+}: {
+  progress: MotionValue<number>;
+  light: MotionValue<number>;
+  range: readonly [number, number];
+  view: ScreenView;
+}) {
+  const wiped = useTransform(progress, [range[0], range[1]], [0, 1], { ease: easeInOut });
+  // In % of each element's own width: the window is 1.3 rooms wide, the light 1.
+  const windowX = useTransform(wiped, (w) => `${lerp(-100, 30, w) / 1.3}%`);
+  const lightX = useTransform(wiped, (w) => `${lerp(100, -30, w)}%`);
+  const opacity = useTransform([progress, light], ([p, l]: number[]) =>
+    p > range[0] && p < range[1] ? l : 0,
+  );
+  return (
+    <motion.div className={styles.sweep} style={{ x: windowX, opacity }}>
+      <motion.div
+        className={styles.sweepLight}
+        style={{ x: lightX, background: roomPaint(view.room) }}
+      />
+    </motion.div>
+  );
+}
+
+/** How much of the room light the screen gives off while it still lies back, dimmed. */
+const ROOM_ASLEEP = 0.3;
+
+/**
+ * The next capture wiping in from the left over the one before, with an edge
+ * lit in the incoming view's colour running across (as the story's wipes do)
+ * and a slight settle of the incoming picture.
  * The edge crosses the part of the capture the camera sees while it is
  * parked at `at` (all of it on a landscape window); what lies outside that
  * part is uncovered the moment the wipe starts or ends, out of sight.
@@ -662,21 +846,31 @@ function Wipe({
       <motion.div
         aria-hidden="true"
         className={styles.edge}
-        style={{ x: edgeX, opacity: edgeOpacity }}
+        style={{
+          x: edgeX,
+          opacity: edgeOpacity,
+          color: view.ink,
+          "--edge-core": view.room.core,
+        } as unknown as CSSProperties}
       />
     </>
   );
 }
 
-/** A caption comes in from below after the last one has gone up and out. */
+/** A caption comes in from below after the last one has gone up and out
+ * (the site's caption swap). */
 const CAPTION: Variants = {
-  shown: { opacity: 1, y: [10, 0], transition: { duration: 0.32, delay: 0.14, ease: EASE_OUT } },
-  hidden: { opacity: 0, y: -8, transition: { duration: 0.16, ease: EASE_OUT } },
+  shown: {
+    opacity: 1,
+    y: [SWAP.in.y, 0],
+    transition: { duration: SWAP.in.duration, delay: SWAP.in.delay, ease: EASE_OUT },
+  },
+  hidden: { opacity: 0, y: SWAP.out.y, transition: { duration: SWAP.out.duration, ease: EASE_IN } },
 };
 /** … or is simply there, when the stage lands somewhere new. */
 const CAPTION_LANDED: Variants = {
   shown: { opacity: 1, y: 0, transition: LAND },
-  hidden: { opacity: 0, y: -8, transition: LAND },
+  hidden: { opacity: 0, y: SWAP.out.y, transition: LAND },
 };
 
 /**
@@ -686,9 +880,10 @@ const CAPTION_LANDED: Variants = {
  * captions are laid out in the same cell, so the strip keeps the height of
  * the tallest. The strip stands on an opaque floor the width of the stage,
  * which the tilted screen's near edge sinks behind while it rises (and the
- * glow and shadow end on), so the words are always on the plain page colour;
- * each change is a short triggered crossfade, so they are either fully there
- * or not there.
+ * room light and the shadow end on), so the words are always on the plain
+ * page colour; each change is the site's caption swap, triggered, so they
+ * are either fully there or not there. The number and the segment take the
+ * view's colour, the room light's key in small type.
  */
 function Captions({
   view,
@@ -719,7 +914,10 @@ function Captions({
             initial={false}
             animate={index === view ? "shown" : "hidden"}
           >
-            <span className="text-[0.75rem] font-bold tabular-nums tracking-[0.12em] text-[var(--accent)]">
+            <span
+              className="text-[0.75rem] font-bold tabular-nums tracking-[0.12em]"
+              style={{ color: item.ink }}
+            >
               0{index + 1}
             </span>
             <span className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-[-0.02em] text-[var(--foreground)] lg:text-xl">
@@ -735,7 +933,7 @@ function Captions({
         transition={land ? LAND : SEGMENTS_FADE}
       >
         {segments.map((range, index) => (
-          <Segment key={SCREEN_VIEWS[index].id} progress={progress} range={range} />
+          <Segment key={SCREEN_VIEWS[index].id} progress={progress} range={range} view={SCREEN_VIEWS[index]} />
         ))}
       </motion.span>
       <span className={styles.lines}>
@@ -755,80 +953,23 @@ function Captions({
   );
 }
 
+/** One view's progress segment, filled in that view's colour. */
 function Segment({
   progress,
   range,
+  view,
 }: {
   progress: MotionValue<number>;
   range: readonly [number, number];
+  view: ScreenView;
 }) {
   const fill = useTransform(progress, [range[0], range[1]], [0, 1]);
   return (
     <span className={styles.segment}>
       <motion.span
-        className="absolute inset-0 origin-left rounded-full bg-[linear-gradient(90deg,#7b2ff7,#c026ff)]"
-        style={{ scaleX: fill }}
+        className="absolute inset-0 origin-left rounded-full"
+        style={{ scaleX: fill, background: `linear-gradient(90deg, ${view.room.core}, ${view.ink})` }}
       />
     </span>
-  );
-}
-
-/**
- * The link's entrance after the rows: it rises into place the first time it
- * scrolls into view. Unlike `Reveal`, it is shown at once the moment it (or
- * anything in it) takes keyboard focus, so focus never lands on something
- * that is not yet visible.
- */
-function RiseIn({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const opacity = useMotionValue(1);
-  const y = useMotionValue(0);
-  const running = useRef<AnimationPlaybackControls[]>([]);
-
-  useLayoutEffect(() => {
-    const node = ref.current;
-    if (!node || node.getBoundingClientRect().top < window.innerHeight) return;
-
-    opacity.set(0);
-    y.set(28);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        running.current = [
-          animate(opacity, 1, { duration: 0.7, delay, ease: EASE_OUT }),
-          animate(y, 0, { duration: 0.95, delay, ease: EASE_OUT }),
-        ];
-      },
-      { rootMargin: "0px 0px -8% 0px" },
-    );
-    observer.observe(node);
-    const stopped = running;
-    return () => {
-      observer.disconnect();
-      stopped.current.forEach((animation) => animation.stop());
-      opacity.set(1);
-      y.set(0);
-    };
-  }, [delay, opacity, y]);
-
-  function showNow() {
-    running.current.forEach((animation) => animation.stop());
-    opacity.set(1);
-    y.set(0);
-  }
-
-  return (
-    <motion.div ref={ref} className={className} style={{ opacity, y }} onFocusCapture={showNow}>
-      {children}
-    </motion.div>
   );
 }

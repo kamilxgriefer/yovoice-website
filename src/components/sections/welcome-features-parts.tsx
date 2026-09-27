@@ -1,5 +1,17 @@
 import type { LucideIcon } from "lucide-react";
 
+import { CHAPTERS, type StoryChapter } from "@/components/story/story-chapters";
+
+/** A story chapter's colours (`story-chapters.ts`), by its app screen. */
+function chapterLight(id: StoryChapter["screen"]["id"]): StoryChapter {
+  const chapter = CHAPTERS.find((candidate) => candidate.screen.id === id);
+  if (!chapter) throw new Error(`No story chapter for ${id}`);
+  return chapter;
+}
+const HOME_LIGHT = chapterLight("home");
+const CHATS_LIGHT = chapterLight("chats");
+const MOMENTS_LIGHT = chapterLight("moments");
+
 /**
  * Pieces the "What you get" section shares between its static layout and its
  * scroll cinema (`welcome-features-cinema.tsx`): the big-screen captures, the
@@ -21,6 +33,22 @@ export type Feature = {
 export const SCREEN_NOTE =
   "The same YO Voice in a modern browser, laid out for a big screen. The people and messages are sample content, not a live account.";
 
+/**
+ * How the section opens, the same words in both layouts (`SceneOpener`): the
+ * ruled eyebrow in the scene's ink, the title with its accent, and the note
+ * above as the lead, directly above the picture it describes. The ink is the
+ * story's Chats label, the colour the section's room light turns to.
+ */
+export const FEATURES_OPENER = {
+  eyebrow: "What you get",
+  title: "One place for the",
+  accent: "people you talk to.",
+  ink: CHATS_LIGHT.ink,
+} as const;
+
+/** The note's id, so the picture can point at it as its description. */
+export const SCREEN_NOTE_ID = "welcome-features-note";
+
 /** Every wide capture is 2160 × 1350 (16:10). */
 export const SCREEN_SIZE = { width: 2160, height: 1350 } as const;
 
@@ -29,6 +57,14 @@ export const SCREEN_SIZE = { width: 2160, height: 1350 } as const;
  * are the current desktop-layout captures on sample content; the alt text
  * describes only what each frame shows and leaves out the sample people's
  * names. Friends has no rail row of its own, so its frame shows More lit.
+ *
+ * `room` is the light each view throws on the room around the screen in the
+ * cinema (a deep `flood` of the view's dock colour, lifted toward its `core`
+ * by `lift`), and `ink` the light tint of the same hue for the wipe's edge,
+ * the caption's number and its progress segment. They are the story's own
+ * chapter values, read from `story-chapters.ts` rather than copied: Home
+ * violet, Chats cyan, and for Friends the magenta the story gives Moments,
+ * the other people-first view.
  */
 export const SCREEN_VIEWS = [
   {
@@ -36,6 +72,8 @@ export const SCREEN_VIEWS = [
     label: "Home",
     src: "/screenshots/current/home-wide-slim.webp",
     line: "Your people, what is live now and your recent chats, on one page.",
+    ink: HOME_LIGHT.ink,
+    room: { flood: HOME_LIGHT.flood, core: HOME_LIGHT.core, lift: HOME_LIGHT.lift },
     alt: "YO Voice Home on a large screen: the navigation rail with Home selected, a greeting, a Your people row of friends with their status, a Live now card with a voice waveform, a Got a minute? prompt to record a Voice Moment, your recent chats, and a Here and now card for a server.",
   },
   {
@@ -43,6 +81,8 @@ export const SCREEN_VIEWS = [
     label: "Chats",
     src: "/screenshots/current/chats-wide-slim.webp",
     line: "Private conversations, with search and New message up top.",
+    ink: CHATS_LIGHT.ink,
+    room: { flood: CHATS_LIGHT.flood, core: CHATS_LIGHT.core, lift: CHATS_LIGHT.lift },
     alt: "YO Voice Chats on a large screen: the navigation rail with Chats selected, a search field, Add friend and New message at the start of a row of friends, and a Messages list of private conversations with unread counts.",
   },
   {
@@ -50,6 +90,8 @@ export const SCREEN_VIEWS = [
     label: "Friends",
     src: "/screenshots/current/friends-wide-slim.webp",
     line: "Add friend, search, and All, Online, Requests and Blocked.",
+    ink: MOMENTS_LIGHT.ink,
+    room: { flood: MOMENTS_LIGHT.flood, core: MOMENTS_LIGHT.core, lift: MOMENTS_LIGHT.lift },
     alt: "YO Voice Friends on a large screen: an Add friend button, All, Online, Requests and Blocked filters, a search field for current friends, and a list of friends, each with a status and a message button.",
   },
 ] as const;

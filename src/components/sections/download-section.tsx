@@ -1,23 +1,41 @@
 import Link from "next/link";
 import { ArrowRight, Download, Globe2, Laptop, Monitor, Smartphone, type LucideIcon } from "lucide-react";
 
+import { CinemaSurface } from "@/components/animations/cinema-surface";
 import { Reveal } from "@/components/animations/reveal";
+import { SceneOpener } from "@/components/animations/scene-opener";
 import { BeYouFinale } from "@/components/sections/be-you-finale";
-import { PlatformDeck, ZoomHeading } from "@/components/sections/download-cinema";
+import { PlatformDeck } from "@/components/sections/download-cinema";
+import { MagneticCta } from "@/components/ui/magnetic-cta";
 import { currentReleaseAvailability } from "@/content/current-release";
 import { APP_ENTRY_PATH } from "@/lib/auth/auth-redirect";
+import { cn } from "@/lib/utils/cn";
 
 /**
  * The way in. Every sentence here is pinned by `tests/product-updates.test.ts`
  * and `tests/servers-landing.test.ts` — the desktop sentence appears exactly
- * twice — so the copy stays in this file and the scroll cinema only moves it:
- * the heading zooms into place (`ZoomHeading`), the four platform cards are
- * dealt from one fanned stack (`PlatformDeck`) and the identity panel rises
- * in. Without the cinema everything is drawn at rest in the same layout.
+ * twice — so the copy stays in this file and the scroll cinema only moves it.
  *
- * `finale` closes the page on the giant "Be You." (`BeYouFinale`). Only the
- * homepage asks for it (owner, 2026-09-26): /servers renders this section
- * too and ends on the way in, not on the homepage's last word.
+ * It sits on the homepage frame and opens the way every section does
+ * (`SceneOpener`): the ruled eyebrow in the openers' default ink
+ * (`--accent`), "Ready to find / your people?" rising word by word, and the
+ * lead. The four platform cards
+ * are then dealt from one fanned stack (`PlatformDeck`) and the identity
+ * panel rises in. Without the cinema everything is drawn at rest in the same
+ * layout.
+ *
+ * `finale` is the homepage: the section closes the page on the giant
+ * "Be You." (`BeYouFinale`), its title takes the scroll cinema's scene size,
+ * "Open YO Voice" answers the pointer the way every primary action on the
+ * homepage does (`MagneticCta`), and in the cinema it shares the page's one
+ * ground with Premium instead of a hairline. /servers renders this section
+ * too (owner, 2026-09-26) and ends on the way in, not on the homepage's last
+ * word: there it keeps the site's section title size — the page's own `<h1>`
+ * is that size, and only the homepage's scenes may outgrow their hero — its
+ * hairline and a still button.
+ *
+ * A server component: only the seam asks for the cinema (`CinemaSurface`),
+ * so the copy and the release data are not shipped as client code.
  *
  * The desktop cards carry no action: there are no desktop installers and no
  * published GitHub releases, and the Web card already links to the web app.
@@ -31,6 +49,11 @@ type PlatformCard = {
 };
 
 export function DownloadSection({ finale = false }: { finale?: boolean }) {
+  // A stacking context of its own, so the finale's flood can lie behind
+  // everything in it and still over its ground.
+  const ground = "relative isolate overflow-x-clip bg-[var(--background)] pt-[var(--opener-top)]";
+  const hairline = "border-t border-[var(--border)]";
+  const foot = finale ? "" : "pb-[var(--section-bottom)]";
   const platforms: PlatformCard[] = [
     {
       icon: Smartphone,
@@ -59,31 +82,34 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
   ];
 
   return (
-    <section
+    <CinemaSurface
       id="download"
       aria-labelledby="download-heading"
-      className={`relative overflow-x-clip border-t border-[var(--border)] bg-[var(--background)] pt-16 sm:pt-24 ${finale ? "" : "pb-16 sm:pb-24"}`}
+      className={cn(ground, hairline, foot)}
+      // In the cinema the homepage's finale shares the page's one ground with
+      // Premium instead of a hairline; /servers keeps its hairline.
+      cinemaClassName={cn(ground, finale ? "" : hairline, foot)}
     >
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-4xl text-center">
-          <Reveal>
-            <p className="eyebrow">YO Voice everywhere</p>
-          </Reveal>
-          <ZoomHeading id="download-heading" className="section-title">
-            Ready to find <span className="text-[var(--accent)]">your people?</span>
-          </ZoomHeading>
-          <Reveal delay={0.12}>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-[1.6] text-[var(--text-secondary)]">
-              Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones.
-            </p>
-          </Reveal>
-        </div>
+      <div className="frame">
+        <SceneOpener
+          className="max-w-4xl"
+          // /servers keeps the site's section title: its own heading is smaller.
+          size={finale ? "scene" : "section"}
+          eyebrow="YO Voice everywhere"
+          title="Ready to find"
+          accent="your people?"
+          accentClassName="sm:block"
+          headingId="download-heading"
+          titleClassName="text-balance"
+          leadClassName="text-pretty"
+          lead="Existing internal testers can review the current tester build, while the web app remains available in a modern browser. Public mobile and desktop releases remain separate milestones."
+        />
 
         {/* min-h on the description exists to equalize card heights when
             they sit in a row; stacked on mobile it only added blank space. */}
         <PlatformDeck
           id="mobile-downloads"
-          className="mt-10 grid gap-4 sm:mt-14 md:grid-cols-2 xl:grid-cols-4"
+          className="mt-[var(--opener-gap)] grid gap-4 md:grid-cols-2 xl:grid-cols-4"
           cards={platforms.map(({ icon: Icon, title, description, href, action }) => (
             <article key={title} className="panel flex flex-1 flex-col p-5 sm:p-6">
               <span className="icon-tile"><Icon className="size-[22px]" strokeWidth={1.8} aria-hidden="true"/></span>
@@ -91,7 +117,7 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
               <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)] md:min-h-20">{description}</p>
               {href && action ? (
                 <Link href={href} className="focus-ring mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold link-accent">
-                  {action}<ArrowRight className="size-4" aria-hidden="true"/>
+                  {action}<ArrowRight className="arrow-nudge size-4" aria-hidden="true"/>
                 </Link>
               ) : null}
             </article>
@@ -106,13 +132,19 @@ export function DownloadSection({ finale = false }: { finale?: boolean }) {
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">Your account contract remains shared across the web app and tester builds. Public mobile and desktop installers will be linked here only when they are genuinely available.</p>
             </div>
           </div>
-          <Link href={APP_ENTRY_PATH} className="premium-button focus-ring shrink-0">
-            Open YO Voice <ArrowRight className="size-4" aria-hidden="true"/>
-          </Link>
+          {finale ? (
+            <MagneticCta href={APP_ENTRY_PATH} wrapperClassName="shrink-0">
+              Open YO Voice <ArrowRight className="arrow-nudge size-4" aria-hidden="true"/>
+            </MagneticCta>
+          ) : (
+            <Link href={APP_ENTRY_PATH} className="premium-button focus-ring shrink-0">
+              Open YO Voice <ArrowRight className="arrow-nudge size-4" aria-hidden="true"/>
+            </Link>
+          )}
         </Reveal>
 
         {finale ? <BeYouFinale /> : null}
       </div>
-    </section>
+    </CinemaSurface>
   );
 }
