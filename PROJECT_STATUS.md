@@ -1,6 +1,6 @@
 # YO Voice Website — Project Status
 
-_Last updated: September 24, 2026_
+_Last updated: September 26, 2026_
 
 ## Summary
 
@@ -8,6 +8,48 @@ The marketing website at yovoice.app is now feature-complete: every page
 referenced from navigation or the footer exists, has real content, and
 every link/CTA resolves to something real. This document tracks what
 changed in this pass and what's intentionally deferred.
+
+## Homepage scroll cinema (September 2026)
+
+At the owner's request (2026-09-26: the whole site should have the scroll
+effect from a reference video, "strictly fitted to YO Voice") every homepage
+section now moves with the scroll. A new "Inside YO Voice" story follows the
+hero: a pinned phone turns through Home, Servers, Chats and Moments over
+floods of their dock colours, a numbered rail of chapter links follows, and
+"Stop scrolling. / Start talking." arrives behind the phone. The hero leaves
+in depth; the Welcome sentence lights up word by word beside a voice wave;
+YO Voice in a browser rises to nearly full screen and wipes through Home,
+Chats and Friends (panning across each on a phone); the five Server kinds
+stack as cards; the Premium ring spreads ripples; the Download cards are
+dealt from a stack; and the homepage closes on "Be You." (/servers keeps the
+plain Download section). No product claim changed.
+
+It is progressive enhancement: `useCinema()` keeps the static layout on the
+server, without JavaScript, under reduced motion and below 20rem x 32rem
+(rem, so large text on phones and short windows get the static layout).
+There is no scroll-snap, wheel handling, scroll library or timer;
+`CinemaScrollAnchor` re-lands URL fragments, reloads and back/forward
+arrivals once the cinema has grown the page. Rules, scope and contrast
+guarantees: `docs/design/design-system.md`, "Scroll cinema"; where each
+capture is used: `docs/design/current-screenshots.md`; pinned by
+`tests/homepage-cinema.test.ts`.
+
+The first cut was reviewed on four dimensions (visual QA at nine sizes,
+accessibility, engineering and performance, truth and repository rules),
+every finding was checked by an independent verifier, and the confirmed
+findings were fixed; a final check re-verified every fix and its new
+findings (a finale re-layout loop, restored positions after Back / Forward
+and after following the hero arrow, a deep-link sweep, stale text after a
+jump, forced-colour veils) were fixed too. Known limits: on phones the site
+footer is taller than the screen, so at the very bottom "Be You." has
+already scrolled off whole rather than resting under the header; arming the
+cinema after load still ends in one commit of about 220-270 ms on a 4x
+throttled phone (it was about 360 ms before it was deferred); the Welcome
+wave and sentence drive one motion value per bar or word; native
+find-in-page scrolling to a story chapter could not be exercised in
+headless Chromium (the chapter text it would find sits at that chapter's
+scroll position). Pre-existing and outside this work: at 150 % text on a
+desktop the header's buttons are taller than its 56 px bar.
 
 ## Continue with Google / Apple (September 2026)
 
@@ -146,7 +188,8 @@ content and behaviour did not.
 - **Surfaces**: `.panel` (flat surface, hairline, 16 px radius) replaced the
   blurred, glowing `.glass-panel`; buttons, fields, chips and badges lost their
   gradients, glows and sheen. The hero keeps its rotators, gradient headline and
-  one calm radial glow; every other section sits flat.
+  one calm radial glow; every other section sat flat until the homepage
+  scroll cinema (see "Homepage scroll cinema").
 - **Chrome**: 56 px header, full-screen mobile menu with focus trap and scroll
   lock, four-column footer.
 - **Auth and account**: one surface instead of a card in a card; one `<h1>` per

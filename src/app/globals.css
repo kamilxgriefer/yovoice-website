@@ -73,7 +73,14 @@
    genuinely new classes that must not outrank utilities go into
    `@layer components` at the end of this file. */
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 16px); background: var(--background); }
+html { scroll-padding-top: calc(var(--header-height) + 16px); background: var(--background); }
+/* Smooth only for jumps a visitor asks for on the page (a focused in-page
+   link, the story rail). A URL fragment on load, scroll restoration and a
+   route change jump instantly: on the homepage a smooth scroll would sweep
+   the visitor through every scroll-cinema scene on the way. */
+@media (prefers-reduced-motion: no-preference) {
+  html:focus-within { scroll-behavior: smooth; }
+}
 body {
   min-height: 100vh;
   margin: 0;

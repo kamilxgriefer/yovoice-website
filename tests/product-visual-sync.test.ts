@@ -209,7 +209,13 @@ test("no visitor page describes Servers as gated or switched off", async () => {
   // (app ADR-197); only Podcast recording is still off.
   for (const file of [
     "src/components/servers/servers-welcome.tsx",
+    // The scroll cinema (2026-09-26) moved the homepage copy into these.
+    "src/components/servers/servers-welcome-parts.tsx",
+    "src/components/servers/servers-welcome-cinema.tsx",
     "src/components/sections/welcome-features.tsx",
+    "src/components/sections/welcome-features-parts.tsx",
+    "src/components/sections/welcome-features-cinema.tsx",
+    "src/components/story/story-chapters.ts",
     "src/app/(marketing)/community/page.tsx",
     "src/app/(marketing)/safety/page.tsx",
     "src/app/(marketing)/help-center/page.tsx",
