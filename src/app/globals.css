@@ -441,6 +441,89 @@ img { user-select: none; -webkit-user-drag: none; }
 /* Section scale: 40 px desktop / 30 px phone, 800, tight tracking; copy at
    16 px / 1.6 on the secondary text token. */
 .section-title { margin-top: 1.25rem; font-family: var(--font-display), sans-serif; font-size: clamp(1.875rem,1.4rem + 1.5vw,2.5rem); line-height: 1.1; font-weight: 800; letter-spacing: -.025em; }
+
+/* The homepage frame and openers (scroll cinema, 2026-09-27): every section's
+   content starts on one edge — 100px at 1440, 340px at 1920 — and every
+   section opens the same way: a ruled eyebrow in the scene's ink, a title in
+   one of two display sizes, one lead measure. `--edge` resolves against the
+   element it pads, so a full-bleed stage can put its text on the frame. */
+:root {
+  --frame: 1240px;
+  --gutter: 1.25rem;
+  --edge: max(var(--gutter), calc((100% - var(--frame)) / 2));
+  --opener-top: calc(var(--header-height) + clamp(2rem, 6svh, 4.5rem));
+  --section-bottom: clamp(4rem, 3rem + 5vw, 8rem);
+  --opener-gap: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  --type-scene: clamp(2.5rem, 1rem + 5vw, 6rem);
+  --type-column: clamp(2.25rem, 1.25rem + 3vw, 4rem);
+}
+@media (min-width: 40rem) { :root { --gutter: 2rem; } }
+@media (min-width: 64rem) { :root { --gutter: 3rem; } }
+.frame {
+  width: 100%;
+  max-width: calc(var(--frame) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.opener-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--scene-ink, var(--accent));
+}
+.opener-rule {
+  display: block;
+  flex: none;
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left center;
+}
+.title-scene,
+.title-column {
+  margin-top: 1rem;
+  /* Optical edge: Inter 800's side bearing, so the stems meet the rule's edge. */
+  margin-inline-start: -.045em;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  overflow-wrap: break-word;
+  color: var(--foreground);
+}
+.title-scene { font-size: var(--type-scene); line-height: .98; }
+.title-column { font-size: var(--type-column); line-height: 1; }
+.opener-lead {
+  margin-top: 1.25rem;
+  max-width: 34rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+@media (min-width: 64rem) {
+  .opener-rule { width: 40px; }
+  .title-scene, .title-column { margin-top: 1.25rem; }
+  .opener-lead { margin-top: 1.5rem; font-size: 1.125rem; line-height: 1.55; }
+}
+/* A word of an opener title, split for its entrance: it rises out of its own
+   baseline. The clip keeps descenders (g, p, y) inside their paint box. */
+.opener-word {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding-bottom: .14em;
+  margin-bottom: -.14em;
+}
+.opener-word-inner { display: inline-block; }
+/* An arrow in a link or button leans the way it points on hover and focus. */
+.arrow-nudge { transition: transform .16s cubic-bezier(.22,1,.36,1); }
+@media (prefers-reduced-motion: no-preference) {
+  :is(a, button):is(:hover, :focus-visible) .arrow-nudge { transform: translateX(3px); }
+}
 .section-copy { margin-top: 1.25rem; max-width: 44rem; font-size: 1rem; line-height: 1.6; color: var(--text-secondary); }
 
 /* New building blocks for the slim layout. They are layered on purpose:

@@ -1,7 +1,14 @@
 "use client";
 
 import { useDeferredValue, useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
-import { useMotionValueEvent, useScroll, useSpring, type MotionValue } from "framer-motion";
+import {
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+  useVelocity,
+  type MotionValue,
+} from "framer-motion";
 
 /**
  * Scroll cinema: the homepage's scroll-driven scenes (owner request,
@@ -61,6 +68,27 @@ export const SCENE_SPRING = { stiffness: 170, damping: 32, mass: 0.3, restDelta:
 
 /** The site's one ease-out curve (the hero frames use it too). */
 export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+/** Exits leave faster than they came: a cut, not a drift. */
+export const EASE_IN = [0.55, 0, 1, 0.45] as const;
+/** Camera moves and wipes that start and land. */
+export const EASE_IN_OUT = [0.65, 0, 0.35, 1] as const;
+
+/**
+ * The motion language every scene speaks (2026-09-27): the durations,
+ * distances and staggers a triggered move may use. Scrubbed pictures follow
+ * the scroll through `SCENE_SPRING` instead.
+ */
+export const DUR = { micro: 0.16, swap: 0.32, text: 0.56, block: 0.9 } as const;
+export const STAGGER = { word: 0.03, line: 0.07, item: 0.08 } as const;
+/** How far text rises into place, in px. */
+export const RISE = { text: 16, line: 24, block: 36 } as const;
+/** A heading leaving a pinned stage. */
+export const EXIT = { duration: 0.28, y: -16, blur: 6 } as const;
+/** One caption or line handing over to the next. */
+export const SWAP = {
+  out: { duration: DUR.micro, y: -8 },
+  in: { duration: DUR.swap, y: 10, delay: 0.12 },
+} as const;
 
 type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>["offset"];
 
@@ -117,4 +145,16 @@ export function useRelocationJump(source: MotionValue<number>, follower: MotionV
     const justMounted = mountedAt.current === null || performance.now() - mountedAt.current < 250;
     if (justMounted || step > window.innerHeight * 1.5) follower.jump(latest);
   });
+}
+
+/**
+ * A lean, in degrees, that follows how fast the page is being scrolled and
+ * straightens when it stops — for giant decorative words only. Positive
+ * while scrolling down. Mount it only while the cinema is on.
+ */
+export function useScrollLean(max = 6): MotionValue<number> {
+  const { scrollY } = useScroll();
+  const velocity = useVelocity(scrollY);
+  const eased = useSpring(velocity, { stiffness: 260, damping: 44, mass: 0.6 });
+  return useTransform(eased, [-2600, 0, 2600], [-max, 0, max], { clamp: true });
 }
