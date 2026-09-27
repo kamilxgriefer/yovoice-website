@@ -1,7 +1,14 @@
 "use client";
 
-import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
-import { animate, motion, useTransform, type AnimationPlaybackControls } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  type AnimationPlaybackControls,
+  type MotionValue,
+} from "framer-motion";
 
 import {
   DUR,
@@ -11,6 +18,7 @@ import {
   RISE,
   STAGGER,
   justRelocated,
+  onRelocation,
   useCinema,
   useSceneProgress,
 } from "@/components/animations/cinema";
@@ -34,7 +42,9 @@ type OpenerSize = "scene" | "column" | "section";
  * scrubbed, and always finishes, so no text rests half-drawn; the whole
  * opener also settles a little as it crosses the window (transform only).
  * An opener already on screen when the cinema arms is drawn at rest, and
- * keyboard focus inside it draws it at rest at once.
+ * keyboard focus inside it draws it at rest at once. A relocation (a
+ * fragment, a restored position) draws every opener it lands on or passes
+ * in place, before the next paint.
  *
  * Without the cinema it is the same markup at rest: no split words, and the
  * title takes the site's standard section size (`.section-title`), which the
@@ -45,8 +55,11 @@ type OpenerSize = "scene" | "column" | "section";
  *
  * The title is plain text plus an optional accent (the words drawn in the
  * accent colour, always last): "A server for" + "every circle.". Its words
- * stay in one text flow — each word is a span, the spaces between them are
- * text — so screen readers and find in page read the title as written.
+ * are split into spans only while their entrance is waiting or running;
+ * before and after it the title is one run of plain text, so screen
+ * readers, find in page and copy read it as written (each split word is an
+ * inline-block, which the accessibility tree reads as a separate object with
+ * no space after it).
  */
 export function SceneOpener({
   eyebrow,
@@ -91,16 +104,23 @@ export function SceneOpener({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const leadRef = useRef<HTMLParagraphElement>(null);
   const settle = useRef<(() => void) | null>(null);
+  // True only while the entrance is waiting or running: the words are split.
+  const [cue, setCue] = useState(false);
+  // The shared settle, written by `OpenerSettle` while the cinema is on.
+  const settleY = useMotionValue(0);
 
-  // The shared settle: the opener rises the last few pixels as it crosses
-  // the window. Transform only, so the text stays crisp.
-  const progress = useSceneProgress(root, ["start end", "start 0.35"]);
-  const settleY = useTransform(progress, [0, 1], [32, 0]);
-
+  // An opener still below the window when the cinema arms waits for its cue.
   useLayoutEffect(() => {
     const node = root.current;
     if (!cinema || !node) return;
     if (node.getBoundingClientRect().top < window.innerHeight) return;
+    setCue(true);
+    return () => setCue(false);
+  }, [cinema]);
+
+  useLayoutEffect(() => {
+    const node = root.current;
+    if (!cinema || !cue || !node) return;
 
     const rule = eyebrowRef.current?.querySelector<HTMLElement>(".opener-rule") ?? null;
     const label = eyebrowRef.current?.querySelector<HTMLElement>(".opener-label") ?? null;
@@ -128,6 +148,18 @@ export function SceneOpener({
 
     hide();
     let running: AnimationPlaybackControls[] = [];
+    let done = false;
+    // Drawn at rest: the split words go back to one run of text.
+    const finish = () => {
+      if (done) return;
+      done = true;
+      stopWatching();
+      observer.disconnect();
+      running.forEach((animation) => animation.stop());
+      running = [];
+      clear();
+      setCue(false);
+    };
     const play = () => {
       const wordsEnd = 0.12 + STAGGER.word * Math.min(words.length, 12);
       running = [
@@ -152,32 +184,42 @@ export function SceneOpener({
             ]
           : []),
       ];
+      // Once every part has landed, the title is plain text again.
+      const all = running;
+      void Promise.all(all).then(() => {
+        if (running === all) finish();
+      });
     };
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
+        const entry = entries.find((candidate) => candidate.isIntersecting);
+        if (!entry) return;
         observer.disconnect();
+        stopWatching();
         // Arrived by a link or a restored position: drawn in place.
-        if (justRelocated()) clear();
+        if (justRelocated(entry.time)) finish();
         else play();
       },
       { rootMargin: "0px 0px -12% 0px" },
     );
     observer.observe(node);
+    // A relocation that lands on the opener, or past it, draws it in place
+    // before the next paint, so its heading never blinks out.
+    const stopWatching = onRelocation(() => {
+      if (node.getBoundingClientRect().top < window.innerHeight * 0.88) finish();
+    });
 
-    const toRest = () => {
+    settle.current = finish;
+    return () => {
+      settle.current = null;
+      stopWatching();
       observer.disconnect();
       running.forEach((animation) => animation.stop());
       running = [];
       clear();
     };
-    settle.current = toRest;
-    return () => {
-      settle.current = null;
-      toRest();
-    };
-  }, [cinema]);
+  }, [cinema, cue]);
 
   // Pinned stages: off the stage and back, always completing.
   const wasAway = useRef<boolean | null>(null);
@@ -215,6 +257,7 @@ export function SceneOpener({
 
   return (
     <motion.div ref={root} className={className} style={cinema ? { y: settleY } : undefined}>
+      {cinema ? <OpenerSettle target={root} into={settleY} /> : null}
       <div ref={body} onFocusCapture={() => settle.current?.()}>
         {eyebrowSlot ? (
           <div ref={eyebrowRef as never}>{eyebrowSlot}</div>
@@ -229,14 +272,14 @@ export function SceneOpener({
           </p>
         ) : null}
         <h2 ref={titleRef} id={headingId} className={cn(titleClass, titleClassName)}>
-          {cinema ? splitWords(title, "t") : title}
+          {/* The space before the accent stays inside the title's own text:
+              Chrome drops a whitespace-only text node that follows React's
+              server-rendered text separator from the accessibility tree. */}
+          {cue ? splitWords(accent ? `${title} ` : title, "t") : accent ? `${title} ` : title}
           {accent ? (
-            <>
-              {" "}
-              <span className={cn("text-[var(--accent)]", accentClassName)}>
-                {cinema ? splitWords(accent, "a") : accent}
-              </span>
-            </>
+            <span className={cn("text-[var(--accent)]", accentClassName)}>
+              {cue ? splitWords(accent, "a") : accent}
+            </span>
           ) : null}
         </h2>
         {lead ? (
@@ -247,6 +290,23 @@ export function SceneOpener({
       </div>
     </motion.div>
   );
+}
+
+/**
+ * The opener's settle: it rises the last few pixels as it crosses the
+ * window, finishing by the time its eyebrow reaches the voice line's head
+ * (62 % down the window), so the line's tick meets the eyebrow where it
+ * rests. Transform only, so the text stays crisp. Mounted only while the
+ * cinema is on, so the static layout measures nothing.
+ */
+function OpenerSettle({ target, into }: { target: RefObject<HTMLDivElement | null>; into: MotionValue<number> }) {
+  const progress = useSceneProgress(target, ["start end", "start 0.62"]);
+  useMotionValueEvent(progress, "change", (value) => into.set(32 * (1 - value)));
+  useEffect(() => {
+    into.set(32 * (1 - progress.get()));
+    return () => into.set(0);
+  }, [progress, into]);
+  return null;
 }
 
 /**

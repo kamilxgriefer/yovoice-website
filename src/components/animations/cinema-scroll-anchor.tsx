@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
-import { CINEMA_QUERY, useCinema } from "@/components/animations/cinema";
+import { CINEMA_QUERY, relocate, useCinema } from "@/components/animations/cinema";
 
 const STORAGE_KEY = "yovoice:home-scroll";
 
 type SavedPosition = { y: number; cinema: boolean; width: number };
+
+/** Where the visitor is reading: the nth part of the page, and how far into it. */
+type Place = { index: number; fraction: number };
 
 const subscribeToNothing = () => () => {};
 
@@ -30,8 +33,16 @@ const subscribeToNothing = () => () => {};
  *   a reload or a back/forward arrival returns to the saved position if it
  *   was saved in the same layout at the same width.
  *
- * Every jump is instant: `html { scroll-behavior: smooth }` would otherwise
- * sweep the visitor through every scene on the way.
+ * - when the cinema switches on or off later in the visit (reduced motion
+ *   toggled, a phone rotated below the cinema's height, a window resized),
+ *   or a new width reflows its pinned tracks, the page changes length under
+ *   the visitor again, so they are put back in the same section, the same
+ *   distance into it. The same holds when the cinema first arms after the
+ *   visitor has already scrolled the static layout.
+ *
+ * Every jump is instant and made as a relocation (`relocate`), so the scenes
+ * draw in place: `html { scroll-behavior: smooth }` would otherwise sweep the
+ * visitor through every scene on the way.
  */
 export function CinemaScrollAnchor() {
   const cinema = useCinema();
@@ -42,9 +53,22 @@ export function CinemaScrollAnchor() {
   const cinemaNow = useRef(cinema);
   const saved = useRef<SavedPosition | null | undefined>(undefined);
   const handled = useRef(false);
+  // The layout on screen, where the visitor last was in it, and — between a
+  // layout switch committing and the landing below — where they were before.
+  const rendered = useRef<boolean | null>(null);
+  const place = useRef<Place | null>(null);
+  const pending = useRef<Place | null | undefined>(undefined);
 
   useEffect(() => {
     cinemaNow.current = cinema;
+  }, [cinema]);
+
+  // Runs in the commit that swaps the layout, before anything is painted or
+  // scrolled in it: from here until the landing, the last place read in the
+  // old layout is the one to return to.
+  useLayoutEffect(() => {
+    if (rendered.current !== null && rendered.current !== cinema) pending.current = place.current;
+    rendered.current = cinema;
   }, [cinema]);
 
   useEffect(() => {
@@ -58,7 +82,9 @@ export function CinemaScrollAnchor() {
     // already have clamped or reset the scroll.
     let lastY = window.scrollY;
     const track = () => {
-      if (window.location.pathname === home) lastY = window.scrollY;
+      if (window.location.pathname !== home) return;
+      lastY = window.scrollY;
+      if (pending.current === undefined) place.current = readPlace();
     };
     // When the position was last taken on the way out; a later unmount keeps it.
     let savedAt = -Infinity;
@@ -92,12 +118,28 @@ export function CinemaScrollAnchor() {
       if (window.location.pathname !== home) save(lastY);
     };
     const hide = () => save();
+    // A new width (a phone rotated, a window resized) reflows every pinned
+    // track before the cinema can switch, and the browser keeps the raw
+    // position, which is now in another scene: put the visitor back first.
+    // Resize steps run before the scroll steps, so the place is still the
+    // one read before the new width.
+    let width = document.documentElement.clientWidth;
+    const reflow = () => {
+      const next = document.documentElement.clientWidth;
+      if (next === width) return;
+      width = next;
+      if (pending.current !== undefined || !place.current || window.scrollY <= 0) return;
+      const top = placeTop(place.current);
+      if (top !== null) relocate(() => window.scrollTo({ top, behavior: "instant" }));
+    };
+    window.addEventListener("resize", reflow);
     window.addEventListener("scroll", track, { passive: true });
     document.addEventListener("click", follow, true);
     window.addEventListener("popstate", travel);
     window.addEventListener("pagehide", hide);
     return () => {
       if (performance.now() - savedAt > 2000) save(lastY);
+      window.removeEventListener("resize", reflow);
       window.removeEventListener("scroll", track);
       document.removeEventListener("click", follow, true);
       window.removeEventListener("popstate", travel);
@@ -107,19 +149,69 @@ export function CinemaScrollAnchor() {
   }, []);
 
   useEffect(() => {
-    if (handled.current) return;
+    // The scenes have committed with this render, and reading the layout to
+    // scroll lays their tracks out, so every landing runs right here. Not in
+    // an animation frame: a scroll made there is measured by the scenes a
+    // frame late, and they would paint their opening pose once at the target.
+    const from = pending.current;
+    const back = () => {
+      pending.current = undefined;
+      if (from && window.scrollY > 0) {
+        const top = placeTop(from);
+        if (top !== null) relocate(() => window.scrollTo({ top, behavior: "instant" }));
+      }
+      place.current = readPlace();
+    };
+
+    if (handled.current) {
+      // The cinema switched on or off mid-visit.
+      back();
+      return;
+    }
     // Wait for the cinema's layout if this visit will have one.
     if (window.matchMedia(CINEMA_QUERY).matches && !cinema) return;
 
-    // The scenes have committed with this render, and reading the layout to
-    // scroll lays their tracks out, so the landing runs right here. Not in
-    // an animation frame: a scroll made there is measured by the scenes a
-    // frame late, and they would paint their opening pose once at the target.
     handled.current = true;
-    landing(cinema, documentLoad, saved.current ?? null)?.();
+    const land = landing(cinema, documentLoad, saved.current ?? null);
+    if (land) {
+      pending.current = undefined;
+      relocate(land);
+      place.current = readPlace();
+    } else {
+      // No fragment or saved position: stay where the visitor already was.
+      back();
+    }
   }, [cinema, documentLoad]);
 
   return null;
+}
+
+/** The page's parts in reading order: its sections, then the footer. */
+function parts(): HTMLElement[] {
+  return Array.from(document.querySelectorAll<HTMLElement>("#main-content > section, body footer"));
+}
+
+/** How far down the window the visitor is taken to be reading. */
+const READING_LINE = 0.3;
+
+function readPlace(): Place | null {
+  const line = window.innerHeight * READING_LINE;
+  const all = parts();
+  for (let index = all.length - 1; index >= 0; index -= 1) {
+    const rect = all[index].getBoundingClientRect();
+    if (rect.top <= line) {
+      return { index, fraction: Math.min(1, Math.max(0, (line - rect.top) / Math.max(1, rect.height))) };
+    }
+  }
+  return null;
+}
+
+/** The scroll position that puts `place` back on the reading line. */
+function placeTop(place: Place): number | null {
+  const part = parts()[place.index];
+  if (!part) return null;
+  const rect = part.getBoundingClientRect();
+  return Math.max(0, rect.top + window.scrollY + place.fraction * rect.height - window.innerHeight * READING_LINE);
 }
 
 function readSaved(): SavedPosition | null {

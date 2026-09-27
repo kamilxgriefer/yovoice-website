@@ -1,6 +1,6 @@
 # YO Voice Website — Project Status
 
-_Last updated: September 26, 2026_
+_Last updated: September 27, 2026_
 
 ## Summary
 
@@ -48,8 +48,50 @@ throttled phone (it was about 360 ms before it was deferred); the Welcome
 wave and sentence drive one motion value per bar or word; native
 find-in-page scrolling to a story chapter could not be exercised in
 headless Chromium (the chapter text it would find sits at that chapter's
-scroll position). Pre-existing and outside this work: at 150 % text on a
-desktop the header's buttons are taller than its 56 px bar.
+scroll position).
+
+### Next-level pass (2026-09-27)
+
+At the owner's request ("go a step further", plus a "last touch" and
+alignment) the homepage was tightened and taken further:
+
+- **One frame.** Every section, the header and the footer start on one edge
+  (`.frame`, 1240 px plus gutters: 100 px at 1440, 340 px at 1920, 48 px at
+  1280 and 1024, 20 px on phones); `/servers` moved onto it too. The header
+  row joins the frame wherever it fits and switches to the menu below
+  72.5rem; the bar grows with the visitor's text size
+  (`--header-height: max(56px, 3.5rem)`), so its controls and focus rings
+  stay inside it at 150-200 % text.
+- **One opener.** Every section opens the same way (`SceneOpener`): a ruled
+  eyebrow in the scene's ink, a title in one of two display sizes whose
+  words rise out of their baseline once, and one lead. The words are split
+  only while they rise, so screen readers and find in page read each title
+  as written.
+- **A real 3D phone.** The story's phone is WebGL (the new dependency
+  `ogl` ^1.0.11, Unlicense, about 18 KB gzip with the engine, loaded lazily
+  and only in the homepage cinema), textured with the same four captures.
+  It is refused on software rendering, under 4 GB of device memory, with
+  Save-Data and in forced colours, and hands back to the CSS phone (which
+  stays mounted underneath) if it cannot keep up or loses its context. On
+  wide screens the finale fans all four screens out under "Start talking.".
+- **Motion language.** Shared durations, staggers and distances
+  (`src/components/animations/motion.ts`), a pointer-leaning `MagneticCta`
+  for primary actions, kinetic giant words that lean with the scroll speed
+  (never after a jump), a voice line down the frame's edge on wide screens,
+  and colour brought back later in the page (the story's violet seam into
+  Welcome, the What you get room light, the finale flood).
+- **Keeping the visitor's place.** Any jump the page makes (a fragment, a
+  restored position) draws the scenes in place before the next paint, and
+  when the layout changes under the visitor (reduced motion toggled, a
+  phone rotated, a new window width) `CinemaScrollAnchor` puts them back in
+  the same section, the same distance in.
+
+The pass was reviewed again on the same four dimensions with an independent
+verifier per finding, and the confirmed findings were fixed. Known limits:
+the 3D phone is refused on software rendering, so headless browsers and
+machines without GPU acceleration always see the CSS phone; between about
+1160 and 1208 px, and at large text on wide windows, the header row keeps
+the room its links need instead of sitting on the frame edge.
 
 ## Continue with Google / Apple (September 2026)
 

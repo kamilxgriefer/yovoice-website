@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { animate, motion, useMotionValue, type AnimationPlaybackControls } from "framer-motion";
 
-import { EASE_OUT, justRelocated, useCinema } from "@/components/animations/cinema";
+import { EASE_OUT, justRelocated, onRelocation, useCinema } from "@/components/animations/cinema";
 
 const ELEMENTS = {
   div: motion.div,
@@ -19,7 +19,9 @@ const ELEMENTS = {
  * half-faded where a visitor happened to stop scrolling. The server render,
  * reduced motion and the no-cinema layouts all draw it at rest, and when the
  * cinema arms after hydration only what is still below the fold is hidden,
- * so nothing already on screen blinks out and back in.
+ * so nothing already on screen blinks out and back in. A relocation (a
+ * fragment, a restored position) draws every block it lands on or passes in
+ * place, before the next paint.
  *
  * Keyboard focus never waits for the entrance: the moment anything inside
  * receives focus the block is drawn at rest, at once, so a focused link is
@@ -57,10 +59,12 @@ export function Reveal({
     let running: AnimationPlaybackControls[] = [];
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
+        const entry = entries.find((candidate) => candidate.isIntersecting);
+        if (!entry) return;
         observer.disconnect();
+        stopWatching();
         // Arrived by a link or a restored position: drawn in place.
-        if (justRelocated()) {
+        if (justRelocated(entry.time)) {
           opacity.set(1);
           y.set(0);
           return;
@@ -75,11 +79,16 @@ export function Reveal({
     observer.observe(node);
     // Waiting or still rising: either way, straight to rest.
     const toRest = () => {
+      stopWatching();
       observer.disconnect();
       running.forEach((animation) => animation.stop());
       opacity.set(1);
       y.set(0);
     };
+    // A relocation that lands on the block, or past it: drawn in place.
+    const stopWatching = onRelocation(() => {
+      if (node.getBoundingClientRect().top < window.innerHeight * 0.92) toRest();
+    });
     settle.current = toRest;
 
     return () => {

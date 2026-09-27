@@ -62,8 +62,11 @@
   /* The one shadow left on the site: floating chrome (menus, popovers) that
      must separate from content; cards and buttons sit flat on the surface. */
   --shadow-float: 0 16px 40px rgba(0,0,0,.42);
-  /* The fixed SiteHeader is this tall; every page pads the top by it. */
-  --header-height: 56px;
+  /* The fixed SiteHeader is this tall; every page pads the top by it. It
+     grows with the visitor's text size (3.5rem is 56px at 16px), so the
+     header's controls and their focus rings stay inside the bar at 150-200 %
+     text, and every offset that reads the token follows. */
+  --header-height: max(56px, 3.5rem);
 }
 
 /* Everything below is deliberately UNLAYERED. Tailwind v4 declares
@@ -500,6 +503,11 @@ img { user-select: none; -webkit-user-drag: none; }
 }
 .title-scene { font-size: var(--type-scene); line-height: .98; }
 .title-column { font-size: var(--type-column); line-height: 1; }
+/* The narrowest phones (under 356px): every scene title a touch smaller, at
+   most 11vw, so consecutive scenes keep one size and none sets a word alone. */
+@media (max-width: 22.25rem) {
+  .title-scene { font-size: min(var(--type-scene), 11vw); }
+}
 .opener-lead {
   margin-top: 1.25rem;
   max-width: 34rem;

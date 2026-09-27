@@ -329,7 +329,7 @@ test("the story and What you get show only current captures, honestly framed", a
   for (const asset of wide) await access(`public${asset}`);
 
   // The frames are sample-content renders: the drawn window claims no live
-  // address or lock, and the note under them says so.
+  // address or lock, and the note above them says so.
   assert.match(parts, /export const SCREEN_NOTE =\s*"[^"]*\bsample content\b[^"]*";/);
   assert.doesNotMatch(withoutComments(parts), /app\.yovoice\.app|<Lock\b/);
 
@@ -356,15 +356,25 @@ test("the design system documents the cinema as an owner-approved exception", as
 
 test("every section opens the same way, and the static layout keeps the plain title", async () => {
   const opener = await readFile("src/components/animations/scene-opener.tsx", "utf8");
-  // Words are split for their entrance only while the cinema is on.
-  assert.match(opener, /\{cinema \? splitWords\(title, "t"\) : title\}/);
+  // Words are split only while their entrance waits or runs; before and
+  // after it the title is one run of text (and the space before the accent
+  // stays inside it, where Chrome's accessibility tree keeps it).
+  assert.match(opener, /\{cue \? splitWords\(accent \? `\$\{title\} ` : title, "t"\) : accent \? `\$\{title\} ` : title\}/);
+  assert.match(opener, /\{cinema \? <OpenerSettle target=\{root\} into=\{settleY\} \/> : null\}/);
   assert.match(opener, /cinema && size !== "section" \? \(size === "scene" \? "title-scene" : "title-column"\) : "section-title"/);
-  // A jump or restored position draws it in place; focus draws it at rest.
-  assert.match(opener, /if \(justRelocated\(\)\) clear\(\);\s*else play\(\);/);
+  // A jump or restored position draws it in place, judged by when the
+  // intersection was seen, and a landing draws it before the next paint;
+  // focus draws it at rest.
+  assert.match(opener, /if \(justRelocated\(entry\.time\)\) finish\(\);\s*else play\(\);/);
+  assert.match(opener, /onRelocation\(/);
   assert.match(opener, /onFocusCapture=\{\(\) => settle\.current\?\.\(\)\}/);
 
   for (const file of [
     "src/components/story/app-story-static.tsx",
+    "src/components/story/app-story-cinema.tsx",
+    "src/components/sections/welcome-intro.tsx",
+    "src/components/sections/welcome-features.tsx",
+    "src/components/servers/servers-welcome.tsx",
     "src/components/sections/welcome-intro-cinema.tsx",
     "src/components/sections/welcome-features-cinema.tsx",
     "src/components/servers/servers-welcome-sheet.tsx",
@@ -397,4 +407,53 @@ test("primary actions lean toward the pointer without adding a Tab stop", async 
   assert.match(cta, /tabIndex=\{-1\}/);
   assert.match(cta, /\(hover: hover\) and \(pointer: fine\)/);
   assert.match(cta, /useReducedMotion\(\)/);
+});
+
+test("a layout change keeps the visitor's place, and every page jump is a relocation", async () => {
+  const [anchor, cinema] = await Promise.all([
+    readFile("src/components/animations/cinema-scroll-anchor.tsx", "utf8"),
+    readFile("src/components/animations/cinema.ts", "utf8"),
+  ]);
+  // The landings go through `relocate`, so scenes draw in place whatever the distance.
+  assert.match(cinema, /export function relocate\(jump: \(\) => void\)/);
+  assert.match(cinema, /export function onRelocation\(listener: \(\) => void\)/);
+  assert.match(anchor, /relocate\(land\)/);
+  // The cinema switching mid-visit (or its first arming after a scroll) puts
+  // the visitor back in the same section, the same distance in; so does a
+  // new width, before the cinema can switch.
+  assert.match(anchor, /if \(rendered\.current !== null && rendered\.current !== cinema\) pending\.current = place\.current;/);
+  assert.match(anchor, /addEventListener\("resize", reflow\)/);
+  assert.match(anchor, /#main-content > section, body footer/);
+});
+
+test("the giant words' lean ignores jumps and comes to rest", async () => {
+  const cinema = await readFile("src/components/animations/cinema.ts", "utf8");
+  const lean = cinema.slice(cinema.indexOf("export function useScrollLean("));
+  assert.match(lean, /justRelocated\(\) \? 0 : speed/);
+  assert.match(lean, /onRelocation\(\(\) => eased\.jump\(0\)\)/);
+  assert.match(lean, /restDelta: 5, restSpeed: 50/);
+});
+
+test("a primary action's lift and lean add up, and its ring grows evenly", async () => {
+  const cta = await readFile("src/components/ui/magnetic-cta.tsx", "utf8");
+  assert.match(cta, /useTransform\(\(\) => springY\.get\(\) \+ lift\.get\(\)\)/);
+  assert.doesNotMatch(cta, /whileHover/);
+  assert.match(cta, /outlineOffset: \["0px", "10px"\]/);
+});
+
+test("the documented motion tokens are the ones the code uses", async () => {
+  const [motion, doc] = await Promise.all([
+    readFile("src/components/animations/motion.ts", "utf8"),
+    readFile("docs/design/design-system.md", "utf8"),
+  ]);
+  // Server-safe, so server components read plain numbers.
+  assert.doesNotMatch(motion, /^"use client";/m);
+  for (const [name, unit] of [["DUR", " s"], ["STAGGER", " s"], ["RISE", " px"]] as const) {
+    const body = new RegExp(`export const ${name} = \\{([^}]*)\\}`).exec(motion)?.[1];
+    assert.ok(body, `${name} is exported from motion.ts`);
+    const pairs = [...body.matchAll(/(\w+): ([\d.]+)/g)].map(([, key, value]) => `${key} ${value.replace(/^0\./, ".")}`);
+    const documented = new RegExp(`\`${name}\` \\(([^)]*)\\)`).exec(doc.replace(/\s+/g, " "))?.[1];
+    assert.ok(documented, `${name} is documented`);
+    assert.equal(documented, `${pairs.join(", ")}${unit}`, `${name} in the doc matches motion.ts`);
+  }
 });

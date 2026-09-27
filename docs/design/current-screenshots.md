@@ -169,6 +169,11 @@ Rules: `docs/design/design-system.md`, "Scroll cinema".
   one turning phone that is `aria-hidden` (the chapter text carries the
   meaning and the hero already describes each screen); without it they are
   four still phones, each with a short chapter-specific alt text.
+- **The 3D phone (2026-09-27).** With WebGL on a real GPU the same four
+  captures are the textures of a 3D phone: the 640 px WebP the page already
+  loads through the image optimizer, unlit, never retouched. On wide screens
+  all four appear together under "Start talking." at the end of the story.
+  Where WebGL is refused, the CSS phone above shows them one at a time.
 - **What you get** shows the three /updates wide frames inside a drawn
   browser window (three dots, no address, no lock), with a note that the
   people and messages are sample content. Without the cinema only Home is
