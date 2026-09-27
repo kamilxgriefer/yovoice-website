@@ -3,9 +3,10 @@ import { Camera, Geometry, Mesh, Program, Renderer, Texture, Transform, type OGL
 import type { PhonePose, Rgb } from "@/components/story/story-pose";
 
 /**
- * The story's phone as a lit 3D object (OGL, about 15 KB gzip; loaded only
- * with the scroll cinema, as the story approaches, and only where WebGL 2
- * runs on a real GPU — see `story-phone-canvas.tsx`).
+ * The story's phone as a lit 3D object (OGL, about 18 KB gzip with the
+ * engine; loaded only with the scroll cinema, as the visitor scrolls toward
+ * the story, and only where WebGL 2 runs on a real GPU — see
+ * `story-phone-canvas.tsx`).
  *
  * A generic device: a bevelled rounded slab in a lilac titanium, dark glass
  * front and back, two side keys, and the screen. No camera bump, notch or
@@ -14,10 +15,12 @@ import type { PhonePose, Rgb } from "@/components/story/story-pose";
  * white key, a top light and rims in the current dock colour — so the GPU
  * does a few smoothsteps per pixel and nothing is precomputed.
  *
- * The screen shows the app's own captures unlit and not tone-mapped, so
- * their colours are exact; only the wipe's glowing edge and a faint glass
- * glare (at most +0.06) are added on top. It draws only when asked to — once
- * per frame while the story's progress changes — and never on its own.
+ * The screen shows the app's own captures (the same WebP files as the CSS
+ * phone) unlit and not tone-mapped; only the wipe's glowing edge and a faint
+ * glass glare are added on top — at most +0.06 face-on, rising to a Fresnel
+ * sheen of about +0.2 at grazing angles while the phone turns. It draws only
+ * when asked to — once per frame while the story's progress changes — and
+ * never on its own.
  */
 
 const CAPTURE_RATIO = 1206 / 2622;
@@ -33,20 +36,26 @@ const BEVEL = 0.03;
 /** The camera never moves; the field of view sets the phone's pixel size. */
 const CAMERA_Z = 5.4;
 
+/** Where one device of the finale's range comes to rest. */
+type Slot = { x: number; y: number; z: number; ry: number; rz: number; s: number };
+
 /**
- * The finale's range, left to right: Home, Servers and Chats come out from
- * behind the phone, which (on Moments) takes the last place. Sized so the
- * phones' tops stay under "Start talking.".
+ * The finale's range, low under "Start talking." in a slight arc, left to
+ * right: Home, Servers, the phone itself (on Moments, a little larger and
+ * forward) and Chats. The phone settles just right of the centre, across
+ * it, so the middle of the row is never an empty gap; Home, Servers and
+ * Chats come out from behind it at the centre and move straight out to
+ * their places, Home (the furthest) first, so no two paths cross. Sized so
+ * the phones' tops stay under the line's descenders.
  */
-const SLOTS = [
-  { x: -1.36, y: -0.88, z: -0.34, ry: 24, rz: 5 },
-  { x: -0.45, y: -0.8, z: 0, ry: 8, rz: 1.5 },
-  { x: 0.45, y: -0.8, z: 0, ry: -8, rz: -1.5 },
-  { x: 1.36, y: -0.88, z: -0.34, ry: -24, rz: -5 },
+const LEAD_SLOT: Slot = { x: 0.2, y: -0.815, z: 0.1, ry: -6, rz: -1, s: 0.54 };
+const SLOTS: readonly Slot[] = [
+  { x: -1.075, y: -0.91, z: -0.34, ry: 22, rz: 4.5, s: 0.5 },
+  { x: -0.445, y: -0.83, z: -0.08, ry: 9, rz: 1.5, s: 0.5 },
+  { x: 0.84, y: -0.88, z: -0.24, ry: -18, rz: -3.5, s: 0.5 },
 ];
-const FAN_SCALE = 0.5;
 /** When each of Home, Servers and Chats sets off, as a share of the move. */
-const FAN_DELAY = [0.3, 0.12, 0.2];
+const FAN_DELAY = [0.08, 0.16, 0.12];
 
 type Ring = [x: number, y: number, nx: number, ny: number][];
 
@@ -255,17 +264,24 @@ export async function createPhoneEngine(
   canvas: HTMLCanvasElement,
   options: { captures: readonly string[]; dpr: number; antialias: boolean; textureWidth: number },
 ): Promise<PhoneEngine> {
-  // The captures decode off the main thread while nothing is on the GPU yet.
-  const bitmaps = await Promise.all(
-    options.captures.map(async (url) => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`capture ${response.status}`);
-      const blob = await response.blob();
-      const height = Math.round(options.textureWidth / CAPTURE_RATIO);
+  // The captures load through an image, like the CSS phone's <img>: the
+  // browser asks for the format it prefers (WebP) and shares its cache with
+  // the page, so a capture the page already has is not fetched again.
+  const height = Math.round(options.textureWidth / CAPTURE_RATIO);
+  const sources = await Promise.all(
+    options.captures.map(async (url): Promise<ImageBitmap | HTMLImageElement> => {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = url;
+      await image.decode();
       try {
-        return await createImageBitmap(blob, { resizeWidth: options.textureWidth, resizeHeight: height, resizeQuality: "high" });
+        return await createImageBitmap(image, {
+          resizeWidth: options.textureWidth,
+          resizeHeight: height,
+          resizeQuality: "high",
+        });
       } catch {
-        return createImageBitmap(blob);
+        return image;
       }
     }),
   );
@@ -314,17 +330,18 @@ export async function createPhoneEngine(
   const anisotropy = Math.min(4, renderer.parameters.maxAnisotropy ?? 0);
   const textures: Texture[] = [];
   // Upload every capture now, not on its chapter's first frame mid-scroll.
-  for (const bitmap of bitmaps) {
+  for (const source of sources) {
     await nextFrame();
     const texture = new Texture(gl, {
-      image: bitmap as unknown as HTMLCanvasElement,
+      // OGL uploads an ImageBitmap as it does an image (texImage2D takes both).
+      image: source as HTMLImageElement,
       flipY: false,
       generateMipmaps: true,
       minFilter: gl.LINEAR_MIPMAP_LINEAR,
       anisotropy,
     });
     texture.update(0);
-    bitmap.close();
+    if ("close" in source) source.close();
     textures.push(texture);
   }
   await nextFrame();
@@ -417,11 +434,10 @@ export async function createPhoneEngine(
   const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const DEG = Math.PI / 180;
 
-  type Place = { x: number; y: number; z: number; ry: number; rz: number; s: number };
-  function place(group: Transform, slot: (typeof SLOTS)[number], t: number, from: Place) {
+  function place(group: Transform, slot: Slot, t: number, from: Slot) {
     group.position.set(lerp(from.x, slot.x, t), lerp(from.y, slot.y, t), lerp(from.z, slot.z, t));
     group.rotation.set(0, lerp(from.ry, slot.ry, t) * DEG, lerp(from.rz, slot.rz, t) * DEG);
-    const scale = lerp(from.s, FAN_SCALE, t);
+    const scale = lerp(from.s, slot.s, t);
     group.scale.set(scale, scale, scale);
   }
 
@@ -437,21 +453,22 @@ export async function createPhoneEngine(
 
     const k = p.fan;
     const turned = ((p.ry % 360) + 360) % 360;
-    const at: Place = { x: 0, y: 0, z: 0, ry: turned > 180 ? turned - 360 : turned, rz: p.rz, s: p.scale };
+    const at: Slot = { x: 0, y: 0, z: 0, ry: turned > 180 ? turned - 360 : turned, rz: p.rz, s: p.scale };
     const lead = ease(Math.min(1, k / 0.7));
-    if (k > 0) place(phone, SLOTS[3], lead, at);
-    // The others set off from just behind the phone, wherever it has got to.
+    if (k > 0) place(phone, LEAD_SLOT, lead, at);
+    // The others set off from the centre, just behind the phone (at its
+    // height and size so far), each straight out to its own place.
     others.forEach((group, index) => {
       const t = ease(Math.min(1, Math.max(0, (k - FAN_DELAY[index]) / 0.7)));
       group.visible = t > 0;
       if (!group.visible) return;
       place(group, SLOTS[index], t, {
-        x: lerp(0, SLOTS[3].x, lead),
-        y: lerp(0, SLOTS[3].y, lead),
-        z: lerp(0, SLOTS[3].z, lead) - 0.25,
+        x: 0,
+        y: lerp(0, LEAD_SLOT.y, lead),
+        z: lerp(0, LEAD_SLOT.z, lead) - 0.25,
         ry: 0,
         rz: 0,
-        s: lerp(p.scale, FAN_SCALE, lead) * 0.98,
+        s: lerp(p.scale, LEAD_SLOT.s, lead) * 0.98,
       });
     });
   }

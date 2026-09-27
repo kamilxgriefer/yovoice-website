@@ -2,12 +2,14 @@
 
 import {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type MouseEvent,
   type ReactNode,
+  type RefObject,
 } from "react";
 import { flushSync } from "react-dom";
 import Image from "next/image";
@@ -17,6 +19,7 @@ import {
   frame,
   motion,
   useMotionTemplate,
+  useMotionValue,
   useMotionValueEvent,
   useTransform,
   type MotionStyle,
@@ -50,6 +53,7 @@ import {
   type StoryChapter,
 } from "@/components/story/story-chapters";
 import { StoryPhoneGL } from "@/components/story/story-phone-canvas";
+import { FAN } from "@/components/story/story-pose";
 import {
   STORY_EYEBROW,
   STORY_INK,
@@ -74,11 +78,11 @@ import {
  *
  * The phone is drawn twice. The CSS phone below is the baseline; where
  * WebGL 2 runs on a real GPU, a lit 3D phone takes over from it once loaded
- * (`StoryPhoneGL`, fetched as the story approaches), turns further, catches
- * each dock colour on its bevel, and on wide screens ends the story on the
- * whole range — the four destinations fanned out under "Start talking.".
- * The CSS phone stays mounted underneath and takes the stage back if the 3D
- * phone cannot keep up or loses its context.
+ * (`StoryPhoneGL`, fetched once the visitor scrolls toward the story), turns
+ * further, catches each dock colour on its bevel, and on wide screens ends
+ * the story on the whole range — the four destinations fanned out under
+ * "Start talking.". The CSS phone stays mounted underneath and takes the
+ * stage back if the 3D phone cannot keep up or loses its context.
  *
  * Every animated value is a transform, an opacity or a clip-path, with one
  * exception: the weight of the decorative "Start talking." as it lands,
@@ -186,14 +190,12 @@ export function AppStoryCinema() {
           <GiantWords progress={progress} />
           <ChapterTexts progress={progress} />
 
-          <div className={`${styles.slot} ${styles.coreSlot}`} aria-hidden="true">
-            <div className={styles.slotInner}>
-              <Rig progress={progress}>
-                <Cores progress={progress} />
-                <VoiceRings progress={progress} />
-              </Rig>
-            </div>
-          </div>
+          <CoreSlot progress={progress}>
+            <Rig progress={progress}>
+              <Cores progress={progress} />
+              <VoiceRings progress={progress} />
+            </Rig>
+          </CoreSlot>
 
           <div ref={slotRef} className={`${styles.slot} ${styles.phoneSlot}`} aria-hidden="true">
             <div className={styles.slotInner}>
@@ -260,11 +262,17 @@ function StoryText() {
 /* ---- Backdrop ------------------------------------------------------------ */
 
 /** The flood opens out of the phone as it arrives, then takes on each
- * chapter's colour in turn and returns to deep violet for the finale. */
+ * chapter's colour in turn and returns to deep violet for the finale.
+ *
+ * On phones the 3D phone arrives tilted further back than the CSS phone, so
+ * its lower edge sits higher while the iris is still small: there the iris
+ * opens that much higher (`--iris-gl-lift`, while `data-gl` is set), until
+ * the two phones stand alike. */
 function Flood({ progress }: { progress: MotionValue<number> }) {
   const radius = useTransform(progress, [0.004, INTRO_END + 0.006], [0, 150], { ease: easeInOut });
   const drop = useTransform(progress, [0, INTRO_END], [55, 0], { ease: easeOut });
-  const clipPath = useMotionTemplate`circle(${radius}% at 50% calc(var(--iris-y) + ${drop}%))`;
+  const glLift = useTransform(progress, [0.03, 0.075], [1, 0], { ease: easeInOut });
+  const clipPath = useMotionTemplate`circle(${radius}% at 50% calc(var(--iris-y) + ${drop}% - var(--iris-gl) * var(--iris-gl-lift) * ${glLift}))`;
 
   return (
     <motion.div className={styles.flood} style={{ clipPath }} aria-hidden="true">
@@ -315,6 +323,25 @@ function Rig({ progress, children }: { progress: MotionValue<number>; children: 
   return (
     <motion.div className={styles.rig} style={{ "--retreat": retreat } as MotionStyle}>
       {children}
+    </motion.div>
+  );
+}
+
+/**
+ * The bright core's place behind the phone. With the 3D phone's range on
+ * wide screens, the glow fades out as the four phones fan out (`--core-fan`,
+ * read only while `data-gl` is set), so no glow is left in a gap between
+ * them.
+ */
+function CoreSlot({ progress, children }: { progress: MotionValue<number>; children: ReactNode }) {
+  const fan = useTransform(progress, [FAN[0], FAN[0] + (FAN[1] - FAN[0]) * 0.6], [1, 0]);
+  return (
+    <motion.div
+      className={`${styles.slot} ${styles.coreSlot}`}
+      style={{ "--core-fan": fan } as MotionStyle}
+      aria-hidden="true"
+    >
+      <div className={styles.slotInner}>{children}</div>
     </motion.div>
   );
 }
@@ -712,9 +739,12 @@ function WipeLine({
 /** The words lean at most this far (degrees) with the speed of the scroll. */
 const LEAN = 7;
 
-/** "Start talking." arrives quiet and lands loud: its weight over its slide. */
+/** "Start talking." arrives quiet and lands loud: its weight over its slide,
+ * in steps of `WEIGHT_STEP`, so the text is re-set about twenty times a pass
+ * rather than every frame. */
 const QUIET = 300;
 const LOUD = 800;
+const WEIGHT_STEP = 25;
 
 /** The hero's line, giant and behind the phone. Decorative: the hero's own
  * heading already says it, so this copy is hidden from assistive tech. Each
@@ -726,21 +756,24 @@ const LOUD = 800;
  * speed and straighten the moment it stops (a transform), and the solid
  * line gets louder as it lands, from a light weight to the heavy one. Its
  * box is held at the heavy weight's width by an invisible copy, so the
- * changing weight never moves anything around it. */
+ * changing weight never moves anything around it. The lean follows the
+ * scroll only while the words are out and on screen (`Lean`); anywhere else
+ * on the page it is not listening, so it asks for no frames there. */
 function GiantWords({ progress }: { progress: MotionValue<number> }) {
+  const giantRef = useRef<HTMLDivElement>(null);
   // In viewport widths, so each word starts wholly off its own side of the
   // stage whatever the width of the box it is centred in.
   const leftVw = useTransform(progress, [F + 0.005, F + 0.09], [-110, 0], { ease: easeOut });
   const rightVw = useTransform(progress, [F + 0.02, F + 0.105], [110, 0], { ease: easeOut });
   const left = useMotionTemplate`${leftVw}vw`;
   const right = useMotionTemplate`${rightVw}vw`;
-  const lean = useScrollLean(LEAN);
-  const skewX = useTransform(lean, (degrees) => -degrees);
+  const skewX = useMotionValue(0);
+  const leaning = useFinaleInView(progress, giantRef);
   // Quiet while it is still most of a screen away, loud as it lands; in
-  // steps of 10 so the text is only re-set when the weight really changes.
+  // steps, so the text is only re-set when the weight really changes.
   const fontWeight = useTransform(rightVw, (vw) => {
     const k = Math.max(0, 1 - Math.abs(vw) / 90);
-    return Math.round((QUIET + (LOUD - QUIET) * k * k) / 10) * 10;
+    return Math.round((QUIET + (LOUD - QUIET) * k * k) / WEIGHT_STEP) * WEIGHT_STEP;
   });
   // Always at full strength: a word is either off stage or sliding in whole,
   // never a faint copy wherever the scroll stops. Until it sets off it is
@@ -749,7 +782,8 @@ function GiantWords({ progress }: { progress: MotionValue<number> }) {
   const rightVisibility = useTransform(progress, (value) => (value > F + 0.02 ? "visible" : "hidden"));
 
   return (
-    <div className={styles.giant} aria-hidden="true">
+    <div ref={giantRef} className={styles.giant} aria-hidden="true">
+      {leaning && <Lean skewX={skewX} />}
       <motion.span
         className={`${styles.giantWord} ${styles.giantOutline}`}
         style={{ x: left, visibility: leftVisibility }}
@@ -773,12 +807,41 @@ function GiantWords({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
+/** Whether the giant words may be out and on screen: the finale reached
+ * (just before the first word sets off, while both are still off stage and
+ * hidden) and the stage in the window. */
+function useFinaleInView(progress: MotionValue<number>, ref: RefObject<HTMLElement | null>): boolean {
+  const [reached, setReached] = useState(() => progress.get() > F - 0.01);
+  const [inView, setInView] = useState(false);
+  useMotionValueEvent(progress, "change", (value) => setReached(value > F - 0.01));
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+  return reached && inView;
+}
+
+/** The lean, mounted only while the words can be seen: it drives both
+ * words' skew and sets it straight again when it lets go (off screen, or
+ * with both words back off stage). */
+function Lean({ skewX }: { skewX: MotionValue<number> }) {
+  const lean = useScrollLean(LEAN);
+  useMotionValueEvent(lean, "change", (degrees) => skewX.set(-degrees));
+  useEffect(() => () => skewX.set(0), [skewX]);
+  return null;
+}
+
 /* ---- Rail ---------------------------------------------------------------- */
 
 /**
  * The numbered chapter rail: links to the chapters' own anchors, so they
- * work as plain in-page links too (a new tab, a copied address). A click
- * glides to the middle of that chapter instead of jumping.
+ * work as plain in-page links too (a new tab, a copied address, the
+ * keyboard). A pointer's click glides to the middle of that chapter instead
+ * of jumping; a link followed from the keyboard lands on the chapter's
+ * anchor, which is at that same middle.
  *
  * It appears with the first chapter and steps aside for the finale's line
  * once the chapters are done (a CSS fade on `data-shown`), and is drawn
@@ -798,7 +861,11 @@ function Rail({
   const fill = useTransform(progress, [chapterMid(0), chapterMid(CHAPTERS.length - 1)], [0, 1]);
 
   const select = (event: MouseEvent<HTMLAnchorElement>, index: number) => {
-    // Let the browser open a new tab or window as usual.
+    // A pointer's click glides; the keyboard (`detail` 0) follows the link
+    // itself, so focus, a screen reader's position and the address move to
+    // the chapter too (it lands in the same place). Let the browser open a
+    // new tab or window as usual.
+    if (event.detail === 0) return;
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     onSelect(index);

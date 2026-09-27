@@ -11,22 +11,17 @@ export const STORY_TITLE = "Four places your circle lives.";
 /** The story's scene ink: the eyebrow's colour, the first chapter's violet. */
 export const STORY_INK = "#c3a8ff";
 
-/** The story's heading, the same words and id in the scene and without it. */
-export function StoryHeading({
-  className,
-  titleClassName,
-  eyebrowClassName = "eyebrow",
-}: {
-  className?: string;
-  titleClassName?: string;
-  eyebrowClassName?: string;
-}) {
+/**
+ * The story's heading for the cinema's visually hidden anchor at the top of
+ * the track (`StoryText`): what assistive technology reads, and the target
+ * of `#inside-heading`, while the stage draws the same words as its opener.
+ * (The static layout's heading is its own `SceneOpener`.)
+ */
+export function StoryHeading() {
   return (
-    <div className={className}>
-      <p className={eyebrowClassName}>{STORY_EYEBROW}</p>
-      <h2 id="inside-heading" className={titleClassName}>
-        {STORY_TITLE}
-      </h2>
+    <div>
+      <p>{STORY_EYEBROW}</p>
+      <h2 id="inside-heading">{STORY_TITLE}</h2>
     </div>
   );
 }

@@ -2,8 +2,10 @@
  * The pinned app story. Layout and paint only: every moving value is a
  * framer-motion motion value set inline (transform, opacity, clip-path, and
  * a short blur on titles while a triggered transition runs) or read from
- * one (`--rise`, `--retreat`, `--rail-fill`) by a transform here; the rail's
- * arrival is a CSS opacity transition. Nothing here animates layout (the
+ * one (`--rise`, `--retreat`, `--rail-fill` by a transform here, `--core-fan`
+ * by an opacity); the rail's arrival is a CSS opacity transition, and the
+ * iris's lift for the 3D phone (`--iris-gl`) a short CSS transition of the
+ * flood's clip-path. Nothing here animates layout (the
  * one inline exception, the landing weight of the decorative "Start
  * talking.", changes inside a box of fixed width: `.loud`).
  *
@@ -87,8 +89,20 @@
   scroll-margin-top: calc(-1 * (var(--header-height) + 16px));
 }
 
+/* How far the flood's iris is lifted for the 3D phone (`Flood`): 0 → 1 as
+   the stage hands over to it, over the canvas's own fade. */
+@property --iris-gl {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 .stage {
   --iris-y: 62%;
+  /* On phones the 3D phone arrives tilted further back than the CSS phone,
+     its lower edge this much higher: the iris opens out of it there. */
+  --iris-gl-lift: 9svh;
+  --iris-gl: 0;
   position: sticky;
   top: 0;
   display: grid;
@@ -100,6 +114,11 @@
   overflow: clip;
   isolation: isolate;
   background: var(--background);
+  transition: --iris-gl 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stage[data-gl="ready"] {
+  --iris-gl: 1;
 }
 
 /* ---- Backdrop ---------------------------------------------------------- */
@@ -145,14 +164,6 @@
 .introTitle {
   max-width: 12ch;
   text-wrap: balance;
-}
-
-/* The narrowest phones: the title a touch smaller (at most 11vw, so only
-   under 356px) so it sets in two lines, not three with "your" alone. */
-@media (max-width: 22.25rem) {
-  .introTitle {
-    font-size: min(var(--type-scene), 11vw);
-  }
 }
 
 /* ---- Giant words (finale) ---------------------------------------------- */
@@ -642,6 +653,7 @@ a.ctaLarge {
 
   .stage {
     --iris-y: 53%;
+    --iris-gl-lift: 0px;
     --rail-w: 10.5rem;
     --phone-h-wide: min(74svh, calc(100svh - var(--header-height) - 6svh), 48rem);
     /* The giant words: centred on the phone, clear of the rail, with a
@@ -773,6 +785,11 @@ a.ctaLarge {
     top: var(--header-height);
     grid-row: auto;
     grid-column: auto;
+  }
+
+  /* The bright core fades out as the range fans out (`CoreSlot`). */
+  .stage[data-gl="ready"] .coreSlot {
+    opacity: var(--core-fan, 1);
   }
 
   .gl[data-range="true"] .glCanvas {
