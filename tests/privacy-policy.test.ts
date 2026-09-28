@@ -230,5 +230,13 @@ test("the document is dated for this revision", () => {
     new URL("../src/app/(marketing)/privacy/page.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(source, /updatedOn="September 26, 2026"/);
+  assert.match(source, /updatedOn="September 28, 2026"/);
+});
+
+test("who-liked lists and Hide my likes are disclosed", () => {
+  assert.match(privacy, /can open a list of people who liked/);
+  assert.match(privacy, /Hide my likes/);
+  assert.match(privacy, /Reactions in Server\s+channels are stored with the message/);
+  assert.doesNotMatch(privacy, /full list/i);
+  assert.doesNotMatch(privacy, /every list/i);
 });

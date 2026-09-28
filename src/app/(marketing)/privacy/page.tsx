@@ -331,6 +331,21 @@ const sections: LegalSection[] = [
           is posted in it.
         </p>
         <p>
+          <strong>Who liked.</strong> Everyone who can see a Voice Moment, Yeel,
+          comment or Server message can see how many likes or reactions it has,
+          and anyone who can open a Voice Moment also sees up to three recent
+          likers under it. Members with YO Voice Premium, or with a VIP status
+          we have granted, can open a list of people who liked or reacted to
+          content they are able to see. These lists never include people they
+          have blocked or who have blocked them, accounts whose profile is
+          private or limited to friends they are not friends with, restricted,
+          suspended or deleted accounts, or anyone who has turned on Hide my
+          likes in Settings; the counts do not change. Reactions in Server
+          channels are stored with the message, so the apps of members who can
+          read that channel receive which account reacted with which emoji,
+          whatever these settings say.
+        </p>
+        <p>
           <strong>Optional public website showcase.</strong> If you explicitly
           opt in from YO Voice settings, we may publish your display name,
           profile type and a short &quot;Active recently&quot; label on
@@ -499,6 +514,12 @@ const sections: LegalSection[] = [
             website showcase consent described in section 6, in the same step.
           </li>
           <li>
+            Turn on Hide my likes to be left out of the lists of who liked or
+            reacted that YO Voice shows; counts do not change, and reactions in
+            Server channels still reach the apps of members who can read that
+            channel (see &quot;What other people can see&quot;).
+          </li>
+          <li>
             Set your availability — available, be right back, do not disturb,
             or invisible. Invisible is published to everyone else as plain
             offline, so it cannot be told apart from being signed out.
@@ -617,7 +638,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="September 26, 2026"
+        updatedOn="September 28, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />
