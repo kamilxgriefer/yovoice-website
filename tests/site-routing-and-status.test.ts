@@ -75,3 +75,23 @@ test("the hero stats line shows accounts only and no retired Rooms count", async
   assert.doesNotMatch(code, /existingRooms|voice spaces?|voice \{/);
   assert.match(code, /lg:justify-start/);
 });
+
+test("shared ?moment= and ?user= links on the homepage forward to the web app", async () => {
+  const redirects = await nextConfig.redirects!();
+  for (const key of ["moment", "user"]) {
+    const entry = redirects.find((item) =>
+      item.source === "/" && item.has?.some((h) => h.type === "query" && h.key === key),
+    );
+    assert.ok(entry, `missing the ?${key}= redirect`);
+    assert.equal(entry.destination, "https://app.yovoice.app/");
+    // Temporary: the homepage may handle these itself one day.
+    assert.equal("permanent" in entry && entry.permanent, false);
+    const condition = entry.has!.find((h) => h.type === "query" && h.key === key)!;
+    // Next.js anchors the value: an id shape matches, an empty or altered value does not.
+    const value = new RegExp(`^${condition.value}$`);
+    assert.ok(value.test("Zx8qT1mVbN4kLp0sWe7uYh2RcA93"));
+    for (const other of ["", "a b", "x/../y", "<script>", "a".repeat(129)]) {
+      assert.ok(!value.test(other), `${JSON.stringify(other)} must not be forwarded`);
+    }
+  }
+});
