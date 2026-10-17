@@ -194,14 +194,7 @@ const sections: LegalSection[] = [
           notification token, the platform it belongs to and a timestamp.
           Notification text is built from the name of the person who acted plus,
           where relevant, the name of the space or channel — the body of your
-          message is never put into a push notification. The one exception is a
-          post by a Page you follow: a Page post is public to every signed-in
-          member, so that notification shows the post&apos;s first line (at
-          most 120 characters). It is removed from your notifications in the
-          app when the post is deleted or taken down; a push your device has
-          already shown is not withdrawn. To write notifications in your
-          language, we store the language your app is shown in on your account;
-          it is not shown to other people. The apps also run
+          message is never put into a push notification. The apps also run
           Firebase App Check, which produces a device attestation and a Firebase
           installation identifier: on Android the attestation comes from Google
           Play Integrity, and on iPhone, iPad and Mac from Apple&apos;s App
@@ -428,9 +421,7 @@ const sections: LegalSection[] = [
         <p>
           What happens when an account is deleted — what goes, what we keep and
           why — is described in the next section and on our{" "}
-          <a href={PUBLIC_DELETION_PATH}>account deletion page</a>. The next
-          section also covers deleting a Page, which has its own 30-day, 90-day
-          and 7-day periods.
+          <a href={PUBLIC_DELETION_PATH}>account deletion page</a>.
         </p>
       </>
     ),
@@ -506,24 +497,6 @@ const sections: LegalSection[] = [
             <li key={limit}>{limit}</li>
           ))}
         </ul>
-        <p>
-          <strong>Deleting a Page.</strong> If you run a Page, you can delete it
-          from the Page&apos;s settings without deleting your account. The Page
-          is paused and hidden from other people straight away, and kept for{" "}
-          <strong>30 days</strong>, during which you can restore it. You can
-          also end the wait and delete it at once, after signing in again. When
-          the Page is deleted, its posts, its followers and the contact details
-          on it are removed; your account, profile, friends, chats, Servers,
-          Voice Moments and Yeels stay. Posts that were reported, or held or
-          removed by our moderators, may be kept for up to{" "}
-          <strong>90 days</strong>, not publicly visible, so that open reports
-          can still be handled. We keep a small record of
-          the deletion, and you cannot create a new Page for{" "}
-          <strong>7 days</strong>; if the Page had been suspended, that record
-          is kept until you next create a Page, so that deleting and
-          re-creating a Page does not lift a suspension. You can also delete
-          all of a Page&apos;s posts and keep the Page and its followers.
-        </p>
       </>
     ),
   },
@@ -665,7 +638,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="October 17, 2026"
+        updatedOn="September 28, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

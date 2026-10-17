@@ -230,7 +230,7 @@ test("the document is dated for this revision", () => {
     new URL("../src/app/(marketing)/privacy/page.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(source, /updatedOn="October 17, 2026"/);
+  assert.match(source, /updatedOn="September 28, 2026"/);
 });
 
 test("who-liked lists and Hide my likes are disclosed", () => {
@@ -239,18 +239,4 @@ test("who-liked lists and Hide my likes are disclosed", () => {
   assert.match(privacy, /Reactions in Server\s+channels are stored with the message/);
   assert.doesNotMatch(privacy, /full list/i);
   assert.doesNotMatch(privacy, /every list/i);
-});
-
-test("Page deletion, Page post notifications and the stored app language are disclosed (app build 42)", () => {
-  // ADR-236: a Page is deleted separately from the account, with 30 days to
-  // restore, reported content kept non-publicly up to 90 days and a 7-day pause.
-  assert.match(privacy, /delete it from the Page's settings without deleting your account/);
-  assert.match(privacy, /kept for 30 days , during which you can restore it/);
-  assert.match(privacy, /may be kept for up to 90 days , not publicly visible/);
-  assert.match(privacy, /you cannot create a new Page for 7 days/);
-  // ADR-237: the one push that carries content words, and the stored language.
-  assert.match(privacy, /shows the post's first line \(at most 120 characters\)/);
-  assert.match(privacy, /removed from your notifications in the app when the post is deleted/);
-  assert.match(privacy, /we store the language your app is shown in on your account/);
-  assert.match(privacy, /the body of your message is never put into a push notification/);
 });

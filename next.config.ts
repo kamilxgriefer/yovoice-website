@@ -91,19 +91,6 @@ const nextConfig: NextConfig = {
         destination: "https://yovoice.app/:path*",
         permanent: true,
       },
-      // App builds up to 41 shared Voice Moments as https://yovoice.app/?moment=<id>,
-      // and the app's profile links use ?user=<id>. The marketing homepage has no
-      // handler for either, so they are forwarded to the web app, which parses
-      // them (ADR-238 in the app repo). Next.js passes the request's query
-      // through to the destination unchanged. Only an id-shaped value matches
-      // (the value is an anchored regular expression); anything else stays on
-      // the homepage. Temporary (307), so browsers do not cache it for good.
-      ...["moment", "user"].map((key) => ({
-        source: "/",
-        has: [{ type: "query" as const, key, value: "[A-Za-z0-9_-]{1,128}" }],
-        destination: "https://app.yovoice.app/",
-        permanent: false,
-      })),
     ];
   },
   images: {
