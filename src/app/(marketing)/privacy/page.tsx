@@ -99,6 +99,14 @@ const sections: LegalSection[] = [
           enrollment secret is discarded once the first code is accepted.
         </p>
         <p>
+          When you create an account, we record which version of our Terms of
+          Service you accepted and when. Nothing else is stored with it — no
+          email address, device or IP address. We keep this record so we can
+          show which Terms apply to your account; if you accept a newer version,
+          it replaces the older one, and the record is deleted together with
+          your account.
+        </p>
+        <p>
           Your profile holds a display name and a username. You choose the
           username when you register with an email address; for a Google or
           Apple sign-in we derive a starting one from the name or email address
@@ -372,7 +380,9 @@ const sections: LegalSection[] = [
           of people holding a moderator or administrator role can open a report
           and the content it points at, and can see account state — such as
           whether an account is banned — in order to act on it. Those actions
-          are written to an internal audit log.
+          are written to an internal audit log. Reports keep a copy of the
+          reported message&apos;s text as it was when it was reported, so a
+          moderator can still judge it after the message is deleted.
         </p>
       </>
     ),
@@ -410,6 +420,11 @@ const sections: LegalSection[] = [
           built-in expiry, and our database deletes each row automatically about
           90 days after that view. The equivalent record for Voice Moments has
           no expiry and is kept while your account exists.
+        </p>
+        <p>
+          Reports keep a copy of the reported message&apos;s text as it was
+          when it was reported, so a moderator can still judge it after the
+          message is deleted.
         </p>
         <p>
           Crash logs and diagnostics sit in Firebase Crashlytics and Google
@@ -665,7 +680,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="October 17, 2026"
+        updatedOn="October 25, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

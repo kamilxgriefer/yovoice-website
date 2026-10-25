@@ -145,7 +145,7 @@ export function accountDeletionRetains(
     {
       item: "Reports other people filed about you, and any moderation decision taken on your account.",
       reason:
-        "Safety history, and our ability to defend a decision that was challenged. Once your profile and directory entry are gone, what remains is an account identifier that no longer resolves to a person.",
+        "Safety history, and our ability to defend a decision that was challenged. Once your profile and directory entry are gone, what remains is an account identifier that no longer resolves to a person. Reports keep a copy of the reported message's text as it was when it was reported, so a moderator can still judge it after the message is deleted.",
     },
     {
       item: "Our internal staff audit log of moderation actions.",

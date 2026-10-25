@@ -230,7 +230,7 @@ test("the document is dated for this revision", () => {
     new URL("../src/app/(marketing)/privacy/page.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(source, /updatedOn="October 17, 2026"/);
+  assert.match(source, /updatedOn="October 25, 2026"/);
 });
 
 test("who-liked lists and Hide my likes are disclosed", () => {
@@ -253,4 +253,25 @@ test("Page deletion, Page post notifications and the stored app language are dis
   assert.match(privacy, /removed from your notifications in the app when the post is deleted/);
   assert.match(privacy, /we store the language your app is shown in on your account/);
   assert.match(privacy, /the body of your message is never put into a push notification/);
+});
+
+test("W2: the Terms acceptance record is disclosed with its purpose and deletion", () => {
+  assert.match(
+    privacy,
+    /When you create an account, we record which version of our Terms of Service you accepted and when\. Nothing else is stored with it — no email address, device or IP address\. We keep this record so we can show which Terms apply to your account; if you accept a newer version, it replaces the older one, and the record is deleted together with your account\./,
+  );
+});
+
+test("W-A: the copy of a reported message's text is disclosed in sections 6 and 8 and on the deletion list", () => {
+  const sentence =
+    /Reports keep a copy of the reported message's text as it was when it was reported, so a moderator can still judge it after the message is deleted\./g;
+  assert.equal(privacy.match(sentence)?.length, 2);
+  const aboutYou = accountDeletionRetains().find((entry) =>
+    entry.item.startsWith("Reports other people filed about you"),
+  );
+  assert.ok(aboutYou);
+  assert.match(
+    aboutYou.reason,
+    /Reports keep a copy of the reported message's text as it was when it was reported, so a moderator can still judge it after the message is deleted\./,
+  );
 });
