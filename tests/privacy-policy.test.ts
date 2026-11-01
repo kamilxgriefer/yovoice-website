@@ -108,10 +108,15 @@ test("website showcase withdrawal keeps a record instead of deleting one", () =>
   assert.match(privacy, /deleted when the account itself is deleted/);
 });
 
-test("retention states the one enforced expiry and does not generalise it", () => {
+test("retention states the two enforced expiries and does not generalise them", () => {
   assert.match(privacy, /kept for as long as your account exists/);
   assert.match(privacy, /90 days after that view/);
-  assert.match(privacy, /equivalent record for Voice Moments has no expiry/);
+  assert.doesNotMatch(privacy, /equivalent record for Voice Moments has no expiry/);
+  // momentViews (ADR-259): about 90 days after the last listen, only for rows
+  // app build 44+ writes; rows from older builds are never expired, so the
+  // policy must not promise to delete them.
+  assert.match(privacy, /about 90 days after your last listen/);
+  assert.match(privacy, /Rows\s+written only by earlier app versions are kept while your account\s+exists/);
 });
 
 test("the terms and FAQ stop promising Premium billing, and gate self-service deletion", () => {

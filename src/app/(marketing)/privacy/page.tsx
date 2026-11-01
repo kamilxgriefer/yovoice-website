@@ -421,10 +421,13 @@ const sections: LegalSection[] = [
           rather say that plainly than quote a period we do not apply.
         </p>
         <p>
-          One exception. The record of which Yeels you have watched carries a
+          Two exceptions. The record of which Yeels you have watched carries a
           built-in expiry, and our database deletes each row automatically about
-          90 days after that view. The equivalent record for Voice Moments has
-          no expiry and is kept while your account exists.
+          90 days after that view. The record of which Voice Moments you have
+          listened to gets the same 90-day expiry in app build 44 and later: our
+          database deletes each row about 90 days after your last listen. Rows
+          written only by earlier app versions are kept while your account
+          exists.
         </p>
         <p>
           Reports keep a copy of the reported message&apos;s text as it was
