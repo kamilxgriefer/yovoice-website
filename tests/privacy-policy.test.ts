@@ -55,7 +55,16 @@ test("no payment provider is presented as live, because no checkout is deployed"
 
 test("the data the app really collects is disclosed", () => {
   assert.match(privacy, /Firebase Crashlytics/);
-  assert.match(privacy, /no in-app switch to turn crash reporting off/);
+  assert.doesNotMatch(privacy, /no in-app switch to turn crash reporting off/);
+  // PP-6: the switch, where it lives, its default, and the data the in-app
+  // "More" paragraph lists (crash_reports_settings_tile.dart in the app repo).
+  assert.match(privacy, /Settings → Privacy →\s+Crash reports/);
+  assert.match(privacy, /The switch is on until you turn it off/);
+  assert.match(privacy, /in app build 44 and later, and earlier builds have no switch/);
+  assert.match(privacy, /technical state \(such as free memory\)/);
+  assert.match(privacy, /a random installation ID/);
+  assert.match(privacy, /\(not while crash reports are\s+off\)/);
+  assert.match(privacy, /The switch does not change these server logs/);
   assert.match(privacy, /Music and other audio files/);
   assert.match(privacy, /Files and documents/);
   assert.match(privacy, /push notification token/);

@@ -219,14 +219,19 @@ const sections: LegalSection[] = [
         <p>
           <strong>Crash logs and diagnostics.</strong> The app uses{" "}
           <strong>Firebase Crashlytics</strong>. In every released build, an
-          uncaught error sends a stack trace together with your device model and
-          operating system version to Google so we can find and fix it.{" "}
-          <strong>There is currently no in-app switch to turn crash reporting
-          off.</strong> Crashlytics does not run on the web app or in
-          development builds. Separately, when a server call is refused, the app
-          reports that refusal as a non-fatal diagnostic event, and our servers
-          log identifiers such as a conversation, message, sender or recipient
-          id together with the outcome — never the contents of a message.
+          uncaught error sends a report to Google so we can find and fix it: a
+          description of the error and where in the app&apos;s code it happened,
+          your device model and its technical state (such as free memory), the
+          operating system and app versions, and a random installation ID.{" "}
+          <strong>You can turn this off in the app under Settings → Privacy →
+          Crash reports.</strong> The switch is on until you turn it off; it is
+          in app build 44 and later, and earlier builds have no switch.
+          Crashlytics does not run on the web app or in development builds.
+          Separately, when a server call is refused, the app reports that
+          refusal as a non-fatal diagnostic event (not while crash reports are
+          off), and our servers log identifiers such as a conversation, message,
+          sender or recipient id together with the outcome — never the contents
+          of a message. The switch does not change these server logs.
         </p>
         <p>
           <strong>Bug reports.</strong> If you choose &quot;Report a bug&quot;
