@@ -685,7 +685,7 @@ export default function PrivacyPage() {
         description="What we collect, why we collect it, and how you stay in control."
       />
       <LegalDocument
-        updatedOn="October 25, 2026"
+        updatedOn="November 2, 2026"
         intro="This policy covers yovoice.app and the YO Voice apps for iOS, Android, desktop and web."
         sections={sections}
       />

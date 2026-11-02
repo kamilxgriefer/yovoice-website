@@ -239,7 +239,7 @@ test("the document is dated for this revision", () => {
     new URL("../src/app/(marketing)/privacy/page.tsx", import.meta.url),
     "utf8",
   );
-  assert.match(source, /updatedOn="October 25, 2026"/);
+  assert.match(source, /updatedOn="November 2, 2026"/);
 });
 
 test("who-liked lists and Hide my likes are disclosed", () => {
